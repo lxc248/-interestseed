@@ -1,0 +1,46 @@
+# 依赖
+node_modules/
+
+# 构建产物
+dist/
+*.tsbuildinfo
+
+# 测试与覆盖率
+coverage/
+.vitest/
+
+# 编辑器 / 系统
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+
+# 日志
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# 本地环境
+.env
+.env.*
+
+# 插件运行期数据（若把仓库当 vault 使用）
+data.json
+graph.json
+graph.json.*
+graphs/
+
+# 本地验收截图与打包产物
+/*.png
+!/assets/*.png
+/*.zip
+/release/
+/.codex/
+
+# 本地审计与验收记录（不进入社区插件仓库）
+/*.md
+!README.md
+!RELEASE_NOTES_0.1.0.md
+/1/
+/T2-B-BCF-*

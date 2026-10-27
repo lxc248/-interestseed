@@ -1,0 +1,41 @@
+{
+  "name": "interestseed",
+  "version": "0.1.0",
+  "description": "Turn scattered notes into a living interest graph: seeds, relations and next-step insights for Obsidian.",
+  "type": "module",
+  "main": "dist/main.js",
+  "files": [
+    "dist",
+    "manifest.json"
+  ],
+  "scripts": {
+    "dev": "vite build --watch --mode development",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "verify": "npm run typecheck && npm run test && npm run lint && npm run build"
+  },
+  "keywords": [
+    "obsidian",
+    "obsidian-plugin",
+    "graph",
+    "interests",
+    "knowledge-management"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.6.5",
+    "eslint": "^10.13.0",
+    "obsidian": "^1.14.4",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.71.2",
+    "vite": "^8.3.4",
+    "vitest": "^5.0.5"
+  }
+}

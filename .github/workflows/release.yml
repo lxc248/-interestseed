@@ -1,0 +1,40 @@
+name: Release Obsidian plugin
+
+on:
+  push:
+    tags:
+      - '*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run lint
+      - run: npm run build
+      - name: Verify manifest and assets
+        run: |
+          test -f manifest.json
+          test -f versions.json
+          test -f dist/main.js
+          test -f dist/styles.css
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            dist/main.js \
+            dist/styles.css \
+            manifest.json \
+            --title "InterestSeed ${GITHUB_REF_NAME}" \
+            --generate-notes

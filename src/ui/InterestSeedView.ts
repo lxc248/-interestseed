@@ -1,0 +1,605 @@
+import { ItemView, Notice, setIcon } from 'obsidian';
+import type { WorkspaceLeaf } from 'obsidian';
+import type InterestSeedPlugin from '../main';
+import type { InterestSeedStatus } from '../main';
+import type { GraphViewport } from '../types/graph';
+import { DetailPanel } from './DetailPanel';
+import { EmptyState } from './EmptyState';
+import {
+  createDefaultFilter,
+  FilterBar,
+  filterGraph,
+  isEmptyFilter,
+  matchesNode,
+  type GraphFilter,
+} from './FilterBar';
+import { GraphCanvas } from './GraphCanvas';
+import { DiscoveryApplyModal } from './DiscoveryApplyModal';
+import { DiscoveryCorrectionModal } from './DiscoveryCorrectionModal';
+import { DiscoveryPanel } from './DiscoveryPanel';
+
+export const INTERESTSEED_VIEW_TYPE = 'interestseed-graph-view';
+
+/**
+ * 图谱视图：把 FilterBar、GraphCanvas、DetailPanel、EmptyState 组装起来。
+ * 视图不直接修改数据，所有写操作都回调到插件，保证撤销 / 持久化统一。
+ */
+export class InterestSeedView extends ItemView {
+  private canvas: GraphCanvas | null = null;
+  private filterBar: FilterBar | null = null;
+  private detail: DetailPanel | null = null;
+  private emptyState: EmptyState | null = null;
+  private discoveryPanel: DiscoveryPanel | null = null;
+
+  private canvasHost: HTMLElement | null = null;
+  private detailHost: HTMLElement | null = null;
+  private detailContentHost: HTMLElement | null = null;
+  private discoveryHost: HTMLElement | null = null;
+  private countEl: HTMLElement | null = null;
+  private footerScanEl: HTMLElement | null = null;
+  private footerSaveEl: HTMLElement | null = null;
+  private footerErrorEl: HTMLElement | null = null;
+  private totalNodes = 0;
+  private totalEdges = 0;
+  private visibleNodes = 0;
+  private visibleEdges = 0;
+
+  private undoButton: HTMLButtonElement | null = null;
+  private redoButton: HTMLButtonElement | null = null;
+  private inboxButton: HTMLButtonElement | null = null;
+  private inboxOpen = false;
+  private discoveryButton: HTMLButtonElement | null = null;
+  private discoveryOpen = false;
+  private quickUndoButton: HTMLButtonElement | null = null;
+  private quickRedoButton: HTMLButtonElement | null = null;
+  private quickInboxButton: HTMLButtonElement | null = null;
+  private quickDiscoveryButton: HTMLButtonElement | null = null;
+
+  private filter: GraphFilter = createDefaultFilter();
+  private selectedId: string | null = null;
+  private refreshHandle: number | null = null;
+  private viewportApplied = false;
+
+  constructor(
+    leaf: WorkspaceLeaf,
+    private readonly plugin: InterestSeedPlugin,
+  ) {
+    super(leaf);
+  }
+
+  override getViewType(): string {
+    return INTERESTSEED_VIEW_TYPE;
+  }
+
+  override getDisplayText(): string {
+    return '兴趣图谱';
+  }
+
+  override getIcon(): string {
+    return 'sprout';
+  }
+
+  override async onOpen(): Promise<void> {
+    const root = this.contentEl;
+    root.empty();
+    root.addClass('interestseed-root');
+
+    const header = root.createDiv({ cls: 'interestseed-header' });
+    const heading = header.createDiv({ cls: 'interestseed-heading' });
+    const icon = heading.createDiv({ cls: 'interestseed-heading-icon' });
+    setIcon(icon, 'sprout');
+    heading.createEl('h2', { cls: 'interestseed-heading-title', text: '兴趣图谱' });
+    heading.createSpan({
+      cls: 'interestseed-heading-vault',
+      text: this.app.vault.getName(),
+    });
+    this.countEl = heading.createSpan({ cls: 'interestseed-heading-count', text: '' });
+
+    const actions = header.createDiv({ cls: 'interestseed-header-actions' });
+    this.createAction(actions, 'refresh-cw', '重新扫描', () => {
+      this.plugin.promptRebuild();
+    });
+    this.createAction(actions, 'plus', '新建节点', () => this.plugin.promptCreateNode());
+    this.createAction(actions, 'git-fork', '刷新规则建议', () => {
+      this.plugin.refreshSuggestions();
+    });
+    this.inboxButton = this.createAction(actions, 'inbox', '建议收件箱', () => {
+      this.toggleInbox();
+    });
+    this.undoButton = this.createAction(actions, 'undo-2', '撤销图谱操作', () => {
+      this.plugin.undo.undo();
+    });
+    this.redoButton = this.createAction(actions, 'redo-2', '重做图谱操作', () => {
+      this.plugin.undo.redo();
+    });
+    this.createAction(actions, 'maximize-2', '适应画布', () => this.canvas?.zoomToFit());
+    this.createAction(actions, 'download', '导出图谱 JSON', () => {
+      this.plugin.exportGraph();
+    });
+    this.discoveryButton = this.createAction(actions, 'lightbulb', '发现', () => {
+      this.toggleDiscoveries();
+    });
+    this.createAction(actions, 'layout-dashboard', '兴趣总览', () => {
+      this.plugin.openDiscoveryOverview();
+    });
+
+    const quickbar = root.createDiv({ cls: 'interestseed-quickbar' });
+    this.createQuickAction(quickbar, 'refresh-cw', '扫描', () => this.plugin.promptRebuild());
+    this.createQuickAction(quickbar, 'plus', '节点', () => this.plugin.promptCreateNode());
+    this.createQuickAction(quickbar, 'git-fork', '建议', () => this.plugin.refreshSuggestions());
+    this.quickInboxButton = this.createQuickAction(quickbar, 'inbox', '收件', () =>
+      this.toggleInbox(),
+    );
+    this.quickUndoButton = this.createQuickAction(quickbar, 'undo-2', '撤销', () =>
+      this.plugin.undo.undo(),
+    );
+    this.quickRedoButton = this.createQuickAction(quickbar, 'redo-2', '重做', () =>
+      this.plugin.undo.redo(),
+    );
+    this.createQuickAction(quickbar, 'maximize-2', '适应', () => this.canvas?.zoomToFit());
+    this.quickDiscoveryButton = this.createQuickAction(quickbar, 'lightbulb', '发现', () =>
+      this.toggleDiscoveries(),
+    );
+    this.quickDiscoveryButton.setAttribute('aria-pressed', 'false');
+    this.quickInboxButton?.setAttribute('aria-pressed', 'false');
+    this.discoveryButton?.setAttribute('aria-pressed', 'false');
+    this.inboxButton?.setAttribute('aria-pressed', 'false');
+    this.createQuickAction(quickbar, 'layout-dashboard', '总览', () =>
+      this.plugin.openDiscoveryOverview(),
+    );
+    this.createQuickAction(quickbar, 'download', '导出', () => this.plugin.exportGraph());
+
+    const filterHost = root.createDiv({ cls: 'interestseed-filter-host' });
+    this.filterBar = new FilterBar(filterHost, (filter) => {
+      this.filter = filter;
+      this.refresh();
+    });
+
+    const body = root.createDiv({ cls: 'interestseed-body' });
+    const canvasHost = body.createDiv({ cls: 'interestseed-canvas-container' });
+    this.canvasHost = canvasHost;
+    const detailHost = body.createDiv({ cls: 'interestseed-detail' });
+    this.detailHost = detailHost;
+    this.detailContentHost = detailHost.createDiv({ cls: 'interestseed-detail-content' });
+    this.discoveryHost = detailHost.createDiv({
+      cls: 'interestseed-discovery-panel is-hidden',
+    });
+
+    const footer = root.createDiv({ cls: 'interestseed-footer' });
+    this.footerScanEl = footer.createSpan({ cls: 'interestseed-footer-item' });
+    this.footerSaveEl = footer.createSpan({ cls: 'interestseed-footer-item' });
+    this.footerErrorEl = footer.createSpan({ cls: 'interestseed-footer-error' });
+
+    this.emptyState = new EmptyState(canvasHost);
+
+    this.canvas = new GraphCanvas(canvasHost, {
+      onSelect: (nodeId) => this.select(nodeId),
+      onDoubleClick: (nodeId) => {
+        this.select(nodeId);
+        const node = this.plugin.store.getNode(nodeId);
+        if (node?.sourceUri) void this.plugin.openSource(node.sourceUri);
+      },
+      onViewportChange: (viewport: GraphViewport) => {
+        this.plugin.saveViewport(viewport);
+      },
+      onNodeMoved: (nodeId, position) => {
+        this.plugin.saveNodePosition(nodeId, position);
+      },
+    });
+
+    this.detail = new DetailPanel(this.app, this.detailContentHost, this.plugin.store, {
+      openSource: (uri) => {
+        void this.plugin.openSource(uri);
+      },
+      selectNode: (nodeId) => this.select(nodeId),
+      deleteNode: (nodeId) => this.plugin.deleteNode(nodeId),
+      confirmEdge: (edgeId) => this.plugin.confirmEdge(edgeId),
+      rejectEdge: (edgeId) => this.plugin.rejectEdge(edgeId),
+      restoreEdge: (edgeId) => this.plugin.restoreEdge(edgeId),
+      editRelation: (edgeId) => this.plugin.promptEditRelation(edgeId),
+      deleteEdge: (edgeId) => this.plugin.deleteEdge(edgeId),
+      createRelation: (sourceId) => this.plugin.promptCreateRelation(sourceId),
+      expandWithAI: (nodeId) => {
+        void this.plugin.expandWithAI(nodeId);
+      },
+    });
+
+    this.discoveryPanel = new DiscoveryPanel(this.discoveryHost, {
+      nodeTitle: (nodeId) => this.plugin.store.getNode(nodeId)?.title ?? nodeId,
+      sourceUri: (nodeId) => this.plugin.store.getNode(nodeId)?.sourceUri,
+      edgeSummary: (edgeId) => {
+        const edge = this.plugin.store.getEdge(edgeId);
+        if (!edge) return undefined;
+        const source = this.plugin.store.getNode(edge.source)?.title ?? edge.source;
+        const target = this.plugin.store.getNode(edge.target)?.title ?? edge.target;
+        return `${source} → ${target}（${edge.relation}）`;
+      },
+      onAccept: (id) => {
+        void this.plugin
+          .setDiscoveryFeedback(id, 'accepted')
+          .finally(() => this.scheduleRefresh());
+      },
+      onReject: (id) => {
+        void this.plugin
+          .setDiscoveryFeedback(id, 'rejected')
+          .finally(() => this.scheduleRefresh());
+      },
+      onCorrect: (id) => {
+        const discovery = this.plugin.listDiscoveries().find((item) => item.id === id);
+        if (!discovery) return;
+        const modal = new DiscoveryCorrectionModal(
+          this.app,
+          discovery.title,
+          discovery.description,
+          {
+            onSubmit: async (correction) => {
+              await this.plugin.setDiscoveryFeedback(id, 'corrected', correction);
+              this.scheduleRefresh();
+            },
+          },
+        );
+        modal.open();
+      },
+      onLowValue: (id) => {
+        void this.plugin
+          .setDiscoveryFeedback(id, 'low-value')
+          .finally(() => this.scheduleRefresh());
+      },
+      onUndo: (id) => {
+        void this.plugin
+          .undoDiscoveryFeedback(id)
+          .finally(() => this.scheduleRefresh());
+      },
+      onNeedsVerification: (id) => {
+        void this.plugin
+          .setDiscoveryFeedback(id, 'needs-verification')
+          .finally(() => this.scheduleRefresh());
+      },
+      onApply: (id) => {
+        const discovery = this.plugin.listDiscoveries().find((item) => item.id === id);
+        if (!discovery) return;
+        const modal = new DiscoveryApplyModal(this.app, discovery, {
+          nodes: this.plugin.store.listNodes(),
+          preview: (draft) =>
+            this.plugin.getDiscoveryApplicationPreview(id, draft),
+          apply: (draft) => this.plugin.applyDiscovery(id, draft),
+          onFinished: () => {
+            void this.plugin.refreshDiscoveries();
+            this.scheduleRefresh();
+          },
+        });
+        modal.open();
+      },
+      onOpenEdge: (edgeId) => {
+        const edge = this.plugin.store.getEdge(edgeId);
+        if (!edge) {
+          new Notice('该关系已不存在。');
+          return;
+        }
+        this.plugin.setSelectedNode(edge.source);
+        new Notice(`关系：${edge.source} → ${edge.target}（${edge.relation}）`, 5000);
+      },
+      onRefresh: () => {
+        void this.plugin.refreshDiscoveries().finally(() => this.scheduleRefresh());
+      },
+    });
+
+    this.register(this.plugin.store.subscribe(() => this.scheduleRefresh()));
+    this.register(this.plugin.subscribeDiscoveries(() => this.scheduleRefresh()));
+    this.register(this.plugin.undo.subscribe(() => this.updateUndoButtons()));
+    this.register(
+      this.plugin.subscribeStatus((status) => this.renderFooter(status)),
+    );
+
+    this.refresh();
+    this.renderFooter(this.plugin.getStatus());
+  }
+
+  override async onClose(): Promise<void> {
+    if (this.refreshHandle !== null) window.cancelAnimationFrame(this.refreshHandle);
+    this.refreshHandle = null;
+
+    if (this.canvas) {
+      this.plugin.saveViewport(this.canvas.getViewport());
+      this.canvas.destroy();
+      this.canvas = null;
+    }
+
+    this.detail?.destroy();
+    this.detail = null;
+    this.filterBar?.destroy();
+    this.filterBar = null;
+    this.emptyState?.destroy();
+    this.emptyState = null;
+
+    await super.onClose();
+  }
+
+  focusSelectedNode(): void {
+    if (this.selectedId) this.canvas?.focusNode(this.selectedId);
+  }
+
+  private toggleInbox(): void {
+    this.inboxOpen = !this.inboxOpen;
+    this.inboxButton?.toggleClass('is-active', this.inboxOpen);
+    this.quickInboxButton?.toggleClass('is-active', this.inboxOpen);
+    this.inboxButton?.setAttribute('aria-pressed', String(this.inboxOpen));
+    this.quickInboxButton?.setAttribute('aria-pressed', String(this.inboxOpen));
+
+    if (this.inboxOpen) {
+      this.discoveryOpen = false;
+      this.discoveryButton?.removeClass('is-active');
+      this.quickDiscoveryButton?.removeClass('is-active');
+      this.discoveryButton?.setAttribute('aria-pressed', 'false');
+      this.quickDiscoveryButton?.setAttribute('aria-pressed', 'false');
+      this.selectedId = null;
+      this.plugin.setSelectedNode(null);
+      this.canvas?.setSelected(null);
+    }
+
+    this.refresh();
+  }
+
+  private toggleDiscoveries(): void {
+    this.discoveryOpen = !this.discoveryOpen;
+    this.discoveryButton?.toggleClass('is-active', this.discoveryOpen);
+    this.quickDiscoveryButton?.toggleClass('is-active', this.discoveryOpen);
+    this.discoveryButton?.setAttribute('aria-pressed', String(this.discoveryOpen));
+    this.quickDiscoveryButton?.setAttribute('aria-pressed', String(this.discoveryOpen));
+
+    if (this.discoveryOpen) {
+      this.inboxOpen = false;
+      this.inboxButton?.removeClass('is-active');
+      this.quickInboxButton?.removeClass('is-active');
+      this.inboxButton?.setAttribute('aria-pressed', 'false');
+      this.quickInboxButton?.setAttribute('aria-pressed', 'false');
+      this.selectedId = null;
+      this.plugin.setSelectedNode(null);
+      this.canvas?.setSelected(null);
+    }
+
+    this.syncDiscoveryVisibility();
+    this.refresh();
+  }
+
+  private renderDiscoveries(): void {
+    this.discoveryPanel?.render(
+      this.plugin.listDiscoveries(),
+      this.plugin.getDiscoveryLoadBlocked(),
+    );
+  }
+
+  private select(nodeId: string | null): void {
+    if (nodeId) {
+      const node = this.plugin.store.getNode(nodeId);
+      if (!node || !matchesNode(node, this.filter)) {
+        new Notice('该节点被当前搜索或筛选隐藏，请先清除筛选再选择。');
+        return;
+      }
+      this.inboxOpen = false;
+      this.inboxButton?.removeClass('is-active');
+      this.quickInboxButton?.removeClass('is-active');
+      this.inboxButton?.setAttribute('aria-pressed', 'false');
+      this.quickInboxButton?.setAttribute('aria-pressed', 'false');
+    }
+
+    this.selectedId = nodeId;
+    this.plugin.setSelectedNode(nodeId);
+
+    this.canvas?.setSelected(nodeId);
+    if (nodeId) {
+      this.canvas?.focusNode(nodeId);
+      this.detail?.renderSelection(nodeId);
+    } else if (this.inboxOpen) {
+      this.detail?.renderSuggestionInbox();
+    } else {
+      this.detail?.renderInsights(this.plugin.getInsights(), this.insightsScopeNote());
+    }
+
+    this.updateUndoButtons();
+  }
+
+  private scheduleRefresh(): void {
+    if (this.refreshHandle !== null) return;
+    this.refreshHandle = window.requestAnimationFrame(() => {
+      this.refreshHandle = null;
+      this.refresh();
+    });
+  }
+
+  private syncDiscoveryVisibility(): void {
+    const showDiscovery = this.discoveryOpen;
+    if (this.discoveryOpen) this.detailHost?.removeClass('is-hidden');
+    if (this.detailContentHost) {
+      this.detailContentHost.toggleClass('is-hidden', showDiscovery);
+      this.detailContentHost.style.display = showDiscovery ? 'none' : '';
+    }
+    if (this.discoveryHost) {
+      this.discoveryHost.toggleClass('is-hidden', !showDiscovery);
+      this.discoveryHost.style.display = showDiscovery ? '' : 'none';
+    }
+  }
+
+  private refresh(): void {
+    if (!this.canvas || !this.emptyState) return;
+    this.syncDiscoveryVisibility();
+
+    const graph = this.plugin.store.getGraph();
+    const filtered = filterGraph(graph, this.filter);
+    const total = graph.nodes.length;
+    this.totalNodes = total;
+    this.totalEdges = graph.edges.length;
+    this.visibleNodes = filtered.nodeCount;
+    this.visibleEdges = filtered.edgeCount;
+
+    if (
+      this.selectedId &&
+      !filtered.graph.nodes.some((node) => node.id === this.selectedId)
+    ) {
+      this.selectedId = null;
+      this.plugin.setSelectedNode(null);
+    }
+
+    this.countEl?.setText(
+      total > 0
+        ? `${filtered.nodeCount}/${total} 节点 · ${filtered.edgeCount} 可见关系`
+        : '',
+    );
+    this.filterBar?.setSummary(total > 0 ? `${filtered.nodeCount}/${total} 节点` : '');
+
+    if (filtered.nodeCount === 0) {
+      this.canvasHost?.addClass('is-empty');
+      if (this.discoveryOpen) {
+        this.detailHost?.removeClass('is-hidden');
+        this.renderDiscoveries();
+      } else if (this.inboxOpen) {
+        this.detailHost?.removeClass('is-hidden');
+        this.detail?.renderSuggestionInbox();
+      } else {
+        this.detailHost?.addClass('is-hidden');
+      }
+
+      if (total === 0) {
+        this.emptyState.show({
+          title: '还没有建立地图。',
+          detail:
+            '选择一个项目目录，开始构建你的第一张知识地图。地图只会读取你授权的资料，不会自动上传文件。可在设置里的“包含文件夹”限定范围。',
+          actions: [
+            {
+              label: '选择范围并扫描',
+              primary: true,
+              onClick: () => this.plugin.promptRebuild(),
+            },
+            { label: '新建节点', onClick: () => this.plugin.promptCreateNode() },
+          ],
+        });
+      } else {
+        this.emptyState.show({
+          title: '没有匹配的节点',
+          detail: '当前筛选条件下没有节点。放宽条件，或者清除筛选重新看整张图谱。',
+          actions: [{ label: '清除筛选', primary: true, onClick: () => this.filterBar?.reset() }],
+        });
+      }
+
+      this.updateUndoButtons();
+      return;
+    }
+
+    this.emptyState.hide();
+    this.canvasHost?.removeClass('is-empty');
+    this.detailHost?.removeClass('is-hidden');
+
+    this.canvas.setGraph(filtered.graph, this.selectedId);
+
+    if (!this.viewportApplied) {
+      this.viewportApplied = true;
+      const viewport = this.plugin.store.currentViewport;
+      if (viewport) this.canvas.setViewport(viewport);
+    }
+
+    if (this.discoveryOpen) this.renderDiscoveries();
+    else if (this.inboxOpen) this.detail?.renderSuggestionInbox();
+    else if (this.selectedId) this.detail?.renderSelection(this.selectedId);
+    else this.detail?.renderInsights(this.plugin.getInsights(), this.insightsScopeNote());
+
+    this.renderFooter(this.plugin.getStatus());
+    this.updateUndoButtons();
+  }
+
+  private insightsScopeNote(): string | undefined {
+    if (isEmptyFilter(this.filter)) return undefined;
+    const graph = this.plugin.store.getGraph();
+    const filtered = filterGraph(graph, this.filter);
+    return `当前筛选显示 ${filtered.nodeCount}/${graph.nodes.length} 节点、${filtered.edgeCount}/${graph.edges.length} 关系；以下为全图洞察。`;
+  }
+
+  private renderFooter(status: InterestSeedStatus): void {
+    if (this.footerScanEl) {
+      const counts = isEmptyFilter(this.filter)
+        ? `${this.totalNodes} 节点 / ${status.confirmed} 已确认 · ${status.suggested} 建议`
+        : `显示 ${this.visibleNodes}/${this.totalNodes} 节点 · ${this.visibleEdges}/${this.totalEdges} 可见关系；全图 ${status.confirmed} 已确认 · ${status.suggested} 建议`;
+      this.footerScanEl.setText(
+        status.scanning ? '正在扫描…' : `就绪 · ${counts}`,
+      );
+    }
+
+    if (this.footerSaveEl) {
+      this.footerSaveEl.setText(
+        status.blocked ? '存储已暂停' : status.saveFailed ? '未保存' : '已保存',
+      );
+      this.footerSaveEl.toggleClass('is-warning', status.blocked || status.saveFailed);
+    }
+
+    if (this.footerErrorEl) {
+      const message = status.lastError ?? status.blockedReason ?? '';
+      this.footerErrorEl.setText(message ? `⚠ ${message}` : '');
+      this.footerErrorEl.toggleClass('is-visible', Boolean(message));
+      if (message) this.footerErrorEl.setAttribute('title', message);
+      else this.footerErrorEl.removeAttribute('title');
+    }
+  }
+
+  private updateUndoButtons(): void {
+    const state = this.plugin.undo.getState();
+
+    if (this.undoButton) {
+      this.undoButton.disabled = !state.canUndo;
+      this.undoButton.setAttribute(
+        'title',
+        state.undoLabel ? `撤销：${state.undoLabel}` : '撤销',
+      );
+    }
+    if (this.redoButton) {
+      this.redoButton.disabled = !state.canRedo;
+      this.redoButton.setAttribute(
+        'title',
+        state.redoLabel ? `重做：${state.redoLabel}` : '重做',
+      );
+    }
+    if (this.quickUndoButton) {
+      this.quickUndoButton.disabled = !state.canUndo;
+      this.quickUndoButton.setAttribute(
+        'title',
+        state.undoLabel ? `撤销：${state.undoLabel}` : '撤销',
+      );
+    }
+    if (this.quickRedoButton) {
+      this.quickRedoButton.disabled = !state.canRedo;
+      this.quickRedoButton.setAttribute(
+        'title',
+        state.redoLabel ? `重做：${state.redoLabel}` : '重做',
+      );
+    }
+  }
+
+  private createAction(
+    parent: HTMLElement,
+    icon: string,
+    label: string,
+    onClick: () => void,
+  ): HTMLButtonElement {
+    const button = parent.createEl('button', {
+      cls: 'interestseed-action',
+      attr: { 'aria-label': label, title: label },
+    });
+    setIcon(button, icon);
+    button.addEventListener('click', onClick);
+    return button;
+  }
+
+  private createQuickAction(
+    parent: HTMLElement,
+    icon: string,
+    label: string,
+    onClick: () => void,
+  ): HTMLButtonElement {
+    const button = parent.createEl('button', {
+      cls: 'interestseed-quick-action',
+      attr: { 'aria-label': label, title: label },
+    });
+    setIcon(button, icon);
+    button.createSpan({ text: label });
+    button.addEventListener('click', onClick);
+    return button;
+  }
+}
