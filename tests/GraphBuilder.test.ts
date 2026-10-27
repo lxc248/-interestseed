@@ -335,7 +335,7 @@ describe('InterestSeedGraphBuilder.build', () => {
     expect(byTitle(second, 'Alpha').metadata.position).toEqual({ x: 10, y: 20 });
   });
 
-  it('重新扫描不清空撤销历史，也不覆盖手动关系', () => {
+  it('重新扫描清空旧撤销历史，但不覆盖手动关系', () => {
     const store = new InterestSeedGraphStore(undefined, { now: () => NOW });
     const undo = new UndoHistory();
     const session = new GraphSession(store, undo);
@@ -370,7 +370,6 @@ describe('InterestSeedGraphBuilder.build', () => {
     session.addEdge(manualEdge);
     session.updateEdge(manualEdge.id, { status: 'confirmed' });
 
-    const depthBeforeRescan = undo.depth();
     const builder = new InterestSeedGraphBuilder(
       () => store.getGraph(),
       undefined,
@@ -380,12 +379,12 @@ describe('InterestSeedGraphBuilder.build', () => {
     const graph = builder.build([stableAlpha, stableBeta], options);
     session.apply(graph);
 
-    expect(undo.depth()).toBe(depthBeforeRescan);
+    expect(undo.depth()).toBe(0);
     expect(store.getNode('manual-topic')).toBeDefined();
     expect(store.getEdge('manual-ref')?.status).toBe('confirmed');
 
-    expect(undo.undo()).toBe(true);
-    expect(store.getEdge('manual-ref')?.status).toBe('suggested');
+    expect(undo.undo()).toBe(false);
+    expect(store.getEdge('manual-ref')?.status).toBe('confirmed');
   });
 
   it('降噪过滤后仍保留 confirmed 和 rejected 关系', () => {

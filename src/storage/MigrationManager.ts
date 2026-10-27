@@ -106,7 +106,7 @@ const MIGRATION_V0_V1: GraphMigration = {
       if (!isRecord(raw)) continue;
       const id =
         typeof raw.id === 'string' && raw.id.trim()
-          ? raw.id
+          ? raw.id.trim()
           : `node_${Object.keys(nodes).length + 1}`;
       const title =
         typeof raw.title === 'string' && raw.title.trim()
@@ -121,6 +121,9 @@ const MIGRATION_V0_V1: GraphMigration = {
           : [];
 
       nodes[id] = {
+        // 先保留旧版/外部字段（type、sourceUri、metadata、position 等），
+        // 再做字段名归一化；避免 v0 迁移把 v2 数据降级成 document。
+        ...raw,
         id,
         title,
         kind: raw.kind ?? 'note',

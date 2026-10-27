@@ -151,7 +151,7 @@ export class DiscoveryExplorerModal extends Modal {
     section.createEl('h3', { text: 'AI 探索解读' });
     section.createEl('p', {
       cls: 'interestseed-ai-note',
-      text: '只发送主题、项目名称和聚合计数；不发送笔记正文、路径或原始证据。需在设置中启用 AI 并授权。',
+      text: '只发送匿名化的主题/项目别名和聚合计数；不发送笔记正文、路径或原始证据。需在设置中启用 AI 并授权。',
     });
 
     const button = section.createEl('button', {
@@ -172,18 +172,46 @@ export class DiscoveryExplorerModal extends Modal {
       status.removeClass('is-error');
       status.setText('正在生成……');
       result.empty();
+      const themeAliases = new Map(
+        this.data.matrix.themes.slice(0, 12).map((theme, index) => [
+          `theme_${index + 1}`,
+          theme.key,
+        ]),
+      );
+      const projectAliases = new Map(
+        this.data.matrix.projects.slice(0, 20).map((project, index) => [
+          `project_${index + 1}`,
+          project,
+        ]),
+      );
       const request: ExplorationRequest = {
-        themes: this.data.matrix.themes.slice(0, 12).map((theme) => ({
-          key: theme.key,
+        themes: this.data.matrix.themes.slice(0, 12).map((theme, index) => ({
+          key: `theme_${index + 1}`,
           active: theme.active,
           total: theme.total,
         })),
-        projects: this.data.matrix.projects.slice(0, 20),
+        projects: [...projectAliases.keys()],
         activity: this.overview.activity,
       };
-      void this.deps
-        .onGenerateAi(request)
-        .then((insight) => {
+      const restoreAliases = (text: string): string => {
+        let result = text;
+        for (const [alias, value] of themeAliases) result = result.split(alias).join(value);
+        for (const [alias, value] of projectAliases) result = result.split(alias).join(value);
+        return result;
+      };
+      void Promise.resolve()
+        .then(() => this.deps.onGenerateAi!(request))
+        .then((rawInsight) => {
+          const insight = {
+            ...rawInsight,
+            summary: restoreAliases(rawInsight.summary),
+            opportunities: rawInsight.opportunities.map((item) => ({
+              ...item,
+              why: restoreAliases(item.why),
+              nextStep: restoreAliases(item.nextStep),
+              themes: item.themes.map((theme) => themeAliases.get(theme) ?? theme),
+            })),
+          };
           status.setText('AI 解读已生成。');
           result.createEl('p', { cls: 'interestseed-ai-summary', text: insight.summary });
           for (const item of insight.opportunities) {

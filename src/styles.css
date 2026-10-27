@@ -2057,3 +2057,25 @@ button.interestseed-inbox-node:hover {
   color: var(--text-faint, var(--text-muted));
   font-family: var(--font-monospace);
 }
+/* 收口：窄侧边栏/分屏也要保持详情面板在底部而不是固定 360px 侧栏。 */
+.interestseed-discovery-panel {
+  padding: 18px;
+}
+
+@container (max-width: 640px) {
+  .interestseed-body {
+    flex-direction: column;
+  }
+
+  .interestseed-canvas-container {
+    min-height: 220px;
+  }
+
+  .interestseed-detail {
+    width: auto;
+    max-width: none;
+    max-height: 42%;
+    border-left: 0;
+    border-top: 1px solid var(--is-border);
+  }
+}

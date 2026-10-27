@@ -33,6 +33,7 @@ export class RelationEditModal extends Modal {
           this.relation = value.trim();
         });
       text.inputEl.addEventListener('keydown', (event) => {
+        if (event.isComposing) return;
         if (event.key === 'Enter') this.submit();
       });
     });

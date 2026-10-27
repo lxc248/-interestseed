@@ -157,14 +157,14 @@ describe('DiscoveryApplicationService', () => {
     });
   });
 
-  it('已应用后重复提交返回 existing 且不新增关系', async () => {
+  it('已应用后重复提交返回 blocked 且不新增关系', async () => {
     const { service, store, getState } = setup();
     const first = await service.apply('d1', draft());
     expect(first.status).toBe('applied');
     const second = await service.apply('d1', draft());
-    expect(second.status).toBe('existing');
+    expect(second.status).toBe('blocked');
     expect(store.listEdges()).toHaveLength(1);
-    expect(getState().discoveries[0]?.application?.state).toBe('existing');
+    expect(getState().discoveries[0]?.application?.state).toBe('applied');
   });
 
   it('相同 confirmed 关系识别为 existing 且不重复写入', async () => {

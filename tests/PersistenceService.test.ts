@@ -47,4 +47,38 @@ describe('PersistenceService dirty tracking', () => {
     await service.flush();
     expect(saves).toBe(1);
   });
+
+  it('keeps dirty when an edit happens while a save is in flight', async () => {
+    vi.stubGlobal('window', {
+      setTimeout: () => 1,
+      clearTimeout: () => {},
+    });
+    let saves = 0;
+    let releaseFirst!: () => void;
+    const firstSave = new Promise<void>((resolve) => {
+      releaseFirst = resolve;
+    });
+    const service = new PersistenceService({
+      store: { toJSON: () => ({}) } as never,
+      repository: {
+        save: async () => {
+          saves += 1;
+          if (saves === 1) await firstSave;
+        },
+      } as never,
+      debounceMs: 0,
+      onStateChange: () => {},
+      onError: () => {},
+    });
+
+    service.scheduleSave();
+    const firstFlush = service.flush();
+    await Promise.resolve();
+    service.scheduleSave();
+    releaseFirst();
+    await firstFlush;
+    await service.flush();
+
+    expect(saves).toBe(2);
+  });
 });

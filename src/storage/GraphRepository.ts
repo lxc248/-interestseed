@@ -48,6 +48,7 @@ export interface LoadResult {
   migratedFrom: number | null;
   corruptedBackupKey: string | null;
   preMigrationBackupKey: string | null;
+  issuesBackupKey?: string | null;
   blocked: boolean;
   blockedReason: string | null;
 }
@@ -159,6 +160,14 @@ export class VaultGraphRepository implements GraphRepository {
     const { graph, issues } = validateGraph(migrated.data, this.now());
     graph.schemaVersion = migrated.to;
 
+    let issuesBackupKey: string | null = null;
+    if (issues.length > 0) {
+      issuesBackupKey = await this.writeBackup(raw, 'issues');
+      if (issuesBackupKey === null) {
+        issues.push('图谱数据已被部分清洗，但清洗前备份失败');
+      }
+    }
+
     if (isRecord(migrated.data)) {
       graph.updatedAt = toIsoString(migrated.data.updatedAt, this.now());
     }
@@ -171,6 +180,7 @@ export class VaultGraphRepository implements GraphRepository {
       migratedFrom: migrated.from === migrated.to ? null : migrated.from,
       corruptedBackupKey: null,
       preMigrationBackupKey,
+      issuesBackupKey,
       blocked: this.blockedReason !== null,
       blockedReason: this.blockedReason,
     };

@@ -17,10 +17,14 @@ function context(overrides: Partial<Parameters<typeof writeConfirmedAiSuggestion
 
 function writer(overrides: Partial<AiSuggestionWriter> = {}) {
   const added: InterestSeedEdge[] = [];
+  const removed: string[] = [];
   let flushed = 0;
   const result: AiSuggestionWriter = {
     addEdge: (edge) => {
       added.push(edge);
+    },
+    removeEdge: (edgeId) => {
+      removed.push(edgeId);
     },
     flush: async () => {
       flushed += 1;
@@ -28,7 +32,7 @@ function writer(overrides: Partial<AiSuggestionWriter> = {}) {
     saveFailed: () => false,
     ...overrides,
   };
-  return { result, added, flushed: () => flushed };
+  return { result, added, removed, flushed: () => flushed };
 }
 
 describe('AI suggestion confirmation writer', () => {
@@ -110,6 +114,7 @@ describe('AI suggestion confirmation writer', () => {
         flushFailure.result,
       ),
     ).toMatchObject({ ok: false });
+    expect(flushFailure.removed).toHaveLength(1);
 
     const saveFailed = writer({ saveFailed: () => true });
     expect(

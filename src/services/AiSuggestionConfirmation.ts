@@ -8,6 +8,7 @@ import {
 
 export interface AiSuggestionWriter {
   addEdge(edge: InterestSeedEdge): void;
+  removeEdge?(edgeId: string): void;
   flush(): Promise<void>;
   saveFailed(): boolean;
 }
@@ -43,14 +44,18 @@ export async function writeConfirmedAiSuggestion(
     updatedAt: now,
   };
 
+  let added = false;
   try {
     writer.addEdge(edge);
+    added = true;
     await writer.flush();
     if (writer.saveFailed()) {
+      writer.removeEdge?.(edge.id);
       return { ok: false, message: '写入图谱失败，未标记为已接受。' };
     }
     return { ok: true };
   } catch (error) {
+    if (added) writer.removeEdge?.(edge.id);
     return {
       ok: false,
       message: error instanceof Error ? error.message : String(error),

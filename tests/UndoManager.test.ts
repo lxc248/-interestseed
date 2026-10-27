@@ -111,7 +111,7 @@ describe('UndoHistory', () => {
     expect(manager.undo()).toBe(false);
   });
 
-  it('撤销失败时保留命令并上报错误', () => {
+  it('撤销失败时丢弃命令并上报错误', () => {
     const errorSpy = vi.fn();
     const manager = new UndoHistory({ onError: errorSpy });
 
@@ -125,7 +125,7 @@ describe('UndoHistory', () => {
 
     expect(manager.undo()).toBe(false);
     expect(errorSpy).toHaveBeenCalledTimes(1);
-    expect(manager.canUndo()).toBe(true);
+    expect(manager.canUndo()).toBe(false);
   });
 
   it('clear 清空全部历史', () => {

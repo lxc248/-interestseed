@@ -410,7 +410,7 @@ export class InterestSeedGraphStore implements GraphStore {
               ? origin
               : existing.origin,
           status: mergeStatus(existing.status, status),
-          updatedAt: this.now(),
+          updatedAt: input.updatedAt ?? this.now(),
         };
         if (input.confidence !== undefined) {
           merged.confidence = Math.max(existing.confidence ?? 0, clamp01(input.confidence));
@@ -431,9 +431,21 @@ export class InterestSeedGraphStore implements GraphStore {
       );
     }
 
-    const id = (input.id ?? '').trim() || edgeIdFor(source, target, relation);
+    let id = (input.id ?? '').trim() || edgeIdFor(source, target, relation);
     if (this.edges.has(id)) {
-      throw new GraphStoreError('duplicate-edge', `关系 id 冲突：${id}`);
+      const existing = this.edges.get(id);
+      if (
+        existing &&
+        existing.source === source &&
+        existing.target === target &&
+        existing.relation === relation
+      ) {
+        throw new GraphStoreError('duplicate-edge', `关系已存在：${id}`);
+      }
+      // 端点/关系已改名但旧 id 仍占用时，生成新的稳定唯一 id。
+      do {
+        id = createId('edge');
+      } while (this.edges.has(id));
     }
 
     const createdAt = input.createdAt ?? this.now();

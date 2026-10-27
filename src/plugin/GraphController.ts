@@ -164,6 +164,32 @@ export class GraphController {
       });
       const report = this.deps.builder.lastReport;
 
+      // 收窄目录/标签时，旧节点的受保护关系可能从新图中消失。
+      // 先备份并明确告警，避免静默覆盖用户已确认/已拒绝的决定。
+      const current = this.deps.store.getGraph();
+      const nextNodeIds = new Set(graph.nodes.map((node) => node.id));
+      const nextEdgeIds = new Set(graph.edges.map((edge) => edge.id));
+      const lostNodes = current.nodes.filter((node) => !nextNodeIds.has(node.id));
+      const lostProtected = current.edges.filter(
+        (edge) =>
+          !nextEdgeIds.has(edge.id) &&
+          (edge.status !== 'suggested' || edge.origin === 'ai' || edge.userRenamed === true),
+      );
+      if (lostProtected.length > 0 || lostNodes.length > 0) {
+        try {
+          await this.deps.persistence.createBackup();
+        } catch (backupError) {
+          report.warnings.push(
+            `范围收窄导致数据减少，但自动备份失败：${
+              backupError instanceof Error ? backupError.message : String(backupError)
+            }`,
+          );
+        }
+        report.warnings.push(
+          `本次重建移除了 ${lostNodes.length} 个节点、${lostProtected.length} 条已确认/用户关系；已尝试创建备份，请先确认范围设置。`,
+        );
+      }
+
       this.deps.session.apply(graph);
 
       const rebuiltAt = new Date().toISOString();
@@ -483,11 +509,14 @@ export class GraphController {
         consentGranted: this.deps.settings.aiConsentGranted,
         hasNode: (id) => this.deps.store.getNode(id) !== undefined,
         hasEdge: (source, target, relation) =>
-          this.deps.store.findEdge(source, target, relation) !== undefined,
+          this.deps.store.findEdge(source, target, relation) !== undefined ||
+          this.deps.store.findEdge(target, source, relation) !== undefined,
       },
       {
         addEdge: (edge) =>
           this.deps.session.addEdge(edge, `确认 AI 建议「${edge.relation}」`),
+        removeEdge: (edgeId) =>
+          this.deps.session.removeEdge(edgeId, '回滚未完成的 AI 关系写入'),
         flush: () => this.deps.persistence.flush(),
         saveFailed: () => this.deps.persistence.state.saveFailed,
       },

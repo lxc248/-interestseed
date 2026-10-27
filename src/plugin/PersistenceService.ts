@@ -27,6 +27,7 @@ export class PersistenceService {
   private timer: number | null = null;
   private queue: Promise<void> = Promise.resolve();
   private lastNoticeAt = 0;
+  private revision = 0;
 
   constructor(private readonly options: PersistenceOptions) {}
 
@@ -52,6 +53,7 @@ export class PersistenceService {
   }
 
   scheduleSave(): void {
+    this.revision += 1;
     this.dirty = true;
     if (this.timer !== null) window.clearTimeout(this.timer);
     this.timer = window.setTimeout(() => {
@@ -68,6 +70,7 @@ export class PersistenceService {
     if (!this.dirty && !this.saveFailed) return;
 
     const graph = this.options.store.toJSON();
+    const revisionAtStart = this.revision;
     const run = async (): Promise<void> => {
       if (this.blocked) {
         this.notify();
@@ -76,7 +79,9 @@ export class PersistenceService {
 
       try {
         await this.options.repository.save(graph);
-        this.dirty = false;
+        // 保存期间若又发生编辑，scheduleSave 已把 revision 增加；
+        // 此时不能把 dirty 清掉，否则最后一次编辑会永远不落盘。
+        if (this.revision === revisionAtStart) this.dirty = false;
         if (this.saveFailed) {
           this.saveFailed = false;
           this.notify();

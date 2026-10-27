@@ -41,4 +41,17 @@ describe('AI exploration insight parser', () => {
       parseExplorationInsight('{"summary":"ok","opportunities":[{}]}'),
     ).toThrow(ModelProviderError);
   });
+
+  it('过滤 AI 编造的未知主题', () => {
+    const result = parseExplorationInsight(
+      JSON.stringify({
+        summary: 'ok',
+        opportunities: [
+          { title: 'x', why: 'y', nextStep: 'z', themes: ['theme8', 'fake'] },
+        ],
+      }),
+      new Set(['theme8']),
+    );
+    expect(result.opportunities[0]?.themes).toEqual(['theme8']);
+  });
 });

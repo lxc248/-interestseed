@@ -35,6 +35,7 @@ export class NodeCreateModal extends Modal {
       this.title = value;
     });
     input.inputEl.addEventListener('keydown', (event) => {
+      if (event.isComposing) return;
       if (event.key === 'Enter') this.submit();
     });
     window.setTimeout(() => input.inputEl.focus(), 0);

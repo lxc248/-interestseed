@@ -345,6 +345,7 @@ export class InterestSeedView extends ItemView {
   }
 
   private toggleDiscoveries(): void {
+    if (!this.discoveryOpen) this.discoveryThemeFilter = null;
     this.discoveryOpen = !this.discoveryOpen;
     this.discoveryButton?.toggleClass('is-active', this.discoveryOpen);
     this.quickDiscoveryButton?.toggleClass('is-active', this.discoveryOpen);
@@ -370,7 +371,10 @@ export class InterestSeedView extends ItemView {
     const all = this.plugin.listDiscoveries();
     const filtered = this.discoveryThemeFilter
       ? all.filter(
-          (item) => item.subjectKeys.join(' · ') === this.discoveryThemeFilter,
+          (item) =>
+            (item.subjectKeys.length > 0
+              ? item.subjectKeys.join(' · ')
+              : '未分类主题') === this.discoveryThemeFilter,
         )
       : all;
     this.discoveryPanel?.render(

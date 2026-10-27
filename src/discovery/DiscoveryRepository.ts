@@ -529,6 +529,18 @@ export class DiscoveryRepository {
       });
     }
 
+    const ids = new Set(discoveries.map((item) => item.id));
+    for (const item of discoveries) {
+      if (!item.supersededBy) continue;
+      if (item.supersededBy === item.id || !ids.has(item.supersededBy)) {
+        item.supersededBy = undefined;
+        item.supersededAt = undefined;
+      } else {
+        // 与 validate() 的契约保持一致：superseded 记录必须是 dismissed。
+        item.status = 'dismissed';
+      }
+    }
+
     return {
       file: {
         discoverySchemaVersion: DISCOVERY_SCHEMA_VERSION,

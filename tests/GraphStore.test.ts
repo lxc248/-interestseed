@@ -285,14 +285,14 @@ describe('GraphStore / 关系', () => {
     });
     expect(created.id).toBe('e1');
 
-    expect(() =>
-      store.addEdge({
-        id: 'e1',
-        source: 'a',
-        target: 'b',
-        relation: 'owns',
-      }),
-    ).toThrowError(/id 冲突/);
+    const renamed = store.addEdge({
+      id: 'e1',
+      source: 'a',
+      target: 'b',
+      relation: 'owns',
+    });
+    expect(renamed.id).not.toBe('e1');
+    expect(store.getEdge(renamed.id)?.relation).toBe('owns');
 
     expect(() =>
       store.updateEdge('e1', { source: 'c' }),

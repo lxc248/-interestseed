@@ -50,6 +50,7 @@ export class GraphSession {
     label = '修改节点',
   ): void {
     const before = this.requireNode(id);
+    const beforeMetadata = { ...before.metadata };
     const patchCopy: Partial<InterestSeedNode> = { ...patch };
 
     this.undo.execute(
@@ -58,13 +59,21 @@ export class GraphSession {
         this.store.updateNode(id, patchCopy);
       },
       () => {
-        this.store.updateNode(id, {
-          title: before.title,
-          type: before.type,
-          tags: [...before.tags],
-          metadata: { ...before.metadata },
-          sourceUri: before.sourceUri ?? '',
-        });
+        const current = this.store.getNode(id);
+        const revert: Partial<InterestSeedNode> = {};
+        if (Object.hasOwn(patchCopy, 'title')) revert.title = before.title;
+        if (Object.hasOwn(patchCopy, 'type')) revert.type = before.type;
+        if (Object.hasOwn(patchCopy, 'tags')) revert.tags = [...before.tags];
+        if (Object.hasOwn(patchCopy, 'sourceUri')) revert.sourceUri = before.sourceUri ?? '';
+        if (Object.hasOwn(patchCopy, 'metadata')) {
+          const metadata = { ...(current?.metadata ?? {}) };
+          for (const key of Object.keys(patchCopy.metadata ?? {})) {
+            if (Object.hasOwn(beforeMetadata, key)) metadata[key] = beforeMetadata[key];
+            else delete metadata[key];
+          }
+          revert.metadata = metadata;
+        }
+        this.store.updateNode(id, revert);
       },
     );
   }
@@ -186,6 +195,9 @@ export class GraphSession {
 
   /** 重新扫描 / 刷新建议等系统操作：更新图谱但不写入撤销历史。 */
   apply(graph: InterestSeedGraph): void {
+    // 重扫可能删除节点/关系，旧撤销命令引用已失效的快照。
+    // 清理历史，避免永久卡住或把已失效关系“撤销复活”。
+    this.undo.clear();
     this.store.replace(graph);
   }
 

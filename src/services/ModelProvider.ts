@@ -25,7 +25,7 @@ export interface ModelProvider {
 
   suggestRelations(request: RelationRequest): Promise<unknown>;
 
-  /** 只读探索洞察：只发送聚合后的主题/项目计数，不发送正文、路径或节点内容。 */
+  /** 只读探索洞察：只发送匿名化主题/项目别名与聚合计数，不发送正文、路径或节点内容。 */
   explore?(request: ExplorationRequest): Promise<unknown>;
 
   dispose(): void;
@@ -139,6 +139,7 @@ export function resolveLocalApiKey(): string | undefined {
  */
 export class OpenAICompatibleModelProvider implements ModelProvider {
   private disposed = false;
+  private abortController: AbortController | null = null;
 
   constructor(
     private readonly config: ExperimentalModelConfig = DEEPSEEK_V4_PRO_CONFIG,
@@ -229,10 +230,14 @@ export class OpenAICompatibleModelProvider implements ModelProvider {
     if (this.apiKey) headers.Authorization = `Bearer ${this.apiKey}`;
 
     let response: Response;
+    const controller = new AbortController();
+    this.abortController = controller;
+    const timeout = globalThis.setTimeout(() => controller.abort(), 30_000);
     try {
       response = await this.fetchImpl(url, {
         method: 'POST',
         headers,
+        signal: controller.signal,
         body: JSON.stringify({
           model: this.config.model,
           messages: [
@@ -258,7 +263,10 @@ export class OpenAICompatibleModelProvider implements ModelProvider {
         }),
       });
     } catch {
-      throw new ModelProviderError('network', 'AI 本地服务不可达');
+      throw new ModelProviderError('network', 'AI 本地服务不可达或请求超时');
+    } finally {
+      globalThis.clearTimeout(timeout);
+      if (this.abortController === controller) this.abortController = null;
     }
 
     if (!response.ok) {
@@ -275,11 +283,16 @@ export class OpenAICompatibleModelProvider implements ModelProvider {
     if (content === null) {
       throw new ModelProviderError('invalid-response', 'AI 服务返回结构无效');
     }
-    return parseExplorationInsight(content);
+    return parseExplorationInsight(
+      content,
+      new Set(safeRequest.themes.map((theme) => theme.key)),
+    );
   }
 
   dispose(): void {
     this.disposed = true;
+    this.abortController?.abort();
+    this.abortController = null;
   }
 }
 
@@ -431,7 +444,10 @@ function sanitizeExplorationRequest(input: ExplorationRequest): ExplorationReque
 }
 
 /** 只接受完整 JSON 或完整代码围栏，避免从解释文本中猜测 JSON。 */
-export function parseExplorationInsight(content: string): ExplorationInsight {
+export function parseExplorationInsight(
+  content: string,
+  allowedThemes?: ReadonlySet<string>,
+): ExplorationInsight {
   let text = content.trim();
   const fence = /^```(?:json)?\s*([\s\S]*?)\s*```$/i.exec(text);
   if (fence) text = fence[1]!.trim();
@@ -474,7 +490,12 @@ export function parseExplorationInsight(content: string): ExplorationInsight {
       title: title.trim().slice(0, 120),
       why: why.trim().slice(0, 500),
       nextStep: nextStep.trim().slice(0, 300),
-      themes: themeList.slice(0, 12),
+      themes: themeList
+        .filter(
+          (value): value is string =>
+            typeof value === 'string' && (!allowedThemes || allowedThemes.has(value)),
+        )
+        .slice(0, 12),
     };
   });
   return { summary: summary.trim(), opportunities: normalized };

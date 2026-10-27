@@ -157,6 +157,9 @@ function validSourceUri(uri: string | undefined): boolean {
   const trimmed = uri.trim();
   if (!trimmed) return false;
   if (/^[a-z][a-z0-9+.-]*:\/\//i.test(trimmed)) return false;
+  // 拒绝绝对路径、盘符路径和目录穿越，避免把 Vault 外路径误判为可定位来源。
+  if (/^[\\/]/.test(trimmed) || /^[a-zA-Z]:[\\/]/.test(trimmed)) return false;
+  if (/(^|[\\/])\.\.([\\/]|$)/.test(trimmed)) return false;
   return pathFromUri(trimmed).length > 0;
 }
 
@@ -631,14 +634,29 @@ export function formatDiscoveryAudit(summary: DiscoveryAuditSummary): string {
     );
   }
 
-  lines.push(
-    '',
-    `evidence_source: ${summary.evidence.source}`,
-    `evidence_shared_tag: ${summary.evidence.sharedTag}`,
-    `evidence_confirmed: ${summary.evidence.confirmedEdge}`,
-    `evidence_missing_source: ${summary.evidence.missingSource}`,
-    `evidence_missing_confirmed: ${summary.evidence.missingConfirmed}`,
+  const evidenceSafe = mayShowBreakdown(
+    {
+      source: summary.evidence.source,
+      sharedTag: summary.evidence.sharedTag,
+      confirmed: summary.evidence.confirmedEdge,
+      missingSource: summary.evidence.missingSource,
+      missingConfirmed: summary.evidence.missingConfirmed,
+    },
+    summary.sampledCount,
   );
+
+  if (!evidenceSafe) {
+    lines.push('evidence_detail: suppressed_small_group');
+  } else {
+    lines.push(
+      '',
+      `evidence_source: ${summary.evidence.source}`,
+      `evidence_shared_tag: ${summary.evidence.sharedTag}`,
+      `evidence_confirmed: ${summary.evidence.confirmedEdge}`,
+      `evidence_missing_source: ${summary.evidence.missingSource}`,
+      `evidence_missing_confirmed: ${summary.evidence.missingConfirmed}`,
+    );
+  }
 
   if (!themeSafe) {
     lines.push('theme_detail: suppressed_small_group');

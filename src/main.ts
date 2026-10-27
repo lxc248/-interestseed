@@ -265,8 +265,17 @@ export default class InterestSeedPlugin extends Plugin {
 
     this.statusBarEl = this.addStatusBarItem();
     this.statusBarEl.addClass('interestseed-status-bar');
+    this.statusBarEl.setAttribute('role', 'button');
+    this.statusBarEl.setAttribute('tabindex', '0');
+    this.statusBarEl.setAttribute('aria-label', '打开兴趣图谱');
     this.statusBarEl.addEventListener('click', () => {
       void this.activateView();
+    });
+    this.statusBarEl.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        void this.activateView();
+      }
     });
 
     this.register(
@@ -297,6 +306,7 @@ export default class InterestSeedPlugin extends Plugin {
     await this.refreshDiscoveries();
 
     this.app.workspace.onLayoutReady(() => {
+      if (this.unloading) return;
       if (
         this.settings.autoBuildOnOpen &&
         !this.persistence.isBlocked &&
@@ -315,10 +325,12 @@ export default class InterestSeedPlugin extends Plugin {
     this.auditRuntimeSession = null;
     this.auditVaultBinding?.invalidate();
     this.auditVaultBinding = null;
+    // 先 detach，让 view.onClose 的 saveViewport 在 flush 前提交。
+    this.app.workspace.detachLeavesOfType(INTERESTSEED_VIEW_TYPE);
     this.discoveryQueue?.close();
     void this.discoveryQueue?.flush();
     void this.persistence?.flush();
-    this.app.workspace.detachLeavesOfType(INTERESTSEED_VIEW_TYPE);
+    this.persistence?.dispose();
   }
 
   // ------------------------------------------------------------ 视图
@@ -727,6 +739,15 @@ export default class InterestSeedPlugin extends Plugin {
     }
     if (result.corruptedBackupKey) {
       console.warn(`[InterestSeed] 原始数据已备份：${result.corruptedBackupKey}`);
+    }
+    if (result.issuesBackupKey) {
+      console.warn(`[InterestSeed] 清洗前图谱已备份：${result.issuesBackupKey}`);
+    }
+    if (result.issues.length > 0 && !result.blocked) {
+      new Notice(
+        `InterestSeed：图谱加载时清洗了 ${result.issues.length} 条问题记录；原始文件已备份到插件目录。`,
+        10_000,
+      );
     }
 
     if (result.blocked) {

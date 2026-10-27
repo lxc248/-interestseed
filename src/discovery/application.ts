@@ -159,7 +159,7 @@ export function reconcileDiscoveryApplications(
         nextState = 'failed';
         nextFailureReason = '目标关系不存在，已确认未应用；可主动重试';
       }
-    } else if (application.state === 'stale') {
+    } else if (application.state === 'stale' || application.state === 'failed') {
       if (edge && endpointMatches) {
         nextState = 'applied';
         nextFailureReason = undefined;
@@ -258,6 +258,17 @@ export class DiscoveryApplicationService {
 
     const exact = this.deps.store.findEdge(sourceNodeId, targetNodeId, relation);
     if (exact) {
+      if (
+        discovery.application?.edgeId === exact.id &&
+        (discovery.application.state === 'applied' ||
+          discovery.application.state === 'existing')
+      ) {
+        return {
+          kind: 'blocked',
+          reason: '这条发现已经应用到图谱，无需重复提交',
+          conflicts: [],
+        };
+      }
       if (exact.status === 'confirmed') {
         return {
           kind: 'existing',
@@ -496,9 +507,12 @@ export class DiscoveryApplicationService {
     application: DiscoveryApplication,
   ): Promise<DiscoveryApplicationPersistResult> {
     try {
-      await this.deps.enqueue((file) =>
-        updateDiscoveryApplication(file, id, application),
-      );
+      await this.deps.enqueue((file) => {
+        if (!file.discoveries.some((item) => item.id === id)) {
+          throw new Error('发现记录已不存在，无法保存应用状态');
+        }
+        return updateDiscoveryApplication(file, id, application);
+      });
       return { ok: true, conflict: false };
     } catch (error) {
       const conflict =

@@ -36,6 +36,9 @@ export function applyDiscoveryFeedback(
     if (item.id !== id) return item;
     const appState = item.application?.state;
     if (appState === 'applying' || appState === 'recovery-required') return item;
+    // 系统自动收敛的记录不能被普通反馈重新激活；否则会产生
+    // status=active + supersededBy 的非法形状，导致后续保存校验失败。
+    if (item.supersededBy) return item;
     changed = true;
     const history = item.feedbackHistory ?? [];
     const normalizedCorrection =

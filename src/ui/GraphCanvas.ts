@@ -111,6 +111,9 @@ export class GraphCanvas {
     private readonly options: GraphCanvasOptions,
   ) {
     this.canvas = container.createEl('canvas', { cls: 'interestseed-canvas' });
+    this.canvas.setAttribute('role', 'img');
+    this.canvas.setAttribute('tabindex', '0');
+    this.canvas.setAttribute('aria-label', '兴趣图谱画布；可拖拽平移、滚轮缩放，节点可点击查看详情');
     const context = this.canvas.getContext('2d');
     if (!context) throw new Error('当前环境不支持 Canvas 2D');
     this.ctx = context;
@@ -512,6 +515,7 @@ export class GraphCanvas {
       suggested: this.readCssVariable('--color-yellow', '#fbbf24'),
       rejected: this.readCssVariable('--text-faint', '#64748b'),
     };
+    const nodeStrokeColor = this.readCssVariable('--text-faint', '#64748b');
 
     const neighbors = this.neighborIds();
 
@@ -573,7 +577,7 @@ export class GraphCanvas {
         // 浅色主题下淡色节点需要细边框，否则与白色背景对比不足。
         ctx.globalAlpha = isNeighbor ? 0.65 : 0.45;
         ctx.lineWidth = 1 / this.zoom;
-        ctx.strokeStyle = this.readCssVariable('--text-faint', '#64748b');
+        ctx.strokeStyle = nodeStrokeColor;
         ctx.stroke();
       }
     }
@@ -772,7 +776,8 @@ export class GraphCanvas {
     if (this.hoveredId === null) return;
     this.hoveredId = null;
     this.options.onHover?.(null);
-    this.canvas.style.cursor = 'default';
+    this.canvas.style.cursor = '';
+    this.canvas.removeClass('is-panning');
     this.draw();
   };
 

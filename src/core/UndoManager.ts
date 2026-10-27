@@ -63,8 +63,9 @@ export class UndoHistory implements UndoManager {
     try {
       command.revert();
     } catch (error) {
-      this.undoStack.push(command);
+      // 引用已失效的命令不能再放回栈顶，否则会永久阻塞后续撤销。
       this.onError(error, command);
+      this.notify();
       return false;
     }
 
@@ -93,8 +94,9 @@ export class UndoHistory implements UndoManager {
     try {
       command.apply();
     } catch (error) {
-      this.redoStack.push(command);
+      // 同理：失效的 redo 命令不能反复卡住栈顶。
       this.onError(error, command);
+      this.notify();
       return false;
     }
 
