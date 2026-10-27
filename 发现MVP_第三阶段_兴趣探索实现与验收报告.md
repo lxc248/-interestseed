@@ -117,7 +117,7 @@ research/phase3_simulation_results.json
 
 ```text
 typecheck       通过
-test            41 文件 / 424 用例通过
+test            41 文件 / 424 用例通过\n\nmain.js         408,677 bytes / D9CC9AF8BF1F27B03C8F0C7FA493D36F95E3922CFABBAB0EA967D61AAD739941\nstyles.css       44,187 bytes / 7EF7454D2139D8F806CAEBB587509FC4926A0DF1DDF3554C654AEDEEA163E727
 lint            通过
 build           通过
 ```
