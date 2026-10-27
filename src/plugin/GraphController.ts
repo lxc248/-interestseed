@@ -515,8 +515,7 @@ export class GraphController {
       {
         addEdge: (edge) =>
           this.deps.session.addEdge(edge, `确认 AI 建议「${edge.relation}」`),
-        removeEdge: (edgeId) =>
-          this.deps.session.removeEdge(edgeId, '回滚未完成的 AI 关系写入'),
+        removeEdge: (edgeId) => this.deps.store.removeEdge(edgeId),
         flush: () => this.deps.persistence.flush(),
         saveFailed: () => this.deps.persistence.state.saveFailed,
       },
