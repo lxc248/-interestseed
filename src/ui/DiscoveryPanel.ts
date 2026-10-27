@@ -51,7 +51,12 @@ export class DiscoveryPanel {
     private readonly deps: DiscoveryPanelDeps,
   ) {}
 
-  render(discoveries: Discovery[], blocked: string | null): void {
+  render(
+    discoveries: Discovery[],
+    blocked: string | null,
+    themeFilter: string | null = null,
+    onClearTheme?: () => void,
+  ): void {
     this.host.empty();
 
     if (blocked) {
@@ -93,6 +98,15 @@ export class DiscoveryPanel {
     });
     setIcon(refresh, 'refresh-cw');
     refresh.addEventListener('click', () => this.deps.onRefresh());
+
+    if (themeFilter) {
+      const filter = header.createEl('button', {
+        cls: 'interestseed-discovery-filter',
+        text: `#${themeFilter} ×`,
+        attr: { 'aria-label': `清除主题筛选 ${themeFilter}`, title: '清除主题筛选' },
+      });
+      filter.addEventListener('click', () => onClearTheme?.());
+    }
 
     if (active.length === 0) {
       this.host.createDiv({

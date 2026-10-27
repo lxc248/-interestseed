@@ -12,6 +12,7 @@ export interface CommandHost {
   refreshSuggestions(): void;
   promptAudit(): void;
   openDiscoveryOverview(): void;
+  openDiscoveryExplorer(): void;
   reconcileDiscoveries(): Promise<void>;
   readonly undo: UndoHistory;
   expandWithAI(nodeId?: string): Promise<void>;
@@ -71,6 +72,12 @@ export function registerCommands(plugin: Plugin, host: CommandHost): void {
     id: 'interestseed-overview',
     name: '打开兴趣总览（只读）',
     callback: () => host.openDiscoveryOverview(),
+  });
+
+  plugin.addCommand({
+    id: 'interestseed-explorer',
+    name: '打开兴趣探索（只读/AI 可选）',
+    callback: () => host.openDiscoveryExplorer(),
   });
 
   plugin.addCommand({

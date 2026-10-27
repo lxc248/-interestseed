@@ -50,6 +50,7 @@ export class InterestSeedView extends ItemView {
   private inboxOpen = false;
   private discoveryButton: HTMLButtonElement | null = null;
   private discoveryOpen = false;
+  private discoveryThemeFilter: string | null = null;
   private quickUndoButton: HTMLButtonElement | null = null;
   private quickRedoButton: HTMLButtonElement | null = null;
   private quickInboxButton: HTMLButtonElement | null = null;
@@ -146,6 +147,9 @@ export class InterestSeedView extends ItemView {
     this.inboxButton?.setAttribute('aria-pressed', 'false');
     this.createQuickAction(quickbar, 'layout-dashboard', '总览', () =>
       this.plugin.openDiscoveryOverview(),
+    );
+    this.createQuickAction(quickbar, 'compass', '探索', () =>
+      this.plugin.openDiscoveryExplorer(),
     );
     this.createQuickAction(quickbar, 'download', '导出', () => this.plugin.exportGraph());
 
@@ -363,10 +367,40 @@ export class InterestSeedView extends ItemView {
   }
 
   private renderDiscoveries(): void {
+    const all = this.plugin.listDiscoveries();
+    const filtered = this.discoveryThemeFilter
+      ? all.filter(
+          (item) => item.subjectKeys.join(' · ') === this.discoveryThemeFilter,
+        )
+      : all;
     this.discoveryPanel?.render(
-      this.plugin.listDiscoveries(),
+      filtered,
       this.plugin.getDiscoveryLoadBlocked(),
+      this.discoveryThemeFilter,
+      () => {
+        this.discoveryThemeFilter = null;
+        this.refresh();
+      },
     );
+  }
+
+  public showDiscoveriesForTheme(theme: string): void {
+    this.discoveryThemeFilter = theme;
+    this.discoveryOpen = true;
+    this.inboxOpen = false;
+    this.discoveryButton?.addClass('is-active');
+    this.quickDiscoveryButton?.addClass('is-active');
+    this.inboxButton?.removeClass('is-active');
+    this.quickInboxButton?.removeClass('is-active');
+    this.discoveryButton?.setAttribute('aria-pressed', 'true');
+    this.quickDiscoveryButton?.setAttribute('aria-pressed', 'true');
+    this.inboxButton?.setAttribute('aria-pressed', 'false');
+    this.quickInboxButton?.setAttribute('aria-pressed', 'false');
+    this.selectedId = null;
+    this.plugin.setSelectedNode(null);
+    this.canvas?.setSelected(null);
+    this.syncDiscoveryVisibility();
+    this.refresh();
   }
 
   private select(nodeId: string | null): void {

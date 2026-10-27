@@ -65,7 +65,10 @@ import {
   DiscoveryAuditScopeModal,
 } from './ui/DiscoveryAuditModal';
 import { DiscoveryOverviewModal } from './ui/DiscoveryOverviewModal';
+import { DiscoveryExplorerModal } from './ui/DiscoveryExplorerModal';
 import { buildDiscoveryOverview } from './discovery/overview';
+import { buildExploration } from './discovery/exploration';
+import { createModelProvider, type ExplorationInsight, type ExplorationRequest } from './services/ModelProvider';
 import { isRecord } from './utils/validation';
 
 const DATA_SCHEMA_VERSION = 1;
@@ -403,6 +406,43 @@ export default class InterestSeedPlugin extends Plugin {
       this.store.getGraph(),
     );
     new DiscoveryOverviewModal(this.app, overview).open();
+  }
+
+  openDiscoveryExplorer(): void {
+    const file = this.discoveryQueue.getState();
+    const overview = buildDiscoveryOverview(file, this.store.getGraph());
+    const data = buildExploration(file);
+    new DiscoveryExplorerModal(this.app, data, overview, {
+      onThemeSelect: (theme) => {
+        void this.showDiscoveriesForTheme(theme);
+      },
+      onGenerateAi: (request) => this.generateExplorationInsight(request),
+    }).open();
+  }
+
+  async showDiscoveriesForTheme(theme: string): Promise<void> {
+    await this.activateView();
+    const leaf = this.app.workspace.getLeavesOfType(INTERESTSEED_VIEW_TYPE)[0];
+    const view = leaf?.view;
+    if (view instanceof InterestSeedView) view.showDiscoveriesForTheme(theme);
+  }
+
+  private async generateExplorationInsight(
+    request: ExplorationRequest,
+  ): Promise<ExplorationInsight> {
+    const provider = createModelProvider({
+      enableAI: this.settings.enableAI,
+      aiConsentGranted: this.settings.aiConsentGranted,
+    });
+    try {
+      if (!provider.explore) {
+        throw new Error('AI 尚未启用或未授权；请在设置中启用 AI 并确认隐私授权。');
+      }
+      const result = await provider.explore(request);
+      return result as ExplorationInsight;
+    } finally {
+      provider.dispose();
+    }
   }
 
   promptAudit(): void {

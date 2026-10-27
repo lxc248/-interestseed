@@ -1891,3 +1891,169 @@ button.interestseed-inbox-node:hover {
   outline-offset: 3px;
   border-color: var(--is-accent);
 }
+/* 探索面板 */
+.interestseed-explorer {
+  max-width: 780px;
+}
+
+.interestseed-discovery-filter {
+  margin-left: auto;
+  height: 24px;
+  padding: 0 8px;
+  border: 1px solid color-mix(in srgb, var(--is-accent) 38%, var(--is-border));
+  border-radius: 8px;
+  background: var(--is-accent-soft);
+  color: var(--text-normal);
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+
+.interestseed-explorer-themes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.interestseed-explorer-theme {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 7px 10px;
+  border: 1px solid var(--is-border);
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--background-primary) 58%, transparent);
+  color: var(--text-normal);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 130ms ease, background 130ms ease, transform 130ms ease;
+}
+
+.interestseed-explorer-theme:hover {
+  border-color: color-mix(in srgb, var(--is-accent) 55%, var(--is-border));
+  background: color-mix(in srgb, var(--is-accent) 13%, var(--background-secondary));
+  transform: translateY(-1px);
+}
+
+.interestseed-explorer-theme-key {
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.interestseed-explorer-theme-meta {
+  color: var(--text-faint, var(--text-muted));
+  font-size: 0.65rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.interestseed-explorer-matrix-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--is-border);
+  border-radius: 10px;
+}
+
+.interestseed-explorer-matrix {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.72rem;
+}
+
+.interestseed-explorer-matrix th,
+.interestseed-explorer-matrix td {
+  padding: 6px 8px;
+  border-bottom: 1px solid color-mix(in srgb, var(--background-modifier-border) 55%, transparent);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.interestseed-explorer-matrix thead th {
+  color: var(--text-faint, var(--text-muted));
+  font-size: 0.65rem;
+  font-weight: 650;
+  letter-spacing: 0.03em;
+  background: color-mix(in srgb, var(--background-secondary) 76%, transparent);
+}
+
+.interestseed-explorer-matrix tbody th {
+  text-align: left;
+}
+
+.interestseed-explorer-theme-link {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: var(--text-normal);
+  font-size: 0.72rem;
+  cursor: pointer;
+  text-align: left;
+}
+
+.interestseed-explorer-theme-link:hover {
+  color: var(--is-accent-2);
+  text-decoration: underline;
+}
+
+.interestseed-explorer-matrix td.is-hit {
+  color: var(--text-normal);
+  font-weight: 700;
+  background: color-mix(in srgb, var(--is-accent) 10%, transparent);
+}
+
+.interestseed-explorer-matrix td.is-empty {
+  color: var(--text-faint, var(--text-muted));
+}
+
+.interestseed-explorer-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+  color: var(--text-muted);
+  font-size: 0.68rem;
+}
+
+.interestseed-ai-note {
+  margin: 0 0 8px;
+  color: var(--text-faint, var(--text-muted));
+  font-size: 0.7rem;
+  line-height: 1.5;
+}
+
+.interestseed-ai-result {
+  margin-top: 10px;
+}
+
+.interestseed-ai-summary {
+  margin: 0 0 8px;
+  color: var(--text-normal);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+.interestseed-ai-opportunity {
+  margin: 6px 0;
+  padding: 9px 10px;
+  border: 1px solid var(--is-border);
+  border-left: 3px solid var(--is-accent-2);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--background-primary) 52%, transparent);
+}
+
+.interestseed-ai-opportunity-title {
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.interestseed-ai-opportunity-why,
+.interestseed-ai-opportunity-next,
+.interestseed-ai-opportunity-themes {
+  margin-top: 3px;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+.interestseed-ai-opportunity-themes {
+  color: var(--text-faint, var(--text-muted));
+  font-family: var(--font-monospace);
+}

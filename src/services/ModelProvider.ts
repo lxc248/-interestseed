@@ -25,7 +25,33 @@ export interface ModelProvider {
 
   suggestRelations(request: RelationRequest): Promise<unknown>;
 
+  /** 只读探索洞察：只发送聚合后的主题/项目计数，不发送正文、路径或节点内容。 */
+  explore?(request: ExplorationRequest): Promise<unknown>;
+
   dispose(): void;
+}
+
+export interface ExplorationRequest {
+  themes: Array<{
+    key: string;
+    active: number;
+    total: number;
+  }>;
+  projects: string[];
+  activity: Array<{
+    date: string;
+    count: number;
+  }>;
+}
+
+export interface ExplorationInsight {
+  summary: string;
+  opportunities: Array<{
+    title: string;
+    why: string;
+    nextStep: string;
+    themes: string[];
+  }>;
 }
 
 export type ModelProviderErrorCode =
@@ -191,6 +217,67 @@ export class OpenAICompatibleModelProvider implements ModelProvider {
     );
   }
 
+  async explore(request: ExplorationRequest): Promise<unknown> {
+    if (this.disposed) {
+      throw new ModelProviderError('disabled', 'AI 服务已释放');
+    }
+    const safeRequest = sanitizeExplorationRequest(request);
+    const url = `${this.config.baseUrl.replace(/\/+$/, '')}/chat/completions`;
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    if (this.apiKey) headers.Authorization = `Bearer ${this.apiKey}`;
+
+    let response: Response;
+    try {
+      response = await this.fetchImpl(url, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          model: this.config.model,
+          messages: [
+            {
+              role: 'system',
+              content:
+                'Return exactly one JSON object. No prose, no Markdown, no code fences. ' +
+                'Shape: {"summary":"<short Chinese summary>","opportunities":[{"title":"<short title>","why":"<why supported by aggregate counts>","nextStep":"<concrete next action>","themes":["<theme>"]}]}. ' +
+                'Use only aggregate themes, projects and counts supplied by the user. ' +
+                'Do not invent facts, note content, sources or causes. ' +
+                'If evidence is insufficient, return a cautious summary and 0-2 opportunities.',
+            },
+            {
+              role: 'user',
+              content:
+                'Analyze this aggregated interest data. Return exactly one JSON object with the required shape:\n' +
+                JSON.stringify(safeRequest),
+            },
+          ],
+          temperature: 0.2,
+          stream: false,
+          response_format: { type: 'json_object' },
+        }),
+      });
+    } catch {
+      throw new ModelProviderError('network', 'AI 本地服务不可达');
+    }
+
+    if (!response.ok) {
+      throw new ModelProviderError('http', `AI 服务返回 HTTP ${response.status}`);
+    }
+
+    let payload: unknown;
+    try {
+      payload = await response.json();
+    } catch {
+      throw new ModelProviderError('invalid-response', 'AI 服务返回非 JSON');
+    }
+    const content = extractContent(payload);
+    if (content === null) {
+      throw new ModelProviderError('invalid-response', 'AI 服务返回结构无效');
+    }
+    return parseExplorationInsight(content);
+  }
+
   dispose(): void {
     this.disposed = true;
   }
@@ -317,6 +404,80 @@ function sanitizeRelationRequest(input: RelationRequest): RelationRequest {
   });
 
   return { nodes };
+}
+
+function sanitizeExplorationRequest(input: ExplorationRequest): ExplorationRequest {
+  if (!input || !Array.isArray(input.themes) || !Array.isArray(input.projects) || !Array.isArray(input.activity)) {
+    throw new ModelProviderError('invalid-request', 'AI 探索请求无效');
+  }
+  const themes = input.themes.map((item) => {
+    if (
+      typeof item?.key !== 'string' ||
+      typeof item.active !== 'number' ||
+      typeof item.total !== 'number'
+    ) {
+      throw new ModelProviderError('invalid-request', 'AI 主题字段无效');
+    }
+    return { key: item.key, active: item.active, total: item.total };
+  });
+  const projects = input.projects.filter((item): item is string => typeof item === 'string');
+  const activity = input.activity.map((item) => {
+    if (typeof item?.date !== 'string' || typeof item.count !== 'number') {
+      throw new ModelProviderError('invalid-request', 'AI 活动字段无效');
+    }
+    return { date: item.date, count: item.count };
+  });
+  return { themes, projects, activity };
+}
+
+/** 只接受完整 JSON 或完整代码围栏，避免从解释文本中猜测 JSON。 */
+export function parseExplorationInsight(content: string): ExplorationInsight {
+  let text = content.trim();
+  const fence = /^```(?:json)?\s*([\s\S]*?)\s*```$/i.exec(text);
+  if (fence) text = fence[1]!.trim();
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(text);
+  } catch {
+    throw new ModelProviderError('invalid-response', 'AI 返回内容不是 JSON');
+  }
+  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+    throw new ModelProviderError('invalid-response', 'AI 返回内容不是对象');
+  }
+  const summary = (parsed as { summary?: unknown }).summary;
+  const opportunities = (parsed as { opportunities?: unknown }).opportunities;
+  if (typeof summary !== 'string' || !summary.trim() || summary.length > 2000) {
+    throw new ModelProviderError('invalid-response', 'AI 总结缺失或过长');
+  }
+  if (!Array.isArray(opportunities) || opportunities.length > 8) {
+    throw new ModelProviderError('invalid-response', 'AI 机会列表无效');
+  }
+  const normalized = opportunities.map((item) => {
+    if (typeof item !== 'object' || item === null) {
+      throw new ModelProviderError('invalid-response', 'AI 机会项无效');
+    }
+    const title = (item as { title?: unknown }).title;
+    const why = (item as { why?: unknown }).why;
+    const nextStep = (item as { nextStep?: unknown }).nextStep;
+    const themeList = (item as { themes?: unknown }).themes;
+    if (
+      typeof title !== 'string' ||
+      typeof why !== 'string' ||
+      typeof nextStep !== 'string' ||
+      !Array.isArray(themeList) ||
+      !themeList.every((value) => typeof value === 'string')
+    ) {
+      throw new ModelProviderError('invalid-response', 'AI 机会字段无效');
+    }
+    return {
+      title: title.trim().slice(0, 120),
+      why: why.trim().slice(0, 500),
+      nextStep: nextStep.trim().slice(0, 300),
+      themes: themeList.slice(0, 12),
+    };
+  });
+  return { summary: summary.trim(), opportunities: normalized };
 }
 
 /**
