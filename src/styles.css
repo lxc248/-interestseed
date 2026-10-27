@@ -1886,3 +1886,8 @@ button.interestseed-inbox-node:hover {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
+.interestseed-discovery-card:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--is-accent) 72%, var(--is-accent-2));
+  outline-offset: 3px;
+  border-color: var(--is-accent);
+}

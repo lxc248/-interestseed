@@ -122,10 +122,27 @@ export class DiscoveryPanel {
     card.setAttr('data-status', item.status);
     card.setAttr('data-application', item.application?.state ?? 'none');
     card.setAttr('role', 'group');
+    card.setAttr('tabindex', '0');
     card.setAttr(
       'aria-label',
-      `${item.title}；${item.feedbackStatus}；${item.application?.state ?? 'none'}`,
+      `${item.title}；${item.feedbackStatus}；${item.application?.state ?? 'none'}；按上下键浏览发现`,
     );
+    card.addEventListener('keydown', (event) => {
+      if (event.target !== card) return;
+      const cards = Array.from(
+        parent.querySelectorAll<HTMLElement>('.interestseed-discovery-card'),
+      );
+      const index = cards.indexOf(card);
+      if (index < 0) return;
+      let next: number;
+      if (event.key === 'ArrowDown') next = Math.min(cards.length - 1, index + 1);
+      else if (event.key === 'ArrowUp') next = Math.max(0, index - 1);
+      else if (event.key === 'Home') next = 0;
+      else if (event.key === 'End') next = cards.length - 1;
+      else return;
+      event.preventDefault();
+      cards[next]?.focus();
+    });
 
     card.createDiv({ cls: 'interestseed-discovery-title', text: item.title });
 
