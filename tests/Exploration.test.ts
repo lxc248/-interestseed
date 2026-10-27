@@ -38,7 +38,7 @@ describe('Discovery exploration matrix', () => {
     ];
 
     const data = buildExploration(file, NOW);
-    expect(data.matrix.projects).toEqual(['未归类项目', 'P1', 'P2']);
+    expect(data.matrix.projects).toEqual(['P1', 'P2', '未归类项目']);
     expect(data.matrix.themes[0]?.key).toBe('theme8');
     expect(data.matrix.themes[0]?.total).toBe(2);
     expect(data.matrix.themes[0]?.projects).toEqual(['P1', 'P2']);

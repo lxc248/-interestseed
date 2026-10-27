@@ -17,6 +17,10 @@ import { GraphCanvas } from './GraphCanvas';
 import { DiscoveryApplyModal } from './DiscoveryApplyModal';
 import { DiscoveryCorrectionModal } from './DiscoveryCorrectionModal';
 import { DiscoveryPanel } from './DiscoveryPanel';
+import {
+  getDiscoveryThemeKeys,
+  UNCATEGORIZED_THEME,
+} from '../discovery/exploration';
 
 export const INTERESTSEED_VIEW_TYPE = 'interestseed-graph-view';
 
@@ -370,12 +374,14 @@ export class InterestSeedView extends ItemView {
   private renderDiscoveries(): void {
     const all = this.plugin.listDiscoveries();
     const filtered = this.discoveryThemeFilter
-      ? all.filter(
-          (item) =>
-            (item.subjectKeys.length > 0
-              ? item.subjectKeys.join(' · ')
-              : '未分类主题') === this.discoveryThemeFilter,
-        )
+      ? all.filter((item) => {
+          const keys = getDiscoveryThemeKeys(item);
+          return (
+            (keys.length > 0 ? keys : [UNCATEGORIZED_THEME]).includes(
+              this.discoveryThemeFilter!,
+            )
+          );
+        })
       : all;
     this.discoveryPanel?.render(
       filtered,

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../src/styles.css">
+<style>
+:root { --background-primary:#171a21; --background-secondary:#20242e; --background-modifier-border:#343a48; --text-normal:#f1f4fa; --text-muted:#a7b0c2; --text-faint:#697386; --interactive-accent:#8b7cf6; --color-yellow:#fbbf24; --color-red:#fb7185; --color-green:#34d399; }
+.interestseed-insight-modal .modal-content { max-height:none !important; }\nbody { margin:0; padding:38px; background:#0d1015; font-family:Inter, "Microsoft YaHei", sans-serif; }
+.modal { position:relative; margin:auto; }
+</style>
+</head>
+<body>
+<div class="modal interestseed-insight-modal">
+  <div class="modal-content interestseed-overview interestseed-explorer interestseed-insight-shell">
+    <div class="interestseed-insight-hero">
+      <div class="interestseed-insight-hero-top"><div class="interestseed-insight-eyebrow"><span class="interestseed-insight-live-dot"></span><span>INTEREST SEED / EXPLORATION</span></div><span class="interestseed-insight-readonly">只读 · 本地计算 · AI 可选</span></div>
+      <h1 class="interestseed-insight-title">你的兴趣，正在形成一张地图</h1>
+      <p class="interestseed-insight-subtitle">从 9 条发现中识别 5 个主题，连接 2 个项目。先看本地信号，再决定是否让 AI 解释。</p>
+      <div class="interestseed-insight-stats">
+        <div class="interestseed-insight-stat"><span class="interestseed-overview-stat-value">9</span><span class="interestseed-overview-stat-label">发现</span><span class="interestseed-insight-stat-hint">全部记录</span></div>
+        <div class="interestseed-insight-stat"><span class="interestseed-overview-stat-value">6</span><span class="interestseed-overview-stat-label">活动</span><span class="interestseed-insight-stat-hint">尚未抑制</span></div>
+        <div class="interestseed-insight-stat"><span class="interestseed-overview-stat-value">5</span><span class="interestseed-overview-stat-label">跨项目主题</span><span class="interestseed-insight-stat-hint">连接 2+ 项目</span></div>
+        <div class="interestseed-insight-stat"><span class="interestseed-overview-stat-value">12</span><span class="interestseed-overview-stat-label">7 天反馈</span><span class="interestseed-insight-stat-hint">最近节奏</span></div>
+      </div>
+    </div>
+    <div class="interestseed-insight-tabs"><button class="interestseed-insight-tab">洞察</button><button class="interestseed-insight-tab">主题矩阵</button><button class="interestseed-insight-tab">趋势</button><button class="interestseed-insight-tab">AI 解读</button></div>
+    <div class="interestseed-overview-section interestseed-insight-section">
+      <div class="interestseed-insight-section-head"><span class="interestseed-insight-kicker">01 / SIGNALS</span><h3>先看结论</h3></div>
+      <p class="interestseed-insight-section-desc">这些结论完全来自本地聚合，不依赖 AI。</p>
+      <div class="interestseed-insight-list">
+        <div class="interestseed-insight-card is-bridge"><div class="interestseed-insight-card-index">01</div><div class="interestseed-insight-card-body"><div class="interestseed-insight-card-top"><span class="interestseed-insight-kicker">跨项目连接</span><span class="interestseed-insight-confidence">置信度 74%</span></div><h4>「theme8」正在跨项目连接</h4><p>这个主题出现在 2 个项目里，且有 6 条活动发现；它更像一条可复用的兴趣主线，而不是单篇笔记的偶然标签。</p><div class="interestseed-insight-evidence"><span>6 条活动发现 / 9 条总发现</span><span>横跨 2 个项目</span><span>2 条已接受</span></div><button class="interestseed-insight-inline-link">查看相关主题 →</button></div></div>
+        <div class="interestseed-insight-card is-momentum"><div class="interestseed-insight-card-index">02</div><div class="interestseed-insight-card-body"><div class="interestseed-insight-card-top"><span class="interestseed-insight-kicker">势能</span><span class="interestseed-insight-confidence">置信度 82%</span></div><h4>「theme8」值得继续加注</h4><p>它的接受率为 67%，说明你的反馈已经把它从“看起来相关”推向“确实有用”。</p><div class="interestseed-insight-evidence"><span>2 条已接受</span><span>横跨 2 个项目</span></div><button class="interestseed-insight-inline-link">查看相关主题 →</button></div></div>
+      </div>
+    </div>
+    <div class="interestseed-overview-section interestseed-insight-section">
+      <div class="interestseed-insight-section-head"><span class="interestseed-insight-kicker">02 / THEMES</span><h3>主题入口</h3></div>
+      <p class="interestseed-insight-section-desc">按活动量和跨项目扩散排序；点击进入发现列表。</p>
+      <div class="interestseed-insight-theme-grid">
+        <button class="interestseed-insight-theme-card"><div class="interestseed-insight-theme-head"><span class="interestseed-insight-theme-name">#theme8</span><span class="interestseed-insight-theme-score">74%</span></div><div class="interestseed-insight-theme-meta"><span>6 活动</span><span>2 项目</span><span class="is-positive">2 接受</span></div><div class="interestseed-insight-theme-bar"><div class="interestseed-insight-theme-bar-fill" style="width:74%"></div></div></button>
+        <button class="interestseed-insight-theme-card"><div class="interestseed-insight-theme-head"><span class="interestseed-insight-theme-name">#theme9</span><span class="interestseed-insight-theme-score">52%</span></div><div class="interestseed-insight-theme-meta"><span>3 活动</span><span>1 项目</span><span class="is-warning">1 低价值</span></div><div class="interestseed-insight-theme-bar"><div class="interestseed-insight-theme-bar-fill" style="width:52%"></div></div></button>
+        <button class="interestseed-insight-theme-card"><div class="interestseed-insight-theme-head"><span class="interestseed-insight-theme-name">#人工智能</span><span class="interestseed-insight-theme-score">44%</span></div><div class="interestseed-insight-theme-meta"><span>2 活动</span><span>2 项目</span></div><div class="interestseed-insight-theme-bar"><div class="interestseed-insight-theme-bar-fill" style="width:44%"></div></div></button>
+      </div>
+    </div>
+    <div class="interestseed-overview-section interestseed-insight-section">
+      <div class="interestseed-insight-section-head"><span class="interestseed-insight-kicker">03 / MATRIX</span><h3>主题 × 项目</h3></div>
+      <p class="interestseed-insight-section-desc">颜色越亮，代表这个主题在该项目中的发现越多；点击单元格可筛选主题。</p>
+      <div class="interestseed-explorer-matrix-wrap"><table class="interestseed-explorer-matrix interestseed-insight-matrix"><thead><tr><th>主题</th><th>P1</th><th>P2</th><th>未归类项目</th></tr></thead><tbody>
+        <tr><th><button class="interestseed-explorer-theme-link">#theme8</button></th><td class="is-hit" style="--is-heat:.82"><button class="interestseed-insight-cell">5</button></td><td class="is-hit" style="--is-heat:.52"><button class="interestseed-insight-cell">3</button></td><td class="is-empty"><span class="interestseed-insight-cell-empty">·</span></td></tr>
+        <tr><th><button class="interestseed-explorer-theme-link">#theme9</button></th><td class="is-hit" style="--is-heat:.4"><button class="interestseed-insight-cell">2</button></td><td class="is-empty"><span class="interestseed-insight-cell-empty">·</span></td><td class="is-empty"><span class="interestseed-insight-cell-empty">·</span></td></tr>
+      </tbody></table></div>
+    </div>
+    <div class="interestseed-overview-section interestseed-insight-section">
+      <div class="interestseed-insight-section-head"><span class="interestseed-insight-kicker">04 / RHYTHM</span><h3>近 7 天反馈节奏</h3></div>
+      <p class="interestseed-insight-section-desc">看的是反馈事件，不是阅读时长；用它判断探索是否在持续推进。</p>
+      <div class="interestseed-insight-chart">
+        <div class="interestseed-insight-chart-column"><span class="interestseed-insight-chart-value">2</span><div class="interestseed-insight-chart-track"><div class="interestseed-insight-chart-bar" style="height:38%"></div></div><span class="interestseed-insight-chart-label">10-21</span></div>
+        <div class="interestseed-insight-chart-column"><span class="interestseed-insight-chart-value">0</span><div class="interestseed-insight-chart-track"><div class="interestseed-insight-chart-bar" style="height:4%"></div></div><span class="interestseed-insight-chart-label">10-22</span></div>
+        <div class="interestseed-insight-chart-column"><span class="interestseed-insight-chart-value">4</span><div class="interestseed-insight-chart-track"><div class="interestseed-insight-chart-bar" style="height:76%"></div></div><span class="interestseed-insight-chart-label">10-23</span></div>
+        <div class="interestseed-insight-chart-column"><span class="interestseed-insight-chart-value">1</span><div class="interestseed-insight-chart-track"><div class="interestseed-insight-chart-bar" style="height:19%"></div></div><span class="interestseed-insight-chart-label">10-24</span></div>
+        <div class="interestseed-insight-chart-column"><span class="interestseed-insight-chart-value">5</span><div class="interestseed-insight-chart-track"><div class="interestseed-insight-chart-bar" style="height:95%"></div></div><span class="interestseed-insight-chart-label">10-25</span></div>
+        <div class="interestseed-insight-chart-column"><span class="interestseed-insight-chart-value">0</span><div class="interestseed-insight-chart-track"><div class="interestseed-insight-chart-bar" style="height:4%"></div></div><span class="interestseed-insight-chart-label">10-26</span></div>
+        <div class="interestseed-insight-chart-column"><span class="interestseed-insight-chart-value">0</span><div class="interestseed-insight-chart-track"><div class="interestseed-insight-chart-bar" style="height:4%"></div></div><span class="interestseed-insight-chart-label">10-27</span></div>
+      </div>
+    </div>
+    <div class="interestseed-overview-section interestseed-insight-section">
+      <div class="interestseed-insight-section-head"><span class="interestseed-insight-kicker">05 / EXPLAIN</span><h3>AI 解读</h3></div>
+      <p class="interestseed-insight-section-desc">本地信号先成立，AI 只负责把信号翻译成可执行的下一步。</p>
+      <div class="interestseed-insight-ai-note"><span class="interestseed-insight-ai-gate">默认关闭</span><span>只发送匿名化主题/项目别名、聚合计数和活动数据；不发送笔记正文、路径或证据原文。启用需在设置中授权。</span></div>
+      <div class="interestseed-insight-ai-actions"><button class="interestseed-modal-button is-primary interestseed-insight-ai-button">生成可解释解读</button><div class="interestseed-apply-status">本地洞察已在上方；AI 仅做解释。</div></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

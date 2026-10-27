@@ -54,4 +54,29 @@ describe('AI exploration insight parser', () => {
     );
     expect(result.opportunities[0]?.themes).toEqual(['theme8']);
   });
+
+  it('保留可解释推理、置信度与证据字段', () => {
+    const result = parseExplorationInsight(
+      JSON.stringify({
+        summary: 'ok',
+        confidence: 0.76,
+        reasoning: ['观察：theme8 跨 3 个项目', '推断：它是稳定主线', '行动：继续收集'],
+        opportunities: [
+          {
+            title: 'x',
+            why: 'y',
+            nextStep: 'z',
+            themes: ['theme8'],
+            evidence: ['3 个项目', '5 条发现'],
+            confidence: 0.7,
+          },
+        ],
+      }),
+      new Set(['theme8']),
+    );
+    expect(result.confidence).toBe(0.76);
+    expect(result.reasoning).toHaveLength(3);
+    expect(result.opportunities[0]?.evidence).toEqual(['3 个项目', '5 条发现']);
+    expect(result.opportunities[0]?.confidence).toBe(0.7);
+  });
 });

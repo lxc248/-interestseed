@@ -428,6 +428,7 @@ export default class InterestSeedPlugin extends Plugin {
       onThemeSelect: (theme) => {
         void this.showDiscoveriesForTheme(theme);
       },
+      aiAvailable: this.settings.enableAI && this.settings.aiConsentGranted,
       onGenerateAi: (request) => this.generateExplorationInsight(request),
     }).open();
   }

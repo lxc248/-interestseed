@@ -38,9 +38,9 @@ describe('Discovery overview', () => {
         feedbackStatus: 'accepted',
         feedbackHistory: [
           {
-            id: 'd1:accepted:2026-01-01T00:00:00.000Z:0',
+            id: 'd1:accepted:2026-01-01T17:00:00.000Z:0',
             action: 'accepted',
-            at: NOW,
+            at: '2026-01-01T17:00:00.000Z',
             previousStatus: 'none',
           },
         ],

@@ -5,6 +5,10 @@ import type {
   DiscoveryFeedbackStatus,
   DiscoveryFile,
 } from './types';
+import {
+  getDiscoveryThemeKeys,
+  UNCATEGORIZED_THEME,
+} from './exploration';
 
 export interface DiscoveryOverviewTheme {
   key: string;
@@ -67,12 +71,6 @@ const EMPTY_APPLICATION: Record<DiscoveryApplicationState, number> = {
   'recovery-required': 0,
 };
 
-function themeKey(discovery: Discovery): string {
-  return discovery.subjectKeys.length > 0
-    ? discovery.subjectKeys.join(' · ')
-    : '未分类主题';
-}
-
 /**
  * 只读总览：不修改发现、反馈或图谱。
  * 仅聚合已有记录，作为“探索/回顾”入口。
@@ -88,11 +86,14 @@ export function buildDiscoveryOverview(
   const edgeMap = new Map<string, DiscoveryOverviewEdge>();
   const activityMap = new Map<string, number>();
   const nowDate = new Date(now);
-  const dayKey = (date: Date): string => date.toISOString().slice(0, 10);
+  const safeNow = Number.isNaN(nowDate.getTime()) ? new Date() : nowDate;
+  const pad = (value: number): string => String(value).padStart(2, '0');
+  const dayKey = (date: Date): string =>
+    `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 
   for (let offset = 6; offset >= 0; offset -= 1) {
-    const day = new Date(nowDate);
-    day.setUTCDate(day.getUTCDate() - offset);
+    const day = new Date(safeNow);
+    day.setDate(day.getDate() - offset);
     activityMap.set(dayKey(day), 0);
   }
 
@@ -102,27 +103,31 @@ export function buildDiscoveryOverview(
     application[app] += 1;
 
     for (const event of item.feedbackHistory ?? []) {
-      const key = event.at.slice(0, 10);
+      const eventDate = new Date(event.at);
+      if (Number.isNaN(eventDate.getTime())) continue;
+      const key = dayKey(eventDate);
       if (activityMap.has(key)) activityMap.set(key, (activityMap.get(key) ?? 0) + 1);
     }
 
-    const key = themeKey(item);
-    const theme =
-      themeMap.get(key) ??
-      {
-        key,
-        active: 0,
-        accepted: 0,
-        corrected: 0,
-        lowValue: 0,
-        applied: 0,
-      };
-    if (item.status === 'active') theme.active += 1;
-    if (item.feedbackStatus === 'accepted') theme.accepted += 1;
-    if (item.feedbackStatus === 'corrected') theme.corrected += 1;
-    if (item.feedbackStatus === 'low-value') theme.lowValue += 1;
-    if (app === 'applied' || app === 'existing') theme.applied += 1;
-    themeMap.set(key, theme);
+    const keys = getDiscoveryThemeKeys(item);
+    for (const key of keys.length > 0 ? keys : [UNCATEGORIZED_THEME]) {
+      const theme =
+        themeMap.get(key) ??
+        {
+          key,
+          active: 0,
+          accepted: 0,
+          corrected: 0,
+          lowValue: 0,
+          applied: 0,
+        };
+      if (item.status === 'active') theme.active += 1;
+      if (item.feedbackStatus === 'accepted') theme.accepted += 1;
+      if (item.feedbackStatus === 'corrected') theme.corrected += 1;
+      if (item.feedbackStatus === 'low-value') theme.lowValue += 1;
+      if (app === 'applied' || app === 'existing') theme.applied += 1;
+      themeMap.set(key, theme);
+    }
 
     const edgeId = item.application?.edgeId;
     if ((app === 'applied' || app === 'existing') && edgeId) {
@@ -150,7 +155,7 @@ export function buildDiscoveryOverview(
       (left, right) =>
         right.active - left.active ||
         right.accepted - left.accepted ||
-        left.key.localeCompare(right.key),
+        (left.key < right.key ? -1 : left.key > right.key ? 1 : 0),
     ),
     appliedEdges: [...edgeMap.values()],
     activity: [...activityMap.entries()].map(([date, count]) => ({

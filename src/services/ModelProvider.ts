@@ -26,7 +26,7 @@ export interface ModelProvider {
   suggestRelations(request: RelationRequest): Promise<unknown>;
 
   /** 只读探索洞察：只发送匿名化主题/项目别名与聚合计数，不发送正文、路径或节点内容。 */
-  explore?(request: ExplorationRequest): Promise<unknown>;
+  explore?(request: ExplorationRequest): Promise<ExplorationInsight>;
 
   dispose(): void;
 }
@@ -36,6 +36,9 @@ export interface ExplorationRequest {
     key: string;
     active: number;
     total: number;
+    projectCount?: number;
+    acceptanceRate?: number;
+    signal?: number;
   }>;
   projects: string[];
   activity: Array<{
@@ -46,11 +49,17 @@ export interface ExplorationRequest {
 
 export interface ExplorationInsight {
   summary: string;
+  /** AI 的显式推理步骤；UI 会原样展示，避免只有结论没有依据。 */
+  reasoning: string[];
+  /** 0-1，模型自评置信度；不是事实概率。 */
+  confidence: number;
   opportunities: Array<{
     title: string;
     why: string;
     nextStep: string;
     themes: string[];
+    evidence: string[];
+    confidence: number;
   }>;
 }
 
@@ -59,6 +68,8 @@ export type ModelProviderErrorCode =
   | 'not-authorized'
   | 'invalid-request'
   | 'network'
+  | 'timeout'
+  | 'aborted'
   | 'http'
   | 'invalid-response';
 
@@ -139,7 +150,7 @@ export function resolveLocalApiKey(): string | undefined {
  */
 export class OpenAICompatibleModelProvider implements ModelProvider {
   private disposed = false;
-  private abortController: AbortController | null = null;
+  private abortControllers = new Set<AbortController>();
 
   constructor(
     private readonly config: ExperimentalModelConfig = DEEPSEEK_V4_PRO_CONFIG,
@@ -218,7 +229,7 @@ export class OpenAICompatibleModelProvider implements ModelProvider {
     );
   }
 
-  async explore(request: ExplorationRequest): Promise<unknown> {
+  async explore(request: ExplorationRequest): Promise<ExplorationInsight> {
     if (this.disposed) {
       throw new ModelProviderError('disabled', 'AI 服务已释放');
     }
@@ -229,12 +240,15 @@ export class OpenAICompatibleModelProvider implements ModelProvider {
     };
     if (this.apiKey) headers.Authorization = `Bearer ${this.apiKey}`;
 
-    let response: Response;
     const controller = new AbortController();
-    this.abortController = controller;
-    const timeout = globalThis.setTimeout(() => controller.abort(), 30_000);
+    let timedOut = false;
+    this.abortControllers.add(controller);
+    const timeout = globalThis.setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, 30_000);
     try {
-      response = await this.fetchImpl(url, {
+      const response = await this.fetchImpl(url, {
         method: 'POST',
         headers,
         signal: controller.signal,
@@ -245,10 +259,11 @@ export class OpenAICompatibleModelProvider implements ModelProvider {
               role: 'system',
               content:
                 'Return exactly one JSON object. No prose, no Markdown, no code fences. ' +
-                'Shape: {"summary":"<short Chinese summary>","opportunities":[{"title":"<short title>","why":"<why supported by aggregate counts>","nextStep":"<concrete next action>","themes":["<theme>"]}]}. ' +
+                'Shape: {"summary":"<short Chinese summary>","confidence":0.0,"reasoning":["<observation>","<inference>","<action>"],"opportunities":[{"title":"<short title>","why":"<why supported by aggregate counts>","nextStep":"<concrete next action>","themes":["<theme alias>"],"evidence":["<count or spread from input>"],"confidence":0.0}]}. ' +
                 'Use only aggregate themes, projects and counts supplied by the user. ' +
+                'Every opportunity must cite at least one numeric observation from the input in evidence. ' +
                 'Do not invent facts, note content, sources or causes. ' +
-                'If evidence is insufficient, return a cautious summary and 0-2 opportunities.',
+                'If evidence is insufficient, return a cautious summary, confidence below 0.5, and 0-2 opportunities.',
             },
             {
               role: 'user',
@@ -262,37 +277,42 @@ export class OpenAICompatibleModelProvider implements ModelProvider {
           response_format: { type: 'json_object' },
         }),
       });
-    } catch {
-      throw new ModelProviderError('network', 'AI 本地服务不可达或请求超时');
+      if (!response.ok) {
+        throw new ModelProviderError('http', `AI 服务返回 HTTP ${response.status}`);
+      }
+      let payload: unknown;
+      try {
+        payload = await response.json();
+      } catch {
+        throw new ModelProviderError('invalid-response', 'AI 服务返回非 JSON');
+      }
+      const content = extractContent(payload);
+      if (content === null) {
+        throw new ModelProviderError('invalid-response', 'AI 服务返回结构无效');
+      }
+      return parseExplorationInsight(
+        content,
+        new Set(safeRequest.themes.map((theme) => theme.key)),
+      );
+    } catch (error) {
+      if (error instanceof ModelProviderError) throw error;
+      if (timedOut) {
+        throw new ModelProviderError('timeout', 'AI 请求超时，请稍后重试');
+      }
+      if (controller.signal.aborted) {
+        throw new ModelProviderError('aborted', 'AI 请求已取消');
+      }
+      throw new ModelProviderError('network', 'AI 本地服务不可达');
     } finally {
       globalThis.clearTimeout(timeout);
-      if (this.abortController === controller) this.abortController = null;
+      this.abortControllers.delete(controller);
     }
-
-    if (!response.ok) {
-      throw new ModelProviderError('http', `AI 服务返回 HTTP ${response.status}`);
-    }
-
-    let payload: unknown;
-    try {
-      payload = await response.json();
-    } catch {
-      throw new ModelProviderError('invalid-response', 'AI 服务返回非 JSON');
-    }
-    const content = extractContent(payload);
-    if (content === null) {
-      throw new ModelProviderError('invalid-response', 'AI 服务返回结构无效');
-    }
-    return parseExplorationInsight(
-      content,
-      new Set(safeRequest.themes.map((theme) => theme.key)),
-    );
   }
 
   dispose(): void {
     this.disposed = true;
-    this.abortController?.abort();
-    this.abortController = null;
+    for (const controller of this.abortControllers) controller.abort();
+    this.abortControllers.clear();
   }
 }
 
@@ -419,11 +439,22 @@ function sanitizeRelationRequest(input: RelationRequest): RelationRequest {
   return { nodes };
 }
 
+function clampNumber(value: number): number {
+  if (!Number.isFinite(value)) return 0;
+  return Math.max(0, Math.min(1, value));
+}
+
+function countNumber(value: number | undefined): number {
+  return typeof value === 'number' && Number.isFinite(value)
+    ? Math.max(0, Math.floor(value))
+    : 0;
+}
+
 function sanitizeExplorationRequest(input: ExplorationRequest): ExplorationRequest {
   if (!input || !Array.isArray(input.themes) || !Array.isArray(input.projects) || !Array.isArray(input.activity)) {
     throw new ModelProviderError('invalid-request', 'AI 探索请求无效');
   }
-  const themes = input.themes.map((item) => {
+  const themes = input.themes.slice(0, 20).map((item) => {
     if (
       typeof item?.key !== 'string' ||
       typeof item.active !== 'number' ||
@@ -431,14 +462,24 @@ function sanitizeExplorationRequest(input: ExplorationRequest): ExplorationReque
     ) {
       throw new ModelProviderError('invalid-request', 'AI 主题字段无效');
     }
-    return { key: item.key, active: item.active, total: item.total };
+    return {
+      key: item.key.slice(0, 80),
+      active: countNumber(item.active),
+      total: countNumber(item.total),
+      projectCount: countNumber(item.projectCount),
+      acceptanceRate: clampNumber(item.acceptanceRate ?? 0),
+      signal: clampNumber(item.signal ?? 0),
+    };
   });
-  const projects = input.projects.filter((item): item is string => typeof item === 'string');
-  const activity = input.activity.map((item) => {
+  const projects = input.projects
+    .filter((item): item is string => typeof item === 'string' && Boolean(item.trim()))
+    .slice(0, 30)
+    .map((item) => item.slice(0, 80));
+  const activity = input.activity.slice(-14).map((item) => {
     if (typeof item?.date !== 'string' || typeof item.count !== 'number') {
       throw new ModelProviderError('invalid-request', 'AI 活动字段无效');
     }
-    return { date: item.date, count: item.count };
+    return { date: item.date.slice(0, 20), count: countNumber(item.count) };
   });
   return { themes, projects, activity };
 }
@@ -463,12 +504,27 @@ export function parseExplorationInsight(
   }
   const summary = (parsed as { summary?: unknown }).summary;
   const opportunities = (parsed as { opportunities?: unknown }).opportunities;
-  if (typeof summary !== 'string' || !summary.trim() || summary.length > 2000) {
+  const summaryText = typeof summary === 'string' ? summary.trim() : '';
+  if (!summaryText || summaryText.length > 1200) {
     throw new ModelProviderError('invalid-response', 'AI 总结缺失或过长');
   }
   if (!Array.isArray(opportunities) || opportunities.length > 8) {
     throw new ModelProviderError('invalid-response', 'AI 机会列表无效');
   }
+  const reasoningRaw = (parsed as { reasoning?: unknown }).reasoning;
+  const reasoning = Array.isArray(reasoningRaw)
+    ? reasoningRaw
+        .filter((value): value is string => typeof value === 'string')
+        .map((value) => value.trim().slice(0, 300))
+        .filter(Boolean)
+        .slice(0, 5)
+    : [];
+  const confidenceRaw = (parsed as { confidence?: unknown }).confidence;
+  const confidence =
+    typeof confidenceRaw === 'number' && Number.isFinite(confidenceRaw)
+      ? clampNumber(confidenceRaw)
+      : 0.5;
+
   const normalized = opportunities.map((item) => {
     if (typeof item !== 'object' || item === null) {
       throw new ModelProviderError('invalid-response', 'AI 机会项无效');
@@ -481,24 +537,48 @@ export function parseExplorationInsight(
       typeof title !== 'string' ||
       typeof why !== 'string' ||
       typeof nextStep !== 'string' ||
+      !title.trim() ||
+      !why.trim() ||
+      !nextStep.trim() ||
       !Array.isArray(themeList) ||
       !themeList.every((value) => typeof value === 'string')
     ) {
       throw new ModelProviderError('invalid-response', 'AI 机会字段无效');
     }
+    const evidenceRaw = (item as { evidence?: unknown }).evidence;
+    const evidence = Array.isArray(evidenceRaw)
+      ? evidenceRaw
+          .filter((value): value is string => typeof value === 'string')
+          .map((value) => value.trim().slice(0, 200))
+          .filter(Boolean)
+          .slice(0, 5)
+      : [];
+    const itemConfidenceRaw = (item as { confidence?: unknown }).confidence;
     return {
       title: title.trim().slice(0, 120),
       why: why.trim().slice(0, 500),
       nextStep: nextStep.trim().slice(0, 300),
       themes: themeList
+        .filter((value): value is string => typeof value === 'string')
+        .map((value) => value.trim())
         .filter(
           (value): value is string =>
-            typeof value === 'string' && (!allowedThemes || allowedThemes.has(value)),
+            Boolean(value) && (!allowedThemes || allowedThemes.has(value)),
         )
         .slice(0, 12),
+      evidence,
+      confidence:
+        typeof itemConfidenceRaw === 'number' && Number.isFinite(itemConfidenceRaw)
+          ? clampNumber(itemConfidenceRaw)
+          : confidence,
     };
   });
-  return { summary: summary.trim(), opportunities: normalized };
+  return {
+    summary: summaryText,
+    reasoning,
+    confidence,
+    opportunities: normalized,
+  };
 }
 
 /**

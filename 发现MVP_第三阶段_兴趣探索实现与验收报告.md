@@ -20,27 +20,31 @@
 
 新增 `buildExploration()`：
 
-- 按 `subjectKeys` 聚合主题；
-- 按 `projectKeys` 聚合项目；
+- 每个 `subjectKeys` 作为独立主题识别，多标签发现进入多个主题；
+- 按 `projectKeys` 聚合项目，区分真实项目与“未归类项目”；
 - 建立主题×项目计数矩阵；
-- 统计 active/accepted/corrected/low-value；
+- 统计 active / accepted / rejected / corrected / low-value；
+- 计算跨项目扩散、接受率与信号强度；
 - 不读取正文、路径或证据文本。
 
-### 2.2 探索面板
+### 2.2 探索工作台
 
 新增：
 
 ```text
 src/ui/DiscoveryExplorerModal.ts
+src/discovery/insights.ts
 ```
 
 包含：
 
-- 主题入口卡片；
-- 主题×项目矩阵；
-- 近 7 天反馈活动；
-- 反馈分布；
-- 可选 AI 探索解读。
+- 本地洞察卡：跨项目连接、势能、质量边界、覆盖缺口；
+- “依据 → 判断 → 下一步”卡内结构；
+- 主题入口卡片与跨项目/接受/低价值标签；
+- 主题×项目热力矩阵、图例与主题筛选；
+- 近 7 天反馈节奏图（0 值不画假柱）；
+- 可选 AI 可解释解读；
+- 键盘焦点、aria-live、图表摘要与窄屏适配。
 
 ### 2.3 主题联动
 
@@ -60,15 +64,18 @@ src/ui/DiscoveryExplorerModal.ts
 
 - 仅在 `enableAI` + `aiConsentGranted` 时为可用；
 - 请求只包含：
-  - 主题键；
-  - 项目名称；
-  - active/total 计数；
+  - 匿名化主题别名；
+  - 匿名化项目别名；
+  - active/total、跨项目数、接受率、信号强度；
   - 日期与反馈数量；
 - 不发送正文、路径、节点内容或原始证据；
 - 返回严格 JSON：
   - summary；
-  - opportunities（title / why / nextStep / themes）；
+  - reasoning（观察 → 推断 → 行动）；
+  - confidence（模型自评）；
+  - opportunities（title / why / nextStep / themes / evidence / confidence）；
 - 严格校验，不使用解释文本中猜测的 JSON；
+- AI 主题按请求白名单过滤，未知主题丢弃；
 - 失败时回退到本地探索数据，不写任何状态。
 
 ### 2.5 命令与入口
@@ -113,11 +120,30 @@ research/phase3_simulation.py
 research/phase3_simulation_results.json
 ```
 
+第二轮独立实验：
+
+```text
+2,000 personas × 5 任务 × 6 设计 = 60,000 次试验
+完整探索层成功率 58.3%（纯列表 27.2%）
+边界组成功率 60.9%
+```
+
+报告：
+
+```text
+research/第三阶段_独立仿真实验V2.md
+research/phase3_simulation_v2.py
+research/phase3_simulation_v2_results.json
+```
+
 ## 4. 测试与质量
 
 ```text
 typecheck       通过
-test            42 文件 / 427 用例通过\n\nmain.js         416,190 bytes / E1AD36FC2F281A26710C4F095752C603A0C6DB0994C391BBB64EEEC1E53A9DC7\nstyles.css       44,643 bytes / 32D9B9E4AC057B59BA62B0149829BF230D6D67AECF7ECAC109A196212AAD2B11
+test            43 文件 / 431 用例通过
+
+main.js         440,563 bytes / 78DB328629EC2D08FCECC390D7B2F8AFEE010022774142489D913D97278E38F3
+styles.css       69,065 bytes / 6F1CCE1DEE698D198A600CDE53DEEB23CF1FE47379C2A889C61297FE5DDBF7BC
 lint            通过
 build           通过
 ```
@@ -127,6 +153,8 @@ build           通过
 ```text
 tests/Exploration.test.ts
 tests/ExplorationInsight.test.ts
+tests/ExplorationProperty.test.ts
+tests/ExplorationRecognition.test.ts
 ```
 
 ## 5. 安全边界
