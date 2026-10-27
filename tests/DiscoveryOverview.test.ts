@@ -33,7 +33,18 @@ describe('Discovery overview', () => {
   it('汇总反馈、主题、应用和最近变化', () => {
     const file = emptyDiscoveryFile(NOW);
     file.discoveries = [
-      item({ id: 'd1', feedbackStatus: 'accepted' }),
+      item({
+        id: 'd1',
+        feedbackStatus: 'accepted',
+        feedbackHistory: [
+          {
+            id: 'd1:accepted:2026-01-01T00:00:00.000Z:0',
+            action: 'accepted',
+            at: NOW,
+            previousStatus: 'none',
+          },
+        ],
+      }),
       item({ id: 'd2', feedbackStatus: 'corrected' }),
       item({ id: 'd3', feedbackStatus: 'low-value', status: 'dismissed' }),
       item({ id: 'd4', feedbackStatus: 'rejected', status: 'dismissed' }),
@@ -61,7 +72,7 @@ describe('Discovery overview', () => {
       },
     ];
 
-    const overview = buildDiscoveryOverview(file, graph);
+    const overview = buildDiscoveryOverview(file, graph, '2026-01-01T12:00:00.000Z');
 
     expect(overview.total).toBe(5);
     expect(overview.feedback.accepted).toBe(2);
@@ -70,6 +81,8 @@ describe('Discovery overview', () => {
     expect(overview.application.applied).toBe(1);
     expect(overview.appliedEdges).toHaveLength(1);
     expect(overview.themes[0]?.key).toBe('theme8');
+    expect(overview.activity).toHaveLength(7);
+    expect(overview.activity.at(-1)?.count).toBe(1);
     expect(overview.recent).toHaveLength(5);
   });
 });

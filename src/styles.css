@@ -1851,3 +1851,38 @@ button.interestseed-inbox-node:hover {
 .interestseed-quick-action[aria-pressed='true']:hover {
   color: #fff;
 }
+/* 总览：近 7 天活动条形图 */
+.interestseed-activity-row {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 32px;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 0.72rem;
+}
+
+.interestseed-activity-label {
+  color: var(--text-faint, var(--text-muted));
+  font-variant-numeric: tabular-nums;
+}
+
+.interestseed-activity-track {
+  height: 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--background-modifier-border) 60%, transparent);
+}
+
+.interestseed-activity-bar {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #7c3aed, #22d3ee);
+  box-shadow: 0 0 12px rgba(34, 211, 238, 0.28);
+  transition: width 240ms ease;
+}
+
+.interestseed-activity-value {
+  color: var(--text-muted);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}

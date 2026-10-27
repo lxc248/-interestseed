@@ -23,6 +23,12 @@ export interface DiscoveryOverviewEdge {
   discoveryId: string;
 }
 
+export interface DiscoveryOverviewActivity {
+  date: string;
+  label: string;
+  count: number;
+}
+
 export interface DiscoveryOverview {
   total: number;
   active: number;
@@ -32,6 +38,7 @@ export interface DiscoveryOverview {
   application: Record<DiscoveryApplicationState, number>;
   themes: DiscoveryOverviewTheme[];
   appliedEdges: DiscoveryOverviewEdge[];
+  activity: DiscoveryOverviewActivity[];
   recent: Array<{
     id: string;
     title: string;
@@ -73,16 +80,31 @@ function themeKey(discovery: Discovery): string {
 export function buildDiscoveryOverview(
   file: DiscoveryFile,
   graph: InterestSeedGraph,
+  now = new Date().toISOString(),
 ): DiscoveryOverview {
   const feedback = { ...EMPTY_FEEDBACK };
   const application = { ...EMPTY_APPLICATION };
   const themeMap = new Map<string, DiscoveryOverviewTheme>();
   const edgeMap = new Map<string, DiscoveryOverviewEdge>();
+  const activityMap = new Map<string, number>();
+  const nowDate = new Date(now);
+  const dayKey = (date: Date): string => date.toISOString().slice(0, 10);
+
+  for (let offset = 6; offset >= 0; offset -= 1) {
+    const day = new Date(nowDate);
+    day.setUTCDate(day.getUTCDate() - offset);
+    activityMap.set(dayKey(day), 0);
+  }
 
   for (const item of file.discoveries) {
     feedback[item.feedbackStatus] += 1;
     const app = item.application?.state ?? 'none';
     application[app] += 1;
+
+    for (const event of item.feedbackHistory ?? []) {
+      const key = event.at.slice(0, 10);
+      if (activityMap.has(key)) activityMap.set(key, (activityMap.get(key) ?? 0) + 1);
+    }
 
     const key = themeKey(item);
     const theme =
@@ -131,6 +153,11 @@ export function buildDiscoveryOverview(
         left.key.localeCompare(right.key),
     ),
     appliedEdges: [...edgeMap.values()],
+    activity: [...activityMap.entries()].map(([date, count]) => ({
+      date,
+      label: date.slice(5),
+      count,
+    })),
     recent: [...file.discoveries]
       .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))
       .slice(0, 5)

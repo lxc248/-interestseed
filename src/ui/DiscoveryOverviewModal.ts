@@ -33,6 +33,19 @@ export class DiscoveryOverviewModal extends Modal {
     this.stat(stats, '已抑制', this.overview.dismissed);
     this.stat(stats, '自动收敛', this.overview.superseded);
 
+    const activity = this.contentEl.createDiv({ cls: 'interestseed-overview-section' });
+    activity.createEl('h3', { text: '近 7 天反馈活动' });
+    const maxActivity = Math.max(1, ...this.overview.activity.map((item) => item.count));
+    for (const item of this.overview.activity) {
+      const row = activity.createDiv({ cls: 'interestseed-activity-row' });
+      row.createSpan({ cls: 'interestseed-activity-label', text: item.label });
+      const track = row.createDiv({ cls: 'interestseed-activity-track' });
+      const bar = track.createDiv({ cls: 'interestseed-activity-bar' });
+      bar.style.width = `${Math.max(3, (item.count / maxActivity) * 100)}%`;
+      bar.setAttr('aria-label', `${item.date}：${item.count} 次反馈`);
+      row.createSpan({ cls: 'interestseed-activity-value', text: String(item.count) });
+    }
+
     const feedback = this.contentEl.createDiv({ cls: 'interestseed-overview-section' });
     feedback.createEl('h3', { text: '反馈分布' });
     for (const [key, count] of Object.entries(this.overview.feedback)) {
