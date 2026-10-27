@@ -108,6 +108,79 @@ export class DiscoveryExplorerModal extends Modal {
     this.stat(stats, '活动', this.data.totals.active, '尚未抑制');
     this.stat(stats, '跨项目主题', this.data.totals.crossProjectThemes, '连接 2+ 项目');
     this.stat(stats, '7 天反馈', activityTotal(this.overview), '最近节奏');
+    this.renderOrbit(hero);
+  }
+
+  /** 真实数据驱动的主题-项目关系图，而不是装饰性插画。 */
+  private renderOrbit(hero: HTMLElement): void {
+    const themes = this.data.matrix.themes.slice(0, 6);
+    const projects = this.data.matrix.projects.slice(0, 5);
+    if (themes.length === 0) return;
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('viewBox', '0 0 260 170');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.classList.add('interestseed-insight-orbit');
+
+    const projectPoint = (index: number): { x: number; y: number } => ({
+      x: 34 + (index * 192) / Math.max(1, projects.length - 1),
+      y: 148,
+    });
+    const themePoint = (index: number): { x: number; y: number } => {
+      const angle = -Math.PI * 0.86 + (index * Math.PI * 1.34) / Math.max(1, themes.length - 1);
+      return { x: 130 + Math.cos(angle) * 88, y: 76 + Math.sin(angle) * 48 };
+    };
+
+    for (const [themeIndex, theme] of themes.entries()) {
+      const from = themePoint(themeIndex);
+      for (const [projectIndex, project] of projects.entries()) {
+        if ((this.data.matrix.cells[theme.key]?.[project] ?? 0) === 0) continue;
+        const to = projectPoint(projectIndex);
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', String(from.x));
+        line.setAttribute('y1', String(from.y));
+        line.setAttribute('x2', String(to.x));
+        line.setAttribute('y2', String(to.y));
+        line.setAttribute('stroke', 'var(--interactive-accent)');
+        line.setAttribute('stroke-opacity', '0.16');
+        svg.appendChild(line);
+      }
+    }
+
+    for (const [index, project] of projects.entries()) {
+      const point = projectPoint(index);
+      const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      dot.setAttribute('cx', String(point.x));
+      dot.setAttribute('cy', String(point.y));
+      dot.setAttribute('r', '3');
+      dot.setAttribute('fill', 'var(--text-faint)');
+      svg.appendChild(dot);
+      const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      label.setAttribute('x', String(point.x));
+      label.setAttribute('y', '164');
+      label.setAttribute('text-anchor', 'middle');
+      label.setAttribute('class', 'interestseed-insight-orbit-label');
+      label.textContent = project.slice(0, 9);
+      svg.appendChild(label);
+    }
+
+    for (const [index, theme] of themes.entries()) {
+      const point = themePoint(index);
+      const halo = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      halo.setAttribute('cx', String(point.x));
+      halo.setAttribute('cy', String(point.y));
+      halo.setAttribute('r', String(8 + theme.signal * 10));
+      halo.setAttribute('fill', 'var(--interactive-accent)');
+      halo.setAttribute('fill-opacity', '0.10');
+      svg.appendChild(halo);
+      const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      dot.setAttribute('cx', String(point.x));
+      dot.setAttribute('cy', String(point.y));
+      dot.setAttribute('r', String(3 + theme.signal * 3));
+      dot.setAttribute('fill', 'var(--interactive-accent)');
+      dot.setAttribute('fill-opacity', '0.85');
+      svg.appendChild(dot);
+    }
+    hero.appendChild(svg);
   }
 
   private renderTabs(): void {

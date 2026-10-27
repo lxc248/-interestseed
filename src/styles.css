@@ -3041,3 +3041,29 @@ button.interestseed-inbox-node:hover {
   cursor: not-allowed;
 }
 .interestseed-insight-no-evidence { margin-bottom: 8px; font-size: 10px; color: var(--text-faint); }
+.interestseed-insight-orbit {
+  position: absolute;
+  top: 58px;
+  right: 30px;
+  width: 280px;
+  height: 184px;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.interestseed-insight-orbit-label {
+  fill: var(--text-faint);
+  font-size: 8px;
+  font-family: var(--font-interface, sans-serif);
+}
+
+.interestseed-insight-title,
+.interestseed-insight-subtitle {
+  max-width: calc(100% - 270px);
+}
+
+@media (max-width: 900px) {
+  .interestseed-insight-orbit { display: none; }
+  .interestseed-insight-title,
+  .interestseed-insight-subtitle { max-width: none; }
+}
