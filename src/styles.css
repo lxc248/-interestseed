@@ -3066,4 +3066,10 @@ button.interestseed-inbox-node:hover {
   .interestseed-insight-orbit { display: none; }
   .interestseed-insight-title,
   .interestseed-insight-subtitle { max-width: none; }
-}
+}.interestseed-insight-reasoning ol { font-size: 12px; line-height: 1.8; }
+.interestseed-insight-matrix thead th { font-size: 10.5px; }
+.interestseed-insight-theme-chip { font-size: 10.5px; min-height: 24px; }
+.interestseed-insight-inline-link { font-size: 11.5px; }
+.interestseed-insight-ai-gate { font-size: 10.5px; }
+.interestseed-insight-feedback-legend span { font-size: 10.5px; }
+.interestseed-insight-stat-hint { font-size: 11px; }
