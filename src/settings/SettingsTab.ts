@@ -19,6 +19,7 @@ export const DEFAULT_SETTINGS: InterestSeedSettings = {
   enableDshAgent: false,
   dshCommand: 'dsh',
   dshProfile: 'acp',
+  dshModel: 'deepseek-account/deepseek-flash',
 };
 
 export function normalizeSettings(raw: unknown): InterestSeedSettings {
@@ -60,6 +61,10 @@ export function normalizeSettings(raw: unknown): InterestSeedSettings {
       typeof source.dshProfile === 'string' && source.dshProfile.trim()
         ? source.dshProfile.trim()
         : DEFAULT_SETTINGS.dshProfile,
+    dshModel:
+      typeof source.dshModel === 'string' && source.dshModel.trim()
+        ? source.dshModel.trim()
+        : DEFAULT_SETTINGS.dshModel,
   };
 }
 
@@ -256,6 +261,19 @@ export class InterestSeedSettingsTab extends PluginSettingTab {
           .setValue(this.plugin.settings.dshProfile)
           .onChange(async (value) => {
             this.plugin.settings.dshProfile = value.trim() || 'acp';
+            await this.plugin.saveSettings();
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName('DSH 模型')
+      .setDesc('provider/model，例如 deepseek-account/deepseek-flash；留空让 DSH 选择。')
+      .addText((text) =>
+        text
+          .setPlaceholder('deepseek-account/deepseek-flash')
+          .setValue(this.plugin.settings.dshModel)
+          .onChange(async (value) => {
+            this.plugin.settings.dshModel = value.trim();
             await this.plugin.saveSettings();
           }),
       );

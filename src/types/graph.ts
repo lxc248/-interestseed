@@ -84,6 +84,7 @@ export interface InterestSeedSettings {
   enableDshAgent: boolean;
   dshCommand: string;
   dshProfile: string;
+  dshModel: string;
 }
 
 export const NODE_TYPES: readonly NodeType[] = [

@@ -29,6 +29,8 @@ export interface DshAcpClientOptions {
   command: string;
   profile: string;
   cwd: string;
+  /** e.g. deepseek-account/deepseek-flash. Empty means let DSH choose. */
+  model?: string;
   env?: Record<string, string>;
   onEvent(event: DshAgentEvent): void;
 }
@@ -119,6 +121,7 @@ export class DshAcpClient {
         throw new Error('DSH 未返回 sessionId');
       }
       this.sessionId = session.sessionId;
+      await this.selectModel(session);
       this.options.onEvent({ type: 'status', status: 'ready', detail: 'DSH 会话已就绪' });
     } catch (error) {
       this.fail(error instanceof Error ? error : new Error(String(error)));
@@ -126,8 +129,51 @@ export class DshAcpClient {
     }
   }
 
-  async prompt(text: string): Promise<string> {
-    if (!this.sessionId) await this.start();
+  private async selectModel(session: Record<string, unknown>): Promise<void> {
+    const rawOptions = session.configOptions;
+    if (!Array.isArray(rawOptions)) return;
+    const modelConfig = rawOptions.find(
+      (option) => isRecord(option) && option.id === 'model' && Array.isArray(option.options),
+    );
+    if (!isRecord(modelConfig) || !Array.isArray(modelConfig.options)) return;
+    const choices: Array<{ value: string; label: string }> = [];
+    for (const group of modelConfig.options) {
+      if (!isRecord(group) || !Array.isArray(group.options)) continue;
+      for (const option of group.options) {
+        if (isRecord(option) && typeof option.value === 'string') {
+          choices.push({
+            value: option.value,
+            label: typeof option.name === 'string' ? option.name : option.value,
+          });
+        }
+      }
+    }
+    if (choices.length === 0) return;
+
+    const preferred = this.options.model?.trim();
+    const preferredValue = preferred
+      ? choices.find((choice) => choice.value === JSON.stringify(preferred.split('/')))
+      : undefined;
+    const accountValue = choices.find((choice) => choice.value.includes('deepseek-account'));
+    const chosen = preferredValue ?? accountValue ?? choices[0];
+    if (!chosen) return;
+    try {
+      await this.request('session/set_config_option', {
+        sessionId: this.sessionId,
+        configId: 'model',
+        value: chosen.value,
+      });
+      this.options.onEvent({
+        type: 'status',
+        status: 'ready',
+        detail: `模型：${chosen.label}`,
+      });
+    } catch {
+      // The server may not expose model control in older ACP builds; keep going.
+    }
+  }
+
+  async prompt(text: string): Promise<string> {    if (!this.sessionId) await this.start();
     if (!this.sessionId) throw new Error('DSH 会话未就绪');
     this.options.onEvent({ type: 'status', status: 'working' });
     try {

@@ -204,6 +204,7 @@ export class AgentView extends ItemView {
     this.client = new DshAcpClient({
       command: await this.resolveDshCommand(),
       profile: this.plugin.settings.dshProfile || 'acp',
+      model: this.plugin.settings.dshModel,
       cwd,
       onEvent: (event) => this.handleEvent(event),
     });

@@ -575,7 +575,7 @@ InterestSeed UI
 - 停止与新建会话；
 - 会话中直接读取当前 Vault。
 
-设置：`DSH Agent 工作台（桌面）` → 启用 → 填写 DSH 命令（当前机器示例：`D:\dsh\resources\runtime\cli\bin\dsh.cmd`）→ profile 默认 `acp`。
+设置：`DSH Agent 工作台（桌面）` → 启用 → 填写 DSH 命令（当前机器示例：`D:\dsh\resources\runtime\cli\bin\dsh.cmd`）→ profile 默认 `acp`，模型默认 `deepseek-account/deepseek-flash`（使用 DSH 自己的凭据，不复制到插件）。
 
 DSH 自己负责模型与凭据；InterestSeed 不保存 DSH/模型密钥。没有配置 DSH 模型时，ACP 会话会返回明确的 provider/key 错误，本地图谱与探索不会受影响。
 ### Obsidian CLI
