@@ -27,6 +27,11 @@ New-Item -ItemType Directory -Path $releaseDir -Force | Out-Null
 if (Test-Path $zip) { Remove-Item $zip -Force }
 Compress-Archive -Path (Join-Path $stage '*') -DestinationPath $zip
 
+$checksums = Join-Path $releaseDir 'SHA256SUMS.txt'
+Get-FileHash $zip, (Join-Path $plugin 'main.js'), (Join-Path $plugin 'styles.css') -Algorithm SHA256 |
+  ForEach-Object { "$($_.Hash.ToLower())  $($_.Path)" } |
+  Set-Content -Path $checksums -Encoding UTF8
+
 Write-Host 'Deployed to:' $plugin
 Get-FileHash (Join-Path $plugin 'main.js'), (Join-Path $plugin 'styles.css'), $zip -Algorithm SHA256 |
   Select-Object Path, Hash |

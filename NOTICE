@@ -1,0 +1,30 @@
+InterestSeed
+Copyright (C) 2026 InterestSeed
+
+This project is licensed under the GNU Affero General Public License,
+version 3.0 (AGPL-3.0). See LICENSE for the complete license text.
+
+Original works include, without limitation:
+
+- the InterestSeed name and visual identity;
+- the discovery identity, dedupe and suppression model;
+- the discovery feedback lifecycle and soft-undo semantics;
+- the discovery application state machine and recovery rules;
+- the relation provenance, confidence and evidence model;
+- the Explore Studio information architecture and visual system;
+- the DSH ACP session, permission and streaming integration;
+- the custom Canvas interaction layer;
+- the migration, persistence and recovery contracts;
+- the test fixtures and acceptance documentation.
+
+Third-party names, trademarks and open-source components remain the property
+of their respective owners. Obsidian is a trademark of Dynalist Inc. dsh and
+DeepSeek are trademarks or products of their respective owners. This project
+is not endorsed by or affiliated with those owners.
+
+Redistribution must preserve this NOTICE, the LICENSE, and the copyright
+notice. Forks and derivative distributions must not use the InterestSeed name,
+logo or visual identity in a way that suggests endorsement. See TRADEMARKS.md.
+
+Commercial closed-source use, hosted services that do not comply with
+AGPL-3.0, or use of the InterestSeed brand requires prior written permission.

@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use InterestSeed in research or a product, cite this repository."
+title: "InterestSeed: a local-first interest graph and evidence-backed discovery workspace for Obsidian"
+abstract: >-
+  InterestSeed turns Markdown notes into a confirmable, traceable interest
+  graph. It combines a custom Canvas graph, discovery feedback semantics,
+  human-in-the-loop application, local-first insights and an optional DSH
+  Agent workspace over the Agent Client Protocol.
+authors:
+  - name: "InterestSeed"
+    affiliation: "InterestSeed project"
+repository-code: "https://github.com/InterestSeed/interestseed"
+license: "AGPL-3.0-only"
+version: "0.1.0"
+date-released: "2026-10-28"
+keywords:
+  - obsidian
+  - knowledge-graph
+  - local-first
+  - discovery
+  - agent-client-protocol
+  - deepseek-harness

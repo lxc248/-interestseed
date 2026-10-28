@@ -45,6 +45,7 @@ export default defineConfig({
       external: ['obsidian', 'electron', /^node:/, ...builtinModules],
       output: {
         exports: 'named',
+        banner: '/*! InterestSeed 0.1.0 | Copyright (C) 2026 InterestSeed | AGPL-3.0-only | Original work; see NOTICE and LICENSE. */',
       },
     },
   },
