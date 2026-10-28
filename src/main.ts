@@ -55,6 +55,7 @@ import {
 } from './storage/PluginDataStorage';
 import type { GraphViewport, InterestSeedSettings } from './types/graph';
 import { INTERESTSEED_VIEW_TYPE, InterestSeedView } from './ui/InterestSeedView';
+import { AgentView, INTERESTSEED_AGENT_VIEW_TYPE } from './ui/AgentView';
 import { NodeCreateModal } from './ui/NodeCreateModal';
 import { RelationCreateModal } from './ui/RelationCreateModal';
 import { RelationEditModal } from './ui/RelationEditModal';
@@ -258,8 +259,12 @@ export default class InterestSeedPlugin extends Plugin {
     });
 
     this.registerView(INTERESTSEED_VIEW_TYPE, (leaf) => new InterestSeedView(leaf, this));
+    this.registerView(INTERESTSEED_AGENT_VIEW_TYPE, (leaf) => new AgentView(leaf, this));
     this.addRibbonIcon('sprout', '打开兴趣图谱', () => {
       void this.activateView();
+    });
+    this.addRibbonIcon('sparkles', '打开 InterestSeed Agent', () => {
+      void this.activateAgentView();
     });
     registerCommands(this, this);
     this.addSettingTab(new InterestSeedSettingsTab(this.app, this));
@@ -328,6 +333,7 @@ export default class InterestSeedPlugin extends Plugin {
     this.auditVaultBinding = null;
     // 先 detach，让 view.onClose 的 saveViewport 在 flush 前提交。
     this.app.workspace.detachLeavesOfType(INTERESTSEED_VIEW_TYPE);
+    this.app.workspace.detachLeavesOfType(INTERESTSEED_AGENT_VIEW_TYPE);
     this.discoveryQueue?.close();
     void this.discoveryQueue?.flush();
     void this.persistence?.flush();
@@ -346,6 +352,17 @@ export default class InterestSeedPlugin extends Plugin {
       await leaf.setViewState({ type: INTERESTSEED_VIEW_TYPE, active: true });
     }
 
+    await workspace.revealLeaf(leaf);
+  }
+
+  async activateAgentView(): Promise<void> {
+    const { workspace } = this.app;
+    const existing = workspace.getLeavesOfType(INTERESTSEED_AGENT_VIEW_TYPE);
+    let leaf: WorkspaceLeaf | null = existing[0] ?? null;
+    if (!leaf) {
+      leaf = workspace.getLeaf('tab');
+      await leaf.setViewState({ type: INTERESTSEED_AGENT_VIEW_TYPE, active: true });
+    }
     await workspace.revealLeaf(leaf);
   }
 

@@ -1,6 +1,6 @@
 # InterestSeed V0.1.0 发布说明
 
-> 构建：`449,411 bytes / 4815D79D...`
+> 构建：`476,417 bytes / 140A94CC...`
 > 发布包：`release/interestseed-0.1.0.zip`
 > 测试：44 文件 / 434 用例
 
@@ -74,3 +74,7 @@ scripts/quality-gate.ps1 -Scope release
 - 可选 AI 探索解读；
 - AI 仅发送聚合主题/项目/计数，默认关闭并受授权控制；
 - 严格 JSON 解析，AI 失败不影响本地探索数据。
+
+- DSH Agent 工作台：通过 DSH ACP profile 嵌入流式 Agent、工具状态与权限请求；
+- AI 运行后端：本地 OpenAI-compatible 或 Claudian 插件 API（实验）；
+- `kepano/obsidian-skills` 的 `obsidian-cli` 开发技能已安装到 Codex skills。

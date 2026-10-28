@@ -4,6 +4,7 @@ import type { UndoHistory } from '../core/UndoManager';
 
 export interface CommandHost {
   activateView(): Promise<void> | void;
+  activateAgentView(): Promise<void> | void;
   rebuildGraph(silent?: boolean): Promise<void>;
   exportGraph(): void;
   promptRebuild(): void;
@@ -29,6 +30,14 @@ export function registerCommands(plugin: Plugin, host: CommandHost): void {
     name: '打开兴趣图谱',
     callback: () => {
       void host.activateView();
+    },
+  });
+
+  plugin.addCommand({
+    id: 'interestseed-agent',
+    name: '打开 InterestSeed Agent（DSH）',
+    callback: () => {
+      void host.activateAgentView();
     },
   });
 

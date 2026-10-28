@@ -16,6 +16,9 @@ export const DEFAULT_SETTINGS: InterestSeedSettings = {
   enableAI: false,
   aiProvider: 'offline',
   aiConsentGranted: false,
+  enableDshAgent: false,
+  dshCommand: 'dsh',
+  dshProfile: 'acp',
 };
 
 export function normalizeSettings(raw: unknown): InterestSeedSettings {
@@ -45,6 +48,18 @@ export function normalizeSettings(raw: unknown): InterestSeedSettings {
       typeof source.aiConsentGranted === 'boolean'
         ? source.aiConsentGranted
         : DEFAULT_SETTINGS.aiConsentGranted,
+    enableDshAgent:
+      typeof source.enableDshAgent === 'boolean'
+        ? source.enableDshAgent
+        : DEFAULT_SETTINGS.enableDshAgent,
+    dshCommand:
+      typeof source.dshCommand === 'string' && source.dshCommand.trim()
+        ? source.dshCommand.trim()
+        : DEFAULT_SETTINGS.dshCommand,
+    dshProfile:
+      typeof source.dshProfile === 'string' && source.dshProfile.trim()
+        ? source.dshProfile.trim()
+        : DEFAULT_SETTINGS.dshProfile,
   };
 }
 
@@ -99,6 +114,7 @@ export class InterestSeedSettingsTab extends PluginSettingTab {
     this.renderBuildSettings(containerEl);
     this.renderRuleSettings(containerEl);
     this.renderAISettings(containerEl);
+    this.renderDshAgentSettings(containerEl);
   }
 
   private renderBuildSettings(containerEl: HTMLElement): void {
@@ -200,6 +216,60 @@ export class InterestSeedSettingsTab extends PluginSettingTab {
       );
   }
 
+  private renderDshAgentSettings(containerEl: HTMLElement): void {
+    containerEl.createEl('h3', { text: 'DSH Agent 工作台（桌面）' });
+    containerEl.createEl('p', {
+      cls: 'setting-item-description',
+      text: '通过 DSH 的 ACP profile 启动嵌入式 Agent。DSH 自己拥有模型、工具、沙箱和权限；InterestSeed 只提供会话界面。',
+    });
+
+    new Setting(containerEl)
+      .setName('启用 DSH Agent')
+      .setDesc('桌面端可用；关闭时不会启动任何子进程。')
+      .addToggle((toggle) =>
+        toggle.setValue(this.plugin.settings.enableDshAgent).onChange(async (value) => {
+          this.plugin.settings.enableDshAgent = value;
+          await this.plugin.saveSettings();
+          this.display();
+        }),
+      );
+
+    new Setting(containerEl)
+      .setName('DSH 命令')
+      .setDesc('例如 dsh，或 D:\\dsh\\resources\\runtime\\cli\\bin\\dsh.cmd。使用当前 Vault 作为工作目录。')
+      .addText((text) =>
+        text
+          .setPlaceholder('dsh')
+          .setValue(this.plugin.settings.dshCommand)
+          .onChange(async (value) => {
+            this.plugin.settings.dshCommand = value.trim() || 'dsh';
+            await this.plugin.saveSettings();
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName('DSH profile')
+      .setDesc('默认 acp；这是 DSH 的 ACP stdio 自动化 profile。')
+      .addText((text) =>
+        text
+          .setPlaceholder('acp')
+          .setValue(this.plugin.settings.dshProfile)
+          .onChange(async (value) => {
+            this.plugin.settings.dshProfile = value.trim() || 'acp';
+            await this.plugin.saveSettings();
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName('打开 Agent 工作台')
+      .setDesc('会话、工具调用和权限请求会在新视图中展示。')
+      .addButton((button) =>
+        button
+          .setButtonText('打开')
+          .setCta()
+          .onClick(() => this.plugin.activateAgentView()),
+      );
+  }
   private renderAISettings(containerEl: HTMLElement): void {
     containerEl.createEl('h3', { text: 'AI（实验，默认关闭）' });
     containerEl.createEl('p', {

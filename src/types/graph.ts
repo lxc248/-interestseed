@@ -81,6 +81,9 @@ export interface InterestSeedSettings {
   enableAI: boolean;
   aiProvider: string;
   aiConsentGranted: boolean;
+  enableDshAgent: boolean;
+  dshCommand: string;
+  dshProfile: string;
 }
 
 export const NODE_TYPES: readonly NodeType[] = [

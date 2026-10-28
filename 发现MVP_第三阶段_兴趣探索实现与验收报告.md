@@ -142,7 +142,7 @@ research/phase3_simulation_v2_results.json
 typecheck       通过
 test            44 文件 / 434 用例通过
 
-main.js         449,411 bytes / 4815D79DCEC6197928194B92CF73A88802321DE58EDA404FC6E8142D42F9E76E
+main.js         476,417 bytes / 140A94CC3D3B8C016188F447BA743193EB4543373401C817BB975BE87C2071E7
 styles.css       70,053 bytes / 3374EB64AE51204EAFA32163C67007D075FDE9B5763CA4C4CC537BEF6A15AEEA
 lint            通过
 build           通过
@@ -182,3 +182,42 @@ AI：可选，受设置与授权控制
 - 项目画像；
 - 从矩阵单元格直接打开对应发现/节点；
 - 屏幕阅读器完整审计。
+
+### 2.6 DSH Agent 工作台（桌面）
+
+新增独立视图：
+
+```text
+src/ui/AgentView.ts
+src/agent/DshAcpClient.ts
+```
+
+通过：
+
+```text
+InterestSeed UI
+→ dsh --profile acp
+→ ACP v1 JSON-RPC / stdio
+→ DSH 的模型、工具、沙箱与权限
+```
+
+能力：
+
+- 流式助手消息；
+- 思考过程折叠；
+- 工具调用状态卡；
+- DSH 权限请求卡；
+- 停止 / 新建会话；
+- 当前 Vault 作为工作目录；
+- DSH 自己持有模型与凭据，InterestSeed 不保存模型密钥。
+
+设置项：
+
+```text
+DSH Agent 工作台（桌面）
+启用 DSH Agent
+DSH 命令（默认 dsh，可填本机绝对路径）
+DSH profile（默认 acp）
+```
+
+未配置 DSH 模型 key 时，ACP 会返回明确的 provider/key 错误；本地探索与图谱不受影响。

@@ -111,3 +111,13 @@ obsidian dev:css selector=".interestseed-insight-modal" prop=width
   - 首次使用需在 Claudian 内打开一个会话并完成其 provider 登录。
 
 > 注意：Claudian 是第三方插件，不是 Obsidian 核心功能；启用它等同于允许它读取所选会话/vault 上下文。InterestSeed 只在用户点击“生成可解释解读”时调用其 API。
+## 7. DSH 接入结论
+
+- 官方仓库：[`deepseek-ai/deepseek-harness`](https://github.com/deepseek-ai/deepseek-harness)（约 263k stars）。
+- 推荐协议：`dsh --profile acp` 的 ACP v1 JSON-RPC stdio。
+- 本轮已用本机 `D:\dsh\resources\runtime\cli\bin\dsh.cmd --profile acp` 实测：
+  - `initialize` 返回 ACP v1；
+  - `session/new` 返回 `sessionId`；
+  - `session/prompt` 在未配置 DEEPSEEK_API_KEY 时返回明确 provider/key 错误。
+- InterestSeed 已实现 `src/agent/DshAcpClient.ts`，不复制 Claudian 的 provider 实现，也不依赖其内部文件；只使用标准 ACP 线协议。
+- 没有把模型密钥写进 InterestSeed；模型与工具权限由 DSH 自己管理。

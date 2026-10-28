@@ -556,3 +556,25 @@ AI 默认关闭，必须同时启用 AI 并确认数据边界；只发送匿名�
 ```text
 GITHUB_SKILLS_RESEARCH.md
 ```
+## DSH Agent 工作台
+
+InterestSeed 现在有一个独立的 Agent 视图（命令：`打开 InterestSeed Agent（DSH）`），通过 DSH 的 ACP profile 启动嵌入式 Agent：
+
+```text
+InterestSeed UI
+→ dsh --profile acp
+→ ACP v1
+→ DSH 的模型、工具、沙箱、权限
+```
+
+它支持：
+
+- 流式助手消息；
+- DSH 工具调用状态；
+- DSH 权限请求卡片；
+- 停止与新建会话；
+- 会话中直接读取当前 Vault。
+
+设置：`DSH Agent 工作台（桌面）` → 启用 → 填写 DSH 命令（当前机器示例：`D:\dsh\resources\runtime\cli\bin\dsh.cmd`）→ profile 默认 `acp`。
+
+DSH 自己负责模型与凭据；InterestSeed 不保存 DSH/模型密钥。没有配置 DSH 模型时，ACP 会话会返回明确的 provider/key 错误，本地图谱与探索不会受影响。
