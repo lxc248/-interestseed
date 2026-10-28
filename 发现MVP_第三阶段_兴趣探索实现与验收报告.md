@@ -142,7 +142,7 @@ research/phase3_simulation_v2_results.json
 typecheck       通过
 test            44 文件 / 434 用例通过
 
-main.js         481,857 bytes / 6AE200502DA1E65E254A6587382432047E11F0273FE189092FF034B3C4A6D961
+main.js         481,730 bytes / A58C2403E09A86163811132A5A2978D4BF6DF797F18A06C1C94FEB8A89DFCC7B
 styles.css       70,053 bytes / 3374EB64AE51204EAFA32163C67007D075FDE9B5763CA4C4CC537BEF6A15AEEA
 lint            通过
 build           通过

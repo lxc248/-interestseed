@@ -3780,3 +3780,23 @@ button.interestseed-inbox-node:hover {
 .interestseed-empty-detail { max-width: 440px; font-size: 11px; line-height: 1.75; }
 .interestseed-empty-actions button { min-height: 30px; border-radius: 8px; font-size: 10px; }
 .interestseed-empty-actions button.mod-cta { background: var(--interactive-accent); color: var(--text-on-accent, #fff); }
+/* Keep identity chips compact; the old grid auto tracks stretched the count pill. */
+.interestseed-heading {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.interestseed-heading-icon { flex: 0 0 32px; }
+.interestseed-heading-title { flex: 0 0 auto; }
+.interestseed-heading-vault,
+.interestseed-heading-count { flex: 0 0 auto; max-width: 180px; overflow: hidden; text-overflow: ellipsis; }
+.interestseed-heading-subtitle {
+  flex: 1 0 100%;
+  margin-left: 40px;
+  margin-top: -1px;
+}
+.interestseed-header-cta { flex: 0 0 auto; }
