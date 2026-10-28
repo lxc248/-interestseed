@@ -99,6 +99,20 @@ export class InterestSeedView extends ItemView {
       text: this.app.vault.getName(),
     });
     this.countEl = heading.createSpan({ cls: 'interestseed-heading-count', text: '' });
+    heading.createDiv({
+      cls: 'interestseed-heading-subtitle',
+      text: '把零散笔记连接成可行动的兴趣结构',
+    });
+
+    const agentCta = header.createEl('button', {
+      cls: 'interestseed-header-cta',
+      attr: { type: 'button', 'aria-label': '打开 InterestSeed Agent' },
+    });
+    setIcon(agentCta, 'sparkles');
+    agentCta.createSpan({ text: 'Agent' });
+    agentCta.addEventListener('click', () => {
+      void this.plugin.activateAgentView();
+    });
 
     const actions = header.createDiv({ cls: 'interestseed-header-actions' });
     this.createAction(actions, 'refresh-cw', '重新扫描', () => {
@@ -127,6 +141,40 @@ export class InterestSeedView extends ItemView {
     this.createAction(actions, 'layout-dashboard', '兴趣总览', () => {
       this.plugin.openDiscoveryOverview();
     });
+
+    const launchpad = root.createDiv({ cls: 'interestseed-launchpad' });
+    this.createLaunchCard(
+      launchpad,
+      'sparkles',
+      'Agent',
+      '让 DSH 读取、整理并推进下一步',
+      'is-primary',
+      () => void this.plugin.activateAgentView(),
+    );
+    this.createLaunchCard(
+      launchpad,
+      'compass',
+      '兴趣探索',
+      '主题、项目矩阵与趋势',
+      '',
+      () => this.plugin.openDiscoveryExplorer(),
+    );
+    this.createLaunchCard(
+      launchpad,
+      'lightbulb',
+      '发现',
+      '处理建议、反馈与应用',
+      '',
+      () => this.toggleDiscoveries(),
+    );
+    this.createLaunchCard(
+      launchpad,
+      'layout-dashboard',
+      '总览',
+      '回看整体结构与节奏',
+      '',
+      () => this.plugin.openDiscoveryOverview(),
+    );
 
     const quickbar = root.createDiv({ cls: 'interestseed-quickbar' });
     this.createQuickAction(quickbar, 'refresh-cw', '扫描', () => this.plugin.promptRebuild());
@@ -519,13 +567,17 @@ export class InterestSeedView extends ItemView {
               onClick: () => this.plugin.promptRebuild(),
             },
             { label: '新建节点', onClick: () => this.plugin.promptCreateNode() },
+            { label: '打开 Agent', onClick: () => void this.plugin.activateAgentView() },
           ],
         });
       } else {
         this.emptyState.show({
           title: '没有匹配的节点',
           detail: '当前筛选条件下没有节点。放宽条件，或者清除筛选重新看整张图谱。',
-          actions: [{ label: '清除筛选', primary: true, onClick: () => this.filterBar?.reset() }],
+          actions: [
+            { label: '清除筛选', primary: true, onClick: () => this.filterBar?.reset() },
+            { label: '问 Agent', onClick: () => void this.plugin.activateAgentView() },
+          ],
         });
       }
 
@@ -631,6 +683,29 @@ export class InterestSeedView extends ItemView {
       attr: { 'aria-label': label, title: label },
     });
     setIcon(button, icon);
+    button.addEventListener('click', onClick);
+    return button;
+  }
+
+  private createLaunchCard(
+    parent: HTMLElement,
+    icon: string,
+    title: string,
+    description: string,
+    modifier: string,
+    onClick: () => void,
+  ): HTMLButtonElement {
+    const button = parent.createEl('button', {
+      cls: `interestseed-launch-card${modifier ? ` ${modifier}` : ''}`,
+      attr: { type: 'button', 'aria-label': title },
+    });
+    const iconEl = button.createDiv({ cls: 'interestseed-launch-icon' });
+    setIcon(iconEl, icon);
+    const copy = button.createDiv({ cls: 'interestseed-launch-copy' });
+    copy.createDiv({ cls: 'interestseed-launch-title', text: title });
+    copy.createDiv({ cls: 'interestseed-launch-desc', text: description });
+    const arrow = button.createSpan({ cls: 'interestseed-launch-arrow', text: '→' });
+    arrow.setAttribute('aria-hidden', 'true');
     button.addEventListener('click', onClick);
     return button;
   }

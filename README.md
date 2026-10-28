@@ -587,3 +587,15 @@ obsidian plugin:reload id=interestseed
 obsidian dev:errors
 obsidian dev:screenshot path=screenshot.png
 ```
+## 主页面视觉入口
+
+InterestSeed 主页面现在有统一的工作台头部与可视化入口：
+
+```text
+Agent       让 DSH 读取、整理并推进下一步
+兴趣探索    主题、项目矩阵与趋势
+发现        建议、反馈与应用
+总览        整体结构与节奏
+```
+
+下方快捷条保留扫描、节点、建议、收件、撤销/重做、适应、导出等高频动作；空状态也提供「打开 Agent / 问 Agent」入口。
