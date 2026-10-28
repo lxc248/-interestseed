@@ -599,3 +599,10 @@ Agent       让 DSH 读取、整理并推进下一步
 ```
 
 下方快捷条保留扫描、节点、建议、收件、撤销/重做、适应、导出等高频动作；空状态也提供「打开 Agent / 问 Agent」入口。
+## 一键部署
+
+```bash
+npm run deploy
+```
+
+`scripts/deploy.ps1` 会先跑 `verify`，失败就中止，不会把未通过测试的构建复制到 Vault；通过后同步 `main.js`、`styles.css`、`manifest.json` 并重建 release zip。
