@@ -358,7 +358,7 @@ Agent        兴趣探索        发现        总览
 启用 DSH Agent
 DSH 命令：dsh 或本机绝对路径
 DSH profile：默认 acp
-DSH 模型：provider/model
+DSH 模型：provider/model；默认优先 `wodebody/cn:deepseek-v4.1-flash`（workbuddy2pi 本地入口）
 ```
 
 DSH 自己负责模型与凭据；InterestSeed 不保存密钥。

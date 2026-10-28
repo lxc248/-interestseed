@@ -154,8 +154,9 @@ export class DshAcpClient {
     const preferredValue = preferred
       ? choices.find((choice) => choice.value === JSON.stringify(preferred.split('/')))
       : undefined;
+    const localValue = choices.find((choice) => choice.value.includes('wodebody'));
     const accountValue = choices.find((choice) => choice.value.includes('deepseek-account'));
-    const chosen = preferredValue ?? accountValue ?? choices[0];
+    const chosen = preferredValue ?? localValue ?? accountValue ?? choices[0];
     if (!chosen) return;
     try {
       await this.request('session/set_config_option', {

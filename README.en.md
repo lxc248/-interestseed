@@ -357,7 +357,7 @@ Agent        Explore        Discoveries        Overview
 Enable DSH Agent
 DSH command: dsh or an absolute local path
 DSH profile: acp by default
-DSH model: provider/model
+DSH model: provider/model; prefers `wodebody/cn:deepseek-v4.1-flash` (the local workbuddy2pi route)
 ```
 
 DSH owns models and credentials. InterestSeed does not store keys.

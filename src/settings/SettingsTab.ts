@@ -19,7 +19,7 @@ export const DEFAULT_SETTINGS: InterestSeedSettings = {
   enableDshAgent: false,
   dshCommand: 'dsh',
   dshProfile: 'acp',
-  dshModel: 'deepseek-account/deepseek-flash',
+  dshModel: 'wodebody/cn:deepseek-v4.1-flash',
 };
 
 export function normalizeSettings(raw: unknown): InterestSeedSettings {
@@ -270,7 +270,7 @@ export class InterestSeedSettingsTab extends PluginSettingTab {
       .setDesc('provider/model，例如 deepseek-account/deepseek-flash；留空让 DSH 选择。')
       .addText((text) =>
         text
-          .setPlaceholder('deepseek-account/deepseek-flash')
+          .setPlaceholder('wodebody/cn:deepseek-v4.1-flash')
           .setValue(this.plugin.settings.dshModel)
           .onChange(async (value) => {
             this.plugin.settings.dshModel = value.trim();
