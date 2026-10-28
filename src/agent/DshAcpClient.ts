@@ -1,4 +1,7 @@
-import type { ChildProcessWithoutNullStreams } from 'node:child_process';
+import type {
+  ChildProcessWithoutNullStreams,
+  SpawnOptions,
+} from 'node:child_process';
 
 export type DshAgentStatus = 'starting' | 'ready' | 'working' | 'idle' | 'closed';
 
@@ -78,7 +81,15 @@ export class DshAcpClient {
   async start(): Promise<void> {
     if (this.isRunning) return;
     this.options.onEvent({ type: 'status', status: 'starting', detail: '启动 DSH ACP…' });
-    const { spawn } = await import('node:child_process');
+    // Obsidian desktop plugins are CJS; Vite cannot dynamically import Electron Node built-ins.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { spawn } = require('child_process') as {
+      spawn: (
+        command: string,
+        args?: readonly string[],
+        options?: SpawnOptions,
+      ) => ChildProcessWithoutNullStreams;
+    };
     const child = spawn(this.options.command, ['--profile', this.options.profile], {
       cwd: this.options.cwd,
       env: {

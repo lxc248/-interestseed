@@ -479,6 +479,7 @@ export default class InterestSeedPlugin extends Plugin {
     const provider = createModelProvider({
       enableAI: this.settings.enableAI,
       aiConsentGranted: this.settings.aiConsentGranted,
+      provider: this.settings.aiProvider,
     });
     try {
       if (!provider.explore) {

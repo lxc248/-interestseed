@@ -8,7 +8,7 @@
 
 <p>
   <img alt="Obsidian" src="https://img.shields.io/badge/Obsidian-1.5%2B-7c3aed" />
-  <img alt="Version" src="https://img.shields.io/badge/version-0.1.0-0ea5e9" />
+  <img alt="Version" src="https://img.shields.io/badge/version-0.1.1-0ea5e9" />
   <img alt="Tests" src="https://img.shields.io/badge/tests-437%20passing-22c55e" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b" />
 </p>
@@ -31,7 +31,7 @@ Discovery inbox
 Graph changes + feedback memory
     ↓ local aggregation / anonymization / optional AI
 Themes, project matrix, rhythm, next step
-    ↓ DSH Agent (optional)
+    ↓ Qwen / optional DSH Agent
 Read the vault, call tools, take the next step
 ```
 
@@ -115,9 +115,25 @@ Evidence → Judgment → Next step
 
 It does not just say “you have many themes”. It says which theme is spreading across projects, what evidence supports it, and what to do next.
 
-### 3.4 DSH Agent: an agent inside the vault, not a copied chat product
+### 3.4 AI backend: Qwen (DashScope) first, DSH optional
 
-InterestSeed ships an independent Agent workspace over **ACP v1 / JSON-RPC / stdio**:
+The default AI backend is **Qwen / DashScope OpenAI-compatible**:
+
+```text
+InterestSeed
+    → https://dashscope.aliyuncs.com/compatible-mode/v1
+    → qwen-turbo (or another Qwen model available to the account)
+```
+
+- Credentials are read only from `DASHSCOPE_API_KEY` / `QWEN_API_KEY`, never stored in the vault;
+- Explore AI sends only anonymized theme/project aliases, aggregate counts and activity data;
+- Qwen Agent mode is a direct chat: it does not read the vault and has no local tool permissions;
+- A missing key produces an explicit “Qwen key not configured” message, with no silent fallback or retry;
+- Free quota, model availability and rate limits are determined by the platform account.
+
+### 3.5 DSH Agent (optional): an agent inside the vault
+
+For tool calls, sandboxing and approval prompts, DSH Agent can be enabled separately:
 
 ```text
 InterestSeed UI
@@ -126,27 +142,9 @@ InterestSeed UI
     → DSH models, tools, sandbox and permissions
 ```
 
-Supported:
+Streaming messages, reasoning, tool cards, permission cards, stop, new session and a vault working directory are supported. DSH is entirely optional; Qwen chat, graph and exploration remain usable without it, and DSH owns its own models and keys.
 
-- Streaming assistant messages;
-- Collapsible reasoning;
-- Tool-call status cards;
-- DSH permission cards;
-- Allow / deny permission;
-- Stop task;
-- New session;
-- Current vault as working directory;
-- Model selection;
-- Permission, timeout, exit and error states.
-
-The boundary is explicit:
-
-- InterestSeed does not store DSH or model keys;
-- DSH owns models, tools and permissions;
-- The Agent does not bypass graph confirmation;
-- Without DSH, graph and exploration remain fully usable.
-
-### 3.5 Local-first privacy
+### 3.6 Local-first privacy
 
 - AI is off by default;
 - Explicit consent is required before enabling it;
@@ -276,7 +274,7 @@ Vault → GraphBuilder → GraphStore
 
 ### Manual install
 
-1. Download `release/interestseed-0.1.0.zip`;
+1. Download `release/interestseed-0.1.1.zip`;
 2. Extract into:
 
 ```text
@@ -345,13 +343,22 @@ Agent        Explore        Discoveries        Overview
 
 ### AI (experimental, off by default)
 
+- Qwen DashScope (default): `qwen-turbo`; reads the key from `DASHSCOPE_API_KEY` / `QWEN_API_KEY`;
 - Local OpenAI-compatible provider;
 - Optional Claudian plugin API;
 - Sends anonymized theme/project aliases, aggregate counts and activity data only;
 - No automatic retries or model switching on failure;
 - Local rule-based discovery remains available.
 
-### DSH Agent (desktop)
+Set the Qwen key on Windows (never commit it):
+
+```powershell
+[Environment]::SetEnvironmentVariable("DASHSCOPE_API_KEY", "<your-key>", "User")
+```
+
+Fully quit and restart Obsidian so the desktop process inherits the new environment variable.
+
+### DSH Agent (optional, desktop)
 
 ```text
 Enable DSH Agent
@@ -414,7 +421,7 @@ Do not submit:
 ## 13. Status
 
 ```text
-Version: 0.1.0
+Version: 0.1.1
 Tests:   46 files / 437 cases
 License: AGPL-3.0
 ```

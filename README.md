@@ -8,7 +8,7 @@
 
 <p>
   <img alt="Obsidian" src="https://img.shields.io/badge/Obsidian-1.5%2B-7c3aed" />
-  <img alt="Version" src="https://img.shields.io/badge/version-0.1.0-0ea5e9" />
+  <img alt="Version" src="https://img.shields.io/badge/version-0.1.1-0ea5e9" />
   <img alt="Tests" src="https://img.shields.io/badge/tests-437%20passing-22c55e" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b" />
 </p>
@@ -31,7 +31,7 @@ Markdown 笔记
 图谱变更 + 反馈记忆
     ↓ 本地聚合 / 匿名化 / 可选 AI
 主题、项目矩阵、节奏与下一步
-    ↓ DSH Agent（可选）
+    ↓ 千问 / 可选 DSH Agent
 读 Vault、调用工具、执行下一步
 ```
 
@@ -116,9 +116,25 @@ active → accepted / rejected / corrected / low-value / needs-verification
 
 > 哪个主题正在跨项目扩散，哪条证据支持它，下一步可以做什么。
 
-### 3.4 DSH Agent：把 Agent 放进 Vault，而不是复制一个聊天产品
+### 3.4 AI 后端：千问（DashScope）优先，DSH 可选
 
-InterestSeed 内置一个独立的 Agent 工作台，通过 **ACP v1 / JSON-RPC / stdio** 连接 DSH：
+InterestSeed 的默认 AI 后端是 **千问 / DashScope OpenAI-compatible**：
+
+```text
+InterestSeed
+    → https://dashscope.aliyuncs.com/compatible-mode/v1
+    → qwen-turbo（可换成账户可用的千问模型）
+```
+
+- 密钥只从环境变量 `DASHSCOPE_API_KEY` / `QWEN_API_KEY` 读取，不写进 Vault；
+- Explore AI 只发送匿名化主题 / 项目别名、聚合计数和活动数据；
+- Agent 的千问模式是直接对话，不读取 Vault、不持有本地工具权限；
+- 没有密钥时会明确提示“未配置千问密钥”，不会偷偷回退或重试；
+- 千问免费额度、模型可用性和限流由平台账户决定。
+
+### 3.5 DSH Agent（可选）：把 Agent 放进 Vault
+
+如果需要工具调用、沙箱和权限审批，可以额外启用 DSH Agent：
 
 ```text
 InterestSeed UI
@@ -127,27 +143,9 @@ InterestSeed UI
     → DSH 的模型、工具、沙箱、权限
 ```
 
-支持：
+支持流式消息、思考过程、工具卡、权限卡、停止、新建会话和当前 Vault 工作目录。DSH 完全可选，不启用时千问对话、图谱和探索仍可用；DSH 自己管理模型与密钥。
 
-- 流式助手消息；
-- 思考过程折叠；
-- DSH 工具调用状态卡；
-- DSH 权限请求卡片；
-- 允许 / 拒绝权限；
-- 停止任务；
-- 新建会话；
-- 当前 Vault 作为工作目录；
-- 模型选择；
-- 权限、超时、退出与错误状态。
-
-边界很明确：
-
-- InterestSeed 不保存 DSH / 模型密钥；
-- 模型与工具权限由 DSH 自己管理；
-- Agent 不会绕过用户确认直接修改图谱；
-- 没有 DSH 时，本地图谱与探索完全可用。
-
-### 3.5 本地优先与隐私边界
+### 3.6 本地优先与隐私边界
 
 - 默认关闭 AI；
 - 开启前需要明确同意；
@@ -277,7 +275,7 @@ Vault → GraphBuilder → GraphStore
 
 ### 手动安装
 
-1. 下载 `release/interestseed-0.1.0.zip`；
+1. 下载 `release/interestseed-0.1.1.zip`；
 2. 解压到：
 
 ```text
@@ -346,13 +344,22 @@ Agent        兴趣探索        发现        总览
 
 ### AI（实验，默认关闭）
 
+- 千问 DashScope（默认）：`qwen-turbo`，密钥从 `DASHSCOPE_API_KEY` / `QWEN_API_KEY` 读取；
 - 本地 OpenAI-compatible；
 - 可选 Claudian 插件 API；
 - 默认只发送匿名化主题 / 项目别名、聚合计数与活动数据；
 - 失败不自动重试、不自动切换模型；
 - 本地规则发现始终可用。
 
-### DSH Agent（桌面）
+Windows 设置千问密钥（不要把 Key 提交到仓库）：
+
+```powershell
+[Environment]::SetEnvironmentVariable("DASHSCOPE_API_KEY", "<your-key>", "User")
+```
+
+设置后完全退出并重启 Obsidian，让桌面进程继承新的环境变量。
+
+### DSH Agent（可选，桌面）
 
 ```text
 启用 DSH Agent
@@ -415,7 +422,7 @@ AGPL-3.0 允许在相同许可证下学习、修改与再分发，但不允许�
 ## 13. 状态
 
 ```text
-Version: 0.1.0
+Version: 0.1.1
 Tests:   46 files / 437 cases
 License: AGPL-3.0
 ```

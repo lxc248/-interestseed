@@ -2,7 +2,7 @@ import { Notice, PluginSettingTab, Setting } from 'obsidian';
 import type { App } from 'obsidian';
 import type InterestSeedPlugin from '../main';
 import type { InterestSeedSettings } from '../types/graph';
-import { DEEPSEEK_V4_PRO_CONFIG } from '../services/ModelProvider';
+import { DEEPSEEK_V4_PRO_CONFIG, QWEN_CONFIG } from '../services/ModelProvider';
 import { hasClaudianApi } from '../services/ClaudianProvider';
 import { confirmAction } from '../ui/ConfirmModal';
 import { isRecord, sanitizeTags } from '../utils/validation';
@@ -14,7 +14,7 @@ export const DEFAULT_SETTINGS: InterestSeedSettings = {
   includeTags: [],
   enableRuleSuggestions: true,
   enableAI: false,
-  aiProvider: 'offline',
+  aiProvider: 'qwen',
   aiConsentGranted: false,
   enableDshAgent: false,
   dshCommand: 'dsh',
@@ -319,11 +319,11 @@ export class InterestSeedSettingsTab extends PluginSettingTab {
     containerEl.createEl('h3', { text: 'AI（实验，默认关闭）' });
     containerEl.createEl('p', {
       cls: 'setting-item-description',
-      text: 'Obsidian 核心没有公开的原生生成式 AI API；这里支持两种可选后端：本地 OpenAI-compatible 服务，或已安装并启用的 Claudian 插件 API。',
+      text: 'Obsidian 核心没有公开的原生生成式 AI API；这里支持三种可选后端：本地 OpenAI-compatible 服务、千问 DashScope OpenAI-compatible 平台，或已安装并启用的 Claudian 插件 API。',
     });
     containerEl.createEl('p', {
       cls: 'setting-item-description',
-      text: `本地后端：${DEEPSEEK_V4_PRO_CONFIG.displayName} / ${DEEPSEEK_V4_PRO_CONFIG.model} / ${DEEPSEEK_V4_PRO_CONFIG.baseUrl}。API Key 从现有本地环境复用，不在此输入、保存或显示。Claudian 后端使用其 v1 实验 API，需先在 Claudian 打开一个会话。`,
+      text: `本地：${DEEPSEEK_V4_PRO_CONFIG.displayName} / ${DEEPSEEK_V4_PRO_CONFIG.model}。千问：${QWEN_CONFIG.displayName} / ${QWEN_CONFIG.model}，地址 ${QWEN_CONFIG.baseUrl}，密钥从 DASHSCOPE_API_KEY 或 QWEN_API_KEY 环境变量读取，不写入设置。Claudian 后端使用其 v1 实验 API，需先在 Claudian 打开一个会话。`,
     });
     containerEl.createEl('p', {
       cls: 'setting-item-description',
@@ -339,8 +339,8 @@ export class InterestSeedSettingsTab extends PluginSettingTab {
           if (!value) {
             this.plugin.settings.aiProvider = 'offline';
             this.plugin.settings.aiConsentGranted = false;
-          } else if (this.plugin.settings.aiProvider !== 'claudian') {
-            this.plugin.settings.aiProvider = DEEPSEEK_V4_PRO_CONFIG.model;
+          } else if (this.plugin.settings.aiProvider !== 'claudian' && this.plugin.settings.aiProvider !== 'qwen') {
+            this.plugin.settings.aiProvider = 'qwen';
           }
           await this.plugin.saveSettings();
           this.display();
@@ -351,18 +351,29 @@ export class InterestSeedSettingsTab extends PluginSettingTab {
       .setName('AI 运行后端')
       .setDesc(
         hasClaudianApi(this.app)
-          ? '检测到 Claudian，可选择用它的当前会话来解释探索数据。'
-          : '未检测到 Claudian；仍可使用本地 OpenAI-compatible 服务。',
+          ? '可选择本地服务、千问平台或 Claudian 的当前会话。'
+          : '可选择本地服务或千问平台；未检测到 Claudian。',
       )
       .addDropdown((dropdown) =>
         dropdown
           .addOption('local', '本地 OpenAI-compatible')
+          .addOption('qwen', '千问 DashScope（免费额度）')
           .addOption('claudian', 'Claudian 插件 API（实验）')
-          .setValue(this.plugin.settings.aiProvider === 'claudian' ? 'claudian' : 'local')
+          .setValue(
+            this.plugin.settings.aiProvider === 'claudian'
+              ? 'claudian'
+              : this.plugin.settings.aiProvider === 'qwen'
+                ? 'qwen'
+                : 'local',
+          )
           .setDisabled(!this.plugin.settings.enableAI)
           .onChange(async (value) => {
             this.plugin.settings.aiProvider =
-              value === 'claudian' ? 'claudian' : DEEPSEEK_V4_PRO_CONFIG.model;
+              value === 'claudian'
+                ? 'claudian'
+                : value === 'qwen'
+                  ? 'qwen'
+                  : DEEPSEEK_V4_PRO_CONFIG.model;
             await this.plugin.saveSettings();
             this.display();
           }),

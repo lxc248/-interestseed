@@ -1,5 +1,6 @@
 import { ItemView, MarkdownRenderer, setIcon } from 'obsidian';
 import type { WorkspaceLeaf } from 'obsidian';
+import type { existsSync } from 'node:fs';
 
 import type InterestSeedPlugin from '../main';
 import {
@@ -7,6 +8,8 @@ import {
   type DshAgentEvent,
   type DshPermissionRequest,
 } from '../agent/DshAcpClient';
+import { QwenChatClient, type QwenChatMessage } from '../agent/QwenChatClient';
+import { resolveQwenApiKey } from '../services/ModelProvider';
 
 export const INTERESTSEED_AGENT_VIEW_TYPE = 'interestseed-agent-view';
 
@@ -18,6 +21,8 @@ export const INTERESTSEED_AGENT_VIEW_TYPE = 'interestseed-agent-view';
  */
 export class AgentView extends ItemView {
   private client: DshAcpClient | null = null;
+  private qwenClient: QwenChatClient | null = null;
+  private qwenMessages: QwenChatMessage[] = [];
   private transcript: HTMLElement | null = null;
   private composer: HTMLTextAreaElement | null = null;
   private sendButton: HTMLButtonElement | null = null;
@@ -54,17 +59,74 @@ export class AgentView extends ItemView {
     this.renderHeader();
     this.renderTranscript();
     this.renderComposer();
-    if (!this.plugin.settings.enableDshAgent) {
+    if (this.isQwen()) {
+      this.setStatus(
+        'idle',
+        resolveQwenApiKey() ? '千问已就绪' : '未配置千问密钥',
+      );
+    } else if (!this.plugin.settings.enableDshAgent) {
       this.renderSetup();
+    } else {
+      this.setStatus('idle', 'DSH Agent 已启用');
+    }
+    // Obsidian may restore the agent leaf before loadData() finishes.
+    window.setTimeout(() => {
+      if (!this.disposed) this.refreshMode();
+    }, 250);
+    const modeTimer = window.setInterval(() => {
+      if (this.disposed || this.isQwen()) {
+        window.clearInterval(modeTimer);
+        if (!this.disposed) this.refreshMode();
+      }
+    }, 500);
+    window.setTimeout(() => window.clearInterval(modeTimer), 10_000);
+  }
+
+  private refreshMode(): void {
+    const qwen = this.isQwen();
+    const subtitle = this.contentEl.querySelector('.interestseed-agent-subtitle');
+    if (subtitle instanceof HTMLElement) {
+      subtitle.setText(
+        qwen
+          ? '千问 DashScope · 直接对话 · 不执行本地工具'
+          : 'DSH 运行时 · 工具、沙箱与权限由 Harness 管理',
+      );
+    }
+    if (this.composer) {
+      this.composer.placeholder = qwen
+        ? '问千问任何关于兴趣、项目或下一步的问题…'
+        : '问 DSH 任何关于你 Vault 的问题…';
+      this.composer.setAttribute(
+        'aria-label',
+        qwen ? '给千问的消息' : '给 DSH Agent 的消息',
+      );
+    }
+    if (qwen) {
+      this.permissionHost?.empty();
+      this.transcript?.empty();
+      this.renderEmptyState();
+      this.setStatus(
+        'idle',
+        resolveQwenApiKey() ? '千问已就绪' : '未配置千问密钥',
+      );
+    } else if (!this.plugin.settings.enableDshAgent) {
+      this.renderSetup();
+      this.setStatus('closed', 'DSH Agent 未启用');
     } else {
       this.setStatus('idle', 'DSH Agent 已启用');
     }
   }
 
+  private isQwen(): boolean {
+    return this.plugin.settings.aiProvider === 'qwen';
+  }
+
   override async onClose(): Promise<void> {
     this.disposed = true;
     await this.client?.dispose();
+    this.qwenClient?.dispose();
     this.client = null;
+    this.qwenClient = null;
     this.contentEl.empty();
   }
 
@@ -77,7 +139,9 @@ export class AgentView extends ItemView {
     copy.createDiv({ cls: 'interestseed-agent-title', text: 'InterestSeed Agent' });
     copy.createDiv({
       cls: 'interestseed-agent-subtitle',
-      text: 'DSH 运行时 · 工具、沙箱与权限由 Harness 管理',
+      text: this.isQwen()
+        ? '千问 DashScope · 直接对话 · 不执行本地工具'
+        : 'DSH 运行时 · 工具、沙箱与权限由 Harness 管理',
     });
     this.statusEl = header.createDiv({ cls: 'interestseed-agent-status is-idle' });
     this.statusEl.createSpan({ cls: 'interestseed-agent-status-dot' });
@@ -106,7 +170,9 @@ export class AgentView extends ItemView {
     setIcon(mark, 'sparkles');
     empty.createEl('h4', { text: '从一个问题开始' });
     empty.createEl('p', {
-      text: '让 DSH 读取你的 Vault、搜索相关笔记，或把一个模糊的兴趣变成下一步行动。',
+      text: this.isQwen()
+        ? '直接连接千问，把模糊兴趣变成可执行的下一步；不读取 Vault，不执行工具。'
+        : '让 DSH 读取你的 Vault、搜索相关笔记，或把一个模糊的兴趣变成下一步行动。',
     });
     const suggestions = empty.createDiv({ cls: 'interestseed-agent-suggestions' });
     for (const text of [
@@ -133,9 +199,11 @@ export class AgentView extends ItemView {
     this.composer = box.createEl('textarea', {
       cls: 'interestseed-agent-input',
       attr: {
-        placeholder: '问 DSH 任何关于你 Vault 的问题…',
+        placeholder: this.isQwen()
+          ? '问千问任何关于兴趣、项目或下一步的问题…'
+          : '问 DSH 任何关于你 Vault 的问题…',
         rows: '3',
-        'aria-label': '给 DSH Agent 的消息',
+        'aria-label': this.isQwen() ? '给千问的消息' : '给 DSH Agent 的消息',
       },
     });
     this.composer.addEventListener('keydown', (event) => {
@@ -219,7 +287,9 @@ export class AgentView extends ItemView {
     if (envCommand) return envCommand;
     if ((globalThis as { process?: { platform?: string } }).process?.platform === 'win32') {
       const candidates = ['D:\\dsh\\resources\\runtime\\cli\\bin\\dsh.cmd'];
-      const fs = await import('node:fs');
+      // Obsidian desktop plugins are CJS; dynamic import('node:fs') fails in the renderer.
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const fs = require('fs') as { existsSync: typeof existsSync };
       for (const candidate of candidates) {
         if (fs.existsSync(candidate)) return candidate;
       }
@@ -237,13 +307,17 @@ export class AgentView extends ItemView {
     this.streamEl = null;
     this.streamText = '';
     try {
-      const client = await this.ensureClient();
-      await client.prompt(text);
+      if (this.isQwen()) {
+        await this.sendQwen(text);
+      } else {
+        const client = await this.ensureClient();
+        await client.prompt(text);
+      }
       if (this.streamEl) await this.renderFinalMarkdown(this.streamEl, this.streamText);
       this.setStatus('idle', '待命');
     } catch (error) {
       this.appendError(error instanceof Error ? error.message : String(error));
-      this.setStatus('closed', '连接中断');
+      this.setStatus('closed', this.isQwen() ? '千问请求失败' : '连接中断');
     } finally {
       this.busy = false;
       this.updateSendState();
@@ -251,8 +325,31 @@ export class AgentView extends ItemView {
     }
   }
 
+  private async sendQwen(text: string): Promise<void> {
+    if (!this.qwenMessages.length) {
+      this.qwenMessages.push({
+        role: 'system',
+        content:
+          '你是 InterestSeed 的兴趣探索助手。请用简体中文回答，' +
+          '帮助用户把模糊兴趣拆成具体、可验证的下一步。' +
+          '你不知道用户的 Vault 内容，也不能声称读取了笔记或执行了工具；' +
+          '信息不足时先提出一个简短澄清问题。',
+      });
+    }
+    this.qwenMessages.push({ role: 'user', content: text });
+    this.qwenClient ??= new QwenChatClient();
+    this.setStatus('working', '千问正在回答');
+    const answer = await this.qwenClient.complete(this.qwenMessages);
+    this.qwenMessages.push({ role: 'assistant', content: answer });
+    this.appendAssistantDelta(answer);
+  }
+
   private async stop(): Promise<void> {
-    await this.client?.cancel();
+    if (this.isQwen()) {
+      this.qwenClient?.cancel();
+    } else {
+      await this.client?.cancel();
+    }
     this.busy = false;
     this.updateSendState();
     this.setStatus('idle', '已请求停止');
@@ -260,7 +357,10 @@ export class AgentView extends ItemView {
 
   private async resetSession(): Promise<void> {
     await this.client?.dispose();
+    this.qwenClient?.dispose();
     this.client = null;
+    this.qwenClient = null;
+    this.qwenMessages = [];
     this.streamEl = null;
     this.streamText = '';
     this.permissionHost?.empty();
