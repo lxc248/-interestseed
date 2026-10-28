@@ -17,6 +17,7 @@ export const DEFAULT_SETTINGS: InterestSeedSettings = {
   aiBaseUrl: DEEPSEEK_V4_PRO_CONFIG.baseUrl,
   aiModel: DEEPSEEK_V4_PRO_CONFIG.model,
   aiConsentGranted: false,
+  seedSprintCompletedAt: null,
   agentMode: 'dsh',
   enableDshAgent: false,
   dshCommand: 'dsh',
@@ -59,6 +60,10 @@ export function normalizeSettings(raw: unknown): InterestSeedSettings {
       typeof source.aiConsentGranted === 'boolean'
         ? source.aiConsentGranted
         : DEFAULT_SETTINGS.aiConsentGranted,
+    seedSprintCompletedAt:
+      typeof source.seedSprintCompletedAt === 'string'
+        ? source.seedSprintCompletedAt
+        : null,
     agentMode: 'dsh',
     enableDshAgent:
       typeof source.enableDshAgent === 'boolean'

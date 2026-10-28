@@ -1,6 +1,6 @@
 import { setIcon } from 'obsidian';
 import type { App } from 'obsidian';
-import type { GraphInsights } from '../core/InsightEngine';
+import type { GraphInsights, Insight } from '../core/InsightEngine';
 import type { NeighborEntry, InterestSeedGraphStore } from '../core/GraphStore';
 import type { InterestSeedNode, RelationOrigin, RelationStatus } from '../types/graph';
 import { pathFromUri } from '../utils/paths';
@@ -19,6 +19,7 @@ export interface DetailPanelActions {
   deleteEdge(id: string): void;
   createRelation(sourceId: string): void;
   expandWithAI(id: string): void;
+  openGapCoach(insight: Insight): void;
 }
 
 const STATUS_LABELS: Record<RelationStatus, string> = {
@@ -186,6 +187,11 @@ export class DetailPanel {
         button.addEventListener('click', () =>
           this.actions.selectNode(insight.nodeIds[0] ?? null),
         );
+        const coach = card.createEl('button', {
+          cls: 'interestseed-insight-coach',
+          text: '补一条连接',
+        });
+        coach.addEventListener('click', () => this.actions.openGapCoach(insight));
       }
     }
   }

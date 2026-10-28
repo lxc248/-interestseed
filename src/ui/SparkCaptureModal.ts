@@ -1,0 +1,127 @@
+import { Modal, Notice, setIcon } from 'obsidian';
+import type { App } from 'obsidian';
+import type InterestSeedPlugin from '../main';
+
+/**
+ * 兴趣火花：把短视频、文章、一次对话里让你停下来的东西，
+ * 变成一个待确认的兴趣种子。它不是书签，而是图谱的入口。
+ */
+export class SparkCaptureModal extends Modal {
+  private text = '';
+  private targetId = '';
+  private previewEl: HTMLElement | null = null;
+  private submitEl: HTMLButtonElement | null = null;
+
+  constructor(
+    app: App,
+    private readonly plugin: InterestSeedPlugin,
+  ) {
+    super(app);
+    this.modalEl.addClass('interestseed-spark-modal');
+  }
+
+  override onOpen(): void {
+    this.modalEl.setAttribute('aria-label', '记录兴趣火花');
+    this.render();
+  }
+
+  override onClose(): void {
+    this.contentEl.empty();
+  }
+
+  private render(): void {
+    const root = this.contentEl;
+    root.empty();
+    root.addClass('interestseed-spark');
+    const header = root.createDiv({ cls: 'interestseed-spark-header' });
+    const mark = header.createDiv({ cls: 'interestseed-spark-mark' });
+    setIcon(mark, 'sparkles');
+    const copy = header.createDiv();
+    copy.createDiv({ cls: 'interestseed-spark-kicker', text: 'CAPTURE A SPARK' });
+    copy.createEl('h2', { cls: 'interestseed-spark-title', text: '把一个好奇，留成种子。' });
+    copy.createEl('p', {
+      cls: 'interestseed-spark-lede',
+      text: '刷到一条视频、读到一句话、听到一个问题——先记下它，再决定它和你的哪条兴趣有关。',
+    });
+
+    const input = root.createEl('textarea', {
+      cls: 'interestseed-spark-input',
+      attr: {
+        placeholder: '粘贴一个链接，或写下让你停下来的那句话……',
+        rows: '5',
+      },
+    });
+    input.addEventListener('input', () => {
+      this.text = input.value;
+      this.updatePreview();
+    });
+    input.focus();
+
+    const target = root.createEl('select', { cls: 'interestseed-spark-target' });
+    target.createEl('option', { text: '先不连接，作为一个新种子', attr: { value: '' } });
+    const nodes = this.plugin.store
+      .listNodes()
+      .filter((node) => !node.metadata?.spark)
+      .sort((left, right) => left.title.localeCompare(right.title, 'zh'))
+      .slice(0, 40);
+    for (const node of nodes) {
+      target.createEl('option', { text: node.title, attr: { value: node.id } });
+    }
+    target.addEventListener('change', () => {
+      this.targetId = target.value;
+    });
+
+    const preview = root.createDiv({ cls: 'interestseed-spark-preview' });
+    this.previewEl = preview;
+    this.updatePreview();
+
+    const footer = root.createDiv({ cls: 'interestseed-spark-footer' });
+    const cancel = footer.createEl('button', {
+      cls: 'interestseed-sprint-secondary',
+      text: '取消',
+      attr: { type: 'button' },
+    });
+    cancel.addEventListener('click', () => this.close());
+    this.submitEl = footer.createEl('button', {
+      cls: 'mod-cta interestseed-sprint-primary',
+      text: '种下这个火花',
+      attr: { type: 'button' },
+    });
+    this.submitEl.disabled = true;
+    this.submitEl.addEventListener('click', () => this.submit());
+  }
+
+  private updatePreview(): void {
+    if (!this.previewEl) return;
+    const title = this.plugin.describeSpark(this.text);
+    this.previewEl.empty();
+    if (!title) {
+      this.previewEl.addClass('is-empty');
+      this.previewEl.createDiv({
+        cls: 'interestseed-spark-preview-placeholder',
+        text: '这里会出现你的火花预览',
+      });
+      if (this.submitEl) this.submitEl.disabled = true;
+      return;
+    }
+    this.previewEl.removeClass('is-empty');
+    const icon = this.previewEl.createDiv({ cls: 'interestseed-spark-preview-icon' });
+    setIcon(icon, this.plugin.isVideoSpark(this.text) ? 'play' : 'quote');
+    const copy = this.previewEl.createDiv();
+    copy.createDiv({ cls: 'interestseed-spark-preview-kicker', text: this.plugin.isVideoSpark(this.text) ? 'VIDEO SPARK' : 'TEXT SPARK' });
+    copy.createDiv({ cls: 'interestseed-spark-preview-title', text: title });
+    copy.createDiv({
+      cls: 'interestseed-spark-preview-detail',
+      text: '保存后是一个候选种子；你可以在图谱里继续连接、确认或删除。',
+    });
+    if (this.submitEl) this.submitEl.disabled = false;
+  }
+
+  private submit(): void {
+    const id = this.plugin.captureInterestSpark(this.text, this.targetId || undefined);
+    if (!id) return;
+    new Notice('火花已种下。去图谱里看看它和什么连在一起。');
+    void this.plugin.activateView();
+    this.close();
+  }
+}

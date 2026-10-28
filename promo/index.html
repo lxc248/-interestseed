@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<style>
+  html, body { margin: 0; padding: 0; background: #0d0d0c; overflow: hidden; }
+  canvas { display: block; width: 1920px; height: 1080px; }
+</style>
+</head>
+<body>
+<canvas id="stage" width="1920" height="1080"></canvas>
+<script>
+window.__ready = false;
+window.__bootError = null;
+window.DURATION = 40;
+
+const W = 1920;
+const H = 1080;
+const canvas = document.getElementById('stage');
+const ctx = canvas.getContext('2d');
+const ACCENT = '#d97757';
+const CREAM = '#f4f1ea';
+const MUTED = '#a8a29e';
+const BLUE = '#58c4dd';
+const GREEN = '#7dcf9a';
+const AMBER = '#e7b35a';
+const BG = '#0d0d0c';
+
+const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+const easeOut = (v) => 1 - Math.pow(1 - clamp(v, 0, 1), 3);
+const easeInOut = (v) => {
+  const x = clamp(v, 0, 1);
+  return x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
+};
+const lerp = (a, b, v) => a + (b - a) * v;
+function mulberry32(seed) {
+  return function () {
+    let t = (seed += 0x6D2B79F5);
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const rand = mulberry32(240428);
+const stars = Array.from({ length: 120 }, () => ({
+  x: rand() * W,
+  y: rand() * H,
+  r: 0.5 + rand() * 1.6,
+  phase: rand() * Math.PI * 2,
+  drift: 0.15 + rand() * 0.4,
+}));
+
+function font(size, weight = 400) {
+  return `${weight} ${size}px "Microsoft YaHei", "Noto Sans SC", "PingFang SC", sans-serif`;
+}
+function text(value, x, y, size, color = CREAM, weight = 400, align = 'left') {
+  ctx.font = font(size, weight);
+  ctx.fillStyle = color;
+  ctx.textAlign = align;
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText(value, x, y);
+}
+function pill(value, x, y, color = MUTED, align = 'left') {
+  ctx.font = font(20, 600);
+  const w = ctx.measureText(value).width + 28;
+  const left = align === 'right' ? x - w : x;
+  ctx.fillStyle = 'rgba(244,241,234,0.045)';
+  ctx.strokeStyle = 'rgba(244,241,234,0.14)';
+  ctx.lineWidth = 1;
+  roundRect(left, y - 24, w, 36, 18);
+  ctx.fill();
+  ctx.stroke();
+  text(value, left + 14, y + 1, 18, color, 600);
+}
+function roundRect(x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+function line(x1, y1, x2, y2, color, width = 1) {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+}
+function glowDot(x, y, r, color, alpha = 1) {
+  const grad = ctx.createRadialGradient(x, y, 0, x, y, r * 6);
+  grad.addColorStop(0, color);
+  grad.addColorStop(0.16, color);
+  grad.addColorStop(1, 'rgba(217,119,87,0)');
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.arc(x, y, r * 6, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fill();
+}
+function beat(t) {
+  const phase = (t % 0.5) / 0.5;
+  return Math.exp(-phase * 8);
+}
+
+function background(t, accentAlpha = 0.12) {
+  const grad = ctx.createLinearGradient(0, 0, W, H);
+  grad.addColorStop(0, '#11100e');
+  grad.addColorStop(0.5, BG);
+  grad.addColorStop(1, '#0c1114');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+  const glow = ctx.createRadialGradient(250, 160, 0, 250, 160, 800);
+  glow.addColorStop(0, `rgba(217,119,87,${accentAlpha})`);
+  glow.addColorStop(1, 'rgba(217,119,87,0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, W, H);
+  for (const star of stars) {
+    const alpha = 0.16 + 0.16 * Math.sin(t * star.drift + star.phase);
+    ctx.fillStyle = `rgba(244,241,234,${alpha})`;
+    ctx.beginPath();
+    ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  // deterministic soft grain lines
+  ctx.globalAlpha = 0.05;
+  for (let i = 0; i < 9; i += 1) {
+    const y = ((i * 137 + t * 17) % H);
+    line(0, y, W, y + 60, 'rgba(244,241,234,0.45)', 1);
+  }
+  ctx.globalAlpha = 1;
+}
+
+function sceneHook(t) {
+  const local = clamp(t / 4.2, 0, 1);
+  background(t, 0.13 - local * 0.05);
+  const cx = 960;
+  const cy = 505;
+  const reveal = easeOut(local * 1.5);
+  ctx.globalAlpha = 0.9;
+  for (let i = 0; i < 18; i += 1) {
+    const a = (i / 18) * Math.PI * 2 + t * 0.12;
+    const r = 190 + (i % 4) * 42;
+    glowDot(cx + Math.cos(a) * r, cy + Math.sin(a) * r * 0.42, 2 + (i % 3), i % 5 === 0 ? ACCENT : CREAM, 0.4 + 0.4 * Math.sin(t + i));
+  }
+  glowDot(cx, cy, 8, ACCENT, 1);
+  pill('INTERESTSEED  /  3 MINUTES', 108, 96, ACCENT);
+  ctx.save();
+  ctx.globalAlpha = reveal;
+  const headlineY = 420 + (1 - reveal) * 28;
+  text('你不需要先知道', 108, headlineY, 94, CREAM, 760);
+  text('自己喜欢什么。', 108, headlineY + 106, 94, CREAM, 760);
+  ctx.restore();
+  ctx.globalAlpha = 0.7 * reveal;
+  text('做四个选择，看它连成一张会生长的星图。', 112, 650, 26, MUTED, 400);
+  ctx.globalAlpha = 1;
+  text('CURIOUS  —  CONNECTED  —  YOURS', 112, 998, 17, 'rgba(168,162,158,0.65)', 600);
+}
+
+function sceneProblem(t) {
+  const local = clamp((t - 4.2) / 5.3, 0, 1);
+  background(t, 0.1);
+  const enter = easeOut(local * 1.6);
+  pill('THE PROBLEM', 108, 96, MUTED);
+  ctx.save();
+  ctx.globalAlpha = enter;
+  text('收藏夹越来越大。', 108, 230, 66, CREAM, 730);
+  text('兴趣却没有形状。', 108, 305, 66, CREAM, 730);
+  ctx.restore();
+  const cardData = [
+    ['收藏', '128', ACCENT],
+    ['待看', '64', BLUE],
+    ['笔记', '32', GREEN],
+    ['???', '0', MUTED],
+  ];
+  for (let i = 0; i < cardData.length; i += 1) {
+    const delay = i * 0.10;
+    const a = easeOut((local - delay) * 2.2);
+    const x = 108 + i * 250;
+    const y = 390 + Math.sin(t * 0.9 + i) * 7;
+    ctx.globalAlpha = a;
+    ctx.fillStyle = 'rgba(244,241,234,0.035)';
+    ctx.strokeStyle = 'rgba(244,241,234,0.11)';
+    ctx.lineWidth = 1;
+    roundRect(x, y, 222, 176, 14);
+    ctx.fill();
+    ctx.stroke();
+    text(cardData[i][0], x + 20, y + 35, 18, cardData[i][2], 600);
+    text(cardData[i][1], x + 20, y + 114, 48, CREAM, 720);
+    line(x + 20, y + 140, x + 202, y + 140, 'rgba(244,241,234,0.12)', 1);
+    ctx.globalAlpha = 1;
+  }
+  const arrow = easeOut((local - 0.5) * 2);
+  ctx.globalAlpha = arrow;
+  text('你消费了很多内容。', 108, 730, 28, MUTED, 400);
+  text('但没有一条线，把它们连成“你”。', 108, 775, 28, CREAM, 600);
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = 'rgba(217,119,87,0.08)';
+  ctx.beginPath();
+  ctx.arc(1600, 600, 280 + Math.sin(t) * 12, 0, Math.PI * 2);
+  ctx.fill();
+  text('NO', 1510, 585, 120, 'rgba(217,119,87,0.15)', 760);
+  text('SHAPE', 1480, 670, 48, 'rgba(217,119,87,0.12)', 760);
+}
+
+function sceneChoices(t) {
+  const local = clamp((t - 9.5) / 7.0, 0, 1);
+  background(t, 0.08);
+  pill('01 / 现在的你', 108, 96, ACCENT);
+  text('四个选择，', 108, 225, 72, CREAM, 740);
+  text('不需要写长文。', 108, 303, 72, CREAM, 740);
+  const options = [
+    ['正在做一个东西', '项目 / 作品 / 产品', ACCENT, '01'],
+    ['在几个兴趣间摇摆', '想找到一条线', BLUE, '02'],
+    ['正在研究一个问题', '越挖越深', '#a58bff', '03'],
+    ['想开始，但还没动手', '先给好奇一个入口', GREEN, '04'],
+  ];
+  const active = Math.floor(local * 4) % 4;
+  for (let i = 0; i < options.length; i += 1) {
+    const x = 108 + (i % 2) * 560;
+    const y = 405 + Math.floor(i / 2) * 152;
+    const a = easeOut((local - i * 0.05) * 4);
+    const selected = i === active;
+    ctx.globalAlpha = a;
+    ctx.fillStyle = selected ? `${options[i][2]}1a` : 'rgba(244,241,234,0.025)';
+    ctx.strokeStyle = selected ? options[i][2] : 'rgba(244,241,234,0.10)';
+    ctx.lineWidth = selected ? 2 : 1;
+    roundRect(x, y, 520, 122, 12);
+    ctx.fill();
+    ctx.stroke();
+    text(options[i][3], x + 22, y + 34, 15, options[i][2], 700);
+    text(options[i][0], x + 22, y + 72, 25, CREAM, 650);
+    text(options[i][1], x + 22, y + 101, 17, MUTED, 400);
+    ctx.fillStyle = selected ? options[i][2] : 'rgba(244,241,234,0.18)';
+    ctx.beginPath();
+    ctx.arc(x + 493, y + 61, selected ? 10 : 7, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+  const progress = clamp(local * 1.1, 0, 1);
+  ctx.fillStyle = 'rgba(244,241,234,0.10)';
+  roundRect(108, 920, 1070, 4, 2);
+  ctx.fill();
+  ctx.fillStyle = ACCENT;
+  roundRect(108, 920, 1070 * progress, 4, 2);
+  ctx.fill();
+  text('你的选择正在长成结构', 108, 872, 20, MUTED, 400);
+  text('4 / 4', 1178, 880, 18, ACCENT, 700);
+}
+
+function sceneReveal(t) {
+  const local = clamp((t - 16.5) / 7.0, 0, 1);
+  background(t, 0.1);
+  const cx = 620;
+  const cy = 545;
+  const nodes = [
+    { title: '正在做的项目', x: cx - 250, y: cy - 120, c: ACCENT },
+    { title: '动手创造', x: cx + 190, y: cy - 130, c: GREEN },
+    { title: 'AI 与工具', x: cx + 260, y: cy + 110, c: BLUE },
+    { title: '项目地图', x: cx - 180, y: cy + 170, c: '#a58bff' },
+    { title: '7 天实验', x: cx + 430, y: cy + 260, c: AMBER },
+  ];
+  const edges = [[0, 1], [1, 3], [2, 0], [2, 1], [2, 4], [3, 4]];
+  const reveal = easeOut(local * 1.7);
+  ctx.globalAlpha = 0.9;
+  for (let i = 0; i < edges.length; i += 1) {
+    const delay = 0.15 + i * 0.055;
+    const a = easeOut((local - delay) * 4);
+    const [from, to] = edges[i];
+    const x1 = nodes[from].x;
+    const y1 = nodes[from].y;
+    const x2 = nodes[to].x;
+    const y2 = nodes[to].y;
+    ctx.strokeStyle = i === 4 ? 'rgba(231,179,90,0.65)' : 'rgba(244,241,234,0.28)';
+    ctx.lineWidth = i === 4 ? 2 : 1.2;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(lerp(x1, x2, a), lerp(y1, y2, a));
+    ctx.stroke();
+  }
+  for (let i = 0; i < nodes.length; i += 1) {
+    const a = easeOut((local - i * 0.08) * 5);
+    const node = nodes[i];
+    const pop = 0.8 + 0.2 * a;
+    ctx.globalAlpha = a;
+    glowDot(node.x, node.y, 9 * pop, node.c, 0.9);
+    text(node.title, node.x + 20, node.y + 8, 22, CREAM, 560);
+    ctx.globalAlpha = 1;
+  }
+  pill('YOUR FIRST CONSTELLATION', 108, 96, ACCENT);
+  text('你的兴趣，', 1030, 390, 68, CREAM, 740);
+  text('开始有形状了。', 1030, 465, 68, CREAM, 740);
+  ctx.globalAlpha = 0.8;
+  text('不是自动生成的答案。', 1032, 550, 25, MUTED, 400);
+  text('是一张可以确认、可以修改的草稿。', 1032, 590, 25, MUTED, 400);
+  ctx.globalAlpha = 1;
+  text('5', 1032, 730, 74, ACCENT, 760);
+  text('种子', 1100, 728, 18, MUTED, 500);
+  text('6', 1180, 730, 74, CREAM, 760);
+  text('候选连接', 1248, 728, 18, MUTED, 500);
+}
+
+function sceneDraft(t) {
+  const local = clamp((t - 23.5) / 6.0, 0, 1);
+  background(t, 0.07);
+  pill('HUMAN IN THE LOOP', 108, 96, GREEN);
+  text('先确认，再写入。', 108, 220, 66, CREAM, 740);
+  text('AI 提案，不是替你决定。', 108, 285, 30, MUTED, 400);
+  const cards = [
+    ['正在做的项目', '来自你的选择', ACCENT, 0.9],
+    ['AI 与工具', '你的磁场', BLUE, 0.86],
+    ['项目地图', '你想长成的样子', '#a58bff', 0.82],
+    ['7 天兴趣实验', '可执行下一步', AMBER, 0.76],
+  ];
+  for (let i = 0; i < cards.length; i += 1) {
+    const a = easeOut((local - i * 0.08) * 4);
+    const x = 108 + (i % 2) * 545;
+    const y = 370 + Math.floor(i / 2) * 150;
+    ctx.globalAlpha = a;
+    ctx.fillStyle = 'rgba(244,241,234,0.035)';
+    ctx.strokeStyle = i === 3 ? 'rgba(231,179,90,0.4)' : 'rgba(244,241,234,0.12)';
+    roundRect(x, y, 505, 118, 11);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = cards[i][2];
+    ctx.beginPath();
+    ctx.arc(x + 27, y + 38, 7, 0, Math.PI * 2);
+    ctx.fill();
+    text(cards[i][0], x + 48, y + 44, 25, CREAM, 650);
+    text(cards[i][1], x + 48, y + 76, 17, MUTED, 400);
+    text(`${Math.round(cards[i][3] * 100)}%`, x + 462, y + 88, 16, cards[i][2], 650);
+    ctx.globalAlpha = 1;
+  }
+  // unexpected link
+  const a = easeOut((local - 0.65) * 3);
+  ctx.globalAlpha = a;
+  ctx.strokeStyle = 'rgba(217,119,87,0.65)';
+  ctx.setLineDash([7, 7]);
+  line(610, 430, 657, 590, 'rgba(217,119,87,0.5)', 2);
+  ctx.setLineDash([]);
+  ctx.fillStyle = 'rgba(217,119,87,0.10)';
+  roundRect(690, 700, 610, 70, 10);
+  ctx.fill();
+  text('意外连接', 714, 733, 18, ACCENT, 700);
+  text('你没想到的一条桥，值得先看一眼。', 714, 758, 17, MUTED, 400);
+  ctx.globalAlpha = 1;
+  text('不是自动写回。', 108, 900, 24, MUTED, 400);
+  text('每一步都可以撤销。', 108, 940, 24, CREAM, 600);
+}
+
+function sceneSpark(t) {
+  const local = clamp((t - 29.5) / 5.5, 0, 1);
+  background(t, 0.11);
+  pill('CAPTURE A SPARK', 108, 96, ACCENT);
+  text('刷到的视频，', 108, 225, 68, CREAM, 740);
+  text('也能变成一个种子。', 108, 300, 68, CREAM, 740);
+  const p = easeOut(local * 1.8);
+  const x = 108;
+  const y = 400;
+  ctx.fillStyle = 'rgba(244,241,234,0.04)';
+  ctx.strokeStyle = 'rgba(244,241,234,0.13)';
+  roundRect(x, y, 660, 260, 18);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = 'rgba(217,119,87,0.18)';
+  roundRect(x + 24, y + 24, 170, 100, 10);
+  ctx.fill();
+  ctx.fillStyle = ACCENT;
+  ctx.beginPath();
+  ctx.moveTo(x + 96, y + 57);
+  ctx.lineTo(x + 130, y + 74);
+  ctx.lineTo(x + 96, y + 91);
+  ctx.closePath();
+  ctx.fill();
+  text('一个短视频', x + 220, y + 62, 26, CREAM, 620);
+  text('bilibili.com / 03:24', x + 220, y + 94, 17, MUTED, 400);
+  text('“为什么我们总是重新开始？”', x + 24, y + 168, 26, CREAM, 520);
+  text('这不是书签。它是一颗兴趣种子。', x + 24, y + 211, 19, MUTED, 400);
+  text('+ 火花', x + 24, y + 239, 16, ACCENT, 650);
+  // flying spark to graph
+  const fly = easeInOut((local - 0.45) * 2);
+  const sx = lerp(x + 600, 1460, fly);
+  const sy = lerp(y + 150, 520, fly);
+  glowDot(sx, sy, 7 + 4 * Math.sin(t * 8), ACCENT, 0.85);
+  if (p > 0.8) {
+    const cx = 1510;
+    const cy = 530;
+    const nodes = [[0, -130, ACCENT], [170, 40, BLUE], [-160, 120, GREEN], [180, 200, AMBER]];
+    ctx.globalAlpha = p;
+    for (let i = 0; i < nodes.length; i += 1) {
+      line(cx, cy, cx + nodes[i][0], cy + nodes[i][1], 'rgba(244,241,234,0.22)', 1.3);
+      glowDot(cx + nodes[i][0], cy + nodes[i][1], 7, nodes[i][2], 0.9);
+    }
+    glowDot(cx, cy, 13, ACCENT, 1);
+    text('你的图谱', cx - 66, cy + 235, 24, CREAM, 600);
+    ctx.globalAlpha = 1;
+  }
+  text('每一次停留，都可能是一条新连接。', 108, 840, 24, MUTED, 400);
+}
+
+function sceneEnd(t) {
+  const local = clamp((t - 35.0) / 5.0, 0, 1);
+  background(t, 0.16);
+  const a = easeOut(local * 2);
+  ctx.globalAlpha = a;
+  glowDot(960, 390, 12, ACCENT, 1);
+  const ring = 180 + Math.sin(t * 1.2) * 8;
+  ctx.strokeStyle = 'rgba(217,119,87,0.25)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.arc(960, 390, ring, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(960, 390, ring * 1.35, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(244,241,234,0.08)';
+  ctx.stroke();
+  text('从 0 到一张', 960, 585, 62, CREAM, 740, 'center');
+  text('会生长的兴趣星图。', 960, 660, 62, CREAM, 740, 'center');
+  ctx.globalAlpha = 0.72 * a;
+  text('InterestSeed  ·  seeds, relations, next steps', 960, 730, 24, MUTED, 400, 'center');
+  text('InterestSeed 1.0  /  github.com/lxc248/-interestseed', 960, 850, 20, ACCENT, 600, 'center');
+  ctx.globalAlpha = 1;
+  pill('OBSIDIAN PLUGIN  ·  LOCAL FIRST', 960, 940, MUTED, 'center');
+}
+
+window.renderFrame = function (t) {
+  ctx.clearRect(0, 0, W, H);
+  if (t < 4.2) sceneHook(t);
+  else if (t < 9.5) sceneProblem(t);
+  else if (t < 16.5) sceneChoices(t);
+  else if (t < 23.5) sceneReveal(t);
+  else if (t < 29.5) sceneDraft(t);
+  else if (t < 35.0) sceneSpark(t);
+  else sceneEnd(t);
+  const pulse = beat(t);
+  if (pulse > 0.25) {
+    ctx.fillStyle = `rgba(255,255,255,${Math.max(0, pulse - 0.25) * 0.025})`;
+    ctx.fillRect(0, 0, W, H);
+  }
+};
+
+window.__ready = true;
+</script>
+</body>
+</html>

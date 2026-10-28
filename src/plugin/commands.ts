@@ -5,6 +5,8 @@ import type { UndoHistory } from '../core/UndoManager';
 export interface CommandHost {
   activateView(): Promise<void> | void;
   activateAgentView(): Promise<void> | void;
+  openSeedSprint(): void;
+  openSparkCapture(): void;
   rebuildGraph(silent?: boolean): Promise<void>;
   exportGraph(): void;
   promptRebuild(): void;
@@ -31,6 +33,18 @@ export function registerCommands(plugin: Plugin, host: CommandHost): void {
     callback: () => {
       void host.activateView();
     },
+  });
+
+  plugin.addCommand({
+    id: 'interestseed-seed-sprint',
+    name: '兴趣起跑：从 0 长出第一张星图',
+    callback: () => host.openSeedSprint(),
+  });
+
+  plugin.addCommand({
+    id: 'interestseed-spark',
+    name: '记录一个兴趣火花',
+    callback: () => host.openSparkCapture(),
   });
 
   plugin.addCommand({

@@ -119,6 +119,7 @@ export class InterestSeedView extends ItemView {
       this.plugin.promptRebuild();
     });
     this.createAction(actions, 'plus', '新建节点', () => this.plugin.promptCreateNode());
+    this.createAction(actions, 'sparkles', '记录兴趣火花', () => this.plugin.openSparkCapture());
     this.createAction(actions, 'git-fork', '刷新规则建议', () => {
       this.plugin.refreshSuggestions();
     });
@@ -141,6 +142,61 @@ export class InterestSeedView extends ItemView {
     this.createAction(actions, 'layout-dashboard', '兴趣总览', () => {
       this.plugin.openDiscoveryOverview();
     });
+
+    if (!this.plugin.settings.seedSprintCompletedAt) {
+      const sprintBanner = root.createDiv({ cls: 'interestseed-sprint-banner' });
+      const sprintMark = sprintBanner.createDiv({ cls: 'interestseed-sprint-banner-mark' });
+      setIcon(sprintMark, 'sparkles');
+      const sprintCopy = sprintBanner.createDiv({ cls: 'interestseed-sprint-banner-copy' });
+      sprintCopy.createDiv({
+        cls: 'interestseed-sprint-banner-kicker',
+        text: 'FIRST CONSTELLATION',
+      });
+      sprintCopy.createDiv({
+        cls: 'interestseed-sprint-banner-title',
+        text: '你的兴趣，还没有连成一张地图。',
+      });
+      sprintCopy.createDiv({
+        cls: 'interestseed-sprint-banner-detail',
+        text: '做 4 个选择，用 3 分钟长出第一张会生长的兴趣星图。',
+      });
+      const sprintButton = sprintBanner.createEl('button', {
+        cls: 'mod-cta interestseed-sprint-banner-button',
+        text: '兴趣起跑',
+        attr: { type: 'button' },
+      });
+      sprintButton.addEventListener('click', () => this.plugin.openSeedSprint());
+    }
+    const experiment = this.plugin.getActiveExperiment();
+    if (experiment) {
+      const strip = root.createDiv({ cls: 'interestseed-experiment-strip' });
+      const stripIcon = strip.createDiv({ cls: 'interestseed-experiment-strip-icon' });
+      setIcon(stripIcon, 'flask-conical');
+      const stripCopy = strip.createDiv({ cls: 'interestseed-experiment-strip-copy' });
+      stripCopy.createDiv({
+        cls: 'interestseed-experiment-strip-kicker',
+        text: experiment.status === 'complete' ? 'EXPERIMENT COMPLETE' : `INTEREST EXPERIMENT · DAY ${experiment.day} / 7`,
+      });
+      stripCopy.createDiv({
+        cls: 'interestseed-experiment-strip-title',
+        text: experiment.node.title,
+      });
+      const dots = stripCopy.createDiv({ cls: 'interestseed-experiment-dots' });
+      for (let day = 1; day <= 7; day += 1) {
+        const dot = dots.createSpan({ cls: 'interestseed-experiment-dot' });
+        if (day <= experiment.day) dot.addClass('is-done');
+      }
+      const advance = strip.createEl('button', {
+        cls: 'interestseed-experiment-advance',
+        text: experiment.status === 'complete' ? '已完成' : '完成今天',
+        attr: { type: 'button' },
+      });
+      advance.disabled = experiment.status === 'complete';
+      advance.addEventListener('click', () => {
+        this.plugin.advanceExperiment();
+        void this.onOpen();
+      });
+    }
 
     const launchpad = root.createDiv({ cls: 'interestseed-launchpad' });
     this.createLaunchCard(
@@ -179,6 +235,7 @@ export class InterestSeedView extends ItemView {
     const quickbar = root.createDiv({ cls: 'interestseed-quickbar' });
     this.createQuickAction(quickbar, 'refresh-cw', '扫描', () => this.plugin.promptRebuild());
     this.createQuickAction(quickbar, 'plus', '节点', () => this.plugin.promptCreateNode());
+    this.createQuickAction(quickbar, 'sparkles', '火花', () => this.plugin.openSparkCapture());
     this.createQuickAction(quickbar, 'git-fork', '建议', () => this.plugin.refreshSuggestions());
     this.quickInboxButton = this.createQuickAction(quickbar, 'inbox', '收件', () =>
       this.toggleInbox(),
@@ -268,6 +325,7 @@ export class InterestSeedView extends ItemView {
       expandWithAI: (nodeId) => {
         void this.plugin.expandWithAI(nodeId);
       },
+      openGapCoach: (insight) => this.plugin.openGapCoach(insight),
     });
 
     this.discoveryPanel = new DiscoveryPanel(this.discoveryHost, {

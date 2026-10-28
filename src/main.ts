@@ -53,10 +53,16 @@ import {
   PluginDataStorage,
   migrateLegacyGraphFile,
 } from './storage/PluginDataStorage';
-import type { GraphViewport, InterestSeedSettings } from './types/graph';
+import type { GraphViewport, InterestSeedNode, InterestSeedSettings } from './types/graph';
 import { INTERESTSEED_VIEW_TYPE, InterestSeedView } from './ui/InterestSeedView';
 import { AgentView, INTERESTSEED_AGENT_VIEW_TYPE } from './ui/AgentView';
 import { NodeCreateModal } from './ui/NodeCreateModal';
+import { SeedSprintModal } from './ui/SeedSprintModal';
+import { SparkCaptureModal } from './ui/SparkCaptureModal';
+import { GapCoachModal } from './ui/GapCoachModal';
+import type { Insight } from './core/InsightEngine';
+import type { SeedSprintDraft } from './onboarding/seedSprint';
+import { edgeIdFor, hashString, nodeIdForUri } from './utils/ids';
 import { RelationCreateModal } from './ui/RelationCreateModal';
 import { RelationEditModal } from './ui/RelationEditModal';
 import { ScanConfirmModal } from './ui/ScanConfirmModal';
@@ -357,6 +363,260 @@ export default class InterestSeedPlugin extends Plugin {
     }
 
     await workspace.revealLeaf(leaf);
+  }
+
+  getActiveExperiment(): { node: InterestSeedNode; day: number; status: string } | null {
+    const node = this.store
+      .listNodes()
+      .find((candidate) => candidate.metadata?.nextStep === true);
+    if (!node) return null;
+    const rawDay = Number(node.metadata?.experimentDay ?? 1);
+    return {
+      node,
+      day: Number.isFinite(rawDay) ? Math.min(7, Math.max(1, rawDay)) : 1,
+      status: String(node.metadata?.experimentStatus ?? 'active'),
+    };
+  }
+
+  advanceExperiment(): void {
+    const active = this.getActiveExperiment();
+    if (!active || active.day >= 7) {
+      new Notice('这个兴趣实验已经完成 7 天。');
+      return;
+    }
+    const nextDay = active.day + 1;
+    this.session.updateNode(
+      active.node.id,
+      {
+        metadata: {
+          ...active.node.metadata,
+          experimentDay: nextDay,
+          experimentLastCheckInAt: new Date().toISOString(),
+          experimentStatus: nextDay >= 7 ? 'complete' : 'active',
+        },
+      },
+      `兴趣实验：完成第 ${active.day} 天`,
+    );
+    this.insightsCache = null;
+    this.notifyStatus();
+    void this.persist();
+    new Notice(nextDay >= 7 ? '7 天兴趣实验完成。你的图谱多了一段真实反馈。' : `完成第 ${active.day} 天，明天继续。`);
+  }
+
+  openGapCoach(insight: Insight): void {
+    new GapCoachModal(this.app, this, insight).open();
+  }
+
+  captureGapSeed(insight: Insight, text: string): string | null {
+    const value = text.trim();
+    if (!value) return null;
+    const now = new Date().toISOString();
+    const id = nodeIdForUri(`interestseed://gap/${hashString(`${insight.id}:${value}`)}`);
+    if (this.store.getNode(id)) return id;
+    this.session.addNode(
+      {
+        id,
+        type: 'topic',
+        title: value.slice(0, 96),
+        tags: ['缺口', '观察'],
+        createdAt: now,
+        updatedAt: now,
+        metadata: {
+          gapCoach: true,
+          insightId: insight.id,
+          insightTitle: insight.title,
+          evidence: insight.detail,
+        },
+      },
+      '兴趣缺口：种下一个观察',
+    );
+    const target = insight.nodeIds.find((nodeId) => this.store.getNode(nodeId));
+    if (target) {
+      this.session.addEdge(
+        {
+          id: edgeIdFor(target, id, '补充观察'),
+          source: target,
+          target: id,
+          relation: '补充观察',
+          origin: 'user',
+          status: 'suggested',
+          evidence: [`来自图谱缺口：${insight.title}`],
+          createdAt: now,
+          updatedAt: now,
+        },
+        '把观察接到缺口上',
+      );
+    }
+    this.insightsCache = null;
+    this.notifyStatus();
+    void this.persist();
+    this.setSelectedNode(id);
+    return id;
+  }
+
+  openSparkCapture(): void {
+    new SparkCaptureModal(this.app, this).open();
+  }
+
+  isVideoSpark(text: string): boolean {
+    return /(youtube\.com|youtu\.be|bilibili\.com|douyin\.com|tiktok\.com|vimeo\.com)/i.test(
+      text,
+    );
+  }
+
+  describeSpark(text: string): string {
+    const value = text.trim();
+    if (!value) return '';
+    const url = value.match(/https?:\/\/[^\s]+/i)?.[0];
+    if (url) {
+      try {
+        const host = new URL(url).hostname.replace(/^www\./, '');
+        const prefix = value.replace(url, '').trim();
+        return (prefix || `视频火花 · ${host}`).slice(0, 96);
+      } catch {
+        return '视频火花';
+      }
+    }
+    return value.slice(0, 96);
+  }
+
+  captureInterestSpark(text: string, targetId?: string): string | null {
+    const value = text.trim();
+    const title = this.describeSpark(value);
+    if (!title) {
+      new Notice('先写下一句话，或粘贴一个链接。');
+      return null;
+    }
+    const url = value.match(/https?:\/\/[^\s]+/i)?.[0];
+    const id = nodeIdForUri(`interestseed://spark/${hashString(value.toLowerCase())}`);
+    if (this.store.getNode(id)) {
+      new Notice('这个火花已经在图谱里了。');
+      return id;
+    }
+    const now = new Date().toISOString();
+    const video = this.isVideoSpark(value);
+    this.session.addNode(
+      {
+        id,
+        type: video ? 'video' : 'topic',
+        title,
+        ...(url ? { sourceUri: url } : {}),
+        tags: ['火花', video ? '视频' : '文本'],
+        createdAt: now,
+        updatedAt: now,
+        metadata: {
+          spark: true,
+          raw: value,
+          capturedAt: now,
+        },
+      },
+      '种下一个兴趣火花',
+    );
+    if (targetId && this.store.getNode(targetId)) {
+      this.session.addEdge(
+        {
+          id: edgeIdFor(targetId, id, '引出'),
+          source: targetId,
+          target: id,
+          relation: '引出',
+          origin: 'user',
+          status: 'confirmed',
+          evidence: ['来自你的火花捕获'],
+          createdAt: now,
+          updatedAt: now,
+        },
+        '把火花连接到已有兴趣',
+      );
+    }
+    this.insightsCache = null;
+    this.notifyStatus();
+    void this.persist();
+    this.setSelectedNode(id);
+    return id;
+  }
+
+  openSeedSprint(): void {
+    new SeedSprintModal(this.app, this).open();
+  }
+
+  applySeedSprint(
+    draft: SeedSprintDraft,
+    acceptedNodeIds: ReadonlySet<string>,
+    acceptedEdgeIds: ReadonlySet<string>,
+  ): number {
+    const now = new Date().toISOString();
+    const current = this.store.getGraph();
+    const nodes = [...current.nodes];
+    const edges = [...current.edges];
+    const knownNodes = new Set(nodes.map((node) => node.id));
+    const knownEdges = new Set(edges.map((edge) => edge.id));
+    const idMap = new Map<string, string>();
+
+    for (const proposal of draft.nodes) {
+      if (!acceptedNodeIds.has(proposal.id)) continue;
+      const id = nodeIdForUri(`interestseed://seed-sprint/${proposal.id}`);
+      idMap.set(proposal.id, id);
+      if (knownNodes.has(id)) continue;
+      nodes.push({
+        id,
+        type: proposal.type,
+        title: proposal.title,
+        tags: [...proposal.tags],
+        createdAt: now,
+        updatedAt: now,
+        metadata: {
+          seedSprint: true,
+          evidence: proposal.evidence,
+          confidence: proposal.confidence,
+          nextStep: proposal.nextStep === true,
+          ...(proposal.nextStep
+            ? { experimentDay: 1, experimentStartedAt: now, experimentStatus: 'active' }
+            : {}),
+        },
+      });
+      knownNodes.add(id);
+    }
+
+    for (const proposal of draft.edges) {
+      if (!acceptedEdgeIds.has(proposal.id)) continue;
+      const source = idMap.get(proposal.source);
+      const target = idMap.get(proposal.target);
+      if (!source || !target) continue;
+      const id = edgeIdFor(source, target, proposal.relation);
+      if (knownEdges.has(id)) continue;
+      edges.push({
+        id,
+        source,
+        target,
+        relation: proposal.relation,
+        origin: 'ai',
+        status: 'confirmed',
+        confidence: proposal.confidence,
+        evidence: [proposal.evidence],
+        createdAt: now,
+        updatedAt: now,
+      });
+      knownEdges.add(id);
+    }
+
+    const added = nodes.length - current.nodes.length;
+    if (added === 0) return 0;
+    this.session.replace(
+      {
+        ...current,
+        schemaVersion: current.schemaVersion,
+        updatedAt: now,
+        nodes,
+        edges,
+      },
+      '兴趣起跑：种下第一张星图',
+    );
+    this.settings.seedSprintCompletedAt = now;
+    void this.saveSettings();
+    this.insightsCache = null;
+    this.notifyStatus();
+    void this.persist();
+    return added;
   }
 
   async activateAgentView(): Promise<void> {

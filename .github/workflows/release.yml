@@ -9,7 +9,7 @@ on:
       tag:
         description: 'Tag to build and release'
         required: true
-        default: 'v0.2.0'
+        default: 'v1.0.0'
 
 permissions:
   contents: write
@@ -41,5 +41,9 @@ jobs:
       - uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ inputs.tag || github.ref_name }}
-          files: release/interestseed-*.zip
+          body_path: RELEASE_NOTES_1.0.0.md
+          files: |
+            release/interestseed-*.zip
+            assets/interestseed-launch.mp4
+            assets/interestseed-launch-cover.png
           generate_release_notes: true

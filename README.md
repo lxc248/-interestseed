@@ -1,276 +1,153 @@
 # InterestSeed
 
-**把散落在 Vault 里的笔记，长成一张可确认、可追溯、可行动的兴趣图谱。**
+**你不需要先知道自己喜欢什么。做四个选择，长出第一张会生长的兴趣星图。**
 
-[简体中文](README.md) · [English](README.en.md)
+[简体中文](README.md) · [English](README.en.md) · [看 40 秒演示](assets/interestseed-launch.mp4) · [产品设计](docs/seed-sprint.md)
 
-![InterestSeed 兴趣图谱](assets/screenshot-1.png)
+[![InterestSeed 演示封面](assets/interestseed-launch-cover.png)](assets/interestseed-launch.mp4)
 
 <p>
   <img alt="Obsidian" src="https://img.shields.io/badge/Obsidian-1.5%2B-7c3aed" />
-  <img alt="Version" src="https://img.shields.io/badge/version-0.2.0-0ea5e9" />
-  <img alt="Tests" src="https://img.shields.io/badge/tests-437%20passing-22c55e" />
+  <img alt="Version" src="https://img.shields.io/badge/version-1.0.0-0ea5e9" />
+  <img alt="Tests" src="https://img.shields.io/badge/tests-448%20passing-22c55e" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b" />
+  <img alt="Local first" src="https://img.shields.io/badge/local--first-yes-14b8a6" />
 </p>
 
 ---
 
-## 1. InterestSeed 是什么
+## 这不是又一个 AI 笔记插件
 
-InterestSeed 不是一个“把 AI 塞进侧边栏”的聊天壳，也不是又一个关系图视图。
-
-它是一套面向 **Obsidian 本地知识库** 的兴趣工作台：
+大多数兴趣工具让你：
 
 ```text
-Markdown 笔记
-    ↓ 扫描 / 解析 / 类型识别
-可追溯的节点与关系
-    ↓ 规则发现 / 证据 / 人工确认
-发现收件箱
-    ↓ 接受 / 拒绝 / 修正 / 低价值 / 待验证
-图谱变更 + 反馈记忆
-    ↓ 本地聚合 / 匿名化 / 可选 AI
-主题、项目矩阵、节奏与下一步
-    ↓ 可选：连接自己的 Agent
-读 Vault、调用工具、执行下一步
+打开空白输入框 → 想不出写什么 → 关掉
 ```
 
-它解决的核心问题不是“笔记不够多”，而是：
+InterestSeed 让你：
 
-> 你写了很多，但不知道什么正在重复出现、什么值得继续、什么只是噪音。
+```text
+做四个具体选择
+→ 看见第一张兴趣星图
+→ 确认哪些种子值得留下
+→ 领一个 7 天兴趣实验
+→ 让图谱在真实行动里继续生长
+```
 
-InterestSeed 把这些信号变成可确认的结构，而不是让模型直接替你改图谱。
+它把 **短视频时代的一次短暂好奇**，变成一张可确认、可追溯、可行动的兴趣图谱。
 
 ---
 
-## 2. 为什么它和普通“AI 笔记插件”不同
+## 3 分钟，从 0 到 1
 
-| 常见做法 | InterestSeed 的选择 |
+### 01 · 四个选择，不写长文
+
+不是问“你对什么感兴趣”，而是给你具体的场景卡片：
+
+```text
+现在的你，更接近哪种状态？
+什么最容易让你忘记时间？
+最近什么内容最容易让你停下来？
+你希望这张图先长成什么？
+```
+
+### 02 · 看见兴趣开始有形状
+
+选完后，InterestSeed 生成一张 **草稿星图**：
+
+- 5 个种子节点；
+- 4–6 条带证据的候选连接；
+- 1 个“意外连接”；
+- 1 个未解锁的神秘方向；
+- 1 个可以马上开始的 7 天兴趣实验。
+
+### 03 · AI 提案，不替你决定
+
+每条关系都有：
+
+```text
+证据 · 置信度 · 来源 · 状态
+```
+
+草稿默认不写回图谱。你可以逐项保留、删除、修改；写入后仍然可以撤销。
+
+---
+
+## 四个让它持续生长的入口
+
+| 入口 | 作用 |
 | --- | --- |
-| 让模型直接生成关系并写回 | 关系默认是 `suggested`，必须人工确认 |
-| 只给一个聊天气泡 | 图谱、发现、探索、Agent 是同一套工作流 |
-| 拒绝一次后下次继续推荐 | `rejected` 被持久记录，后续不再反复打扰 |
-| AI 读取整篇笔记 | 默认只发送匿名化主题/项目聚合，正文不出 Vault |
-| 只展示“相关” | 每条关系都有 `origin`、`status`、`confidence`、`evidence` |
-| 一键应用，失败后状态不明 | `applying / applied / existing / failed / stale / recovery-required` 全状态机 |
-| 只能靠模型回答 | 本地规则洞察永远可用，AI 只是增强层 |
-| Agent 是另一个插件 | DSH Agent 通过 ACP 接入同一套 Vault 上下文 |
-
----
-
-## 3. 核心能力
-
-### 3.1 图谱基础：可解释，而不是“看起来相关”
-
-- 通过 `Vault.getMarkdownFiles()` 与 `MetadataCache` 扫描 Markdown；
-- 按 frontmatter `type`、`project`、`activity` 与文件扩展名识别节点类型；
-- 解析双链、共享标签、用户定义主题，生成候选关系；
-- 每条边保留：
-  - `origin`: `user` / `rule` / `ai`
-  - `status`: `confirmed` / `suggested` / `rejected`
-  - `confidence`
-  - `evidence`
-- 扫描产生的边默认是建议，只有确认后才进入正式图谱；
-- 拒绝会留下抑制记录，避免反复推荐；
-- 关系名称可编辑，但 ID、来源、状态保持稳定；
-- 图谱与视口持久化，支持撤销 / 重做；
-- 自定义 Canvas 画布，无运行时图形库依赖。
-
-### 3.2 发现：带反馈记忆的候选引擎
-
-发现不是“随机推荐”，而是一个有生命周期的对象：
+| **兴趣起跑** | 4 个选择，生成第一张可确认图谱 |
+| **兴趣火花** | 粘贴短视频链接或一句话，留下一个种子 |
+| **图谱缺口教练** | 从孤立节点和桥接节点出发，补一条真实连接 |
+| **7 天兴趣实验** | 把兴趣变成行动，把行动反馈回图谱 |
 
 ```text
-active → accepted / rejected / corrected / low-value / needs-verification
-                         ↓
-                    feedbackHistory
-                         ↓
-                   soft undo
-```
-
-- 跨项目共享标签、主题与已确认关系生成“共同主题”；
-- 支持接受、拒绝、修正、低价值、待验证；
-- 反馈可软撤销，历史不会被抹掉；
-- 发现身份、去重与抑制键独立于展示文案；
-- 发现独立于图谱保存，应用图谱需要明确确认；
-- 应用失败不会把发现错误标成已应用；
-- 支持 `existing`、`stale`、`recovery-required` 等恢复语义。
-
-### 3.3 Explore Studio：从“数据”到“下一步”
-
-探索面板不是统计报表，而是一个决策界面：
-
-- **01 / Signals**：先看本地结论；
-- **02 / Themes**：主题入口，按活动与跨项目扩散排序；
-- **03 / Matrix**：主题 × 项目热力矩阵；
-- **04 / Rhythm**：近 7 天反馈节奏；
-- **05 / Explain**：可选 AI 解释。
-
-每一张洞察卡都遵循：
-
-```text
-依据 → 判断 → 下一步
-```
-
-不是只告诉你“你有很多主题”，而是告诉你：
-
-> 哪个主题正在跨项目扩散，哪条证据支持它，下一步可以做什么。
-
-### 3.4 Agent：连接自己的 Agent
-
-InterestSeed 只提供一个 Agent 入口，不替用户决定模型平台：
-
-```text
-InterestSeed UI
-    → DSH ACP / 用户自己的 Agent 命令
-    → ACP v1
-    → 用户自己的模型、工具、沙箱、权限
-```
-
-- 用户配置自己的 Agent 命令、profile 和模型；
-- 支持流式消息、思考过程、工具卡、权限卡、停止、新建会话；
-- 当前 Vault 作为 Agent 工作目录；
-- InterestSeed 不保存 Agent 的模型凭据；
-- 没有启用 Agent 时，图谱、发现和探索仍然完全可用。
-
-### 3.6 本地优先与隐私边界
-
-- 默认关闭 AI；
-- 开启前需要明确同意；
-- 探索 AI 只接收匿名化的主题 / 项目别名、聚合计数与活动数据；
-- 不发送笔记正文、路径、摘要或完整 Vault；
-- 本地规则洞察永远可用；
-- 审计层只接受最小投影，不读取正文；
-- 发现与图谱写入经过队列、备份、恢复与一致性检查；
-- 所有高风险操作都有失败路径，而不是“静默成功”。
-
----
-
-## 4. 产品壁垒：为什么不是“换个皮就能抄”
-
-### 壁垒一：领域模型，不是一组页面
-
-InterestSeed 的核心资产是数据契约与状态机：
-
-- 发现身份 / 去重 / 抑制键；
-- 五类反馈语义；
-- 应用状态机；
-- 边来源 / 状态 / 置信度 / 证据；
-- 迁移与向后兼容；
-- 失败恢复与一致性检查。
-
-这些不是 UI 组件，不能通过复制一个卡片样式得到。
-
-### 壁垒二：Human-in-the-loop 的安全闭环
-
-大多数 AI 图谱产品把“生成”当成终点。InterestSeed 把“确认”当成起点：
-
-```text
-建议 → 证据 → 人工确认 → 应用 → 可撤销 → 可恢复
-```
-
-这条链路需要同时解决：
-
-- 反馈记忆；
-- 软撤销；
-- 幂等写入；
-- 应用失败回滚；
-- 过期发现；
-- 关系冲突；
-- 队列失败；
-- 迁移兼容。
-
-### 壁垒三：图谱交互是产品，不是库调用
-
-InterestSeed 使用自研 Canvas 交互层：
-
-- 拖拽、平移、缩放、悬停高亮、邻居高亮；
-- 实线 / 虚线 / 点线表达关系状态；
-- 视口持久化；
-- 大图性能与选择状态；
-- 窄屏 / 侧边栏 / 移动端布局；
-- 键盘与可访问性。
-
-这类交互细节很难靠一个现成图库“配置”出来。
-
-### 壁垒四：ACP Agent 的工程边界
-
-Agent 工作台不是把终端输出贴进侧边栏：
-
-- ACP 生命周期；
-- NDJSON 流式解析；
-- 工具调用状态；
-- 权限请求；
-- 会话取消；
-- 子进程退出；
-- 模型选择；
-- Vault 工作目录；
-- 桌面 / 移动端加载边界。
-
-### 壁垒五：隐私与审计从第一天就是约束
-
-不是“先收集，再补隐私政策”。InterestSeed 的默认值是：
-
-- 不发送正文；
-- 不保存模型密钥；
-- 不自动改图谱；
-- 不静默重试；
-- 不把失败伪装成成功。
-
-### 壁垒六：测试与部署门禁
-
-当前质量基线：
-
-```text
-46 个 test 文件 / 437 个用例通过
-typecheck / lint / build 全部通过
-部署脚本先 verify，失败即中止
-```
-
-测试覆盖图谱、持久化、迁移、发现、反馈、审计、应用、撤销、性能、AI 展示与 Claudian 适配等关键路径。
-
----
-
-## 5. 架构
-
-```text
-src/
-├── core/              GraphStore / GraphSession / UndoManager / InsightEngine
-├── discovery/         发现、反馈、主题、聚合、总览、探索
-├── plugin/            GraphController / PersistenceService / commands
-├── services/          ModelProvider / ClaudianProvider / AI 展示
-├── storage/           GraphRepository / MigrationManager / PluginDataStorage
-├── ui/                Canvas / DetailPanel / FilterBar / Explore Studio / Agent
-├── agent/             DSH ACP client
-└── types/             图谱与设置类型
-```
-
-关键数据流：
-
-```text
-Vault → GraphBuilder → GraphStore
-                         ├─ GraphSession → Canvas
-                         ├─ PersistenceService → storage
-                         └─ DiscoveryEngine → DiscoveryRepository
-                                                   ├─ feedback
-                                                   ├─ application
-                                                   └─ Explore Studio
+短暂好奇
+   ↓ 火花
+候选种子
+   ↓ 确认
+兴趣星图
+   ↓ 缺口教练
+新连接
+   ↓ 7 天实验
+真实反馈
+   ↓
+下一张更懂你的星图
 ```
 
 ---
 
-## 6. 安装
+## 为什么它与众不同
+
+| 常见 AI 图谱 | InterestSeed |
+| --- | --- |
+| AI 自动生成、自动写回 | **先提案，后确认；默认不写回** |
+| 只给“相关” | 每条边有 `origin`、`status`、`confidence`、`evidence` |
+| 拒绝后下次继续推荐 | 反馈记忆 + 抑制键，减少重复打扰 |
+| 只服务已有笔记 | 从 0 开始，用选择卡完成冷启动 |
+| 收藏夹越来越大 | 火花捕获把消费转成图谱结构 |
+| 图谱只是结果页 | 图谱旁边有缺口、下一步、实验和 Agent |
+| 聊天是主界面 | 图谱是主界面，Agent 是执行层 |
+
+核心原则：
+
+> **AI 负责提出候选，人负责确认，反馈负责让下一轮更聪明。**
+
+---
+
+## 产品截图
+
+### 主工作区
+
+![主工作区](assets/screenshot-1.png)
+
+### 兴趣起跑
+
+![兴趣起跑](assets/onboarding.png)
+
+### 兴趣探索
+
+![探索工作室](assets/screenshot-2.png)
+
+### 连接自己的 Agent
+
+![Agent](assets/screenshot-3.png)
+
+---
+
+## 安装
 
 ### 手动安装
 
-1. 下载 `release/interestseed-0.2.0.zip`；
+1. 下载最新 Release 的 `interestseed-v1.0.0.zip`；
 2. 解压到：
 
 ```text
-<Vault>/.obsidian/plugins/interestseed/
+<你的 Vault>/.obsidian/plugins/interestseed/
 ```
 
-3. 确认包含：
+3. 确认目录内有：
 
 ```text
 main.js
@@ -278,135 +155,89 @@ manifest.json
 styles.css
 ```
 
-4. 打开 Obsidian → 设置 → 第三方插件 → 启用 `InterestSeed`；
-5. 打开 `兴趣图谱` 视图。
+4. 在 Obsidian 设置 → 第三方插件中启用 InterestSeed。
 
 ### 从源码构建
 
 ```bash
 npm install
-npm run verify
+npm run build
 npm run deploy
 ```
 
-`npm run deploy` 会先跑完整质量门禁，通过后才复制到隔离 Vault 并重建 release zip。运行前把 `INTERESTSEED_VAULT` 指向隔离 Vault；脚本不会把本机路径写进仓库。
+要求 Node.js 20+。
 
----
+### 开发校验
 
-## 7. 快速开始
-
-1. 在设置中选择要包含 / 排除的文件夹；
-2. 点击顶部 `扫描`；
-3. 点击画布中的节点；
-4. 在详情面板确认或拒绝建议；
-5. 打开 `发现` 处理反馈；
-6. 打开 `兴趣探索` 查看主题 × 项目矩阵；
-7. 需要时打开 `Agent`，让 DSH 读取当前 Vault 并推进下一步。
-
-首页提供四个可视化入口：
-
-```text
-Agent        兴趣探索        发现        总览
+```bash
+npm run verify
 ```
 
----
-
-## 8. 命令与入口
-
-| 入口 | 作用 |
-| --- | --- |
-| `打开兴趣图谱` | 打开主视图 |
-| `打开 InterestSeed Agent（DSH）` | 打开 Agent 工作台 |
-| `扫描` / `重新扫描` | 重建图谱 |
-| `新建节点` | 从当前文件或手动创建节点 |
-| `建议收件箱` | 查看全部待确认关系 |
-| `发现` | 打开发现建议 |
-| `兴趣总览` | 查看只读聚合总览 |
-| `兴趣探索` | 打开 Explore Studio |
-| `导出` | 导出当前图谱 JSON |
-| `撤销` / `重做` | 回退 / 恢复图谱操作 |
+包含 typecheck、448 个测试、ESLint 与生产构建。
 
 ---
 
-## 9. 设置
+## 连接自己的 Agent
 
-### Agent（桌面）
+InterestSeed 不绑定模型平台，也不托管你的模型凭据。
 
-Agent 只有一个入口：连接用户自己的 Agent。配置 DSH 命令、profile 和模型后，即可使用工具、执行任务并把结果可视化到 Vault。
+```text
+InterestSeed UI
+    → DSH ACP / 你的 Agent 命令
+    → ACP v1
+    → 你的模型、工具、沙箱、权限
+```
+
+设置页配置：
 
 ```text
 启用 DSH Agent
-DSH 命令：dsh 或本机绝对路径
-DSH profile：默认 acp
-DSH 模型：provider/model；默认优先 `wodebody/cn:deepseek-v4.1-flash`（workbuddy2pi 本地入口）
+DSH 命令
+DSH profile（默认 acp）
+DSH 模型
 ```
 
-DSH 自己负责模型与凭据；InterestSeed 不保存密钥。
-
-### Obsidian CLI
-
-设置页提供官方 Obsidian CLI 启用入口，便于使用 `obsidian-cli` skill 与自动化验收。
+Agent 工作目录是当前 Vault。InterestSeed 只负责会话、工具卡、权限卡和任务可视化；DSH 自己管理模型与 Key。
 
 ---
 
-## 10. 安全与隐私承诺
+## 本地优先与隐私
 
-- 不上传完整 Vault；
-- 不把笔记正文发送给 Explore AI；
-- 不自动修改发现或图谱；
-- 不把 AI 建议当成事实；
-- 不隐藏失败；
-- 不在没有确认的情况下覆盖已有关系；
-- 导出是显式操作；
-- 所有写入经过应用路径与恢复机制。
-
-详见 [SECURITY.md](SECURITY.md)。
+- 默认不读取笔记正文；
+- AI 数据发送必须显式授权；
+- 火花只保存你主动粘贴的文本/链接；
+- 图谱、反馈和实验进度保存在本地 Vault；
+- 所有写入经过可撤销的 GraphSession；
+- 没有 Agent 也能完整使用图谱、发现和探索。
 
 ---
 
-## 11. 许可证、署名与品牌保护
-
-InterestSeed 的代码、界面文案、交互设计、发现模型、测试夹具与文档是原创成果。
-
-- 代码许可：[GNU AGPL-3.0](LICENSE)；
-- 署名与再分发要求：[NOTICE](NOTICE)；
-- 名称、图标与品牌使用边界：[TRADEMARKS.md](TRADEMARKS.md)；
-- 引用信息：[CITATION.cff](CITATION.cff)。
-
-AGPL-3.0 允许在相同许可证下学习、修改与再分发，但不允许把本项目改成闭源产品后对外提供网络服务而不公开修改。`InterestSeed` 名称与图标不随代码许可证授权；衍生项目必须使用不同名称与图标，并保留原始署名。
-
-如果你希望在商业闭源产品中使用 InterestSeed，需要单独获得书面许可。
-
----
-
-## 12. 贡献
-
-欢迎问题、复现、测试用例与安全报告。提交前请先读 [CONTRIBUTING.md](CONTRIBUTING.md)。
-
-请不要提交：
-
-- 真实 Vault 内容；
-- API Key、Cookie、token；
-- 个人路径；
-- 未脱敏的发现 / 图谱数据。
-
----
-
-## 13. 状态
+## 目录
 
 ```text
-Version: 0.2.0
-Tests:   46 files / 437 cases
-License: AGPL-3.0
+src/
+  onboarding/     兴趣起跑引擎
+  ui/             SeedSprint / Spark / GapCoach / Agent / Graph
+  core/           图谱、关系、洞察、撤销
+  discovery/      发现生命周期与反馈
+  storage/        持久化、迁移、恢复
+  plugin/         命令与控制器
+docs/
+  seed-sprint.md  产品机制
+  short-video.md  短视频脚本
+  launch.md       发布与传播计划
+promo/
+  index.html      纯代码宣传片
+  render.mjs      Playwright → FFmpeg
+  synth_audio.py  120 BPM 配乐合成
+assets/
+  interestseed-launch.mp4
+  interestseed-launch-cover.png
+  screenshot-1..3.png
 ```
-
-InterestSeed 仍在快速演进。当前重点是：
-
-1. 更稳定的跨项目发现；
-2. 更强的 Explore Studio 可读性；
-3. 更完整的 DSH Agent 权限体验；
-4. 更清晰的迁移与恢复路径。
 
 ---
 
-**InterestSeed 的目标不是替你思考，而是让你的兴趣结构变得可见、可验证、可行动。**
+## License
+
+AGPL-3.0-only. See [LICENSE](LICENSE).
