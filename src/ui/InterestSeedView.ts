@@ -155,6 +155,9 @@ export class InterestSeedView extends ItemView {
     this.createQuickAction(quickbar, 'compass', '探索', () =>
       this.plugin.openDiscoveryExplorer(),
     );
+    this.createQuickAction(quickbar, 'sparkles', 'Agent', () => {
+      void this.plugin.activateAgentView();
+    });
     this.createQuickAction(quickbar, 'download', '导出', () => this.plugin.exportGraph());
 
     const filterHost = root.createDiv({ cls: 'interestseed-filter-host' });

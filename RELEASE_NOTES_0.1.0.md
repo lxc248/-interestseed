@@ -1,6 +1,6 @@
 # InterestSeed V0.1.0 发布说明
 
-> 构建：`476,417 bytes / 140A94CC...`
+> 构建：`476,523 bytes / BE6D2893...`
 > 发布包：`release/interestseed-0.1.0.zip`
 > 测试：44 文件 / 434 用例
 
