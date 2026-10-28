@@ -3800,3 +3800,29 @@ button.interestseed-inbox-node:hover {
   margin-top: -1px;
 }
 .interestseed-header-cta { flex: 0 0 auto; }
+/* Launch cards must be compact: the previous flexible row let the grid stretch
+   each card and clip the one-line description under the quickbar. */
+.interestseed-launch-card {
+  align-self: start;
+  height: 64px;
+  min-height: 64px;
+  max-height: 64px;
+  overflow: visible;
+  align-items: center;
+}
+.interestseed-launch-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-self: center;
+  min-height: 0;
+}
+.interestseed-launch-title { line-height: 1.2; }
+.interestseed-launch-desc {
+  line-height: 1.35;
+  color: var(--text-muted);
+  padding-bottom: 1px;
+}
+@media (max-width: 620px) {
+  .interestseed-launch-card { height: auto; min-height: 58px; max-height: none; }
+}
