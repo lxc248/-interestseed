@@ -105,6 +105,7 @@ export class GraphCanvas {
   private resizeObserver: ResizeObserver | null = null;
   private themeObserver: MutationObserver | null = null;
   private viewportTimer: number | null = null;
+  private hasFittedOnce = false;
 
   constructor(
     private readonly container: HTMLElement,
@@ -251,6 +252,12 @@ export class GraphCanvas {
 
   setViewport(viewport: GraphViewport | undefined): void {
     if (!viewport) return;
+    // A tiny persisted zoom from a previous, larger canvas makes a small graph
+    // look like a dot. Restore a readable fit until the user zooms manually.
+    if (this.nodes.length > 0 && this.nodes.length <= 40 && viewport.zoom < 0.55) {
+      this.zoomToFit();
+      return;
+    }
     this.zoom = clamp(viewport.zoom, 0.2, 3.5);
     this.panX = viewport.panX;
     this.panY = viewport.panY;
@@ -595,28 +602,87 @@ export class GraphCanvas {
       ctx.fillText(TYPE_STYLES[item.node.type].glyph, item.x, item.y + 0.5);
     }
 
-    const showAllLabels = this.nodes.length <= 150 && this.zoom >= 0.55;
+    const showAllLabels = this.nodes.length <= 90 && this.zoom >= 0.6;
     const fontSize = 12 / this.zoom;
+    const maxLabelWidth = 180 / this.zoom;
+    const labelGap = 6 / this.zoom;
+    const labelPadX = 4 / this.zoom;
+    const labelPadY = 2 / this.zoom;
+    const labelHeight = fontSize * 1.3;
+    const labelBackground = this.readCssVariable('--background-primary', '#1e1e1e');
 
     ctx.font = `${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
 
-    for (const item of this.nodes) {
+    const labelCandidates = this.nodes
+      .filter((item) => {
+        const isSelected = item.node.id === this.selectedId;
+        const isHovered = item.node.id === this.hoveredId;
+        const isNeighbor = neighbors.has(item.node.id);
+        return (
+          isSelected ||
+          isHovered ||
+          isNeighbor ||
+          showAllLabels ||
+          this.nodes.length <= 8
+        );
+      })
+      .sort((left, right) => {
+        const rank = (item: LayoutNode): number =>
+          item.node.id === this.selectedId
+            ? 3
+            : item.node.id === this.hoveredId
+              ? 2
+              : neighbors.has(item.node.id)
+                ? 1
+                : 0;
+        return rank(right) - rank(left) || right.degree - left.degree;
+      });
+
+    const occupied: Array<{ left: number; top: number; right: number; bottom: number }> = [];
+
+    for (const item of labelCandidates) {
       const isSelected = item.node.id === this.selectedId;
       const isHovered = item.node.id === this.hoveredId;
       const isNeighbor = neighbors.has(item.node.id);
-      const showLabel =
-        isSelected || isHovered || isNeighbor || showAllLabels || this.nodes.length <= 8;
+      let label =
+        item.node.title.length > 24 ? `${item.node.title.slice(0, 23)}…` : item.node.title;
 
-      if (!showLabel) continue;
+      while (label.length > 5 && ctx.measureText(label).width > maxLabelWidth) {
+        label = `${label.slice(0, -2)}…`;
+      }
 
-      const label =
-        item.node.title.length > 20 ? `${item.node.title.slice(0, 19)}…` : item.node.title;
+      const textWidth = Math.min(ctx.measureText(label).width, maxLabelWidth);
+      const left = item.x - textWidth / 2 - labelPadX;
+      const right = item.x + textWidth / 2 + labelPadX;
+      const top = item.y + item.radius + labelGap;
+      const bottom = top + labelHeight + labelPadY * 2;
+      const overlaps = occupied.some(
+        (rect) =>
+          left < rect.right &&
+          right > rect.left &&
+          top < rect.bottom &&
+          bottom > rect.top,
+      );
 
-      ctx.globalAlpha = isSelected || isHovered ? 1 : 0.85;
+      // Always honor the selected/hovered node; skip colliding ambient labels.
+      if (overlaps && !isSelected && !isHovered) continue;
+      occupied.push({ left, top, right, bottom });
+
+      ctx.globalAlpha = isSelected || isHovered ? 0.96 : isNeighbor ? 0.88 : 0.72;
+      ctx.fillStyle = labelBackground;
+      ctx.beginPath();
+      if (typeof ctx.roundRect === 'function') {
+        ctx.roundRect(left, top, right - left, bottom - top, 3 / this.zoom);
+      } else {
+        ctx.rect(left, top, right - left, bottom - top);
+      }
+      ctx.fill();
+
+      ctx.globalAlpha = isSelected || isHovered ? 1 : isNeighbor ? 0.95 : 0.82;
       ctx.fillStyle = textColor;
-      ctx.fillText(label, item.x, item.y + item.radius + 5 / this.zoom);
+      ctx.fillText(label, item.x, top + labelPadY);
     }
 
     ctx.restore();
@@ -859,6 +925,12 @@ export class GraphCanvas {
     this.canvas.height = Math.floor(this.height * this.dpr);
     this.canvas.style.width = `${this.width}px`;
     this.canvas.style.height = `${this.height}px`;
+
+    if (!this.hasFittedOnce && this.nodes.length > 0) {
+      this.hasFittedOnce = true;
+      this.zoomToFit();
+      return;
+    }
 
     this.draw();
   }

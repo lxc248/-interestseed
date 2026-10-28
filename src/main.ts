@@ -449,15 +449,22 @@ export default class InterestSeedPlugin extends Plugin {
     const data = buildExploration(file);
     const claudianReady =
       this.settings.aiProvider !== 'claudian' || hasClaudianApi(this.app);
+    const qwenReady =
+      this.settings.aiProvider !== 'qwen' || Boolean(this.getAiApiKey());
     const aiAvailable =
-      this.settings.enableAI && this.settings.aiConsentGranted && claudianReady;
+      this.settings.enableAI &&
+      this.settings.aiConsentGranted &&
+      claudianReady &&
+      qwenReady;
     const aiUnavailableReason = !this.settings.enableAI
       ? 'AI 未启用'
       : !this.settings.aiConsentGranted
         ? 'AI 未授权'
         : !claudianReady
           ? '未检测到 Claudian'
-          : undefined;
+          : !qwenReady
+            ? '未配置千问密钥'
+            : undefined;
     new DiscoveryExplorerModal(this.app, data, overview, {
       onThemeSelect: (theme) => {
         void this.showDiscoveriesForTheme(theme);
@@ -487,7 +494,8 @@ export default class InterestSeedPlugin extends Plugin {
       provider: this.settings.aiProvider,
       baseUrl: this.settings.aiBaseUrl,
       model: this.settings.aiModel,
-      apiKey: this.getAiApiKey(),
+      apiKey:
+        this.settings.aiProvider === 'qwen' ? this.getAiApiKey() : undefined,
     });
     try {
       if (!provider.explore) {

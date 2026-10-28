@@ -43,12 +43,12 @@ Alt (ZH): InterestSeed 在 Obsidian 中的兴趣图谱、发现收件箱与 Expl
 ## Release title
 
 ```text
-InterestSeed 0.1.1 — local-first interest graph + Qwen
+InterestSeed 0.1.2 — local-first interest graph + Qwen
 ```
 
 ## Release body — English
 
-InterestSeed 0.1.1 turns Markdown notes into a confirmable, traceable interest
+InterestSeed 0.1.2 turns Markdown notes into a confirmable, traceable interest
 graph. This release includes:
 
 - explainable graph relations with provenance, confidence and evidence;
@@ -61,7 +61,7 @@ graph. This release includes:
 
 ## Release body — 简体中文
 
-InterestSeed 0.1.1 把 Markdown 笔记变成一张可确认、可追溯的兴趣图谱。本次发布包含：
+InterestSeed 0.1.2 把 Markdown 笔记变成一张可确认、可追溯的兴趣图谱。本次发布包含：
 
 - 带来源、置信度与证据的可解释关系；
 - 发现反馈语义与软撤销；

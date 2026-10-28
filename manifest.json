@@ -1,9 +1,9 @@
 {
-    "id":  "interestseed",
-    "name":  "InterestSeed",
-    "version":  "0.1.1",
-    "minAppVersion":  "1.5.0",
-    "description":  "把散落的笔记长成一张活的兴趣图谱：种子、关系与下一步洞察。",
-    "author":  "InterestSeed",
-    "isDesktopOnly":  false
+  "id": "interestseed",
+  "name": "InterestSeed",
+  "version": "0.1.2",
+  "minAppVersion": "1.5.0",
+  "description": "把散落的笔记长成一张活的兴趣图谱：种子、关系与下一步洞察。",
+  "author": "InterestSeed",
+  "isDesktopOnly": false
 }

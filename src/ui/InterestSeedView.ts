@@ -147,7 +147,7 @@ export class InterestSeedView extends ItemView {
       launchpad,
       'sparkles',
       'Agent',
-      '让 DSH 读取、整理并推进下一步',
+      '千问对话；需要工具时用 DSH',
       'is-primary',
       () => void this.plugin.activateAgentView(),
     );
@@ -204,6 +204,16 @@ export class InterestSeedView extends ItemView {
       this.plugin.openDiscoveryExplorer(),
     );
     this.createQuickAction(quickbar, 'download', '导出', () => this.plugin.exportGraph());
+    const filterToggle = this.createQuickAction(quickbar, 'filter', '筛选', () => {
+      root.classList.toggle('is-filter-open');
+      filterToggle.setAttribute(
+        'aria-pressed',
+        root.classList.contains('is-filter-open') ? 'true' : 'false',
+      );
+      window.setTimeout(() => this.canvas?.zoomToFit(), 50);
+    });
+    filterToggle.setAttribute('aria-pressed', 'false');
+    filterToggle.addClass('is-filter-toggle');
 
     const filterHost = root.createDiv({ cls: 'interestseed-filter-host' });
     this.filterBar = new FilterBar(filterHost, (filter) => {

@@ -8,7 +8,7 @@
 
 <p>
   <img alt="Obsidian" src="https://img.shields.io/badge/Obsidian-1.5%2B-7c3aed" />
-  <img alt="Version" src="https://img.shields.io/badge/version-0.1.1-0ea5e9" />
+  <img alt="Version" src="https://img.shields.io/badge/version-0.1.2-0ea5e9" />
   <img alt="Tests" src="https://img.shields.io/badge/tests-437%20passing-22c55e" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b" />
 </p>
@@ -274,7 +274,7 @@ Vault → GraphBuilder → GraphStore
 
 ### Manual install
 
-1. Download `release/interestseed-0.1.1.zip`;
+1. Download `release/interestseed-0.1.2.zip`;
 2. Extract into:
 
 ```text
@@ -421,7 +421,7 @@ Do not submit:
 ## 13. Status
 
 ```text
-Version: 0.1.1
+Version: 0.1.2
 Tests:   46 files / 437 cases
 License: AGPL-3.0
 ```

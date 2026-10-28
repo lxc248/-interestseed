@@ -63,7 +63,7 @@ export class AgentView extends ItemView {
     this.renderComposer();
     if (this.isQwen()) {
       this.setStatus(
-        'idle',
+        this.plugin.getAiApiKey() ? 'idle' : 'warning',
         this.plugin.getAiApiKey() ? '千问已就绪' : '未配置千问密钥',
       );
     } else if (!this.plugin.settings.enableDshAgent) {
@@ -108,7 +108,7 @@ export class AgentView extends ItemView {
       this.transcript?.empty();
       this.renderEmptyState();
       this.setStatus(
-        'idle',
+        this.plugin.getAiApiKey() ? 'idle' : 'warning',
         this.plugin.getAiApiKey() ? '千问已就绪' : '未配置千问密钥',
       );
     } else if (!this.plugin.settings.enableDshAgent) {
@@ -376,7 +376,7 @@ export class AgentView extends ItemView {
     this.transcript?.empty();
     this.renderEmptyState();
     this.setStatus(
-      'idle',
+      this.isQwen() && !this.plugin.getAiApiKey() ? 'warning' : 'idle',
       this.isQwen()
         ? this.plugin.getAiApiKey()
           ? '千问已就绪'

@@ -175,7 +175,7 @@ export class DetailPanel {
     const list = this.root.createDiv({ cls: 'interestseed-insights' });
     for (const insight of insights.insights) {
       const card = list.createDiv({ cls: `interestseed-insight is-${insight.kind}` });
-      card.createEl('h4', { cls: 'interestseed-insight-title', text: insight.title });
+      card.createEl('h4', { cls: 'interestseed-detail-insight-title', text: insight.title });
       card.createEl('p', { cls: 'interestseed-insight-detail', text: insight.detail });
 
       if (insight.nodeIds.length > 0) {
