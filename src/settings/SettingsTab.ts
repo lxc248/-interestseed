@@ -18,6 +18,7 @@ export const DEFAULT_SETTINGS: InterestSeedSettings = {
   aiBaseUrl: QWEN_CONFIG.baseUrl,
   aiModel: QWEN_CONFIG.model,
   aiConsentGranted: false,
+  agentMode: 'qwen',
   enableDshAgent: false,
   dshCommand: 'dsh',
   dshProfile: 'acp',
@@ -59,6 +60,8 @@ export function normalizeSettings(raw: unknown): InterestSeedSettings {
       typeof source.aiConsentGranted === 'boolean'
         ? source.aiConsentGranted
         : DEFAULT_SETTINGS.aiConsentGranted,
+    agentMode:
+      source.agentMode === 'dsh' ? 'dsh' : 'qwen',
     enableDshAgent:
       typeof source.enableDshAgent === 'boolean'
         ? source.enableDshAgent
@@ -237,6 +240,21 @@ export class InterestSeedSettingsTab extends PluginSettingTab {
       cls: 'setting-item-description',
       text: '通过 DSH 的 ACP profile 启动嵌入式 Agent。DSH 自己拥有模型、工具、沙箱和权限；InterestSeed 只提供会话界面。',
     });
+
+    new Setting(containerEl)
+      .setName('Agent 默认入口')
+      .setDesc('千问问答适合直接提问；DSH Agent 适合使用工具、执行任务和接入你自己的 Agent。')
+      .addDropdown((dropdown) =>
+        dropdown
+          .addOption('qwen', '千问问答（DashScope）')
+          .addOption('dsh', 'DSH Agent（自有工具/模型）')
+          .setValue(this.plugin.settings.agentMode)
+          .onChange(async (value) => {
+            this.plugin.settings.agentMode = value === 'dsh' ? 'dsh' : 'qwen';
+            await this.plugin.saveSettings();
+            this.display();
+          }),
+      );
 
     new Setting(containerEl)
       .setName('启用 DSH Agent')

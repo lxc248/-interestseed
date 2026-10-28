@@ -4511,3 +4511,39 @@ button.interestseed-inbox-node:hover {
 }.interestseed-agent-status.is-warning .interestseed-agent-status-dot {
   background: #f59e0b;
 }
+/* Agent entry switch: Qwen chat vs DSH execution. */
+.interestseed-agent-mode {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--background-secondary) 35%, transparent);
+  flex: 0 0 auto;
+}
+
+.interestseed-agent-mode-button {
+  appearance: none;
+  min-height: 24px;
+  padding: 3px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 9px;
+  font-weight: 650;
+  cursor: pointer;
+  box-shadow: none;
+}
+
+.interestseed-agent-mode-button:hover { color: var(--text-normal); background: var(--background-modifier-hover); }
+.interestseed-agent-mode-button.is-active {
+  color: var(--text-on-accent, #fff);
+  background: var(--interactive-accent);
+}
+
+@container (max-width: 760px) {
+  .interestseed-agent-mode { order: 3; margin-left: 42px; }
+  .interestseed-agent-status { margin-left: 0; }
+}

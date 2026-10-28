@@ -8,7 +8,7 @@
 
 <p>
   <img alt="Obsidian" src="https://img.shields.io/badge/Obsidian-1.5%2B-7c3aed" />
-  <img alt="Version" src="https://img.shields.io/badge/version-0.1.2-0ea5e9" />
+  <img alt="Version" src="https://img.shields.io/badge/version-0.1.3-0ea5e9" />
   <img alt="Tests" src="https://img.shields.io/badge/tests-437%20passing-22c55e" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b" />
 </p>
@@ -275,7 +275,7 @@ Vault → GraphBuilder → GraphStore
 
 ### 手动安装
 
-1. 下载 `release/interestseed-0.1.2.zip`；
+1. 下载 `release/interestseed-0.1.3.zip`；
 2. 解压到：
 
 ```text
@@ -359,7 +359,7 @@ Agent        兴趣探索        发现        总览
 
 设置后完全退出并重启 Obsidian，让桌面进程继承新的环境变量。
 
-### DSH Agent（可选，桌面）
+### DSH Agent（可选，桌面）\n\nAgent 顶部提供 **千问 / DSH** 两个入口：千问用于直接问答，DSH 用于接入自己的 Agent、工具和任务执行。切换只改变当前会话，不影响图谱数据。
 
 ```text
 启用 DSH Agent
@@ -422,7 +422,7 @@ AGPL-3.0 允许在相同许可证下学习、修改与再分发，但不允许�
 ## 13. 状态
 
 ```text
-Version: 0.1.2
+Version: 0.1.3
 Tests:   46 files / 437 cases
 License: AGPL-3.0
 ```

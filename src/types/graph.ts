@@ -83,6 +83,7 @@ export interface InterestSeedSettings {
   aiBaseUrl: string;
   aiModel: string;
   aiConsentGranted: boolean;
+  agentMode: 'qwen' | 'dsh';
   enableDshAgent: boolean;
   dshCommand: string;
   dshProfile: string;

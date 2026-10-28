@@ -86,6 +86,7 @@ export class AgentView extends ItemView {
 
   private refreshMode(): void {
     const qwen = this.isQwen();
+    this.syncModeButtons();
     const subtitle = this.contentEl.querySelector('.interestseed-agent-subtitle');
     if (subtitle instanceof HTMLElement) {
       subtitle.setText(
@@ -120,7 +121,33 @@ export class AgentView extends ItemView {
   }
 
   private isQwen(): boolean {
-    return this.plugin.settings.aiProvider === 'qwen';
+    return this.plugin.settings.agentMode !== 'dsh';
+  }
+
+  private async switchAgentMode(mode: 'qwen' | 'dsh'): Promise<void> {
+    if (this.plugin.settings.agentMode === mode) return;
+    this.plugin.settings.agentMode = mode;
+    await this.plugin.saveSettings();
+    await this.client?.dispose();
+    this.qwenClient?.dispose();
+    this.client = null;
+    this.qwenClient = null;
+    this.qwenMessages = [];
+    this.permissionHost?.empty();
+    this.transcript?.empty();
+    this.renderEmptyState();
+    this.syncModeButtons();
+    this.refreshMode();
+  }
+
+  private syncModeButtons(): void {
+    for (const button of Array.from(
+      this.contentEl.querySelectorAll<HTMLElement>('.interestseed-agent-mode-button'),
+    )) {
+      const active = button.dataset.mode === this.plugin.settings.agentMode;
+      button.classList.toggle('is-active', active);
+      button.setAttribute('aria-pressed', String(active));
+    }
   }
 
   override async onClose(): Promise<void> {
@@ -145,6 +172,24 @@ export class AgentView extends ItemView {
         ? '千问 DashScope · 直接对话 · 不执行本地工具'
         : 'DSH 运行时 · 工具、沙箱与权限由 Harness 管理',
     });
+
+    const modeSwitch = header.createDiv({ cls: 'interestseed-agent-mode' });
+    for (const [mode, label] of [
+      ['qwen', '千问'],
+      ['dsh', 'DSH'],
+    ] as const) {
+      const button = modeSwitch.createEl('button', {
+        cls: `interestseed-agent-mode-button${this.plugin.settings.agentMode === mode ? ' is-active' : ''}`,
+        text: label,
+        attr: {
+          type: 'button',
+          'data-mode': mode,
+          'aria-pressed': String(this.plugin.settings.agentMode === mode),
+        },
+      });
+      button.addEventListener('click', () => void this.switchAgentMode(mode));
+    }
+
     this.statusEl = header.createDiv({ cls: 'interestseed-agent-status is-idle' });
     this.statusEl.createSpan({ cls: 'interestseed-agent-status-dot' });
     this.statusEl.createSpan({ text: '未连接' });

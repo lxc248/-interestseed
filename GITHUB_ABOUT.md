@@ -43,12 +43,12 @@ Alt (ZH): InterestSeed 在 Obsidian 中的兴趣图谱、发现收件箱与 Expl
 ## Release title
 
 ```text
-InterestSeed 0.1.2 — local-first interest graph + Qwen
+InterestSeed 0.1.3 — local-first interest graph + Qwen
 ```
 
 ## Release body — English
 
-InterestSeed 0.1.2 turns Markdown notes into a confirmable, traceable interest
+InterestSeed 0.1.3 turns Markdown notes into a confirmable, traceable interest
 graph. This release includes:
 
 - explainable graph relations with provenance, confidence and evidence;
@@ -56,19 +56,19 @@ graph. This release includes:
 - human-in-the-loop graph application with recovery states;
 - Explore Studio with themes, project heatmap and rhythm;
 - local-first insights with optional anonymized AI explanation;
-- direct Qwen/DashScope chat with user-supplied endpoint, model and token (SecretStorage), plus optional DSH Agent over ACP v1;
+- direct Qwen chat plus optional DSH Agent, switchable from the Agent header; user-supplied endpoint/model/token stored in Obsidian SecretStorage;
 - AGPL-3.0 licensing, attribution and brand protection notices.
 
 ## Release body — 简体中文
 
-InterestSeed 0.1.2 把 Markdown 笔记变成一张可确认、可追溯的兴趣图谱。本次发布包含：
+InterestSeed 0.1.3 把 Markdown 笔记变成一张可确认、可追溯的兴趣图谱。本次发布包含：
 
 - 带来源、置信度与证据的可解释关系；
 - 发现反馈语义与软撤销；
 - 人工确认的图谱应用与恢复状态；
 - 主题、项目热力矩阵与节奏组成的 Explore Studio；
 - 本地优先洞察与可选的匿名化 AI 解释；
-- 千问 / DashScope 直接对话，支持用户自填 endpoint、模型和 Token（SecretStorage），以及可选的 ACP v1 DSH Agent；
+- 千问直接问答与可选 DSH Agent 双入口，可在 Agent 顶部切换；用户自填 endpoint、模型和 Token（SecretStorage）；
 - AGPL-3.0 许可、署名与品牌保护声明。
 
 ## Pinned issue / security notice
