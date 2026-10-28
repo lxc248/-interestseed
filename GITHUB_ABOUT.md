@@ -56,7 +56,7 @@ graph. This release includes:
 - human-in-the-loop graph application with recovery states;
 - Explore Studio with themes, project heatmap and rhythm;
 - local-first insights with optional anonymized AI explanation;
-- direct Qwen/DashScope chat and optional DSH Agent over ACP v1;
+- direct Qwen/DashScope chat with user-supplied endpoint, model and token (SecretStorage), plus optional DSH Agent over ACP v1;
 - AGPL-3.0 licensing, attribution and brand protection notices.
 
 ## Release body — 简体中文
@@ -68,7 +68,7 @@ InterestSeed 0.1.1 把 Markdown 笔记变成一张可确认、可追溯的兴趣
 - 人工确认的图谱应用与恢复状态；
 - 主题、项目热力矩阵与节奏组成的 Explore Studio；
 - 本地优先洞察与可选的匿名化 AI 解释；
-- 千问 / DashScope 直接对话，以及可选的 ACP v1 DSH Agent；
+- 千问 / DashScope 直接对话，支持用户自填 endpoint、模型和 Token（SecretStorage），以及可选的 ACP v1 DSH Agent；
 - AGPL-3.0 许可、署名与品牌保护声明。
 
 ## Pinned issue / security notice

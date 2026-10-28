@@ -80,6 +80,8 @@ export interface InterestSeedSettings {
   enableRuleSuggestions: boolean;
   enableAI: boolean;
   aiProvider: string;
+  aiBaseUrl: string;
+  aiModel: string;
   aiConsentGranted: boolean;
   enableDshAgent: boolean;
   dshCommand: string;

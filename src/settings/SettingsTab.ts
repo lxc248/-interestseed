@@ -15,6 +15,8 @@ export const DEFAULT_SETTINGS: InterestSeedSettings = {
   enableRuleSuggestions: true,
   enableAI: false,
   aiProvider: 'qwen',
+  aiBaseUrl: QWEN_CONFIG.baseUrl,
+  aiModel: QWEN_CONFIG.model,
   aiConsentGranted: false,
   enableDshAgent: false,
   dshCommand: 'dsh',
@@ -45,6 +47,14 @@ export function normalizeSettings(raw: unknown): InterestSeedSettings {
       typeof source.aiProvider === 'string' && source.aiProvider.trim()
         ? source.aiProvider.trim()
         : DEFAULT_SETTINGS.aiProvider,
+    aiBaseUrl:
+      typeof source.aiBaseUrl === 'string' && source.aiBaseUrl.trim()
+        ? source.aiBaseUrl.trim()
+        : DEFAULT_SETTINGS.aiBaseUrl,
+    aiModel:
+      typeof source.aiModel === 'string' && source.aiModel.trim()
+        ? source.aiModel.trim()
+        : DEFAULT_SETTINGS.aiModel,
     aiConsentGranted:
       typeof source.aiConsentGranted === 'boolean'
         ? source.aiConsentGranted
@@ -377,6 +387,55 @@ export class InterestSeedSettingsTab extends PluginSettingTab {
             await this.plugin.saveSettings();
             this.display();
           }),
+      );
+
+    new Setting(containerEl)
+      .setName('API Base URL')
+      .setDesc('千问默认：https://dashscope.aliyuncs.com/compatible-mode/v1；也可填其他 OpenAI-compatible 平台。')
+      .addText((text) =>
+        text
+          .setPlaceholder(QWEN_CONFIG.baseUrl)
+          .setValue(this.plugin.settings.aiBaseUrl)
+          .onChange(async (value) => {
+            this.plugin.settings.aiBaseUrl = value.trim() || QWEN_CONFIG.baseUrl;
+            await this.plugin.saveSettings();
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName('模型 ID')
+      .setDesc('千问免费额度可用 qwen-turbo；也可以填账户可用的其他模型 ID。')
+      .addText((text) =>
+        text
+          .setPlaceholder(QWEN_CONFIG.model)
+          .setValue(this.plugin.settings.aiModel)
+          .onChange(async (value) => {
+            this.plugin.settings.aiModel = value.trim() || QWEN_CONFIG.model;
+            await this.plugin.saveSettings();
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName('平台 API Key')
+      .setDesc('用户自己的 Token，只写入 Obsidian SecretStorage，不进入 data.json，不写入日志。填写后留空不会覆盖已保存 Key。')
+      .addText((text) => {
+        text.inputEl.type = 'password';
+        text.setPlaceholder(
+          this.plugin.getAiApiKey() ? '已保存；留空不修改' : '粘贴你的平台 Token',
+        );
+        text.onChange(async (value) => {
+          if (value.trim()) {
+            this.plugin.setAiApiKey(value);
+            text.setValue('');
+          }
+          await this.plugin.saveSettings();
+        });
+      })
+      .addButton((button) =>
+        button.setButtonText('清除').onClick(async () => {
+          this.plugin.clearAiApiKey();
+          this.display();
+        }),
       );
 
     new Setting(containerEl)

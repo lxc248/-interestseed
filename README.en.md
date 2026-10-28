@@ -125,7 +125,7 @@ InterestSeed
     → qwen-turbo (or another Qwen model available to the account)
 ```
 
-- Credentials are read only from `DASHSCOPE_API_KEY` / `QWEN_API_KEY`, never stored in the vault;
+- API base URL, model ID and the user token are configurable; the token goes to Obsidian SecretStorage, not data.json, and `DASHSCOPE_API_KEY` / `QWEN_API_KEY` remain supported;
 - Explore AI sends only anonymized theme/project aliases, aggregate counts and activity data;
 - Qwen Agent mode is a direct chat: it does not read the vault and has no local tool permissions;
 - A missing key produces an explicit “Qwen key not configured” message, with no silent fallback or retry;
@@ -350,7 +350,7 @@ Agent        Explore        Discoveries        Overview
 - No automatic retries or model switching on failure;
 - Local rule-based discovery remains available.
 
-Set the Qwen key on Windows (never commit it):
+Set it in **Platform API Key** in InterestSeed settings, or use a Windows environment variable (never commit it):
 
 ```powershell
 [Environment]::SetEnvironmentVariable("DASHSCOPE_API_KEY", "<your-key>", "User")

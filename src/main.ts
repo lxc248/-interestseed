@@ -69,7 +69,12 @@ import { DiscoveryOverviewModal } from './ui/DiscoveryOverviewModal';
 import { DiscoveryExplorerModal } from './ui/DiscoveryExplorerModal';
 import { buildDiscoveryOverview } from './discovery/overview';
 import { buildExploration } from './discovery/exploration';
-import { createModelProvider, type ExplorationInsight, type ExplorationRequest } from './services/ModelProvider';
+import {
+  createModelProvider,
+  resolveQwenApiKey,
+  type ExplorationInsight,
+  type ExplorationRequest,
+} from './services/ModelProvider';
 import { exploreWithClaudian, hasClaudianApi } from './services/ClaudianProvider';
 import { isRecord } from './utils/validation';
 
@@ -480,6 +485,9 @@ export default class InterestSeedPlugin extends Plugin {
       enableAI: this.settings.enableAI,
       aiConsentGranted: this.settings.aiConsentGranted,
       provider: this.settings.aiProvider,
+      baseUrl: this.settings.aiBaseUrl,
+      model: this.settings.aiModel,
+      apiKey: this.getAiApiKey(),
     });
     try {
       if (!provider.explore) {
@@ -817,6 +825,21 @@ export default class InterestSeedPlugin extends Plugin {
     } else if (typeof lastRebuilt === 'number') {
       this.settingsLastRebuiltAt = new Date(lastRebuilt).toISOString();
     }
+  }
+
+  getAiApiKey(): string | undefined {
+    const stored = this.app.secretStorage?.getSecret('interestseed-api-key');
+    return stored?.trim() || resolveQwenApiKey();
+  }
+
+  setAiApiKey(value: string): void {
+    const secret = value.trim();
+    if (!secret) return;
+    this.app.secretStorage?.setSecret('interestseed-api-key', secret);
+  }
+
+  clearAiApiKey(): void {
+    this.app.secretStorage?.setSecret('interestseed-api-key', '');
   }
 
   getStatus(): InterestSeedStatus {

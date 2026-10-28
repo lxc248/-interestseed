@@ -126,7 +126,7 @@ InterestSeed
     → qwen-turbo（可换成账户可用的千问模型）
 ```
 
-- 密钥只从环境变量 `DASHSCOPE_API_KEY` / `QWEN_API_KEY` 读取，不写进 Vault；
+- API Base URL、模型 ID 和用户自己的 Token 可在设置中配置；Token 写入 Obsidian SecretStorage，不写进 data.json；也支持 `DASHSCOPE_API_KEY` / `QWEN_API_KEY` 环境变量；
 - Explore AI 只发送匿名化主题 / 项目别名、聚合计数和活动数据；
 - Agent 的千问模式是直接对话，不读取 Vault、不持有本地工具权限；
 - 没有密钥时会明确提示“未配置千问密钥”，不会偷偷回退或重试；
@@ -351,7 +351,7 @@ Agent        兴趣探索        发现        总览
 - 失败不自动重试、不自动切换模型；
 - 本地规则发现始终可用。
 
-Windows 设置千问密钥（不要把 Key 提交到仓库）：
+在 InterestSeed 设置的 **平台 API Key** 填写即可；也可以在 Windows 设置环境变量（不要把 Key 提交到仓库）：
 
 ```powershell
 [Environment]::SetEnvironmentVariable("DASHSCOPE_API_KEY", "<your-key>", "User")

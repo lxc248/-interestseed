@@ -120,6 +120,9 @@ export interface ModelProviderSettings {
   aiConsentGranted: boolean;
   /** 'qwen' 使用千问；其余值保持现有本地 OpenAI-compatible 行为。 */
   provider?: string;
+  baseUrl?: string;
+  model?: string;
+  apiKey?: string;
 }
 
 /**
@@ -620,9 +623,16 @@ export function createModelProvider(
     return new DisabledModelProvider();
   }
   const useQwen = settings.provider === 'qwen';
+  const base = useQwen ? QWEN_CONFIG : DEEPSEEK_V4_PRO_CONFIG;
+  const config: ExperimentalModelConfig = {
+    ...base,
+    baseUrl: settings.baseUrl?.trim() || base.baseUrl,
+    model: settings.model?.trim() || base.model,
+  };
   return new OpenAICompatibleModelProvider(
-    useQwen ? QWEN_CONFIG : DEEPSEEK_V4_PRO_CONFIG,
+    config,
     requestImpl ?? ((input, init) => fetch(input, init)),
-    useQwen ? resolveQwenApiKey() : resolveLocalApiKey(),
+    settings.apiKey?.trim() ||
+      (useQwen ? resolveQwenApiKey() : resolveLocalApiKey()),
   );
 }

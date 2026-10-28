@@ -127,6 +127,38 @@ describe('OpenAI-compatible experimental provider', () => {
     provider.dispose();
   });
 
+  it('uses a user-supplied endpoint, model and token', async () => {
+    let captured: { url: string; init: RequestInit } | undefined;
+    const fakeFetch = async (url: string, init: RequestInit): Promise<Response> => {
+      captured = { url, init };
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({
+          choices: [{ message: { content: '{"suggestions":[]}' } }],
+        }),
+      } as Response;
+    };
+    const provider = createModelProvider(
+      {
+        enableAI: true,
+        aiConsentGranted: true,
+        provider: 'qwen',
+        baseUrl: 'https://example.test/v1/',
+        model: 'qwen-plus',
+        apiKey: 'user-token',
+      },
+      fakeFetch as typeof fetch,
+    );
+    await provider.suggestRelations({ nodes: [{ id: 'a', title: 'A', tags: [] }] });
+    expect(captured?.url).toBe('https://example.test/v1/chat/completions');
+    expect(JSON.parse(String(captured?.init.body)).model).toBe('qwen-plus');
+    expect((captured?.init.headers as Record<string, string>).Authorization).toBe(
+      'Bearer user-token',
+    );
+    provider.dispose();
+  });
+
   it('uses the requested model/base URL and sends only id/title/tags', async () => {
     let captured: { url: string; init: RequestInit } | undefined;
     const fakeFetch = async (url: string, init: RequestInit): Promise<Response> => {

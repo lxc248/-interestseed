@@ -9,7 +9,9 @@ import {
   type DshPermissionRequest,
 } from '../agent/DshAcpClient';
 import { QwenChatClient, type QwenChatMessage } from '../agent/QwenChatClient';
-import { resolveQwenApiKey } from '../services/ModelProvider';
+import {
+  QWEN_CONFIG,
+} from '../services/ModelProvider';
 
 export const INTERESTSEED_AGENT_VIEW_TYPE = 'interestseed-agent-view';
 
@@ -62,7 +64,7 @@ export class AgentView extends ItemView {
     if (this.isQwen()) {
       this.setStatus(
         'idle',
-        resolveQwenApiKey() ? '千问已就绪' : '未配置千问密钥',
+        this.plugin.getAiApiKey() ? '千问已就绪' : '未配置千问密钥',
       );
     } else if (!this.plugin.settings.enableDshAgent) {
       this.renderSetup();
@@ -107,7 +109,7 @@ export class AgentView extends ItemView {
       this.renderEmptyState();
       this.setStatus(
         'idle',
-        resolveQwenApiKey() ? '千问已就绪' : '未配置千问密钥',
+        this.plugin.getAiApiKey() ? '千问已就绪' : '未配置千问密钥',
       );
     } else if (!this.plugin.settings.enableDshAgent) {
       this.renderSetup();
@@ -337,7 +339,14 @@ export class AgentView extends ItemView {
       });
     }
     this.qwenMessages.push({ role: 'user', content: text });
-    this.qwenClient ??= new QwenChatClient();
+    this.qwenClient ??= new QwenChatClient(
+      {
+        ...QWEN_CONFIG,
+        baseUrl: this.plugin.settings.aiBaseUrl.trim() || QWEN_CONFIG.baseUrl,
+        model: this.plugin.settings.aiModel.trim() || QWEN_CONFIG.model,
+      },
+      this.plugin.getAiApiKey(),
+    );
     this.setStatus('working', '千问正在回答');
     const answer = await this.qwenClient.complete(this.qwenMessages);
     this.qwenMessages.push({ role: 'assistant', content: answer });

@@ -2,6 +2,7 @@ import {
   ModelProviderError,
   QWEN_CONFIG,
   resolveQwenApiKey,
+  type ExperimentalModelConfig,
 } from '../services/ModelProvider';
 
 export interface QwenChatMessage {
@@ -20,21 +21,26 @@ export class QwenChatClient {
   private abortController: AbortController | null = null;
   private disposed = false;
 
+  constructor(
+    private readonly config: ExperimentalModelConfig = QWEN_CONFIG,
+    private readonly apiKey: string | undefined = resolveQwenApiKey(),
+  ) {}
+
   async complete(messages: QwenChatMessage[]): Promise<string> {
     if (this.disposed) {
       throw new ModelProviderError('disabled', '千问会话已释放');
     }
-    const apiKey = resolveQwenApiKey();
+    const apiKey = this.apiKey?.trim() || resolveQwenApiKey();
     if (!apiKey) {
       throw new ModelProviderError(
         'not-authorized',
-        '未检测到千问密钥。请设置 DASHSCOPE_API_KEY 或 QWEN_API_KEY 后重启 Obsidian。',
+        '未检测到千问密钥。请在 InterestSeed 设置中填写 API Key，或设置 DASHSCOPE_API_KEY / QWEN_API_KEY 后重启 Obsidian。',
       );
     }
 
     const controller = new AbortController();
     this.abortController = controller;
-    const url = `${QWEN_CONFIG.baseUrl.replace(/\/+$/, '')}/chat/completions`;
+    const url = `${this.config.baseUrl.replace(/\/+$/, '')}/chat/completions`;
     let response: Response;
     try {
       response = await fetch(url, {
@@ -44,7 +50,7 @@ export class QwenChatClient {
           Authorization: `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
-          model: QWEN_CONFIG.model,
+          model: this.config.model,
           messages,
           temperature: 0.4,
         }),
