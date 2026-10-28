@@ -1,6 +1,6 @@
 {
   "name": "interestseed",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "description": "Turn scattered notes into a living interest graph: seeds, relations and next-step insights for Obsidian.",
   "type": "module",
   "main": "dist/main.js",

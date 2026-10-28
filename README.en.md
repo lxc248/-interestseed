@@ -8,7 +8,7 @@
 
 <p>
   <img alt="Obsidian" src="https://img.shields.io/badge/Obsidian-1.5%2B-7c3aed" />
-  <img alt="Version" src="https://img.shields.io/badge/version-0.1.3-0ea5e9" />
+  <img alt="Version" src="https://img.shields.io/badge/version-0.2.0-0ea5e9" />
   <img alt="Tests" src="https://img.shields.io/badge/tests-437%20passing-22c55e" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b" />
 </p>
@@ -31,7 +31,7 @@ Discovery inbox
 Graph changes + feedback memory
     ↓ local aggregation / anonymization / optional AI
 Themes, project matrix, rhythm, next step
-    ↓ Qwen / optional DSH Agent
+    ↓ optional: connect your own agent
 Read the vault, call tools, take the next step
 ```
 
@@ -115,34 +115,22 @@ Evidence → Judgment → Next step
 
 It does not just say “you have many themes”. It says which theme is spreading across projects, what evidence supports it, and what to do next.
 
-### 3.4 AI backend: Qwen (DashScope) first, DSH optional
+### 3.4 Agent: connect your own agent
 
-The default AI backend is **Qwen / DashScope OpenAI-compatible**:
-
-```text
-InterestSeed
-    → https://dashscope.aliyuncs.com/compatible-mode/v1
-    → qwen-turbo (or another Qwen model available to the account)
-```
-
-- API base URL, model ID and the user token are configurable; the token goes to Obsidian SecretStorage, not data.json, and `DASHSCOPE_API_KEY` / `QWEN_API_KEY` remain supported;
-- Explore AI sends only anonymized theme/project aliases, aggregate counts and activity data;
-- Qwen Agent mode is a direct chat: it does not read the vault and has no local tool permissions;
-- A missing key produces an explicit “Qwen key not configured” message, with no silent fallback or retry;
-- Free quota, model availability and rate limits are determined by the platform account.
-
-### 3.5 DSH Agent (optional): an agent inside the vault
-
-For tool calls, sandboxing and approval prompts, DSH Agent can be enabled separately:
+InterestSeed exposes one Agent entry and does not choose a model platform for the user:
 
 ```text
 InterestSeed UI
-    → dsh --profile acp
+    → DSH ACP / a user-supplied agent command
     → ACP v1
-    → DSH models, tools, sandbox and permissions
+    → the user's models, tools, sandbox and permissions
 ```
 
-Streaming messages, reasoning, tool cards, permission cards, stop, new session and a vault working directory are supported. DSH is entirely optional; Qwen chat, graph and exploration remain usable without it, and DSH owns its own models and keys.
+- Configure your own agent command, profile and model;
+- Streaming messages, reasoning, tool cards, permission cards, stop and new session;
+- The current vault is the Agent working directory;
+- InterestSeed never stores the Agent's model credentials;
+- Graph, discovery and exploration remain usable without an Agent.
 
 ### 3.6 Local-first privacy
 
@@ -274,7 +262,7 @@ Vault → GraphBuilder → GraphStore
 
 ### Manual install
 
-1. Download `release/interestseed-0.1.3.zip`;
+1. Download `release/interestseed-0.2.0.zip`;
 2. Extract into:
 
 ```text
@@ -341,24 +329,9 @@ Agent        Explore        Discoveries        Overview
 
 ## 9. Settings
 
-### AI (experimental, off by default)
+### Agent (desktop)
 
-- Qwen DashScope (default): `qwen-turbo`; reads the key from `DASHSCOPE_API_KEY` / `QWEN_API_KEY`;
-- Local OpenAI-compatible provider;
-- Optional Claudian plugin API;
-- Sends anonymized theme/project aliases, aggregate counts and activity data only;
-- No automatic retries or model switching on failure;
-- Local rule-based discovery remains available.
-
-Set it in **Platform API Key** in InterestSeed settings, or use a Windows environment variable (never commit it):
-
-```powershell
-[Environment]::SetEnvironmentVariable("DASHSCOPE_API_KEY", "<your-key>", "User")
-```
-
-Fully quit and restart Obsidian so the desktop process inherits the new environment variable.
-
-### DSH Agent (optional, desktop)\n\nThe Agent header exposes **Qwen / DSH** modes: Qwen for direct Q&A, DSH for your own agent, tools and task execution. Switching modes only resets the current session, never the graph.
+The Agent has one entry: connect your own agent. Configure the DSH command, profile and model to use tools, execute tasks and visualize the result in the vault.
 
 ```text
 Enable DSH Agent
@@ -421,7 +394,7 @@ Do not submit:
 ## 13. Status
 
 ```text
-Version: 0.1.3
+Version: 0.2.0
 Tests:   46 files / 437 cases
 License: AGPL-3.0
 ```

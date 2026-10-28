@@ -2,8 +2,7 @@ import { Notice, PluginSettingTab, Setting } from 'obsidian';
 import type { App } from 'obsidian';
 import type InterestSeedPlugin from '../main';
 import type { InterestSeedSettings } from '../types/graph';
-import { DEEPSEEK_V4_PRO_CONFIG, QWEN_CONFIG } from '../services/ModelProvider';
-import { hasClaudianApi } from '../services/ClaudianProvider';
+import { DEEPSEEK_V4_PRO_CONFIG } from '../services/ModelProvider';
 import { confirmAction } from '../ui/ConfirmModal';
 import { isRecord, sanitizeTags } from '../utils/validation';
 
@@ -14,11 +13,11 @@ export const DEFAULT_SETTINGS: InterestSeedSettings = {
   includeTags: [],
   enableRuleSuggestions: true,
   enableAI: false,
-  aiProvider: 'qwen',
-  aiBaseUrl: QWEN_CONFIG.baseUrl,
-  aiModel: QWEN_CONFIG.model,
+  aiProvider: 'offline',
+  aiBaseUrl: DEEPSEEK_V4_PRO_CONFIG.baseUrl,
+  aiModel: DEEPSEEK_V4_PRO_CONFIG.model,
   aiConsentGranted: false,
-  agentMode: 'qwen',
+  agentMode: 'dsh',
   enableDshAgent: false,
   dshCommand: 'dsh',
   dshProfile: 'acp',
@@ -45,9 +44,9 @@ export function normalizeSettings(raw: unknown): InterestSeedSettings {
     enableAI:
       typeof source.enableAI === 'boolean' ? source.enableAI : DEFAULT_SETTINGS.enableAI,
     aiProvider:
-      typeof source.aiProvider === 'string' && source.aiProvider.trim()
-        ? source.aiProvider.trim()
-        : DEFAULT_SETTINGS.aiProvider,
+      source.aiProvider === 'claudian'
+        ? 'claudian'
+        : DEEPSEEK_V4_PRO_CONFIG.model,
     aiBaseUrl:
       typeof source.aiBaseUrl === 'string' && source.aiBaseUrl.trim()
         ? source.aiBaseUrl.trim()
@@ -60,8 +59,7 @@ export function normalizeSettings(raw: unknown): InterestSeedSettings {
       typeof source.aiConsentGranted === 'boolean'
         ? source.aiConsentGranted
         : DEFAULT_SETTINGS.aiConsentGranted,
-    agentMode:
-      source.agentMode === 'dsh' ? 'dsh' : 'qwen',
+    agentMode: 'dsh',
     enableDshAgent:
       typeof source.enableDshAgent === 'boolean'
         ? source.enableDshAgent
@@ -131,7 +129,6 @@ export class InterestSeedSettingsTab extends PluginSettingTab {
 
     this.renderBuildSettings(containerEl);
     this.renderRuleSettings(containerEl);
-    this.renderAISettings(containerEl);
     this.renderDshAgentSettings(containerEl);
   }
 
@@ -242,21 +239,6 @@ export class InterestSeedSettingsTab extends PluginSettingTab {
     });
 
     new Setting(containerEl)
-      .setName('Agent 默认入口')
-      .setDesc('千问问答适合直接提问；DSH Agent 适合使用工具、执行任务和接入你自己的 Agent。')
-      .addDropdown((dropdown) =>
-        dropdown
-          .addOption('qwen', '千问问答（DashScope）')
-          .addOption('dsh', 'DSH Agent（自有工具/模型）')
-          .setValue(this.plugin.settings.agentMode)
-          .onChange(async (value) => {
-            this.plugin.settings.agentMode = value === 'dsh' ? 'dsh' : 'qwen';
-            await this.plugin.saveSettings();
-            this.display();
-          }),
-      );
-
-    new Setting(containerEl)
       .setName('启用 DSH Agent')
       .setDesc('桌面端可用；关闭时不会启动任何子进程。')
       .addToggle((toggle) =>
@@ -343,133 +325,7 @@ export class InterestSeedSettingsTab extends PluginSettingTab {
         }),
       );
   }
-  private renderAISettings(containerEl: HTMLElement): void {
-    containerEl.createEl('h3', { text: 'AI（实验，默认关闭）' });
-    containerEl.createEl('p', {
-      cls: 'setting-item-description',
-      text: 'Obsidian 核心没有公开的原生生成式 AI API；这里支持三种可选后端：本地 OpenAI-compatible 服务、千问 DashScope OpenAI-compatible 平台，或已安装并启用的 Claudian 插件 API。',
-    });
-    containerEl.createEl('p', {
-      cls: 'setting-item-description',
-      text: `本地：${DEEPSEEK_V4_PRO_CONFIG.displayName} / ${DEEPSEEK_V4_PRO_CONFIG.model}。千问：${QWEN_CONFIG.displayName} / ${QWEN_CONFIG.model}，地址 ${QWEN_CONFIG.baseUrl}，密钥从 DASHSCOPE_API_KEY 或 QWEN_API_KEY 环境变量读取，不写入设置。Claudian 后端使用其 v1 实验 API，需先在 Claudian 打开一个会话。`,
-    });
-    containerEl.createEl('p', {
-      cls: 'setting-item-description',
-      text: '只发送匿名化主题/项目别名、聚合计数和活动数据；不会发送笔记正文、路径、摘要或完整 Vault。调用失败不会自动重试或切换模型，本地规则发现继续可用。',
-    });
 
-    new Setting(containerEl)
-      .setName('启用实验 AI')
-      .setDesc('默认关闭。关闭时 ModelProvider 始终为禁用实现，不发起网络请求。')
-      .addToggle((toggle) =>
-        toggle.setValue(this.plugin.settings.enableAI).onChange(async (value) => {
-          this.plugin.settings.enableAI = value;
-          if (!value) {
-            this.plugin.settings.aiProvider = 'offline';
-            this.plugin.settings.aiConsentGranted = false;
-          } else if (this.plugin.settings.aiProvider !== 'claudian' && this.plugin.settings.aiProvider !== 'qwen') {
-            this.plugin.settings.aiProvider = 'qwen';
-          }
-          await this.plugin.saveSettings();
-          this.display();
-        }),
-      );
-
-    new Setting(containerEl)
-      .setName('AI 运行后端')
-      .setDesc(
-        hasClaudianApi(this.app)
-          ? '可选择本地服务、千问平台或 Claudian 的当前会话。'
-          : '可选择本地服务或千问平台；未检测到 Claudian。',
-      )
-      .addDropdown((dropdown) =>
-        dropdown
-          .addOption('local', '本地 OpenAI-compatible')
-          .addOption('qwen', '千问 DashScope（免费额度）')
-          .addOption('claudian', 'Claudian 插件 API（实验）')
-          .setValue(
-            this.plugin.settings.aiProvider === 'claudian'
-              ? 'claudian'
-              : this.plugin.settings.aiProvider === 'qwen'
-                ? 'qwen'
-                : 'local',
-          )
-          .setDisabled(!this.plugin.settings.enableAI)
-          .onChange(async (value) => {
-            this.plugin.settings.aiProvider =
-              value === 'claudian'
-                ? 'claudian'
-                : value === 'qwen'
-                  ? 'qwen'
-                  : DEEPSEEK_V4_PRO_CONFIG.model;
-            await this.plugin.saveSettings();
-            this.display();
-          }),
-      );
-
-    new Setting(containerEl)
-      .setName('API Base URL')
-      .setDesc('千问默认：https://dashscope.aliyuncs.com/compatible-mode/v1；也可填其他 OpenAI-compatible 平台。')
-      .addText((text) =>
-        text
-          .setPlaceholder(QWEN_CONFIG.baseUrl)
-          .setValue(this.plugin.settings.aiBaseUrl)
-          .onChange(async (value) => {
-            this.plugin.settings.aiBaseUrl = value.trim() || QWEN_CONFIG.baseUrl;
-            await this.plugin.saveSettings();
-          }),
-      );
-
-    new Setting(containerEl)
-      .setName('模型 ID')
-      .setDesc('千问免费额度可用 qwen-turbo；也可以填账户可用的其他模型 ID。')
-      .addText((text) =>
-        text
-          .setPlaceholder(QWEN_CONFIG.model)
-          .setValue(this.plugin.settings.aiModel)
-          .onChange(async (value) => {
-            this.plugin.settings.aiModel = value.trim() || QWEN_CONFIG.model;
-            await this.plugin.saveSettings();
-          }),
-      );
-
-    new Setting(containerEl)
-      .setName('平台 API Key')
-      .setDesc('用户自己的 Token，只写入 Obsidian SecretStorage，不进入 data.json，不写入日志。填写后留空不会覆盖已保存 Key。')
-      .addText((text) => {
-        text.inputEl.type = 'password';
-        text.setPlaceholder(
-          this.plugin.getAiApiKey() ? '已保存；留空不修改' : '粘贴你的平台 Token',
-        );
-        text.onChange(async (value) => {
-          if (value.trim()) {
-            this.plugin.setAiApiKey(value);
-            text.setValue('');
-          }
-          await this.plugin.saveSettings();
-        });
-      })
-      .addButton((button) =>
-        button.setButtonText('清除').onClick(async () => {
-          this.plugin.clearAiApiKey();
-          this.display();
-        }),
-      );
-
-    new Setting(containerEl)
-      .setName('确认 AI 数据发送边界')
-      .setDesc('必须同时开启此项，实验 AI 才会读取本地服务并发送节点 id、标题、标签。')
-      .addToggle((toggle) =>
-        toggle
-          .setValue(this.plugin.settings.aiConsentGranted)
-          .setDisabled(!this.plugin.settings.enableAI)
-          .onChange(async (value) => {
-            this.plugin.settings.aiConsentGranted = value;
-            await this.plugin.saveSettings();
-            this.display();
-          }),
-      );
-  }
 }
 
 export type { InterestSeedSettings };

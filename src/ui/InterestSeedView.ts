@@ -147,7 +147,7 @@ export class InterestSeedView extends ItemView {
       launchpad,
       'sparkles',
       'Agent',
-      '千问对话；需要工具时用 DSH',
+      '连接自己的 Agent，执行任务',
       'is-primary',
       () => void this.plugin.activateAgentView(),
     );

@@ -71,7 +71,6 @@ import { buildDiscoveryOverview } from './discovery/overview';
 import { buildExploration } from './discovery/exploration';
 import {
   createModelProvider,
-  resolveQwenApiKey,
   type ExplorationInsight,
   type ExplorationRequest,
 } from './services/ModelProvider';
@@ -449,22 +448,15 @@ export default class InterestSeedPlugin extends Plugin {
     const data = buildExploration(file);
     const claudianReady =
       this.settings.aiProvider !== 'claudian' || hasClaudianApi(this.app);
-    const qwenReady =
-      this.settings.aiProvider !== 'qwen' || Boolean(this.getAiApiKey());
     const aiAvailable =
-      this.settings.enableAI &&
-      this.settings.aiConsentGranted &&
-      claudianReady &&
-      qwenReady;
+      this.settings.enableAI && this.settings.aiConsentGranted && claudianReady;
     const aiUnavailableReason = !this.settings.enableAI
       ? 'AI 未启用'
       : !this.settings.aiConsentGranted
         ? 'AI 未授权'
         : !claudianReady
           ? '未检测到 Claudian'
-          : !qwenReady
-            ? '未配置千问密钥'
-            : undefined;
+          : undefined;
     new DiscoveryExplorerModal(this.app, data, overview, {
       onThemeSelect: (theme) => {
         void this.showDiscoveriesForTheme(theme);
@@ -491,11 +483,6 @@ export default class InterestSeedPlugin extends Plugin {
     const provider = createModelProvider({
       enableAI: this.settings.enableAI,
       aiConsentGranted: this.settings.aiConsentGranted,
-      provider: this.settings.aiProvider,
-      baseUrl: this.settings.aiBaseUrl,
-      model: this.settings.aiModel,
-      apiKey:
-        this.settings.aiProvider === 'qwen' ? this.getAiApiKey() : undefined,
     });
     try {
       if (!provider.explore) {
@@ -836,8 +823,7 @@ export default class InterestSeedPlugin extends Plugin {
   }
 
   getAiApiKey(): string | undefined {
-    const stored = this.app.secretStorage?.getSecret('interestseed-api-key');
-    return stored?.trim() || resolveQwenApiKey();
+    return this.app.secretStorage?.getSecret('interestseed-api-key')?.trim() || undefined;
   }
 
   setAiApiKey(value: string): void {
