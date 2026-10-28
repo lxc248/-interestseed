@@ -3826,3 +3826,64 @@ button.interestseed-inbox-node:hover {
 @media (max-width: 620px) {
   .interestseed-launch-card { height: auto; min-height: 58px; max-height: none; }
 }
+/* ============================================================
+   Explore Studio · section rhythm
+   Explicit section partitioning: cards must never touch or overlap
+   the next editorial heading, even when a theme grid stretches.
+   ============================================================ */
+
+.interestseed-insight-section {
+  display: block;
+  position: relative;
+  padding: 28px 42px 34px;
+  border-top: 1px solid color-mix(in srgb, var(--is-insight-line) 72%, transparent);
+  background: transparent;
+}
+
+.interestseed-insight-section:first-of-type {
+  border-top: 0;
+  padding-top: 24px;
+}
+
+.interestseed-insight-section-head {
+  position: relative;
+  z-index: 2;
+  margin-bottom: 11px;
+}
+
+.interestseed-insight-section > .interestseed-insight-section-desc {
+  position: relative;
+  z-index: 2;
+}
+
+.interestseed-insight-theme-grid,
+.interestseed-insight-list,
+.interestseed-insight-chart,
+.interestseed-explorer-matrix-wrap,
+.interestseed-insight-matrix-legend,
+.interestseed-insight-ai-note,
+.interestseed-insight-ai-actions {
+  position: relative;
+  z-index: 1;
+}
+
+.interestseed-insight-theme-grid {
+  align-items: start;
+  grid-auto-rows: minmax(0, auto);
+  margin-bottom: 2px;
+}
+
+.interestseed-insight-theme-card {
+  align-self: start;
+  height: auto;
+  min-height: 0;
+}
+
+.interestseed-insight-section .interestseed-explorer-matrix-wrap {
+  margin-top: 2px;
+}
+
+@media (max-width: 760px) {
+  .interestseed-insight-section { padding: 24px 20px 28px; }
+  .interestseed-insight-section:first-of-type { padding-top: 20px; }
+}
