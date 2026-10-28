@@ -38,7 +38,7 @@ seed-sprint
 ## Social preview
 
 ```text
-Asset: assets/interestseed-launch-cover.png
+Asset: assets/social-card.png
 Alt (EN): InterestSeed — make four choices and grow a living interest constellation in Obsidian.
 Alt (ZH): InterestSeed — 四个选择，长出第一张会生长的兴趣星图。
 ```
