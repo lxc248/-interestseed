@@ -9,7 +9,7 @@
 <p>
   <img alt="Obsidian" src="https://img.shields.io/badge/Obsidian-1.5%2B-7c3aed" />
   <img alt="Version" src="https://img.shields.io/badge/version-0.1.0-0ea5e9" />
-  <img alt="Tests" src="https://img.shields.io/badge/tests-435%20passing-22c55e" />
+  <img alt="Tests" src="https://img.shields.io/badge/tests-437%20passing-22c55e" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b" />
 </p>
 
@@ -236,7 +236,7 @@ Agent 工作台不是把终端输出贴进侧边栏：
 当前质量基线：
 
 ```text
-45 个 test 文件 / 435 个用例通过
+46 个 test 文件 / 437 个用例通过
 typecheck / lint / build 全部通过
 部署脚本先 verify，失败即中止
 ```
@@ -416,7 +416,7 @@ AGPL-3.0 允许在相同许可证下学习、修改与再分发，但不允许�
 
 ```text
 Version: 0.1.0
-Tests:   45 files / 435 cases
+Tests:   46 files / 437 cases
 License: AGPL-3.0
 ```
 
