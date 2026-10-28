@@ -3887,3 +3887,42 @@ button.interestseed-inbox-node:hover {
   .interestseed-insight-section { padding: 24px 20px 28px; }
   .interestseed-insight-section:first-of-type { padding-top: 20px; }
 }
+/* Obsidian's global button height can collapse the theme card to a single
+   header row; make the card a real vertical surface and keep its children
+   inside the border. */
+.interestseed-insight-theme-grid {
+  align-items: start;
+  grid-auto-rows: auto;
+}
+
+.interestseed-insight-theme-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  height: auto !important;
+  min-height: 88px;
+  max-height: none !important;
+  overflow: visible;
+  gap: 7px;
+}
+
+.interestseed-insight-theme-card > .interestseed-insight-theme-head,
+.interestseed-insight-theme-card > .interestseed-insight-theme-meta,
+.interestseed-insight-theme-card > .interestseed-insight-theme-bar {
+  flex: 0 0 auto;
+  width: 100%;
+}
+
+.interestseed-insight-theme-card > .interestseed-insight-theme-head {
+  margin: 0;
+}
+
+.interestseed-insight-theme-card > .interestseed-insight-theme-meta {
+  min-height: 13px;
+  margin: 0;
+}
+
+.interestseed-insight-theme-card > .interestseed-insight-theme-bar {
+  margin-top: auto;
+}
