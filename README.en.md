@@ -9,7 +9,7 @@
 <p>
   <img alt="Obsidian" src="https://img.shields.io/badge/Obsidian-1.5%2B-7c3aed" />
   <img alt="Version" src="https://img.shields.io/badge/version-0.1.0-0ea5e9" />
-  <img alt="Tests" src="https://img.shields.io/badge/tests-434%20passing-22c55e" />
+  <img alt="Tests" src="https://img.shields.io/badge/tests-435%20passing-22c55e" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b" />
 </p>
 
@@ -235,7 +235,7 @@ Not “collect first, add a policy later”:
 Current baseline:
 
 ```text
-44 test files / 434 passing cases
+45 test files / 435 passing cases
 typecheck / lint / build pass
 deploy aborts when verify fails
 ```
@@ -415,7 +415,7 @@ Do not submit:
 
 ```text
 Version: 0.1.0
-Tests:   44 files / 434 cases
+Tests:   45 files / 435 cases
 License: AGPL-3.0
 ```
 
