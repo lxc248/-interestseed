@@ -46,4 +46,3 @@ jobs:
             release/interestseed-*.zip
             assets/interestseed-launch.mp4
             assets/interestseed-launch-cover.png
-          generate_release_notes: true
