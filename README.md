@@ -303,7 +303,7 @@ npm run verify
 npm run deploy
 ```
 
-`npm run deploy` 会先跑完整质量门禁，通过后才复制到隔离 Vault 并重建 release zip。
+`npm run deploy` 会先跑完整质量门禁，通过后才复制到隔离 Vault 并重建 release zip。运行前把 `INTERESTSEED_VAULT` 指向隔离 Vault；脚本不会把本机路径写进仓库。
 
 ---
 

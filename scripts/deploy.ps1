@@ -1,9 +1,12 @@
 param(
-  [string]$Vault = 'C:\Users\30735\Documents\Obsidian\InterestSeed-4C11-Disposable',
-  [string]$Repo = 'C:\Users\30735\Desktop\interestseed'
+  [string]$Vault = $env:INTERESTSEED_VAULT,
+  [string]$Repo = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 )
 
 $ErrorActionPreference = 'Stop'
+if (-not $Vault) {
+  throw 'Set INTERESTSEED_VAULT to the isolated vault path, or pass -Vault.'
+}
 $plugin = Join-Path $Vault '.obsidian\plugins\interestseed'
 $releaseDir = Join-Path $Repo 'release'
 $zip = Join-Path $releaseDir 'interestseed-0.1.0.zip'

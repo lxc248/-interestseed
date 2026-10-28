@@ -116,7 +116,7 @@ obsidian dev:css selector=".interestseed-insight-modal" prop=width
 
 - 官方仓库：[`deepseek-ai/deepseek-harness`](https://github.com/deepseek-ai/deepseek-harness)（约 263k stars）。
 - 推荐协议：`dsh --profile acp` 的 ACP v1 JSON-RPC stdio。
-- 本轮已用本机 `D:\dsh\resources\runtime\cli\bin\dsh.cmd --profile acp` 实测：
+- 本轮已用本机 `<DSH_CLI_PATH> --profile acp` 实测：
   - `initialize` 返回 ACP v1；
   - `session/new` 返回 `sessionId`；
   - `session/prompt` 在未配置 DEEPSEEK_API_KEY 时返回明确 provider/key 错误。

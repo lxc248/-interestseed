@@ -302,7 +302,7 @@ npm run verify
 npm run deploy
 ```
 
-`npm run deploy` runs the full quality gate, then copies the build into the isolated vault and rebuilds the release zip.
+`npm run deploy` runs the full quality gate, then copies the build into the isolated vault and rebuilds the release zip. Set `INTERESTSEED_VAULT` to the isolated vault path; no local path is committed.
 
 ---
 
