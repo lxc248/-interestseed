@@ -375,7 +375,14 @@ export class AgentView extends ItemView {
     this.permissionHost?.empty();
     this.transcript?.empty();
     this.renderEmptyState();
-    this.setStatus('idle', '新会话');
+    this.setStatus(
+      'idle',
+      this.isQwen()
+        ? this.plugin.getAiApiKey()
+          ? '千问已就绪'
+          : '未配置千问密钥'
+        : '新会话',
+    );
   }
 
   private handleEvent(event: DshAgentEvent): void {
