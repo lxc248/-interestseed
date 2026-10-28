@@ -578,3 +578,12 @@ InterestSeed UI
 设置：`DSH Agent 工作台（桌面）` → 启用 → 填写 DSH 命令（当前机器示例：`D:\dsh\resources\runtime\cli\bin\dsh.cmd`）→ profile 默认 `acp`。
 
 DSH 自己负责模型与凭据；InterestSeed 不保存 DSH/模型密钥。没有配置 DSH 模型时，ACP 会话会返回明确的 provider/key 错误，本地图谱与探索不会受影响。
+### Obsidian CLI
+
+设置 → `DSH Agent 工作台` → `安装 / 启用 Obsidian CLI` 会调用 Obsidian 官方的 CLI 注册流程；终端重启后可使用：
+
+```bash
+obsidian plugin:reload id=interestseed
+obsidian dev:errors
+obsidian dev:screenshot path=screenshot.png
+```

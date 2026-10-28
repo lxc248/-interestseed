@@ -52,6 +52,7 @@ Claudian 插件 API（实验）
 | [YishenTu/claudian](https://github.com/YishenTu/claudian) | 15k+ | 在 Obsidian 内嵌 Claude Code / Codex / OpenCode 等代理 | 有公开 experimental Plugin API，可让 InterestSeed 复用用户已有的 AI 会话 | **已实现可选适配器** |
 | [logancyang/obsidian-copilot](https://github.com/logancyang/obsidian-copilot) | 7.9k | 成熟的 Agent Chat / Quick Chat AI 插件 | 产品体验与 Agent 交互可借鉴；没有稳定的跨插件 API | 不作为硬依赖 |
 | [brianpetro/obsidian-smart-connections](https://github.com/brianpetro/obsidian-smart-connections) | 5.5k | 本地 embedding 语义关联 | 可借鉴“相关笔记”识别；source-available 且有竞争限制 | 仅作识别基准，不嵌入 |
+| [RAIT-09/obsidian-agent-client](https://github.com/RAIT-09/obsidian-agent-client) | 2.4k+ | Obsidian ACP Agent Client（Apache 2.0） | 最接近“Claudian + 任意 ACP Agent”的成熟参考；支持会话、权限、@笔记 | 作为交互/视觉基准，不直接 fork |
 | [aaronsb/obsidian-mcp-plugin](https://github.com/aaronsb/obsidian-mcp-plugin) | 467 | MCP server | 适合把 Vault 暴露给外部 Agent | 非本阶段必需 |
 | [MarkusPfundstein/mcp-obsidian](https://github.com/MarkusPfundstein/mcp-obsidian) | 4.5k | 外部 MCP 连接 Obsidian | 可用于未来 Agent 工具链 | 非本阶段必需 |
 | [coddingtonbear/obsidian-local-rest-api](https://github.com/coddingtonbear/obsidian-local-rest-api) | 3k+ | 本地 REST API / MCP | 可作为未来无插件 API 的桥 | 非本阶段必需 |
