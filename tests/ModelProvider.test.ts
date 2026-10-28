@@ -5,12 +5,10 @@ import {
   DisabledModelProvider,
   ModelProviderError,
   OpenAICompatibleModelProvider,
-  QWEN_CONFIG,
   RELATION_REQUEST_FIELDS,
   buildRelationRequest,
   createModelProvider,
   resolveLocalApiKey,
-  resolveQwenApiKey,
 } from '../src/services/ModelProvider';
 import type { InterestSeedNode } from '../src/types/graph';
 
@@ -93,70 +91,6 @@ describe('OpenAI-compatible experimental provider', () => {
     vi.unstubAllEnvs();
     vi.stubEnv('DEEPSEEK_API_KEY', 'test-fallback');
     expect(resolveLocalApiKey()).toBe('test-fallback');
-  });
-
-  it('reads Qwen credentials only from the environment', () => {
-    vi.stubEnv('DASHSCOPE_API_KEY', 'qwen-primary');
-    vi.stubEnv('QWEN_API_KEY', 'qwen-fallback');
-    expect(resolveQwenApiKey()).toBe('qwen-primary');
-
-    vi.unstubAllEnvs();
-    vi.stubEnv('QWEN_API_KEY', 'qwen-fallback');
-    expect(resolveQwenApiKey()).toBe('qwen-fallback');
-  });
-
-  it('routes the qwen option to the DashScope OpenAI-compatible endpoint', async () => {
-    let captured: { url: string; init: RequestInit } | undefined;
-    const fakeFetch = async (url: string, init: RequestInit): Promise<Response> => {
-      captured = { url, init };
-      return {
-        ok: true,
-        status: 200,
-        json: async () => ({
-          choices: [{ message: { content: '{"suggestions":[]}' } }],
-        }),
-      } as Response;
-    };
-    const provider = createModelProvider(
-      { enableAI: true, aiConsentGranted: true, provider: 'qwen' },
-      fakeFetch as typeof fetch,
-    );
-    await provider.suggestRelations({ nodes: [{ id: 'a', title: 'A', tags: [] }] });
-    expect(captured?.url).toBe(`${QWEN_CONFIG.baseUrl}/chat/completions`);
-    expect(JSON.parse(String(captured?.init.body)).model).toBe(QWEN_CONFIG.model);
-    provider.dispose();
-  });
-
-  it('uses a user-supplied endpoint, model and token', async () => {
-    let captured: { url: string; init: RequestInit } | undefined;
-    const fakeFetch = async (url: string, init: RequestInit): Promise<Response> => {
-      captured = { url, init };
-      return {
-        ok: true,
-        status: 200,
-        json: async () => ({
-          choices: [{ message: { content: '{"suggestions":[]}' } }],
-        }),
-      } as Response;
-    };
-    const provider = createModelProvider(
-      {
-        enableAI: true,
-        aiConsentGranted: true,
-        provider: 'qwen',
-        baseUrl: 'https://example.test/v1/',
-        model: 'qwen-plus',
-        apiKey: 'user-token',
-      },
-      fakeFetch as typeof fetch,
-    );
-    await provider.suggestRelations({ nodes: [{ id: 'a', title: 'A', tags: [] }] });
-    expect(captured?.url).toBe('https://example.test/v1/chat/completions');
-    expect(JSON.parse(String(captured?.init.body)).model).toBe('qwen-plus');
-    expect((captured?.init.headers as Record<string, string>).Authorization).toBe(
-      'Bearer user-token',
-    );
-    provider.dispose();
   });
 
   it('uses the requested model/base URL and sends only id/title/tags', async () => {

@@ -98,17 +98,6 @@ export const DEEPSEEK_V4_PRO_CONFIG: ExperimentalModelConfig = {
   protocol: 'openai-chat-completions',
 };
 
-/**
- * 千问（阿里云百炼 DashScope）的 OpenAI-compatible 入口。
- * 免费额度、限流和可用模型由平台账户决定；这里不保存 API Key。
- */
-export const QWEN_CONFIG: ExperimentalModelConfig = {
-  displayName: 'Qwen（DashScope）',
-  model: 'qwen-turbo',
-  baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
-  protocol: 'openai-chat-completions',
-};
-
 /** 未来启用 AI 时需要向用户展示的字段清单与服务商信息。 */
 export const RELATION_REQUEST_FIELDS = ['节点 id', '标题', '标签'] as const;
 
@@ -118,11 +107,6 @@ export const AI_ENABLEMENT_NOTICE =
 export interface ModelProviderSettings {
   enableAI: boolean;
   aiConsentGranted: boolean;
-  /** 'qwen' 使用千问；其余值保持现有本地 OpenAI-compatible 行为。 */
-  provider?: string;
-  baseUrl?: string;
-  model?: string;
-  apiKey?: string;
 }
 
 /**
@@ -155,20 +139,6 @@ export function resolveLocalApiKey(): string | undefined {
     }
   ).process?.env;
   const value = env?.INTERESTSEED_AI_API_KEY ?? env?.DEEPSEEK_API_KEY;
-  return value && value.trim() ? value.trim() : undefined;
-}
-
-/** 千问密钥只从环境读取；设置文件里不落盘。 */
-export function resolveQwenApiKey(): string | undefined {
-  const env = (
-    globalThis as {
-      process?: { env?: Record<string, string | undefined> };
-    }
-  ).process?.env;
-  const value =
-    env?.DASHSCOPE_API_KEY ??
-    env?.QWEN_API_KEY ??
-    env?.INTERESTSEED_QWEN_API_KEY;
   return value && value.trim() ? value.trim() : undefined;
 }
 
@@ -622,17 +592,9 @@ export function createModelProvider(
   if (!settings.enableAI || !settings.aiConsentGranted) {
     return new DisabledModelProvider();
   }
-  const useQwen = settings.provider === 'qwen';
-  const base = useQwen ? QWEN_CONFIG : DEEPSEEK_V4_PRO_CONFIG;
-  const config: ExperimentalModelConfig = {
-    ...base,
-    baseUrl: settings.baseUrl?.trim() || base.baseUrl,
-    model: settings.model?.trim() || base.model,
-  };
   return new OpenAICompatibleModelProvider(
-    config,
+    DEEPSEEK_V4_PRO_CONFIG,
     requestImpl ?? ((input, init) => fetch(input, init)),
-    settings.apiKey?.trim() ||
-      (useQwen ? resolveQwenApiKey() : resolveLocalApiKey()),
+    resolveLocalApiKey(),
   );
 }

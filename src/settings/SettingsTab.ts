@@ -14,11 +14,8 @@ export const DEFAULT_SETTINGS: InterestSeedSettings = {
   enableRuleSuggestions: true,
   enableAI: false,
   aiProvider: 'offline',
-  aiBaseUrl: DEEPSEEK_V4_PRO_CONFIG.baseUrl,
-  aiModel: DEEPSEEK_V4_PRO_CONFIG.model,
   aiConsentGranted: false,
   seedSprintCompletedAt: null,
-  agentMode: 'dsh',
   enableDshAgent: false,
   dshCommand: 'dsh',
   dshProfile: 'acp',
@@ -48,14 +45,6 @@ export function normalizeSettings(raw: unknown): InterestSeedSettings {
       source.aiProvider === 'claudian'
         ? 'claudian'
         : DEEPSEEK_V4_PRO_CONFIG.model,
-    aiBaseUrl:
-      typeof source.aiBaseUrl === 'string' && source.aiBaseUrl.trim()
-        ? source.aiBaseUrl.trim()
-        : DEFAULT_SETTINGS.aiBaseUrl,
-    aiModel:
-      typeof source.aiModel === 'string' && source.aiModel.trim()
-        ? source.aiModel.trim()
-        : DEFAULT_SETTINGS.aiModel,
     aiConsentGranted:
       typeof source.aiConsentGranted === 'boolean'
         ? source.aiConsentGranted
@@ -64,8 +53,7 @@ export function normalizeSettings(raw: unknown): InterestSeedSettings {
       typeof source.seedSprintCompletedAt === 'string'
         ? source.seedSprintCompletedAt
         : null,
-    agentMode: 'dsh',
-    enableDshAgent:
+      enableDshAgent:
       typeof source.enableDshAgent === 'boolean'
         ? source.enableDshAgent
         : DEFAULT_SETTINGS.enableDshAgent,

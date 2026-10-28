@@ -9,7 +9,7 @@
 <p>
   <img alt="Obsidian" src="https://img.shields.io/badge/Obsidian-1.5%2B-7c3aed" />
   <img alt="Version" src="https://img.shields.io/badge/version-1.0.0-0ea5e9" />
-  <img alt="Tests" src="https://img.shields.io/badge/tests-448%20passing-22c55e" />
+  <img alt="Tests" src="https://img.shields.io/badge/tests-443%20passing-22c55e" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b" />
   <img alt="Local first" src="https://img.shields.io/badge/local--first-yes-14b8a6" />
 </p>
@@ -173,7 +173,7 @@ npm run deploy
 npm run verify
 ```
 
-包含 typecheck、448 个测试、ESLint 与生产构建。
+包含 typecheck、443 个测试、ESLint 与生产构建。
 
 ---
 

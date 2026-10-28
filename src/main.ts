@@ -1082,20 +1082,6 @@ export default class InterestSeedPlugin extends Plugin {
     }
   }
 
-  getAiApiKey(): string | undefined {
-    return this.app.secretStorage?.getSecret('interestseed-api-key')?.trim() || undefined;
-  }
-
-  setAiApiKey(value: string): void {
-    const secret = value.trim();
-    if (!secret) return;
-    this.app.secretStorage?.setSecret('interestseed-api-key', secret);
-  }
-
-  clearAiApiKey(): void {
-    this.app.secretStorage?.setSecret('interestseed-api-key', '');
-  }
-
   getStatus(): InterestSeedStatus {
     const stats = this.store.stats();
     const state = this.persistence?.state;
