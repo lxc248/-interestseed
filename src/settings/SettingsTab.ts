@@ -1,4 +1,4 @@
-import { PluginSettingTab, Setting } from 'obsidian';
+import { Notice, PluginSettingTab, Setting } from 'obsidian';
 import type { App } from 'obsidian';
 import type InterestSeedPlugin from '../main';
 import type { InterestSeedSettings } from '../types/graph';
@@ -268,6 +268,33 @@ export class InterestSeedSettingsTab extends PluginSettingTab {
           .setButtonText('打开')
           .setCta()
           .onClick(() => this.plugin.activateAgentView()),
+      );
+
+    new Setting(containerEl)
+      .setName('安装 / 启用 Obsidian CLI')
+      .setDesc('为 obsidian-cli skill 准备系统命令；会打开 Obsidian 官方的 CLI 注册流程。')
+      .addButton((button) =>
+        button.setButtonText('启用 CLI').onClick(async () => {
+          const electron = (window as unknown as {
+            electron?: {
+              ipcRenderer?: {
+                sendSync(channel: string, value: unknown): unknown;
+                invoke(channel: string): Promise<{ success?: boolean; message?: string }>;
+              };
+            };
+          }).electron;
+          if (!electron?.ipcRenderer) {
+            new Notice('当前不是 Obsidian 桌面环境，无法启用 CLI。');
+            return;
+          }
+          electron.ipcRenderer.sendSync('cli', true);
+          try {
+            const result = await electron.ipcRenderer.invoke('register-cli');
+            new Notice(result.success ? 'Obsidian CLI 已启用。请重启终端。' : (result.message ?? 'CLI 注册未完成。'));
+          } catch (error) {
+            new Notice(`CLI 注册失败：${error instanceof Error ? error.message : String(error)}`);
+          }
+        }),
       );
   }
   private renderAISettings(containerEl: HTMLElement): void {
