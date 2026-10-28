@@ -18,6 +18,7 @@ import type {
 export interface DiscoveryExplorerModalDeps {
   onThemeSelect(theme: string): void;
   aiAvailable?: boolean;
+  aiUnavailableReason?: string;
   onGenerateAi?(request: ExplorationRequest): Promise<ExplorationInsight>;
 }
 
@@ -383,7 +384,10 @@ export class DiscoveryExplorerModal extends Modal {
     const actions = section.createDiv({ cls: 'interestseed-insight-ai-actions' });
     const button = actions.createEl('button', {
       cls: 'interestseed-modal-button is-primary interestseed-insight-ai-button',
-      text: this.deps.aiAvailable === false ? 'AI 未启用' : '生成可解释解读',
+      text:
+        this.deps.aiAvailable === false
+          ? (this.deps.aiUnavailableReason ?? 'AI 未启用')
+          : '生成可解释解读',
       attr: { type: 'button' },
     });
     button.disabled = this.deps.aiAvailable === false;
@@ -391,7 +395,7 @@ export class DiscoveryExplorerModal extends Modal {
     status.setAttribute('role', 'status');
     status.setAttribute('aria-live', 'polite');
     if (this.deps.aiAvailable === false) {
-      status.setText('AI 未启用；上方本地洞察仍然可用。');
+      status.setText(`${this.deps.aiUnavailableReason ?? 'AI 未启用'}；上方本地洞察仍然可用。`);
     }
     const result = section.createDiv({ cls: 'interestseed-ai-result interestseed-insight-ai-result' });
 
