@@ -56,3 +56,5 @@ graphs/
 # 本地 UI 验收原始截图与旧备份（仅本机保留）
 /review/artifacts/2026-10-28/ui-screenshots/
 /review/artifacts/2026-10-28/legacy/
+/review/artifacts/2026-10-29/ui-screenshots/
+/review/artifacts/2026-10-29/
