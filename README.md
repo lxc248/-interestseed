@@ -541,3 +541,18 @@ export interface UndoManager {
 ## License
 
 MIT
+
+## AI 后端与 Agent Skills
+
+Obsidian 核心没有公开的原生生成式 AI API。InterestSeed 支持两种可选后端：
+
+- **本地 OpenAI-compatible**：Ollama、LM Studio 或自建网关；
+- **Claudian 插件 API（实验）**：复用已安装 Claudian 的 Claude/Codex/OpenCode 会话，不需要把模型密钥写进本插件。
+
+AI 默认关闭，必须同时启用 AI 并确认数据边界；只发送匿名化主题/项目别名、聚合计数和活动数据，不发送正文、路径或原始证据。
+
+开发与验证可使用 [kepano/obsidian-skills](https://github.com/kepano/obsidian-skills) 中的 `obsidian-cli` skill（reload、dev:errors、dev:screenshot、DOM/CSS 检查）。仓库研究记录见：
+
+```text
+GITHUB_SKILLS_RESEARCH.md
+```

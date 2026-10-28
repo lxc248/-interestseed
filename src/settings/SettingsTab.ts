@@ -3,6 +3,7 @@ import type { App } from 'obsidian';
 import type InterestSeedPlugin from '../main';
 import type { InterestSeedSettings } from '../types/graph';
 import { DEEPSEEK_V4_PRO_CONFIG } from '../services/ModelProvider';
+import { hasClaudianApi } from '../services/ClaudianProvider';
 import { confirmAction } from '../ui/ConfirmModal';
 import { isRecord, sanitizeTags } from '../utils/validation';
 
@@ -203,11 +204,15 @@ export class InterestSeedSettingsTab extends PluginSettingTab {
     containerEl.createEl('h3', { text: 'AI（实验，默认关闭）' });
     containerEl.createEl('p', {
       cls: 'setting-item-description',
-      text: `实验配置：${DEEPSEEK_V4_PRO_CONFIG.displayName} / ${DEEPSEEK_V4_PRO_CONFIG.model} / ${DEEPSEEK_V4_PRO_CONFIG.baseUrl}。API Key 从现有本地环境复用，不在此输入、保存或显示。`,
+      text: 'Obsidian 核心没有公开的原生生成式 AI API；这里支持两种可选后端：本地 OpenAI-compatible 服务，或已安装并启用的 Claudian 插件 API。',
     });
     containerEl.createEl('p', {
       cls: 'setting-item-description',
-      text: '只发送节点 id、标题、标签；不会发送笔记正文、路径、摘要或完整 Vault。调用失败不会自动重试或切换模型，本地规则发现继续可用。',
+      text: `本地后端：${DEEPSEEK_V4_PRO_CONFIG.displayName} / ${DEEPSEEK_V4_PRO_CONFIG.model} / ${DEEPSEEK_V4_PRO_CONFIG.baseUrl}。API Key 从现有本地环境复用，不在此输入、保存或显示。Claudian 后端使用其 v1 实验 API，需先在 Claudian 打开一个会话。`,
+    });
+    containerEl.createEl('p', {
+      cls: 'setting-item-description',
+      text: '只发送匿名化主题/项目别名、聚合计数和活动数据；不会发送笔记正文、路径、摘要或完整 Vault。调用失败不会自动重试或切换模型，本地规则发现继续可用。',
     });
 
     new Setting(containerEl)
@@ -216,13 +221,36 @@ export class InterestSeedSettingsTab extends PluginSettingTab {
       .addToggle((toggle) =>
         toggle.setValue(this.plugin.settings.enableAI).onChange(async (value) => {
           this.plugin.settings.enableAI = value;
-          this.plugin.settings.aiProvider = value
-            ? DEEPSEEK_V4_PRO_CONFIG.model
-            : 'offline';
-          if (!value) this.plugin.settings.aiConsentGranted = false;
+          if (!value) {
+            this.plugin.settings.aiProvider = 'offline';
+            this.plugin.settings.aiConsentGranted = false;
+          } else if (this.plugin.settings.aiProvider !== 'claudian') {
+            this.plugin.settings.aiProvider = DEEPSEEK_V4_PRO_CONFIG.model;
+          }
           await this.plugin.saveSettings();
           this.display();
         }),
+      );
+
+    new Setting(containerEl)
+      .setName('AI 运行后端')
+      .setDesc(
+        hasClaudianApi(this.app)
+          ? '检测到 Claudian，可选择用它的当前会话来解释探索数据。'
+          : '未检测到 Claudian；仍可使用本地 OpenAI-compatible 服务。',
+      )
+      .addDropdown((dropdown) =>
+        dropdown
+          .addOption('local', '本地 OpenAI-compatible')
+          .addOption('claudian', 'Claudian 插件 API（实验）')
+          .setValue(this.plugin.settings.aiProvider === 'claudian' ? 'claudian' : 'local')
+          .setDisabled(!this.plugin.settings.enableAI)
+          .onChange(async (value) => {
+            this.plugin.settings.aiProvider =
+              value === 'claudian' ? 'claudian' : DEEPSEEK_V4_PRO_CONFIG.model;
+            await this.plugin.saveSettings();
+            this.display();
+          }),
       );
 
     new Setting(containerEl)

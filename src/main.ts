@@ -69,6 +69,7 @@ import { DiscoveryExplorerModal } from './ui/DiscoveryExplorerModal';
 import { buildDiscoveryOverview } from './discovery/overview';
 import { buildExploration } from './discovery/exploration';
 import { createModelProvider, type ExplorationInsight, type ExplorationRequest } from './services/ModelProvider';
+import { exploreWithClaudian, hasClaudianApi } from './services/ClaudianProvider';
 import { isRecord } from './utils/validation';
 
 const DATA_SCHEMA_VERSION = 1;
@@ -424,11 +425,23 @@ export default class InterestSeedPlugin extends Plugin {
     const file = this.discoveryQueue.getState();
     const overview = buildDiscoveryOverview(file, this.store.getGraph());
     const data = buildExploration(file);
+    const claudianReady =
+      this.settings.aiProvider !== 'claudian' || hasClaudianApi(this.app);
+    const aiAvailable =
+      this.settings.enableAI && this.settings.aiConsentGranted && claudianReady;
+    const aiUnavailableReason = !this.settings.enableAI
+      ? 'AI 未启用'
+      : !this.settings.aiConsentGranted
+        ? 'AI 未授权'
+        : !claudianReady
+          ? '未检测到 Claudian'
+          : undefined;
     new DiscoveryExplorerModal(this.app, data, overview, {
       onThemeSelect: (theme) => {
         void this.showDiscoveriesForTheme(theme);
       },
-      aiAvailable: this.settings.enableAI && this.settings.aiConsentGranted,
+      aiAvailable,
+      aiUnavailableReason,
       onGenerateAi: (request) => this.generateExplorationInsight(request),
     }).open();
   }
@@ -443,6 +456,9 @@ export default class InterestSeedPlugin extends Plugin {
   private async generateExplorationInsight(
     request: ExplorationRequest,
   ): Promise<ExplorationInsight> {
+    if (this.settings.aiProvider === 'claudian') {
+      return exploreWithClaudian(this.app, request);
+    }
     const provider = createModelProvider({
       enableAI: this.settings.enableAI,
       aiConsentGranted: this.settings.aiConsentGranted,
