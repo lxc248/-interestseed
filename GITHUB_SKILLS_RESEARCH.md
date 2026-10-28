@@ -100,3 +100,14 @@ obsidian dev:css selector=".interestseed-insight-modal" prop=width
 - Claudian Plugin API：https://github.com/YishenTu/claudian/blob/main/docs/plugin-api.md
 - Copilot：https://github.com/logancyang/obsidian-copilot
 - Smart Connections：https://github.com/brianpetro/obsidian-smart-connections
+
+## 6. 本轮实际安装
+
+- `kepano/obsidian-skills` 的 `obsidian-cli` / `obsidian-markdown` / `json-canvas` / `defuddle` 已复制到 `~/.codex/skills`。
+- 隔离 Vault 已安装 **Claudian 2.3.35**：
+  - 路径：`<Vault>/.obsidian/plugins/realclaudian/`
+  - 已在 `community-plugins.json` 启用；
+  - 仅作为可选后端，没有配置任何 Claude/Codex/OpenCode 凭据；
+  - 首次使用需在 Claudian 内打开一个会话并完成其 provider 登录。
+
+> 注意：Claudian 是第三方插件，不是 Obsidian 核心功能；启用它等同于允许它读取所选会话/vault 上下文。InterestSeed 只在用户点击“生成可解释解读”时调用其 API。
