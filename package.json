@@ -15,7 +15,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint .",
-    "verify": "npm run typecheck && npm run test && npm run lint && npm run build"
+    "verify": "npm run typecheck && npm run test && npm run lint && npm run build",
+    "deploy": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/deploy.ps1"
   },
   "keywords": [
     "obsidian",

@@ -1,9 +1,9 @@
-name: Release Obsidian plugin
+name: Release InterestSeed
 
 on:
   push:
     tags:
-      - '*'
+      - 'v*'
 
 permissions:
   contents: write
@@ -13,28 +13,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '20'
           cache: npm
+
       - run: npm ci
-      - run: npm run typecheck
-      - run: npm test
-      - run: npm run lint
-      - run: npm run build
-      - name: Verify manifest and assets
+      - run: npm run verify
+
+      - name: Package plugin
         run: |
-          test -f manifest.json
-          test -f versions.json
-          test -f dist/main.js
-          test -f dist/styles.css
-      - name: Create GitHub release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release create "${GITHUB_REF_NAME}" \
-            dist/main.js \
-            dist/styles.css \
-            manifest.json \
-            --title "InterestSeed ${GITHUB_REF_NAME}" \
-            --generate-notes
+          mkdir -p release
+          cd dist
+          zip -r "../release/interestseed-${GITHUB_REF_NAME}.zip" main.js manifest.json styles.css
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: release/interestseed-*.zip
+          generate_release_notes: true
