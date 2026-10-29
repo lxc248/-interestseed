@@ -6499,3 +6499,15 @@ body.theme-light .interestseed-sprint-option.is-selected {
   gap: 5px;
 }
 .interestseed-inbox-mode { align-self: flex-end; margin-top: 6px; }
+.interestseed-sprint-secondary {
+  border: 1px solid rgba(210, 218, 238, 0.20) !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  color: #e7ebf2 !important;
+}
+.interestseed-sprint-secondary:hover {
+  border-color: rgba(232, 200, 132, 0.42) !important;
+  background: rgba(232, 200, 132, 0.10) !important;
+  color: #f0d6a0 !important;
+}
+.interestseed-experiment-more { margin-bottom: 28px; }
+.interestseed-experiment-more { margin-bottom: 44px; }

@@ -1,0 +1,38 @@
+{
+  "persona": "工作 2–3 年的产品/运营上班族",
+  "pendingAfterSwipe": 1,
+  "beforeLogs": 0,
+  "afterLogs": 1,
+  "restoredLogs": 0,
+  "steps": [
+    {
+      "name": "inbox-list",
+      "at": 826
+    },
+    {
+      "name": "focus-mode",
+      "at": 1400
+    },
+    {
+      "name": "swipe-left",
+      "at": 1925
+    },
+    {
+      "name": "back-to-list",
+      "at": 2371
+    },
+    {
+      "name": "keep-spark",
+      "at": 2889
+    },
+    {
+      "name": "experiment-open",
+      "at": 3736
+    },
+    {
+      "name": "experiment-one-tap",
+      "at": 4308
+    }
+  ],
+  "totalMs": 4350
+}

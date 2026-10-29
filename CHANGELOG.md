@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.8.0 — Familiar-first UX, validated by two personas
+
+- Made the conventional Share Inbox list the default.
+- Made Focus Deck opt-in and reversible.
+- Changed onboarding skip to open a real spark capture instead of an empty graph.
+- Fixed secondary-button contrast in the onboarding dialog.
+- Ran and documented two real-UI persona tasks: design student and office worker.
+- Kept all test state clean and reversible.
+
 ## 1.7.2 — Conventional inbox by default
 
 - Restored a standard list as the default Share Inbox.

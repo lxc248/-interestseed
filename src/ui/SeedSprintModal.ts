@@ -86,10 +86,13 @@ export class SeedSprintModal extends Modal {
     });
     const skip = actions.createEl('button', {
       cls: 'interestseed-sprint-secondary',
-      text: '先看看空白图谱',
+      text: '先跳过，记录一条',
       attr: { type: 'button' },
     });
-    skip.addEventListener('click', () => this.close());
+    skip.addEventListener('click', () => {
+      this.close();
+      this.plugin.openSparkCapture();
+    });
 
     const promise = this.contentEl.createDiv({ cls: 'interestseed-sprint-promise' });
     promise.createSpan({ text: 'CURIOUS' });

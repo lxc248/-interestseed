@@ -1,0 +1,40 @@
+{
+  "persona": "大三视觉设计学生（非技术）",
+  "sparkOpen": 1,
+  "sparkHasText": true,
+  "pendingAfterPass": 0,
+  "beforeLogs": 0,
+  "afterLogs": 1,
+  "restoredLogs": 0,
+  "steps": [
+    {
+      "name": "cold-start-open",
+      "at": 986
+    },
+    {
+      "name": "skip-to-spark",
+      "at": 1523
+    },
+    {
+      "name": "inbox-list",
+      "at": 2407
+    },
+    {
+      "name": "keep-spark",
+      "at": 2922
+    },
+    {
+      "name": "pass-without-write",
+      "at": 3278
+    },
+    {
+      "name": "experiment-quick-open",
+      "at": 3833
+    },
+    {
+      "name": "experiment-one-tap",
+      "at": 4403
+    }
+  ],
+  "totalMs": 4432
+}
