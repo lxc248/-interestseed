@@ -671,7 +671,10 @@ export default class InterestSeedPlugin extends Plugin {
   async createInterestRoute(): Promise<void> {
     const selectedId = this.getSelectedNodeId();
     const selected = selectedId ? this.store.getNode(selectedId) : undefined;
-    const tag = selected?.tags.find((value) => value.trim().length > 0);
+    const tag = selected?.tags.find(
+      (value) =>
+        value.trim().length > 0 && value !== '火花' && value !== '文本' && value !== '视频',
+    );
     const theme = tag ?? '全部兴趣';
     const allNodes = this.store.listNodes();
     const filtered = tag ? allNodes.filter((node) => node.tags.includes(tag)) : allNodes;

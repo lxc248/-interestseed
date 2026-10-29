@@ -372,7 +372,7 @@ function handle(message) {
         resources: { subscribe: false, listChanged: false },
         prompts: { listChanged: false },
       },
-      serverInfo: { name: 'interestseed', version: '2.3.0' },
+      serverInfo: { name: 'interestseed', version: '2.3.1' },
     });
   }
   if (method === 'notifications/initialized') return null;

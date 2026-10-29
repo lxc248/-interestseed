@@ -1,0 +1,58 @@
+{
+  "persona": "大三视觉设计学生（非技术）",
+  "fixture": "P2/theme-b-two.md",
+  "sparkOpen": 1,
+  "sourceClickable": true,
+  "afterSource": {
+    "active": "P2/theme-b-two.md",
+    "modal": false
+  },
+  "created": {
+    "id": "node_1s4p4ed0ugl27w",
+    "observations": 1,
+    "source": "note",
+    "sourceRef": "P2/theme-b-two.md"
+  },
+  "timelineCount": 1,
+  "route": {
+    "path": "InterestSeed/兴趣路线 - 全部兴趣 - 2026-10-29.md",
+    "text": "# 兴趣路线 · 全部兴趣\n\n> 由 InterestSeed 生成于 2026-10-29。这是一份只读快照，不会自动修改你的笔记。\n\n## 正在验证\n\n- **7 天兴趣实验** · Day 0 / 7\n- 状态：进行中\n\n## 验证中的线索\n\n- 7 天兴趣实验\n\n## 已连接的线索\n\n- AI 与工具\n- [[P1/theme-a-very-long-project-name-with-many-words-for-layout-testing|Long Project A]]\n- [[P1/theme-a-support|Support A]]\n- [[P2/theme-b-four|Theme B Four]]\n- [["
+  },
+  "afterLogs": 1,
+  "restoredLogs": 0,
+  "steps": [
+    {
+      "name": "cold-start-open",
+      "at": 938
+    },
+    {
+      "name": "skip-to-spark",
+      "at": 1670
+    },
+    {
+      "name": "note-to-inbox",
+      "at": 2770
+    },
+    {
+      "name": "source-open-original",
+      "at": 3168
+    },
+    {
+      "name": "keep-spark",
+      "at": 4345
+    },
+    {
+      "name": "observation-timeline",
+      "at": 6155
+    },
+    {
+      "name": "interest-route",
+      "at": 7320
+    },
+    {
+      "name": "experiment-one-tap",
+      "at": 8319
+    }
+  ],
+  "totalMs": 8370
+}

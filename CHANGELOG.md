@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.3.1 — External source URI fix
+
+- Preserved `https://` and `http://` in `sourceUri`.
+- Repaired previously collapsed `https:/` values on graph load.
+- Fixed interest-route links for external sources.
+- Added path normalization tests.
+
 ## 2.3.0 — Timeline, route and agent context
 
 - Added append-only observation timelines to graph nodes.

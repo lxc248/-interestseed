@@ -1,0 +1,47 @@
+{
+  "persona": "工作 2–3 年的产品/运营上班族",
+  "pendingAfterSwipe": 1,
+  "created": {
+    "id": "node_0co6p7l0doyc8d",
+    "observations": 1,
+    "source": "share"
+  },
+  "timelineCount": 1,
+  "route": {
+    "path": "InterestSeed/兴趣路线 - 产品与商业 - 2026-10-29.md",
+    "text": "# 兴趣路线 · 产品与商业\n\n> 由 InterestSeed 生成于 2026-10-29。这是一份只读快照，不会自动修改你的笔记。\n\n## 正在验证\n\n- **7 天兴趣实验** · Day 0 / 7\n- 状态：进行中\n\n## 等待判断\n\n- [增长：先找到愿意付费的 10 个人](https://www.xiaohongshu.com/explore/office-230-one) — 增长：先找到愿意付费的 10 个人 https://www.xiaohongshu.com/explore/office-230-one\n\n## 最近观察\n\n- 增长：先找到愿意付费的 10 个人 — 增长：先找到愿意付费的 10 个人 h"
+  },
+  "afterLogs": 1,
+  "restoredLogs": 0,
+  "steps": [
+    {
+      "name": "inbox-list",
+      "at": 937
+    },
+    {
+      "name": "focus-mode",
+      "at": 1711
+    },
+    {
+      "name": "swipe-left",
+      "at": 2419
+    },
+    {
+      "name": "keep-spark",
+      "at": 3519
+    },
+    {
+      "name": "observation-timeline",
+      "at": 5389
+    },
+    {
+      "name": "interest-route",
+      "at": 6645
+    },
+    {
+      "name": "experiment-one-tap",
+      "at": 7698
+    }
+  ],
+  "totalMs": 7815
+}

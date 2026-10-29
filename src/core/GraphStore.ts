@@ -14,7 +14,7 @@ import type {
   RelationStatus,
 } from '../types/graph';
 import { createId, edgeIdFor } from '../utils/ids';
-import { normalizePath } from '../utils/paths';
+import { normalizeSourceUri } from '../utils/paths';
 import { clamp01, sanitizeTags, validateGraphStructure } from '../utils/validation';
 
 /**
@@ -249,7 +249,7 @@ export class InterestSeedGraphStore implements GraphStore {
     }
 
     if (input.sourceUri) {
-      const key = normalizePath(input.sourceUri).toLowerCase();
+      const key = normalizeSourceUri(input.sourceUri).toLowerCase();
       for (const node of this.nodes.values()) {
         if (node.sourceUri && node.sourceUri.toLowerCase() === key) {
           return { node: this.updateNode(node.id, patch), created: false };
@@ -271,7 +271,7 @@ export class InterestSeedGraphStore implements GraphStore {
   }
 
   findNodeByUri(uri: string): InterestSeedNode | undefined {
-    const key = normalizePath(uri).toLowerCase();
+    const key = normalizeSourceUri(uri).toLowerCase();
     for (const node of this.nodes.values()) {
       if (node.sourceUri && node.sourceUri.toLowerCase() === key) return node;
     }
@@ -316,7 +316,7 @@ export class InterestSeedGraphStore implements GraphStore {
 
     if (patch.sourceUri !== undefined) {
       if (patch.sourceUri === '') delete next.sourceUri;
-      else next.sourceUri = normalizePath(patch.sourceUri);
+      else next.sourceUri = normalizeSourceUri(patch.sourceUri);
     }
 
     this.nodes.set(id, next);
@@ -683,6 +683,7 @@ export class InterestSeedGraphStore implements GraphStore {
       if (!isNodeType(node.type)) continue;
       this.nodes.set(node.id, {
         ...node,
+        ...(node.sourceUri ? { sourceUri: normalizeSourceUri(node.sourceUri) } : {}),
         tags: sanitizeTags(node.tags),
         metadata: { ...(node.metadata ?? {}) },
       });
@@ -810,7 +811,7 @@ export class InterestSeedGraphStore implements GraphStore {
       metadata: { ...(input.metadata ?? {}) },
     };
 
-    if (input.sourceUri) node.sourceUri = normalizePath(input.sourceUri);
+    if (input.sourceUri) node.sourceUri = normalizeSourceUri(input.sourceUri);
     return node;
   }
 

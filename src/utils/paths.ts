@@ -18,6 +18,20 @@ export function normalizePath(input: string): string {
   return parts.join('/');
 }
 
+/**
+ * sourceUri can be a vault path or an external URL. `normalizePath` would
+ * collapse `https://` into `https:/`, so URLs must be kept intact.
+ */
+export function normalizeSourceUri(input: string): string {
+  const value = (input ?? '').trim();
+  if (/^https?:\/\//i.test(value)) return value;
+  if (/^https?:\//i.test(value)) return value.replace(/^(https?:\/)/i, '$1/');
+  if (value.toLowerCase().startsWith(VAULT_URI_SCHEME)) {
+    return `${VAULT_URI_SCHEME}${normalizePath(value.slice(VAULT_URI_SCHEME.length))}`;
+  }
+  return normalizePath(value);
+}
+
 export function basename(path: string): string {
   const normalized = normalizePath(path);
   const index = normalized.lastIndexOf('/');
