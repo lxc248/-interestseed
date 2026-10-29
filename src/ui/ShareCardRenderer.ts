@@ -110,6 +110,21 @@ function hash(value: string): number {
   return (h >>> 0) / 4294967295;
 }
 
+function shareTopics(graph: InterestSeedGraph, limit = 3): string[] {
+  const ignored = new Set(['火花', '视频', '文本', '主题', '兴趣起跑', '项目', '下一步']);
+  const counts = new Map<string, number>();
+  for (const node of graph.nodes) {
+    for (const tag of node.tags) {
+      if (ignored.has(tag)) continue;
+      counts.set(tag, (counts.get(tag) ?? 0) + 1);
+    }
+  }
+  return [...counts.entries()]
+    .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0], 'zh'))
+    .slice(0, limit)
+    .map(([tag]) => tag);
+}
+
 function shortLabel(title: string, limit = 16): string {
   const cut = title.search(/[：:，,。！？!?]/);
   let value = cut >= 3 && cut <= 20 ? title.slice(0, cut) : title;
@@ -532,6 +547,19 @@ function drawPortraitCard(
 
   drawSteps(ctx, margin, quoteY + 62, graphRect.w);
 
+  const topics = shareTopics(graph, 3);
+  if (topics.length > 0) {
+    text(
+      ctx,
+      `最近在关注 · ${topics.join(' · ')}`,
+      margin,
+      height - 74,
+      13,
+      '#b98f3c',
+      600,
+    );
+  }
+
   ctx.save();
   ctx.globalAlpha = 0.78;
   text(ctx, '本地优先  ·  人做决定  ·  Agent 只读', margin, height - 36, 11, '#8995a9', 500);
@@ -582,6 +610,10 @@ function drawLandscapeCard(
 
   drawGraphPanel(ctx, graph, panelRect, false);
 
+  const topics = shareTopics(graph, 3);
+  if (topics.length > 0) {
+    text(ctx, `最近在关注 · ${topics.join(' · ')}`, margin, height - 112, 12, '#b98f3c', 600);
+  }
   text(ctx, '别收藏更多，验证一个。', margin, height - 74, 24, '#f3e5c0', 680);
   text(ctx, 'InterestSeed  ·  把刷到的内容，变成 3 天真实行动', margin, height - 44, 13, '#8995a9', 500);
   text(ctx, preset.shortLabel, width - margin, height - 30, 11, '#b98f3c', 650, 'right');

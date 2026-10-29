@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.7.1 — Share card polish
+
+- Added a real “最近在关注” topic line to portrait and landscape cards.
+- Improved label placement with node/label collision avoidance.
+- Enlarged the share preview and documented the new cover hierarchy.
+
 ## 2.7.0 — Share card redesign
 
 - Rebuilt social cards around a mobile-first hook, three proof stats, the graph, and a three-step close.
