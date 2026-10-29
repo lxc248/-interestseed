@@ -46,20 +46,13 @@ export class SparkCaptureModal extends Modal {
     copy.createEl('h2', { cls: 'interestseed-spark-title', text: '把一个好奇，留成种子。' });
     copy.createEl('p', {
       cls: 'interestseed-spark-lede',
-      text: '刷到一条视频、读到一句话、听到一个问题——先记下它，再决定它和你的哪条兴趣有关。',
+      text: '粘贴分享或一句话，系统会自动识别平台与主题。你只需要决定：留下，还是路过。',
     });
-
-    const flow = root.createDiv({ cls: 'interestseed-spark-flow' });
-    for (const [index, label] of ['识别平台', '提炼兴趣', '你来决定', '进入星图'].entries()) {
-      const step = flow.createDiv({ cls: 'interestseed-spark-flow-step' });
-      step.createSpan({ cls: 'interestseed-spark-flow-index', text: String(index + 1) });
-      step.createSpan({ text: label });
-    }
 
     const input = root.createEl('textarea', {
       cls: 'interestseed-spark-input',
       attr: {
-        placeholder: '粘贴一个链接，或写下让你停下来的那句话……',
+        placeholder: '粘贴分享链接，或写下让你停下来的那句话……',
         rows: '5',
       },
     });
@@ -67,10 +60,18 @@ export class SparkCaptureModal extends Modal {
       this.text = input.value;
       this.updatePreview();
     });
+    input.addEventListener('keydown', (event) => {
+      if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+        event.preventDefault();
+        if (this.submitEl && !this.submitEl.disabled) this.submit();
+      }
+    });
     input.value = this.text;
     input.focus();
 
-    const target = root.createEl('select', { cls: 'interestseed-spark-target' });
+    const options = root.createEl('details', { cls: 'interestseed-spark-options' });
+    options.createEl('summary', { text: '更多选项（可选）' });
+    const target = options.createEl('select', { cls: 'interestseed-spark-target' });
     target.createEl('option', { text: '先放收件箱，作为新种子', attr: { value: '' } });
     const nodes = this.plugin.store
       .listNodes()
@@ -84,13 +85,13 @@ export class SparkCaptureModal extends Modal {
       this.targetId = target.value;
     });
 
-    const whyLabel = root.createEl('label', { cls: 'interestseed-spark-why' });
-    whyLabel.createSpan({ text: '为什么留下？（可选，帮下一次判断）' });
+    const whyLabel = options.createEl('label', { cls: 'interestseed-spark-why' });
+    whyLabel.createSpan({ text: '为什么留下？（可选）' });
     whyLabel.createEl('input', {
       cls: 'interestseed-spark-why-input',
       attr: {
         type: 'text',
-        placeholder: '例如：不是想学这个工具，而是想让我做的东西更容易被看见',
+        placeholder: '例如：不是想学工具，而是想让我做的东西被看见',
       },
     }).addEventListener('input', (event) => {
       this.why = (event.target as HTMLInputElement).value;

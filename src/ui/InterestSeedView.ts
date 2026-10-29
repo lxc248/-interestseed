@@ -66,6 +66,8 @@ export class InterestSeedView extends ItemView {
   private quickUndoButton: HTMLButtonElement | null = null;
   private quickRedoButton: HTMLButtonElement | null = null;
   private quickInboxButton: HTMLButtonElement | null = null;
+  private quickShareInboxButton: HTMLButtonElement | null = null;
+  private shareInboxBadgeEl: HTMLElement | null = null;
   private quickDiscoveryButton: HTMLButtonElement | null = null;
 
   private filter: GraphFilter = createDefaultFilter();
@@ -271,34 +273,17 @@ export class InterestSeedView extends ItemView {
     );
 
     const quickbar = root.createDiv({ cls: 'interestseed-quickbar' });
-    this.createQuickAction(quickbar, 'refresh-cw', '扫描', () => this.plugin.promptRebuild());
-    this.createQuickAction(quickbar, 'plus', '节点', () => this.plugin.promptCreateNode());
-    this.createQuickAction(quickbar, 'sparkles', '火花', () => this.plugin.openSparkCapture());
-    this.createQuickAction(quickbar, 'git-fork', '建议', () => this.plugin.refreshSuggestions());
-    this.quickInboxButton = this.createQuickAction(quickbar, 'inbox', '收件', () =>
-      this.toggleInbox(),
+    const recordAction = this.createQuickAction(quickbar, 'sparkles', '记录', () =>
+      this.plugin.openSparkCapture(),
     );
-    this.quickUndoButton = this.createQuickAction(quickbar, 'undo-2', '撤销', () =>
-      this.plugin.undo.undo(),
+    recordAction.addClass('is-primary');
+    this.quickShareInboxButton = this.createQuickAction(quickbar, 'archive', '收件箱', () =>
+      this.plugin.openInbox(),
     );
-    this.quickRedoButton = this.createQuickAction(quickbar, 'redo-2', '重做', () =>
-      this.plugin.undo.redo(),
-    );
-    this.createQuickAction(quickbar, 'maximize-2', '适应', () => this.canvas?.zoomToFit());
-    this.quickDiscoveryButton = this.createQuickAction(quickbar, 'lightbulb', '发现', () =>
-      this.toggleDiscoveries(),
-    );
-    this.quickDiscoveryButton.setAttribute('aria-pressed', 'false');
-    this.quickInboxButton?.setAttribute('aria-pressed', 'false');
-    this.discoveryButton?.setAttribute('aria-pressed', 'false');
-    this.inboxButton?.setAttribute('aria-pressed', 'false');
-    this.createQuickAction(quickbar, 'layout-dashboard', '总览', () =>
-      this.plugin.openDiscoveryOverview(),
-    );
-    this.createQuickAction(quickbar, 'compass', '探索', () =>
-      this.plugin.openDiscoveryExplorer(),
-    );
-    this.createQuickAction(quickbar, 'download', '导出', () => this.plugin.exportGraph());
+    this.shareInboxBadgeEl = this.quickShareInboxButton.createSpan({
+      cls: 'interestseed-quick-badge is-hidden',
+      text: '0',
+    });
     const filterToggle = this.createQuickAction(quickbar, 'filter', '筛选', () => {
       root.classList.toggle('is-filter-open');
       filterToggle.setAttribute(
@@ -309,6 +294,45 @@ export class InterestSeedView extends ItemView {
     });
     filterToggle.setAttribute('aria-pressed', 'false');
     filterToggle.addClass('is-filter-toggle');
+
+    const more = quickbar.createEl('details', { cls: 'interestseed-more' });
+    const moreSummary = more.createEl('summary', {
+      cls: 'interestseed-quick-action',
+      attr: { 'aria-label': '更多操作', title: '更多操作' },
+    });
+    setIcon(moreSummary, 'more-horizontal');
+    moreSummary.createSpan({ text: '更多' });
+    const moreMenu = more.createDiv({ cls: 'interestseed-more-menu' });
+    this.createQuickAction(moreMenu, 'refresh-cw', '重新扫描', () => this.plugin.promptRebuild());
+    this.createQuickAction(moreMenu, 'plus', '新建节点', () => this.plugin.promptCreateNode());
+    this.createQuickAction(moreMenu, 'git-fork', '刷新建议', () => this.plugin.refreshSuggestions());
+    this.quickInboxButton = this.createQuickAction(moreMenu, 'inbox', '待确认关系', () =>
+      this.toggleInbox(),
+    );
+    this.quickUndoButton = this.createQuickAction(moreMenu, 'undo-2', '撤销', () =>
+      this.plugin.undo.undo(),
+    );
+    this.quickRedoButton = this.createQuickAction(moreMenu, 'redo-2', '重做', () =>
+      this.plugin.undo.redo(),
+    );
+    this.createQuickAction(moreMenu, 'maximize-2', '适应画布', () => this.canvas?.zoomToFit());
+    this.quickDiscoveryButton = this.createQuickAction(moreMenu, 'lightbulb', '发现', () =>
+      this.toggleDiscoveries(),
+    );
+    this.quickDiscoveryButton.setAttribute('aria-pressed', 'false');
+    this.quickInboxButton?.setAttribute('aria-pressed', 'false');
+    this.discoveryButton?.setAttribute('aria-pressed', 'false');
+    this.inboxButton?.setAttribute('aria-pressed', 'false');
+    this.createQuickAction(moreMenu, 'layout-dashboard', '兴趣总览', () =>
+      this.plugin.openDiscoveryOverview(),
+    );
+    this.createQuickAction(moreMenu, 'compass', '兴趣探索', () =>
+      this.plugin.openDiscoveryExplorer(),
+    );
+    this.createQuickAction(moreMenu, 'download', '导出 JSON', () => this.plugin.exportGraph());
+    this.createQuickAction(moreMenu, 'share-2', '导出分享星图', () =>
+      this.plugin.openShareCard(),
+    );
 
     const filterHost = root.createDiv({ cls: 'interestseed-filter-host' });
     this.filterBar = new FilterBar(filterHost, (filter) => {
@@ -627,6 +651,10 @@ export class InterestSeedView extends ItemView {
     if (!host) return;
     const graph = this.plugin.store.getGraph();
     const pendingInbox = this.plugin.getPendingInboxItems().length;
+    if (this.shareInboxBadgeEl) {
+      this.shareInboxBadgeEl.setText(String(pendingInbox));
+      this.shareInboxBadgeEl.toggleClass('is-hidden', pendingInbox === 0);
+    }
     if (graph.nodes.length === 0 && pendingInbox === 0) {
       host.addClass('is-hidden');
       return;

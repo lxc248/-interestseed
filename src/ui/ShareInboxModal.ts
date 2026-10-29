@@ -81,8 +81,13 @@ export class ShareInboxModal extends Modal {
     }
 
     const list = root.createDiv({ cls: 'interestseed-inbox-list' });
-    for (const item of pending.slice(0, 40)) {
-      this.renderItem(list, item);
+    const first = pending[0];
+    if (first) this.renderItem(list, first);
+    if (pending.length > 1) {
+      root.createDiv({
+        cls: 'interestseed-inbox-queue',
+        text: `队列里还有 ${pending.length - 1} 条，处理完这一条会自动轮到下一条。`,
+      });
     }
   }
 
