@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.5.0 — View state convergence
+
+- Replaced competing inbox/discovery booleans with one graph / inbox / discoveries mode.
+- Fixed discovery theme filter being reset when opening.
+- Selecting a node now exits discovery mode and restores its detail.
+- Closed the “更多” menu after running an action.
+- Styled the discovery panel for the dark graph surface.
+- Documented the view-mode invariants.
+
 ## 2.4.0 — Context search
 
 - Extended graph search to source refs, reasons, raw captures and observation evidence.

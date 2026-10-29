@@ -46,12 +46,12 @@ Alt (ZH): InterestSeed — 四个选择，长出第一张会生长的兴趣星�
 ## Release title
 
 ```text
-InterestSeed 2.4.0 — your first living interest constellation
+InterestSeed 2.5.0 — your first living interest constellation
 ```
 
 ## Release body — English
 
-InterestSeed 2.4.0 turns a blank vault into a living interest constellation.
+InterestSeed 2.5.0 turns a blank vault into a living interest constellation.
 This release includes:
 
 - 3-minute Seed Sprint: four choices → a first confirmable constellation;
@@ -68,7 +68,7 @@ This release includes:
 
 ## Release body — 简体中文
 
-InterestSeed 2.4.0 让空白 Vault 长出第一张活的兴趣星图。本次发布包含：
+InterestSeed 2.5.0 让空白 Vault 长出第一张活的兴趣星图。本次发布包含：
 
 - 3 分钟兴趣起跑：四个选择生成第一张可确认星图；
 - 带来源、置信度与证据的可解释关系；

@@ -8,7 +8,7 @@
 
 <p>
   <img alt="Obsidian" src="https://img.shields.io/badge/Obsidian-1.5%2B-7c3aed" />
-  <img alt="Version" src="https://img.shields.io/badge/version-2.4.0-0ea5e9" />
+  <img alt="Version" src="https://img.shields.io/badge/version-2.5.0-0ea5e9" />
   <img alt="Tests" src="https://img.shields.io/badge/tests-471%20passing-22c55e" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b" />
   <img alt="Local first" src="https://img.shields.io/badge/local--first-yes-14b8a6" />
@@ -86,7 +86,7 @@ The core rule:
 
 ## Install
 
-1. Download `interestseed-v2.4.0.zip` from Releases.
+1. Download `interestseed-v2.5.0.zip` from Releases.
 2. Extract into:
 
 ```text

@@ -6603,3 +6603,23 @@ body.theme-light .interestseed-sprint-option.is-selected {
   color: #6f7b8c;
   font-size: 8px;
 }
+/* Discovery panel must follow the dark graph surface, not the host theme. */
+.interestseed-root .interestseed-discovery-panel { color: #dbe4f2; }
+.interestseed-root .interestseed-discovery-panel .interestseed-discovery-card {
+  background: #0e1623;
+  border-color: rgba(210, 218, 238, 0.12);
+  color: #dbe4f2;
+}
+.interestseed-root .interestseed-discovery-panel .interestseed-discovery-title { color: #eef4ff; }
+.interestseed-root .interestseed-discovery-panel .interestseed-discovery-desc,
+.interestseed-root .interestseed-discovery-panel .interestseed-discovery-why p { color: #aab6c9; }
+.interestseed-root .interestseed-discovery-panel .interestseed-discovery-meta,
+.interestseed-root .interestseed-discovery-panel .interestseed-discovery-metrics,
+.interestseed-root .interestseed-discovery-panel .interestseed-discovery-theme { color: #7f8da3; }
+.interestseed-root .interestseed-discovery-panel .interestseed-discovery-nodes { background: rgba(80, 120, 190, 0.10); color: #c6d6ef; }
+.interestseed-root .interestseed-discovery-panel .interestseed-discovery-action {
+  border-color: rgba(210, 218, 238, 0.16);
+  background: rgba(255, 255, 255, 0.04);
+  color: #c5d2e6;
+}
+.interestseed-root .interestseed-discovery-panel .interestseed-discovery-action:hover { background: rgba(90, 130, 210, 0.18); }

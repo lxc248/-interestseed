@@ -24,6 +24,8 @@ import {
 
 export const INTERESTSEED_VIEW_TYPE = 'interestseed-graph-view';
 
+type DetailViewMode = 'graph' | 'inbox' | 'discoveries';
+
 /**
  * 图谱视图：把 FilterBar、GraphCanvas、DetailPanel、EmptyState 组装起来。
  * 视图不直接修改数据，所有写操作都回调到插件，保证撤销 / 持久化统一。
@@ -59,9 +61,8 @@ export class InterestSeedView extends ItemView {
   private undoButton: HTMLButtonElement | null = null;
   private redoButton: HTMLButtonElement | null = null;
   private inboxButton: HTMLButtonElement | null = null;
-  private inboxOpen = false;
   private discoveryButton: HTMLButtonElement | null = null;
-  private discoveryOpen = false;
+  private mode: DetailViewMode = 'graph';
   private discoveryThemeFilter: string | null = null;
   private quickUndoButton: HTMLButtonElement | null = null;
   private quickRedoButton: HTMLButtonElement | null = null;
@@ -493,47 +494,38 @@ export class InterestSeedView extends ItemView {
   }
 
   private toggleInbox(): void {
-    this.inboxOpen = !this.inboxOpen;
-    this.inboxButton?.toggleClass('is-active', this.inboxOpen);
-    this.quickInboxButton?.toggleClass('is-active', this.inboxOpen);
-    this.inboxButton?.setAttribute('aria-pressed', String(this.inboxOpen));
-    this.quickInboxButton?.setAttribute('aria-pressed', String(this.inboxOpen));
+    this.setMode(this.mode === 'inbox' ? 'graph' : 'inbox');
+  }
 
-    if (this.inboxOpen) {
-      this.discoveryOpen = false;
-      this.discoveryButton?.removeClass('is-active');
-      this.quickDiscoveryButton?.removeClass('is-active');
-      this.discoveryButton?.setAttribute('aria-pressed', 'false');
-      this.quickDiscoveryButton?.setAttribute('aria-pressed', 'false');
+  private syncModeButtons(): void {
+    const inbox = this.mode === 'inbox';
+    const discoveries = this.mode === 'discoveries';
+    for (const button of [this.inboxButton, this.quickInboxButton]) {
+      button?.toggleClass('is-active', inbox);
+      button?.setAttribute('aria-pressed', String(inbox));
+    }
+    for (const button of [this.discoveryButton, this.quickDiscoveryButton]) {
+      button?.toggleClass('is-active', discoveries);
+      button?.setAttribute('aria-pressed', String(discoveries));
+    }
+  }
+
+  private setMode(mode: DetailViewMode): void {
+    this.mode = mode;
+    if (mode !== 'graph') {
       this.selectedId = null;
       this.plugin.setSelectedNode(null);
       this.canvas?.setSelected(null);
     }
-
+    this.syncModeButtons();
+    this.syncDiscoveryVisibility();
     this.refresh();
   }
 
   private toggleDiscoveries(): void {
-    if (!this.discoveryOpen) this.discoveryThemeFilter = null;
-    this.discoveryOpen = !this.discoveryOpen;
-    this.discoveryButton?.toggleClass('is-active', this.discoveryOpen);
-    this.quickDiscoveryButton?.toggleClass('is-active', this.discoveryOpen);
-    this.discoveryButton?.setAttribute('aria-pressed', String(this.discoveryOpen));
-    this.quickDiscoveryButton?.setAttribute('aria-pressed', String(this.discoveryOpen));
-
-    if (this.discoveryOpen) {
-      this.inboxOpen = false;
-      this.inboxButton?.removeClass('is-active');
-      this.quickInboxButton?.removeClass('is-active');
-      this.inboxButton?.setAttribute('aria-pressed', 'false');
-      this.quickInboxButton?.setAttribute('aria-pressed', 'false');
-      this.selectedId = null;
-      this.plugin.setSelectedNode(null);
-      this.canvas?.setSelected(null);
-    }
-
-    this.syncDiscoveryVisibility();
-    this.refresh();
+    const leaving = this.mode === 'discoveries';
+    this.discoveryThemeFilter = null;
+    this.setMode(leaving ? 'graph' : 'discoveries');
   }
 
   private renderDiscoveries(): void {
@@ -561,21 +553,7 @@ export class InterestSeedView extends ItemView {
 
   public showDiscoveriesForTheme(theme: string): void {
     this.discoveryThemeFilter = theme;
-    this.discoveryOpen = true;
-    this.inboxOpen = false;
-    this.discoveryButton?.addClass('is-active');
-    this.quickDiscoveryButton?.addClass('is-active');
-    this.inboxButton?.removeClass('is-active');
-    this.quickInboxButton?.removeClass('is-active');
-    this.discoveryButton?.setAttribute('aria-pressed', 'true');
-    this.quickDiscoveryButton?.setAttribute('aria-pressed', 'true');
-    this.inboxButton?.setAttribute('aria-pressed', 'false');
-    this.quickInboxButton?.setAttribute('aria-pressed', 'false');
-    this.selectedId = null;
-    this.plugin.setSelectedNode(null);
-    this.canvas?.setSelected(null);
-    this.syncDiscoveryVisibility();
-    this.refresh();
+    this.setMode('discoveries');
   }
 
   private select(nodeId: string | null): void {
@@ -585,27 +563,36 @@ export class InterestSeedView extends ItemView {
         new Notice('该节点被当前搜索或筛选隐藏，请先清除筛选再选择。');
         return;
       }
-      this.inboxOpen = false;
-      this.inboxButton?.removeClass('is-active');
-      this.quickInboxButton?.removeClass('is-active');
-      this.inboxButton?.setAttribute('aria-pressed', 'false');
-      this.quickInboxButton?.setAttribute('aria-pressed', 'false');
+      if (this.mode !== 'graph') {
+        this.mode = 'graph';
+        this.syncModeButtons();
+        this.syncDiscoveryVisibility();
+      }
     }
 
     this.selectedId = nodeId;
     this.plugin.setSelectedNode(nodeId);
-
     this.canvas?.setSelected(nodeId);
-    if (nodeId) {
-      this.canvas?.focusNode(nodeId);
-      this.detail?.renderSelection(nodeId);
-    } else if (this.inboxOpen) {
-      this.detail?.renderSuggestionInbox();
-    } else {
-      this.detail?.renderInsights(this.plugin.getInsights(), this.insightsScopeNote());
-    }
+    if (nodeId) this.canvas?.focusNode(nodeId);
 
+    this.renderDetail();
     this.updateUndoButtons();
+  }
+
+  private renderDetail(): void {
+    if (this.mode === 'discoveries') {
+      this.renderDiscoveries();
+      return;
+    }
+    if (this.mode === 'inbox') {
+      this.detail?.renderSuggestionInbox();
+      return;
+    }
+    if (this.selectedId) {
+      this.detail?.renderSelection(this.selectedId);
+      return;
+    }
+    this.detail?.renderInsights(this.plugin.getInsights(), this.insightsScopeNote());
   }
 
   private scheduleRefresh(): void {
@@ -617,8 +604,8 @@ export class InterestSeedView extends ItemView {
   }
 
   private syncDiscoveryVisibility(): void {
-    const showDiscovery = this.discoveryOpen;
-    if (this.discoveryOpen) this.detailHost?.removeClass('is-hidden');
+    const showDiscovery = this.mode === 'discoveries';
+    if (showDiscovery) this.detailHost?.removeClass('is-hidden');
     if (this.detailContentHost) {
       this.detailContentHost.toggleClass('is-hidden', showDiscovery);
       this.detailContentHost.style.display = showDiscovery ? 'none' : '';
@@ -798,12 +785,9 @@ export class InterestSeedView extends ItemView {
 
     if (filtered.nodeCount === 0) {
       this.canvasHost?.addClass('is-empty');
-      if (this.discoveryOpen) {
+      if (this.mode === 'discoveries' || this.mode === 'inbox') {
         this.detailHost?.removeClass('is-hidden');
-        this.renderDiscoveries();
-      } else if (this.inboxOpen) {
-        this.detailHost?.removeClass('is-hidden');
-        this.detail?.renderSuggestionInbox();
+        this.renderDetail();
       } else {
         this.detailHost?.addClass('is-hidden');
       }
@@ -851,10 +835,7 @@ export class InterestSeedView extends ItemView {
       if (viewport) this.canvas.setViewport(viewport);
     }
 
-    if (this.discoveryOpen) this.renderDiscoveries();
-    else if (this.inboxOpen) this.detail?.renderSuggestionInbox();
-    else if (this.selectedId) this.detail?.renderSelection(this.selectedId);
-    else this.detail?.renderInsights(this.plugin.getInsights(), this.insightsScopeNote());
+    this.renderDetail();
 
     this.renderFooter(this.plugin.getStatus());
     this.updateUndoButtons();
@@ -961,7 +942,11 @@ export class InterestSeedView extends ItemView {
     });
     setIcon(button, icon);
     button.createSpan({ text: label });
-    button.addEventListener('click', onClick);
+    button.addEventListener('click', () => {
+      onClick();
+      const owner = button.closest('details');
+      if (owner instanceof HTMLDetailsElement) owner.open = false;
+    });
     return button;
   }
 }
