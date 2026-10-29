@@ -41,7 +41,10 @@ graphs/
 # 本地审计与验收记录（不进入社区插件仓库）
 /*.md
 !README.md
-!RELEASE_NOTES_0.1.0.md`n!COMMUNITY_SUBMISSION.md
+!RELEASE_NOTES_0.1.0.md
+!RELEASE_NOTES_1.0.0.md
+!RELEASE_NOTES_1.1.0.md
+!COMMUNITY_SUBMISSION.md
 /1/
 /T2-B-BCF-*
 
