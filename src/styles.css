@@ -5198,27 +5198,41 @@ button.interestseed-inbox-node:hover {
    ============================================================ */
 .interestseed-experiment-modal.modal {
   width: min(820px, 94vw);
-  height: min(820px, 90vh);
+  height: auto;
+  max-height: min(820px, 90vh);
   padding: 0;
-  border: 1px solid var(--background-modifier-border);
+  border: 1px solid rgba(210, 218, 238, 0.14);
   border-radius: 18px;
-  background: var(--background-primary);
+  background: #0b0f19;
+  --background-primary: #0b0f19;
+  --background-secondary: #111826;
+  --background-secondary-alt: #151d2b;
+  --background-modifier-border: rgba(210, 218, 238, 0.14);
+  --text-normal: #f2efe9;
+  --text-muted: #9aa2b1;
+  --text-faint: #6f7887;
   overflow: hidden;
 }
-.interestseed-experiment-modal .modal-content { height: 100%; padding: 0; overflow: hidden; }
+.interestseed-experiment-modal .modal-content {
+  height: auto;
+  max-height: min(820px, 90vh);
+  padding: 0;
+  overflow: auto;
+}
 .interestseed-experiment {
   --exp-accent: #d97757;
   --exp-green: #7dcf9a;
-  --exp-ink: var(--text-normal);
-  --exp-muted: var(--text-muted);
+  --exp-ink: #f2efe9;
+  --exp-muted: #9aa2b1;
   box-sizing: border-box;
-  height: 100%;
+  height: auto;
+  max-height: min(820px, 90vh);
   overflow: auto;
   padding: 32px 36px 28px;
   background:
-    radial-gradient(80% 80% at 100% 0%, rgba(217,119,87,0.10), transparent 60%),
-    radial-gradient(60% 70% at 0% 100%, rgba(125,207,154,0.055), transparent 60%),
-    var(--background-primary);
+    radial-gradient(80% 80% at 100% 0%, rgba(217, 119, 87, 0.10), transparent 60%),
+    radial-gradient(60% 70% at 0% 100%, rgba(125, 207, 154, 0.055), transparent 60%),
+    #0b0f19;
 }
 .interestseed-experiment-header { display: flex; align-items: flex-start; gap: 14px; }
 .interestseed-experiment-mark {
@@ -5310,4 +5324,76 @@ button.interestseed-inbox-node:hover {
 .workspace-leaf-content .interestseed-detail-content {
   background: linear-gradient(180deg, #0d1320 0%, #080c15 100%) !important;
   color: #f2efe9 !important;
+}
+/* Cosmic surfaces: keep native controls and modals inside the same dark universe. */
+.interestseed-root.is-cosmic .interestseed-quickbar button,
+.interestseed-root.is-cosmic .interestseed-experiment-advance,
+.interestseed-root.is-cosmic .interestseed-filter-host button,
+.interestseed-root.is-cosmic .interestseed-action {
+  border-color: rgba(210, 218, 238, 0.14);
+  background: rgba(255, 255, 255, 0.045);
+  color: #c4ccda;
+}
+
+.interestseed-root.is-cosmic .interestseed-quickbar button:hover,
+.interestseed-root.is-cosmic .interestseed-experiment-advance:hover,
+.interestseed-root.is-cosmic .interestseed-filter-host button:hover {
+  border-color: rgba(232, 200, 132, 0.42);
+  background: rgba(232, 200, 132, 0.09);
+  color: #f0d6a0;
+}
+
+.interestseed-sprint-modal.modal,
+.interestseed-spark-modal.modal {
+  background: #0b0f19;
+  --background-primary: #0b0f19;
+  --background-secondary: #111826;
+  --text-normal: #f2efe9;
+  --text-muted: #9aa2b1;
+  --text-faint: #6f7887;
+  --background-modifier-border: rgba(210, 218, 238, 0.14);
+}
+
+.interestseed-sprint-modal .modal-content,
+.interestseed-spark-modal .modal-content {
+  background: #0b0f19;
+}
+
+body.theme-light .interestseed-sprint {
+  --sprint-ink: #f2efe9;
+  --sprint-muted: #9aa2b1;
+  background:
+    radial-gradient(70% 80% at 10% 0%, rgba(225, 128, 97, 0.12), transparent 58%),
+    radial-gradient(60% 70% at 100% 100%, rgba(94, 209, 223, 0.07), transparent 65%),
+    #0b0f19;
+}
+
+body.theme-light .interestseed-sprint-option {
+  border-color: rgba(210, 218, 238, 0.13);
+  background: rgba(255, 255, 255, 0.035);
+  color: #f2efe9;
+}
+
+body.theme-light .interestseed-sprint-option.is-selected {
+  border-color: rgba(225, 128, 97, 0.58);
+  background: rgba(225, 128, 97, 0.12);
+}
+
+.interestseed-spark {
+  background:
+    radial-gradient(90% 80% at 0% 0%, rgba(225, 128, 97, 0.12), transparent 55%),
+    #0b0f19;
+  color: #f2efe9;
+}
+
+.interestseed-spark-input,
+.interestseed-spark-target {
+  border-color: rgba(210, 218, 238, 0.15);
+  background: #111826;
+  color: #f2efe9;
+}
+
+.interestseed-spark-preview {
+  border-color: rgba(210, 218, 238, 0.12);
+  background: rgba(255, 255, 255, 0.035);
 }
