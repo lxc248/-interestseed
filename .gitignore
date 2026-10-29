@@ -44,6 +44,7 @@ graphs/
 !RELEASE_NOTES_0.1.0.md
 !RELEASE_NOTES_1.0.0.md
 !RELEASE_NOTES_1.1.0.md
+!RELEASE_NOTES_1.2.0.md
 !COMMUNITY_SUBMISSION.md
 /1/
 /T2-B-BCF-*
@@ -71,3 +72,5 @@ graphs/
 /review/sim-artifacts/
 
 /review/office-sim-artifacts/
+
+/review/real-life-sim-artifacts/

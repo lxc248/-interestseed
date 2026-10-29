@@ -79,4 +79,24 @@ describe('7-day interest experiment', () => {
     expect(canRecordToday(after, at(3)).ok).toBe(true);
     expect(experimentDay(after)).toBe(2);
   });
+
+  it('supports a 3-day starter that can be extended later', () => {
+    let state = createExperiment({
+      title: '3 天试跑',
+      hypothesis: '先看看这件事会不会自然发生。',
+      targetDays: 3,
+      startedAt: at(1).toISOString(),
+    });
+    expect(state.targetDays).toBe(3);
+    for (let day = 1; day <= 3; day += 1) {
+      state = recordExperimentLog(
+        state,
+        { interest: 4, energy: 3, evidence: `第 ${day} 天：一个真实发生的小证据。` },
+        at(day),
+      );
+    }
+    expect(state.status).toBe('complete');
+    expect(canRecordToday(state, at(4)).reason).toContain('3 天');
+    expect(experimentSummary(state).complete).toBe(true);
+  });
 });

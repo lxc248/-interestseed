@@ -36,6 +36,6 @@ describe('Seed Sprint simulation', () => {
         }
       }
     }
-    expect(combinations).toBe(384);
+    expect(combinations).toBe(512);
   });
 });

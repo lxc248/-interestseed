@@ -17,8 +17,10 @@ export class SparkCaptureModal extends Modal {
   constructor(
     app: App,
     private readonly plugin: InterestSeedPlugin,
+    initialText = '',
   ) {
     super(app);
+    this.text = initialText.trim();
     this.modalEl.addClass('interestseed-spark-modal');
   }
 
@@ -64,6 +66,7 @@ export class SparkCaptureModal extends Modal {
       this.text = input.value;
       this.updatePreview();
     });
+    input.value = this.text;
     input.focus();
 
     const target = root.createEl('select', { cls: 'interestseed-spark-target' });
@@ -110,6 +113,7 @@ export class SparkCaptureModal extends Modal {
     });
     this.submitEl.disabled = true;
     this.submitEl.addEventListener('click', () => this.submit());
+    this.updatePreview();
   }
 
   private updatePreview(): void {

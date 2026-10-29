@@ -6,7 +6,8 @@ export interface CommandHost {
   activateView(): Promise<void> | void;
   activateAgentView(): Promise<void> | void;
   openSeedSprint(): void;
-  openSparkCapture(): void;
+  openSparkCapture(initialText?: string): void;
+  openSparkFromClipboard(): Promise<void>;
   rebuildGraph(silent?: boolean): Promise<void>;
   exportGraph(): void;
   promptRebuild(): void;
@@ -45,6 +46,14 @@ export function registerCommands(plugin: Plugin, host: CommandHost): void {
     id: 'interestseed-spark',
     name: '记录一个兴趣火花',
     callback: () => host.openSparkCapture(),
+  });
+
+  plugin.addCommand({
+    id: 'interestseed-share-clipboard',
+    name: '从剪贴板记录分享（移动端快捷指令）',
+    callback: () => {
+      void host.openSparkFromClipboard();
+    },
   });
 
   plugin.addCommand({

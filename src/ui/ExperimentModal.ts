@@ -42,13 +42,34 @@ export class ExperimentModal extends Modal {
     const mark = header.createDiv({ cls: 'interestseed-experiment-mark' });
     setIcon(mark, 'flask-conical');
     const copy = header.createDiv();
-    copy.createDiv({ cls: 'interestseed-experiment-kicker', text: 'INTEREST EXPERIMENT · 7 DAYS' });
+    copy.createDiv({ cls: 'interestseed-experiment-kicker', text: `INTEREST EXPERIMENT · ${state.targetDays} DAYS` });
     copy.createEl('h2', { cls: 'interestseed-experiment-title', text: state.title });
-    copy.createEl('p', { cls: 'interestseed-experiment-hypothesis', text: state.hypothesis });
+    copy.createEl('p', {
+      cls: 'interestseed-experiment-hypothesis',
+      text:
+        state.targetDays === 3
+          ? state.hypothesis.replace('7 天', '3 天')
+          : state.hypothesis,
+    });
     copy.createDiv({ cls: 'interestseed-experiment-metric', text: state.metric });
+    if (state.targetDays === 7 && state.logs.length === 0 && state.status === 'active') {
+      const starter = copy.createEl('button', {
+        cls: 'interestseed-experiment-starter',
+        text: '先做 3 天试跑',
+        attr: { type: 'button' },
+      });
+      starter.style.setProperty('background', 'rgba(232, 200, 132, 0.10)', 'important');
+      starter.style.setProperty('color', '#e8c884', 'important');
+      starter.style.setProperty('border', '1px solid rgba(232, 200, 132, 0.30)', 'important');
+      starter.style.setProperty('border-radius', '6px', 'important');
+      starter.style.setProperty('padding', '2px 8px', 'important');
+      starter.addEventListener('click', () => {
+        if (this.plugin.startStarterExperiment()) this.render();
+      });
+    }
 
     const progress = root.createDiv({ cls: 'interestseed-experiment-progress' });
-    for (let day = 1; day <= 7; day += 1) {
+    for (let day = 1; day <= state.targetDays; day += 1) {
       const item = progress.createDiv({
         cls: `interestseed-experiment-day${day <= state.logs.length ? ' is-done' : ''}${day === state.logs.length + 1 && state.status !== 'complete' ? ' is-today' : ''}`,
       });
@@ -76,9 +97,19 @@ export class ExperimentModal extends Modal {
       review.createDiv({ cls: 'interestseed-experiment-review-title', text: '实验完成，做一次复盘' });
       review.createDiv({
         cls: 'interestseed-experiment-review-text',
-        text: `7 天平均兴趣 ${summary.averageInterest}/5，平均精力 ${summary.averageEnergy}/5。现在回看：这个兴趣值得继续、转向，还是先放下？`,
+        text: `${state.targetDays} 天平均兴趣 ${summary.averageInterest}/5，平均精力 ${summary.averageEnergy}/5。现在回看：这个兴趣值得继续、转向，还是先放下？`,
       });
       const actions = root.createDiv({ cls: 'interestseed-experiment-actions' });
+      if (state.targetDays === 3) {
+        const extend = actions.createEl('button', {
+          cls: 'interestseed-sprint-secondary',
+          text: '继续到 7 天',
+          attr: { type: 'button' },
+        });
+        extend.addEventListener('click', () => {
+          if (this.plugin.extendExperimentToSeven()) this.render();
+        });
+      }
       const close = actions.createEl('button', {
         cls: 'mod-cta interestseed-sprint-primary',
         text: '回到图谱',

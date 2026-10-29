@@ -10,6 +10,7 @@
  */
 
 export const EXPERIMENT_DAYS = 7;
+export const STARTER_DAYS = 3;
 
 export interface ExperimentLog {
   day: number;
@@ -26,6 +27,7 @@ export interface ExperimentState {
   hypothesis: string;
   metric: string;
   startedAt: string;
+  targetDays: number;
   status: 'active' | 'complete';
   logs: ExperimentLog[];
 }
@@ -44,6 +46,12 @@ function localDate(now: Date): string {
   return `${year}-${month}-${day}`;
 }
 
+function clampTarget(value: unknown): number {
+  const number = typeof value === 'number' ? value : Number(value);
+  if (!Number.isFinite(number)) return EXPERIMENT_DAYS;
+  return Math.min(30, Math.max(1, Math.round(number)));
+}
+
 function clampScore(value: unknown): number {
   const number = typeof value === 'number' ? value : Number(value);
   if (!Number.isFinite(number)) return 0;
@@ -55,12 +63,14 @@ export function createExperiment(input: {
   hypothesis: string;
   metric?: string;
   startedAt?: string;
+  targetDays?: number;
 }): ExperimentState {
   return {
     title: input.title.trim() || '7 天兴趣实验',
     hypothesis: input.hypothesis.trim() || '这个兴趣值得我投入一周的真实注意力。',
     metric: input.metric?.trim() || '每天记录一次兴趣强度（1–5）与一个具体证据。',
     startedAt: input.startedAt ?? new Date().toISOString(),
+    targetDays: clampTarget(input.targetDays),
     status: 'active',
     logs: [],
   };
@@ -87,14 +97,16 @@ export function parseExperiment(
             evidence: String(log.evidence ?? ''),
             ...(log.next ? { next: String(log.next) } : {}),
           }))
-          .slice(0, EXPERIMENT_DAYS)
+          .slice(0, clampTarget(state.targetDays))
       : [];
+    const targetDays = clampTarget(state.targetDays);
     return {
       title: String(state.title ?? fallbackTitle),
       hypothesis: String(state.hypothesis ?? '这个兴趣值得我投入一周的真实注意力。'),
       metric: String(state.metric ?? '每天记录一次兴趣强度（1–5）与一个具体证据。'),
       startedAt: String(state.startedAt ?? metadata.experimentStartedAt ?? ''),
-      status: logs.length >= EXPERIMENT_DAYS ? 'complete' : 'active',
+      targetDays,
+      status: logs.length >= targetDays ? 'complete' : 'active',
       logs,
     };
   }
@@ -103,21 +115,26 @@ export function parseExperiment(
     hypothesis: String(metadata.experimentHypothesis ?? '这个兴趣值得我投入一周的真实注意力。'),
     metric: String(metadata.experimentMetric ?? '每天记录一次兴趣强度（1–5）与一个具体证据。'),
     startedAt: String(metadata.experimentStartedAt ?? ''),
+    targetDays: EXPERIMENT_DAYS,
     status: 'active',
     logs: [],
   };
 }
 
 export function experimentDay(state: ExperimentState): number {
-  return Math.min(EXPERIMENT_DAYS, state.logs.length + 1);
+  return Math.min(state.targetDays, state.logs.length + 1);
 }
 
 export function canRecordToday(
   state: ExperimentState,
   now = new Date(),
 ): { ok: boolean; reason?: string; day: number } {
-  if (state.status === 'complete' || state.logs.length >= EXPERIMENT_DAYS) {
-    return { ok: false, reason: '7 天实验已经完成。', day: EXPERIMENT_DAYS };
+  if (state.status === 'complete' || state.logs.length >= state.targetDays) {
+    return {
+      ok: false,
+      reason: state.targetDays === STARTER_DAYS ? '3 天试跑已经完成。' : '7 天实验已经完成。',
+      day: state.targetDays,
+    };
   }
   const today = localDate(now);
   if (state.logs.some((log) => log.date === today)) {
@@ -150,7 +167,7 @@ export function recordExperimentLog(
   return {
     ...state,
     logs,
-    status: logs.length >= EXPERIMENT_DAYS ? 'complete' : 'active',
+    status: logs.length >= state.targetDays ? 'complete' : 'active',
   };
 }
 
@@ -169,6 +186,6 @@ export function experimentSummary(state: ExperimentState): {
     averageInterest: average('interest'),
     averageEnergy: average('energy'),
     days,
-    complete: days >= EXPERIMENT_DAYS,
+    complete: days >= state.targetDays,
   };
 }

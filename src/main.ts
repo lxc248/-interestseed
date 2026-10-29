@@ -59,10 +59,12 @@ import { AgentView, INTERESTSEED_AGENT_VIEW_TYPE } from './ui/AgentView';
 import { NodeCreateModal } from './ui/NodeCreateModal';
 import { SeedSprintModal } from './ui/SeedSprintModal';
 import { SparkCaptureModal } from './ui/SparkCaptureModal';
+import { analyzeShareText } from './services/shareAnalysis';
 import { GapCoachModal } from './ui/GapCoachModal';
 import { ExperimentModal } from './ui/ExperimentModal';
 import type { Insight } from './core/InsightEngine';
 import {
+  STARTER_DAYS,
   canRecordToday,
   createExperiment,
   experimentSummary,
@@ -287,6 +289,10 @@ export default class InterestSeedPlugin extends Plugin {
       void this.activateAgentView();
     });
     registerCommands(this, this);
+    this.registerObsidianProtocolHandler('interestseed-share', (params) => {
+      const text = typeof params.text === 'string' ? params.text : '';
+      this.openSparkCapture(text);
+    });
     this.addSettingTab(new InterestSeedSettingsTab(this.app, this));
 
     this.statusBarEl = this.addStatusBarItem();
@@ -392,7 +398,7 @@ export default class InterestSeedPlugin extends Plugin {
     return {
       node,
       state,
-      day: Math.min(7, state.logs.length + 1),
+      day: Math.min(state.targetDays, state.logs.length + 1),
       gate: canRecordToday(state),
       summary: experimentSummary(state),
     };
@@ -428,7 +434,7 @@ export default class InterestSeedPlugin extends Plugin {
       void this.persist();
       new Notice(
         state.status === 'complete'
-          ? '7 天实验完成。现在可以回看你的兴趣曲线。'
+          ? `${state.targetDays} 天实验完成。现在可以回看你的兴趣曲线。`
           : `第 ${state.logs.length} 天已记录。明天再来。`,
       );
       return true;
@@ -436,6 +442,77 @@ export default class InterestSeedPlugin extends Plugin {
       new Notice(error instanceof Error ? error.message : '实验记录失败。');
       return false;
     }
+  }
+
+  startStarterExperiment(): boolean {
+    const active = this.getActiveExperiment();
+    if (!active) {
+      new Notice('还没有进行中的实验。');
+      return false;
+    }
+    if (active.state.logs.length > 0 || active.state.status === 'complete') {
+      new Notice('已经有记录，不能再切换成 3 天试跑。');
+      return false;
+    }
+    const state: ExperimentState = {
+      ...active.state,
+      title: '3 天兴趣试跑',
+      targetDays: STARTER_DAYS,
+      hypothesis: active.state.hypothesis
+        .replace('7 天', '3 天')
+        .replace('一周', '三天'),
+      metric: '先做 3 天：每天记录一次兴趣强度、精力值和一个具体证据；3 条有效记录即完成。',
+    };
+    this.session.updateNode(
+      active.node.id,
+      {
+        title: state.title,
+        metadata: {
+          ...active.node.metadata,
+          experimentState: state,
+          experimentStatus: state.status,
+        },
+      },
+      '开始 3 天兴趣试跑',
+    );
+    this.insightsCache = null;
+    this.notifyStatus();
+    void this.persist();
+    new Notice('已切换为 3 天试跑。先看它能不能自然发生。');
+    return true;
+  }
+
+  extendExperimentToSeven(): boolean {
+    const active = this.getActiveExperiment();
+    if (!active || active.state.targetDays !== STARTER_DAYS) return false;
+    if (active.state.logs.length < STARTER_DAYS) {
+      new Notice('先完成 3 天试跑，再决定是否延长。');
+      return false;
+    }
+    const state: ExperimentState = {
+      ...active.state,
+      title: '7 天兴趣实验',
+      targetDays: 7,
+      status: 'active',
+      metric: '继续 4 天：每天记录一次兴趣强度、精力值和一个具体证据；7 条有效记录才完成。',
+    };
+    this.session.updateNode(
+      active.node.id,
+      {
+        title: state.title,
+        metadata: {
+          ...active.node.metadata,
+          experimentState: state,
+          experimentStatus: state.status,
+        },
+      },
+      '把 3 天试跑延长为 7 天实验',
+    );
+    this.insightsCache = null;
+    this.notifyStatus();
+    void this.persist();
+    new Notice('已延长为 7 天实验。接下来 4 天继续记录。');
+    return true;
   }
 
   openGapCoach(insight: Insight): void {
@@ -489,8 +566,21 @@ export default class InterestSeedPlugin extends Plugin {
     return id;
   }
 
-  openSparkCapture(): void {
-    new SparkCaptureModal(this.app, this).open();
+  openSparkCapture(initialText = ''): void {
+    new SparkCaptureModal(this.app, this, initialText).open();
+  }
+
+  async openSparkFromClipboard(): Promise<void> {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (!text.trim()) {
+        new Notice('剪贴板里没有可识别的分享内容。');
+        return;
+      }
+      this.openSparkCapture(text);
+    } catch {
+      new Notice('无法读取剪贴板。请在手机快捷指令中使用 interestseed-share 链接，或手动粘贴。');
+    }
   }
 
   isVideoSpark(text: string): boolean {
@@ -530,19 +620,22 @@ export default class InterestSeedPlugin extends Plugin {
     }
     const now = new Date().toISOString();
     const video = this.isVideoSpark(value);
+    const analysis = analyzeShareText(value);
     this.session.addNode(
       {
         id,
         type: video ? 'video' : 'topic',
         title,
         ...(url ? { sourceUri: url } : {}),
-        tags: ['火花', video ? '视频' : '文本'],
+        tags: ['火花', video ? '视频' : '文本', ...analysis.topics],
         createdAt: now,
         updatedAt: now,
         metadata: {
           spark: true,
           raw: value,
           capturedAt: now,
+          platform: analysis.platform,
+          topics: analysis.topics,
           ...(why?.trim() ? { why: why.trim() } : {}),
         },
       },

@@ -45,6 +45,9 @@ export class InterestSeedView extends ItemView {
   private nextStepTitleEl: HTMLElement | null = null;
   private nextStepDetailEl: HTMLElement | null = null;
   private nextStepButton: HTMLButtonElement | null = null;
+  private clusterRailEl: HTMLElement | null = null;
+  private clusterFocus: string | null = null;
+  private clusterInitialized = false;
   private footerScanEl: HTMLElement | null = null;
   private footerSaveEl: HTMLElement | null = null;
   private footerErrorEl: HTMLElement | null = null;
@@ -163,6 +166,8 @@ export class InterestSeedView extends ItemView {
       attr: { type: 'button' },
     });
 
+    this.clusterRailEl = root.createDiv({ cls: 'interestseed-cluster-rail is-hidden' });
+
     if (!this.plugin.settings.seedSprintCompletedAt) {
       const sprintBanner = root.createDiv({ cls: 'interestseed-sprint-banner' });
       const sprintMark = sprintBanner.createDiv({ cls: 'interestseed-sprint-banner-mark' });
@@ -199,14 +204,14 @@ export class InterestSeedView extends ItemView {
         text:
           experiment.state.status === 'complete'
             ? 'EXPERIMENT COMPLETE · REVIEW'
-            : `INTEREST EXPERIMENT · DAY ${experiment.day} / 7`,
+            : `INTEREST EXPERIMENT · DAY ${experiment.day} / ${experiment.state.targetDays}`,
       });
       stripCopy.createDiv({
         cls: 'interestseed-experiment-strip-title',
         text: experiment.state.title,
       });
       const dots = stripCopy.createDiv({ cls: 'interestseed-experiment-dots' });
-      for (let day = 1; day <= 7; day += 1) {
+      for (let day = 1; day <= experiment.state.targetDays; day += 1) {
         const dot = dots.createSpan({ cls: 'interestseed-experiment-dot' });
         if (day <= experiment.state.logs.length) dot.addClass('is-done');
         if (day === experiment.gate.day && experiment.state.status !== 'complete') {
@@ -676,6 +681,68 @@ export class InterestSeedView extends ItemView {
     host.removeClass('is-hidden');
   }
 
+  private renderClusterRail(total: number): void {
+    const host = this.clusterRailEl;
+    if (!host || !this.canvas) return;
+    const summaries = this.canvas.getClusterSummaries();
+    if (total === 0) {
+      this.clusterFocus = null;
+      this.clusterInitialized = false;
+      host.addClass('is-hidden');
+      return;
+    }
+    if (summaries.length < 2) {
+      host.addClass('is-hidden');
+      return;
+    }
+
+    if (!this.clusterInitialized && total >= 8) {
+      const largest = [...summaries].sort((left, right) => right.count - left.count)[0];
+      if (largest) {
+        this.clusterFocus = largest.key;
+        this.clusterInitialized = true;
+        this.canvas.setClusterFocus(largest.key);
+      }
+    }
+    if (this.clusterFocus && !summaries.some((cluster) => cluster.key === this.clusterFocus)) {
+      this.clusterFocus = null;
+      this.canvas.setClusterFocus(null);
+    }
+
+    host.empty();
+    host.removeClass('is-hidden');
+    const actualFocus = this.canvas.getClusterFocus();
+    if (actualFocus !== this.clusterFocus) this.clusterFocus = actualFocus;
+    host.createSpan({ cls: 'interestseed-cluster-rail-label', text: '主题' });
+    const all = host.createEl('button', {
+      cls: `interestseed-cluster-chip${this.clusterFocus === null ? ' is-active' : ''}`,
+      text: `全部 ${total}`,
+      attr: { type: 'button' },
+    });
+    all.addEventListener('click', () => {
+      this.clusterFocus = null;
+      this.canvas?.setClusterFocus(null);
+      this.renderClusterRail(total);
+    });
+    for (const cluster of summaries) {
+      const chip = host.createEl('button', {
+        cls: `interestseed-cluster-chip${this.clusterFocus === cluster.key ? ' is-active' : ''}`,
+        text: `${cluster.label} ${cluster.count}`,
+        attr: { type: 'button' },
+      });
+      chip.style.setProperty('--cluster-color', cluster.color);
+      chip.style.setProperty('color', '#d8deea', 'important');
+      if (this.clusterFocus === cluster.key) {
+        chip.style.setProperty('color', '#f7f2e4', 'important');
+      }
+      chip.addEventListener('click', () => {
+        this.clusterFocus = cluster.key;
+        this.canvas?.setClusterFocus(cluster.key);
+        this.renderClusterRail(total);
+      });
+    }
+  }
+
   private refresh(): void {
     if (!this.canvas || !this.emptyState) return;
     this.syncDiscoveryVisibility();
@@ -690,6 +757,7 @@ export class InterestSeedView extends ItemView {
     this.contentEl.toggleClass('has-graph', total > 0);
     this.contentEl.toggleClass('has-experiment', Boolean(this.plugin.getActiveExperiment()));
     this.renderNextStep();
+    if (total === 0) this.renderClusterRail(0);
 
     if (
       this.selectedId &&
@@ -753,6 +821,7 @@ export class InterestSeedView extends ItemView {
     this.detailHost?.removeClass('is-hidden');
 
     this.canvas.setGraph(filtered.graph, this.selectedId);
+    this.renderClusterRail(total);
 
     if (!this.viewportApplied) {
       this.viewportApplied = true;

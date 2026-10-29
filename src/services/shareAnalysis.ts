@@ -43,6 +43,9 @@ const TOPIC_RULES: Array<{ topic: string; test: RegExp }> = [
   { topic: '学习与认知', test: /学习|课程|考试|大学|作业|论文|认知|记忆/i },
   { topic: '产品与商业', test: /产品|创业|增长|用户|需求|商业|项目/i },
   { topic: '城市与生活', test: /城市|空间|旅行|生活|消费|退款|租房/i },
+  { topic: '美妆与风格', test: /美妆|化妆|护肤|穿搭|口红|妆容|底妆|彩妆|发型|风格/i },
+  { topic: '运动与身体', test: /健身|运动|跑步|瑜伽|篮球|足球|羽毛球|深蹲|减脂|拉伸/i },
+  { topic: '游戏与虚拟世界', test: /游戏|网游|手游|电竞|steam|主机|玩家|开放世界|塞尔达|英雄联盟|lpl/i },
 ];
 
 const SHARE_NOISE = [

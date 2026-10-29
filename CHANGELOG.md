@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.2.0 — Three-day starter and theme-first map
+
+- Added a 3-day starter experiment that can be extended to 7 days after review.
+- Added a theme rail with cluster focus; long graphs open on one theme instead of every planet.
+- Added mobile share entry through `obsidian://interestseed-share` and clipboard intake.
+- Added real-life interest choices: beauty/style and games/virtual worlds.
+- Added life-topic inference for makeup, sport, games and open-world content.
+- Fixed initial-text spark cards not enabling their primary action.
+- Added a complete real-life 7-day report with screenshot index.
+
 ## 1.1.0 — Clear next action
 
 - Global audit of the student and office-worker journeys.

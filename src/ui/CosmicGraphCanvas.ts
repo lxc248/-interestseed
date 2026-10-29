@@ -58,6 +58,9 @@ const CLUSTER_STYLE: Record<string, { label: string; color: string }> = {
   genesis: { label: '兴趣起跑', color: '#e18061' },
   projects: { label: '项目轨道', color: '#9c8cff' },
   expression: { label: '表达轨道', color: '#e6b66a' },
+  beauty: { label: '风格轨道', color: '#e9a0b4' },
+  body: { label: '身体轨道', color: '#7dd9ad' },
+  game: { label: '游戏轨道', color: '#8f9cff' },
   city: { label: '城市轨道', color: '#5ed1df' },
   experiment: { label: '实验轨道', color: '#7dd9ad' },
   other: { label: '其他轨道', color: '#969ca8' },
@@ -108,6 +111,9 @@ function graphLabel(title: string): string {
 function clusterKey(node: InterestSeedNode): string {
   const tags = node.tags.map((tag) => tag.toLowerCase());
   if (tags.includes('兴趣起跑')) return 'genesis';
+  if (tags.some((tag) => /美妆|穿搭|风格|护肤|妆容/.test(tag))) return 'beauty';
+  if (tags.some((tag) => /游戏|玩家|虚拟世界|电竞/.test(tag))) return 'game';
+  if (tags.some((tag) => /运动|身体|健身|跑步|健康/.test(tag))) return 'body';
   if (tags.includes('城市') || tags.includes('空间')) return 'city';
   if (tags.includes('设计') || tags.includes('表达') || tags.includes('影像')) {
     return 'expression';
@@ -130,6 +136,7 @@ export class CosmicGraphCanvas {
   private nodes: CosmicNode[] = [];
   private edges: CosmicEdge[] = [];
   private clusters = new Map<string, Cluster>();
+  private focusCluster: string | null = null;
   private selectedId: string | null = null;
   private hoveredId: string | null = null;
   private width = 0;
@@ -286,10 +293,31 @@ export class CosmicGraphCanvas {
       if (source && target) this.edges.push({ edge, source, target });
     }
     this.selectedId = selectedId;
+    if (this.focusCluster && !this.clusters.has(this.focusCluster)) {
+      this.focusCluster = null;
+    }
     const firstGraph = !this.hasGraph;
     this.hasGraph = true;
-    if (firstGraph) this.zoomToFit();
+    if (firstGraph || this.focusCluster) this.zoomToFit();
     else this.draw();
+  }
+
+  getClusterSummaries(): Array<{ key: string; label: string; count: number; color: string }> {
+    return [...this.clusters.values()].map((cluster) => ({
+      key: cluster.key,
+      label: cluster.label,
+      count: cluster.count,
+      color: cluster.color,
+    }));
+  }
+
+  setClusterFocus(key: string | null): void {
+    this.focusCluster = key && this.clusters.has(key) ? key : null;
+    this.zoomToFit();
+  }
+
+  getClusterFocus(): string | null {
+    return this.focusCluster;
   }
 
   setSelected(nodeId: string | null): void {
@@ -339,11 +367,13 @@ export class CosmicGraphCanvas {
 
   zoomToFit(): void {
     if (this.nodes.length === 0 || this.width <= 0 || this.height <= 0) return;
+    const fitNodes = this.visibleNodes();
+    const source = fitNodes.length > 0 ? fitNodes : this.nodes;
     let minX = Infinity;
     let minY = Infinity;
     let maxX = -Infinity;
     let maxY = -Infinity;
-    for (const node of this.nodes) {
+    for (const node of source) {
       minX = Math.min(minX, node.x - 135);
       minY = Math.min(minY, node.y - 105);
       maxX = Math.max(maxX, node.x + 135);
@@ -415,6 +445,16 @@ export class CosmicGraphCanvas {
     };
   }
 
+  private isNodeVisible(node: CosmicNode): boolean {
+    return this.focusCluster === null || node.cluster === this.focusCluster;
+  }
+
+  private visibleNodes(): CosmicNode[] {
+    return this.focusCluster === null
+      ? this.nodes
+      : this.nodes.filter((node) => node.cluster === this.focusCluster);
+  }
+
   private draw(): void {
     if (this.disposed) return;
     const { ctx, width, height } = this;
@@ -426,7 +466,7 @@ export class CosmicGraphCanvas {
     this.drawOrbits();
     this.drawEdges();
     this.drawClusterStars();
-    for (const node of this.nodes) this.drawPlanet(node);
+    for (const node of this.visibleNodes()) this.drawPlanet(node);
     this.drawLabels();
   }
 
@@ -655,6 +695,7 @@ export class CosmicGraphCanvas {
   private drawEdges(): void {
     const activeId = this.selectedId ?? this.hoveredId;
     for (const edge of this.edges) {
+      if (!this.isNodeVisible(edge.source) || !this.isNodeVisible(edge.target)) continue;
       const curve = this.edgeCurve(edge);
       const stroke = edge.edge.status === 'suggested' ? '#b98f3c' : '#e8c884';
       const active =
@@ -810,7 +851,7 @@ export class CosmicGraphCanvas {
 
   private drawLabels(): void {
     const boxes: Array<{ x: number; y: number; w: number; h: number }> = [];
-    const ordered = [...this.nodes].sort(
+    const ordered = [...this.visibleNodes()].sort(
       (a, b) =>
         (b.id === this.selectedId ? 1 : 0) - (a.id === this.selectedId ? 1 : 0) ||
         b.degree - a.degree,
@@ -885,7 +926,7 @@ export class CosmicGraphCanvas {
   private nodeAt(x: number, y: number): CosmicNode | null {
     for (let index = this.nodes.length - 1; index >= 0; index -= 1) {
       const node = this.nodes[index];
-      if (!node) continue;
+      if (!node || !this.isNodeVisible(node)) continue;
       const p = this.screen(node);
       const r = Math.max(11, node.radius * this.zoom);
       if ((x - p.x) ** 2 + (y - p.y) ** 2 <= (r + 8) ** 2) return node;
