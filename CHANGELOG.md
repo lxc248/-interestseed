@@ -7,6 +7,8 @@
 - Moved scales, evidence and next-step fields into optional details.
 - Added a compact, scroll-safe experiment modal.
 - Kept the strict one-record-per-day and no-fake-progress model.
+- Unified overview and explorer modals with the dark graph surface.
+- Added a visible active state to explorer tabs.
 
 ## 1.5.3 — Cold-start questionnaire and validation track
 

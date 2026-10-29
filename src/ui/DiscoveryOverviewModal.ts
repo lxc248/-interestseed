@@ -19,6 +19,7 @@ export class DiscoveryOverviewModal extends Modal {
   }
 
   override onOpen(): void {
+    this.modalEl.addClass('interestseed-overview-modal');
     this.titleEl.setText('兴趣总览');
     this.contentEl.empty();
     this.contentEl.addClass('interestseed-overview');

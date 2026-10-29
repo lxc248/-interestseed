@@ -6161,3 +6161,145 @@ body.theme-light .interestseed-sprint-option.is-selected {
 }
 .interestseed-experiment { padding-bottom: 46px; }
 .interestseed-experiment-more { padding-bottom: 14px; }
+.interestseed-experiment-more { margin-bottom: 18px; }
+/* Keep read-only overview/explorer on the same dark surface as the main view. */
+.modal.interestseed-overview-modal,
+.modal.interestseed-insight-modal {
+  --background-primary: #0b0f19 !important;
+  --background-secondary: #0d1320 !important;
+  --background-modifier-border: rgba(210, 218, 238, 0.14) !important;
+  --text-normal: #f2efe9 !important;
+  --text-muted: #9aa5b7 !important;
+  --text-faint: #7f8a9c !important;
+  --is-border: rgba(210, 218, 238, 0.14) !important;
+  --is-v2-line: rgba(210, 218, 238, 0.14) !important;
+  --is-v2-surface: rgba(255, 255, 255, 0.035) !important;
+  color: #f2efe9 !important;
+}
+.modal.interestseed-overview-modal .modal-content,
+.modal.interestseed-insight-modal .modal-content {
+  background: radial-gradient(900px 420px at 15% -10%, rgba(139, 92, 246, 0.12), transparent 70%), #0b0f19 !important;
+  color: #f2efe9 !important;
+}
+.interestseed-overview-modal .modal-title,
+.interestseed-overview-modal .interestseed-overview-note {
+  color: #9aa5b7 !important;
+}
+.interestseed-overview-modal .interestseed-overview {
+  max-width: 720px;
+  padding: 22px 26px 30px;
+  color: #f2efe9;
+}
+.interestseed-overview-modal .interestseed-overview-section {
+  border-color: rgba(210, 218, 238, 0.13) !important;
+  background: rgba(255, 255, 255, 0.035) !important;
+  color: #f2efe9 !important;
+}
+.interestseed-overview-modal .interestseed-overview-row {
+  color: #c9d2df !important;
+  border-bottom-color: rgba(210, 218, 238, 0.09) !important;
+}
+.interestseed-overview-modal .interestseed-overview-row strong,
+.interestseed-overview-modal .interestseed-overview-section h3 {
+  color: #f2efe9 !important;
+}
+.interestseed-overview-modal .interestseed-overview-stat {
+  border-color: rgba(210, 218, 238, 0.14) !important;
+  background: rgba(255, 255, 255, 0.045) !important;
+  color: #f2efe9 !important;
+}
+.interestseed-overview-modal .interestseed-overview-stat-value {
+  color: #e8c884 !important;
+}
+.interestseed-overview-modal .interestseed-overview-stat-label {
+  color: #9aa5b7 !important;
+}
+.interestseed-overview-modal .interestseed-activity-track {
+  background: rgba(255, 255, 255, 0.07) !important;
+}
+.interestseed-overview-modal .interestseed-activity-label,
+.interestseed-overview-modal .interestseed-activity-value {
+  color: #9aa5b7 !important;
+}
+.interestseed-insight-shell {
+  --is-insight-panel: #0d1320 !important;
+  --is-insight-soft: rgba(139, 92, 246, 0.06) !important;
+  --is-insight-line: rgba(210, 218, 238, 0.14) !important;
+  color: #f2efe9 !important;
+}
+.interestseed-insight-modal .interestseed-insight-hero {
+  background: transparent !important;
+}
+.interestseed-insight-modal .interestseed-insight-subtitle,
+.interestseed-insight-modal .interestseed-insight-section-subtitle {
+  color: #9aa5b7 !important;
+}
+.interestseed-insight-modal .interestseed-insight-stats,
+.interestseed-insight-modal .interestseed-insight-section,
+.interestseed-insight-modal .interestseed-insight-theme-card,
+.interestseed-insight-modal .interestseed-explorer-matrix-wrap {
+  color: #f2efe9 !important;
+}
+.interestseed-insight-modal .interestseed-insight-stat,
+.interestseed-insight-modal .interestseed-insight-theme-card,
+.interestseed-insight-modal .interestseed-explorer-matrix-wrap {
+  border-color: rgba(210, 218, 238, 0.14) !important;
+  background: rgba(255, 255, 255, 0.035) !important;
+}
+.interestseed-insight-modal .interestseed-insight-tabs {
+  border-bottom-color: rgba(210, 218, 238, 0.14) !important;
+}
+.interestseed-insight-modal .interestseed-explorer-matrix th,
+.interestseed-insight-modal .interestseed-explorer-matrix td {
+  border-bottom-color: rgba(210, 218, 238, 0.10) !important;
+  color: #b9c2d0 !important;
+}
+.interestseed-insight-modal .interestseed-explorer-matrix thead th {
+  color: #8995a8 !important;
+}
+.interestseed-insight-modal .interestseed-insight-ai-note,
+.interestseed-insight-modal .interestseed-insight-ai-actions {
+  background: rgba(255, 255, 255, 0.035) !important;
+  border-color: rgba(210, 218, 238, 0.14) !important;
+}
+.modal.interestseed-overview-modal,
+.modal.interestseed-insight-modal {
+  background: #0b0f19 !important;
+}
+.modal.interestseed-overview-modal .modal-header,
+.modal.interestseed-insight-modal .modal-header {
+  background: #0b0f19 !important;
+}
+.modal.interestseed-overview-modal .modal-title { color: #f2efe9 !important; }
+.interestseed-insight-modal .interestseed-insight-tab {
+  border-color: transparent !important;
+  background: transparent !important;
+  color: #8995a8 !important;
+}
+.interestseed-insight-modal .interestseed-insight-tab:hover {
+  border-color: rgba(210, 218, 238, 0.16) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: #f2efe9 !important;
+}
+.interestseed-insight-modal .interestseed-insight-tab.is-active {
+  border-color: rgba(139, 92, 246, 0.35) !important;
+  background: rgba(139, 92, 246, 0.12) !important;
+  color: #f2efe9 !important;
+  box-shadow: inset 0 -2px 0 #8b5cf6 !important;
+}
+.interestseed-insight-modal .interestseed-insight-shell button:not(.mod-cta):not(.modal-close-button) {
+  border-color: rgba(210, 218, 238, 0.16) !important;
+  background: rgba(255, 255, 255, 0.045) !important;
+  color: #c9d2df !important;
+}
+.interestseed-insight-modal .interestseed-insight-shell button:not(.mod-cta):not(.modal-close-button):hover {
+  border-color: rgba(232, 200, 132, 0.4) !important;
+  background: rgba(232, 200, 132, 0.09) !important;
+  color: #f0d6a0 !important;
+}
+.interestseed-insight-modal .interestseed-insight-tabs button.interestseed-insight-tab.is-active {
+  border-color: rgba(139, 92, 246, 0.38) !important;
+  background: rgba(139, 92, 246, 0.16) !important;
+  color: #f2efe9 !important;
+  box-shadow: inset 0 -2px 0 #8b5cf6 !important;
+}
