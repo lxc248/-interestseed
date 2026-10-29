@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.1.0 — Source-aware Context Inbox
+
+- Added source metadata to Share Inbox items: share, clipboard, note.
+- Added “把当前笔记加入分享收件箱”.
+- Displayed source labels in list and focus cards.
+- Kept local-first behavior: no account, no credits, no platform scraping.
+- Preserved backward compatibility with existing inbox data.
+
 ## 2.0.0 — Full acceptance release
 
 - Completed a full build, typecheck, lint and test pass.

@@ -1,12 +1,14 @@
 import { hashString } from '../utils/ids';
 
 export type InboxStatus = 'pending' | 'kept' | 'passed';
+export type InboxSource = 'share' | 'clipboard' | 'note';
 
 export interface ShareInboxItem {
   id: string;
   text: string;
   addedAt: string;
   status: InboxStatus;
+  source: InboxSource;
 }
 
 export interface EnqueueResult {
@@ -32,7 +34,7 @@ export class ShareInbox {
     this.maxItems = maxItems;
   }
 
-  enqueue(text: string, now = new Date().toISOString()): EnqueueResult | null {
+  enqueue(text: string, source: InboxSource = 'share', now = new Date().toISOString()): EnqueueResult | null {
     const value = text.trim();
     if (!value) return null;
     const key = normalizeKey(value);
@@ -45,6 +47,7 @@ export class ShareInbox {
       text: value,
       addedAt: now,
       status: 'pending',
+      source,
     };
     this.items = [item, ...this.items].slice(0, this.maxItems);
     return { item, duplicate: false };
@@ -84,6 +87,9 @@ export class ShareInbox {
         status: (item.status === 'kept' || item.status === 'passed'
           ? item.status
           : 'pending') as InboxStatus,
+        source: (item.source === 'clipboard' || item.source === 'note'
+          ? item.source
+          : 'share') as InboxSource,
       }))
       .filter((item) => item.id && item.text)
       .slice(0, this.maxItems);

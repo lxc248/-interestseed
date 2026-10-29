@@ -61,7 +61,7 @@ import { SeedSprintModal } from './ui/SeedSprintModal';
 import { SparkCaptureModal } from './ui/SparkCaptureModal';
 import { ShareCardModal } from './ui/ShareCardModal';
 import { ShareInboxModal } from './ui/ShareInboxModal';
-import { ShareInbox } from './inbox/ShareInbox';
+import { ShareInbox, type InboxSource } from './inbox/ShareInbox';
 import { analyzeShareText } from './services/shareAnalysis';
 import { GapCoachModal } from './ui/GapCoachModal';
 import { ExperimentModal } from './ui/ExperimentModal';
@@ -298,7 +298,7 @@ export default class InterestSeedPlugin extends Plugin {
     registerCommands(this, this);
     this.registerObsidianProtocolHandler('interestseed-share', (params) => {
       const text = typeof params.text === 'string' ? params.text : '';
-      const result = this.enqueueShare(text);
+      const result = this.enqueueShare(text, 'clipboard');
       this.openSparkCapture(text, result?.item.id);
     });
     this.addSettingTab(new InterestSeedSettingsTab(this.app, this));
@@ -591,10 +591,33 @@ export default class InterestSeedPlugin extends Plugin {
     new ShareInboxModal(this.app, this).open();
   }
 
-  enqueueShare(text: string): ReturnType<ShareInbox['enqueue']> {
-    const result = this.inbox.enqueue(text);
+  enqueueShare(text: string, source: InboxSource = 'share'): ReturnType<ShareInbox['enqueue']> {
+    const result = this.inbox.enqueue(text, source);
     if (result) void this.persist();
     return result;
+  }
+
+  async enqueueActiveNote(): Promise<void> {
+    const file = this.app.workspace.getActiveFile();
+    if (!file || file.extension !== 'md') {
+      new Notice('先打开一篇 Markdown 笔记，再加入收件箱。');
+      return;
+    }
+    const content = (await this.app.vault.cachedRead(file))
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 1600);
+    if (!content) {
+      new Notice('这篇笔记是空的，没有可加入的内容。');
+      return;
+    }
+    const result = this.enqueueShare(`${file.basename}\n${content}`, 'note');
+    if (!result) {
+      new Notice('当前笔记没有可加入的内容。');
+      return;
+    }
+    new Notice(result.duplicate ? '这篇笔记已经在收件箱里了。' : '已把当前笔记放进收件箱。');
+    this.openInbox();
   }
 
   getPendingInboxItems(): ReturnType<ShareInbox['pending']> {
@@ -612,7 +635,7 @@ export default class InterestSeedPlugin extends Plugin {
         new Notice('剪贴板里没有可识别的分享内容。');
         return;
       }
-      const result = this.enqueueShare(text);
+      const result = this.enqueueShare(text, 'clipboard');
       this.openSparkCapture(text, result?.item.id);
     } catch {
       new Notice('无法读取剪贴板。请在手机快捷指令中使用 interestseed-share 链接，或手动粘贴。');

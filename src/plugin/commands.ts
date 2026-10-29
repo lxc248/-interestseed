@@ -11,6 +11,7 @@ export interface CommandHost {
   openSparkFromClipboard(): Promise<void>;
   openShareCard(): void;
   openInbox(): void;
+  enqueueActiveNote(): Promise<void> | void;
   openExperiment(): void;
   recordQuickExperiment(kind: QuickCheckInKind): boolean;
   rebuildGraph(silent?: boolean): Promise<void>;
@@ -71,6 +72,14 @@ export function registerCommands(plugin: Plugin, host: CommandHost): void {
     id: 'interestseed-inbox',
     name: '打开分享收件箱（列表 / 专注）',
     callback: () => host.openInbox(),
+  });
+
+  plugin.addCommand({
+    id: 'interestseed-note-inbox',
+    name: '把当前笔记加入分享收件箱',
+    callback: () => {
+      void host.enqueueActiveNote();
+    },
   });
 
   plugin.addCommand({

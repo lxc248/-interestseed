@@ -6513,3 +6513,10 @@ body.theme-light .interestseed-sprint-option.is-selected {
 .interestseed-experiment-more { margin-bottom: 44px; }
 .interestseed-experiment-more > summary { padding-bottom: 10px; }
 .interestseed-inbox-add-details > summary { padding-bottom: 8px; }
+.interestseed-inbox-source {
+  padding: 2px 6px;
+  border: 1px solid rgba(210, 218, 238, 0.12);
+  border-radius: 99px;
+  color: #8793a5;
+  font-size: 8px;
+}

@@ -38,4 +38,14 @@ describe('Share Inbox', () => {
     expect(restored.pendingCount()).toBe(2);
     expect(restored.all()[0]?.text).toBe('运动');
   });
+
+  it('preserves the source of a context packet', () => {
+    const inbox = new ShareInbox();
+    inbox.enqueue('课程笔记：观察用户如何停下', 'note');
+    const raw = inbox.serialize();
+    const restored = new ShareInbox();
+    restored.load(raw);
+    expect(restored.pending()[0]?.source).toBe('note');
+    expect(restored.pending()[0]?.text).toContain('课程笔记');
+  });
 });

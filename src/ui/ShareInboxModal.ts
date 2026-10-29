@@ -2,7 +2,7 @@ import { Modal, Notice, setIcon } from 'obsidian';
 import type { App } from 'obsidian';
 import type InterestSeedPlugin from '../main';
 import { analyzeShareText } from '../services/shareAnalysis';
-import type { ShareInboxItem } from '../inbox/ShareInbox';
+import type { InboxSource, ShareInboxItem } from '../inbox/ShareInbox';
 
 /**
  * Share Inbox: a familiar list by default, with an optional Focus Deck.
@@ -10,6 +10,12 @@ import type { ShareInboxItem } from '../inbox/ShareInbox';
  * One card, one decision, swipe or press. The queue never becomes a wall of
  * cards; adding another share is deliberately tucked away below the card.
  */
+function sourceLabel(source: InboxSource): string {
+  if (source === 'note') return 'Obsidian 笔记';
+  if (source === 'clipboard') return '剪贴板';
+  return '分享';
+}
+
 export class ShareInboxModal extends Modal {
   private mode: 'list' | 'focus' = 'list';
 
@@ -94,6 +100,7 @@ export class ShareInboxModal extends Modal {
       const row = list.createDiv({ cls: 'interestseed-inbox-row' });
       const top = row.createDiv({ cls: 'interestseed-inbox-item-top' });
       top.createSpan({ cls: 'interestseed-inbox-platform', text: analysis.platformLabel });
+      top.createSpan({ cls: 'interestseed-inbox-source', text: sourceLabel(item.source) });
       top.createSpan({
         cls: 'interestseed-inbox-item-date',
         text: item.addedAt ? item.addedAt.slice(0, 10) : '',
@@ -139,6 +146,7 @@ export class ShareInboxModal extends Modal {
     });
     const top = card.createDiv({ cls: 'interestseed-inbox-item-top' });
     top.createSpan({ cls: 'interestseed-inbox-platform', text: analysis.platformLabel });
+    top.createSpan({ cls: 'interestseed-inbox-source', text: sourceLabel(item.source) });
     top.createSpan({
       cls: 'interestseed-inbox-item-date',
       text: item.addedAt ? item.addedAt.slice(0, 10) : '',
