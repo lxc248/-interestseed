@@ -122,11 +122,11 @@ InterestSeed 让你：
 
 ![主工作区](assets/screenshot-1.png)
 
-### 宇宙星图（不需要 Obsidian）
+### 宇宙星图（插件内默认）
 
-![Cosmic Viewer](assets/cosmic-viewer.png)
+![Cosmic Viewer](assets/plugin-cosmic.png)
 
-行星是兴趣，轨道是主题，粒子流是关系。独立 HTML Viewer 可以直接打开、搜索、缩放和导出 PNG；Obsidian 只是可选宿主。
+打开 InterestSeed 就是宇宙星图：行星是兴趣，轨道是主题，粒子流是关系。选中、拖拽、缩放、筛选、详情面板都在 Obsidian 内完成。单文件 HTML Viewer 只作为 Agent Skill 的便携输出，不是主体验。
 
 ### 兴趣起跑
 
@@ -247,7 +247,7 @@ promo/
   render.mjs      Playwright → FFmpeg
   synth_audio.py  120 BPM 配乐合成
 viewer/
-  index.html      独立宇宙星图 Viewer
+  index.html      独立宇宙星图 Viewer（Skill 便携输出）
   cosmic.js       Canvas 行星/轨道/粒子渲染
   cosmic.css      玻璃 HUD 与响应式界面
 skill/

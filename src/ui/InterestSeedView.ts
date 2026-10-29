@@ -13,7 +13,7 @@ import {
   matchesNode,
   type GraphFilter,
 } from './FilterBar';
-import { GraphCanvas } from './GraphCanvas';
+import { CosmicGraphCanvas } from './CosmicGraphCanvas';
 import { DiscoveryApplyModal } from './DiscoveryApplyModal';
 import { DiscoveryCorrectionModal } from './DiscoveryCorrectionModal';
 import { DiscoveryPanel } from './DiscoveryPanel';
@@ -29,7 +29,7 @@ export const INTERESTSEED_VIEW_TYPE = 'interestseed-graph-view';
  * 视图不直接修改数据，所有写操作都回调到插件，保证撤销 / 持久化统一。
  */
 export class InterestSeedView extends ItemView {
-  private canvas: GraphCanvas | null = null;
+  private canvas: CosmicGraphCanvas | null = null;
   private filterBar: FilterBar | null = null;
   private detail: DetailPanel | null = null;
   private emptyState: EmptyState | null = null;
@@ -88,6 +88,7 @@ export class InterestSeedView extends ItemView {
     const root = this.contentEl;
     root.empty();
     root.addClass('interestseed-root');
+    root.addClass('is-cosmic');
 
     const header = root.createDiv({ cls: 'interestseed-header' });
     const heading = header.createDiv({ cls: 'interestseed-heading' });
@@ -288,11 +289,15 @@ export class InterestSeedView extends ItemView {
     });
 
     const body = root.createDiv({ cls: 'interestseed-body' });
+    body.style.setProperty('background', '#05070d', 'important');
     const canvasHost = body.createDiv({ cls: 'interestseed-canvas-container' });
     this.canvasHost = canvasHost;
     const detailHost = body.createDiv({ cls: 'interestseed-detail' });
+    detailHost.style.setProperty('background', 'linear-gradient(180deg, #0d1320 0%, #080c15 100%)', 'important');
+    detailHost.style.setProperty('color', '#f2efe9', 'important');
     this.detailHost = detailHost;
     this.detailContentHost = detailHost.createDiv({ cls: 'interestseed-detail-content' });
+    this.detailContentHost.style.setProperty('background', 'transparent', 'important');
     this.discoveryHost = detailHost.createDiv({
       cls: 'interestseed-discovery-panel is-hidden',
     });
@@ -304,7 +309,7 @@ export class InterestSeedView extends ItemView {
 
     this.emptyState = new EmptyState(canvasHost);
 
-    this.canvas = new GraphCanvas(canvasHost, {
+    this.canvas = new CosmicGraphCanvas(canvasHost, {
       onSelect: (nodeId) => this.select(nodeId),
       onDoubleClick: (nodeId) => {
         this.select(nodeId);

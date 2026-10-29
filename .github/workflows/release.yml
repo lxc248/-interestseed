@@ -57,4 +57,4 @@ jobs:
             release/interestseed-skill-*.zip
             assets/interestseed-launch.mp4
             assets/interestseed-launch-cover.png
-            assets/cosmic-viewer.png
+            assets/cosmic-viewer.png\n            assets/plugin-cosmic.png

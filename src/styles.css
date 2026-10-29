@@ -238,7 +238,107 @@
   cursor: grabbing;
 }
 
-/* ------------------------------------------------------------- 详情 */
+.interestseed-cosmic-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  touch-action: none;
+  background: #05070d;
+}
+
+.interestseed-cosmic-canvas:active {
+  cursor: grabbing;
+}
+
+.interestseed-canvas-container.is-empty .interestseed-cosmic-canvas {
+  visibility: hidden;
+}
+
+.interestseed-canvas-container:has(.interestseed-cosmic-canvas) {
+  background: #05070d;
+}
+
+/* ------------------------------------------------------------- 宇宙视图主题 */
+
+.interestseed-root.is-cosmic {
+  --is-accent: #e18061;
+  --is-accent-2: #5ed1df;
+  --is-accent-soft: rgba(225, 128, 97, 0.13);
+  --is-border: rgba(210, 218, 238, 0.12);
+  --is-surface: #0b0f19;
+  --is-surface-raised: #111826;
+  --is-shadow: 0 18px 44px rgba(0, 0, 0, 0.34);
+  --background-primary: #070a12;
+  --background-primary-alt: #0d1320;
+  --background-secondary: #0a0e17;
+  --background-secondary-alt: #0e1420;
+  --background-modifier-border: rgba(210, 218, 238, 0.12);
+  --text-normal: #f2efe9;
+  --text-muted: #9aa2b1;
+  --text-faint: #6f7887;
+  color: var(--text-normal);
+  background: #05070d;
+}
+
+.interestseed-root.is-cosmic .interestseed-header {
+  border-bottom-color: rgba(210, 218, 238, 0.10);
+  background: linear-gradient(180deg, rgba(225, 128, 97, 0.07), transparent 92%);
+}
+
+.interestseed-root.is-cosmic .interestseed-heading-icon {
+  background: radial-gradient(circle at 35% 30%, #f0a181, #b9543b 72%);
+  box-shadow: 0 5px 18px rgba(225, 128, 97, 0.28);
+}
+
+.interestseed-root.is-cosmic .interestseed-heading-count {
+  color: #f0c0ad;
+  background: rgba(225, 128, 97, 0.12);
+}
+
+.interestseed-root.is-cosmic .interestseed-heading-vault {
+  color: #aeb6c5;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.interestseed-root.is-cosmic .interestseed-body {
+  background: #05070d;
+}
+
+.interestseed-root.is-cosmic .interestseed-detail {
+  border-left-color: rgba(210, 218, 238, 0.10);
+  background: linear-gradient(180deg, rgba(13, 19, 32, 0.96), rgba(7, 10, 18, 0.98));
+  box-shadow: -18px 0 52px rgba(0, 0, 0, 0.28);
+}
+
+.interestseed-root.is-cosmic .interestseed-detail-inner {
+  color: #f2efe9;
+}
+
+.interestseed-root.is-cosmic .interestseed-detail-title {
+  color: #f2efe9;
+}
+
+.interestseed-root.is-cosmic .interestseed-detail-meta,
+.interestseed-root.is-cosmic .interestseed-detail-placeholder,
+.interestseed-root.is-cosmic .interestseed-detail-empty {
+  color: #9aa2b1;
+}
+
+.interestseed-root.is-cosmic .interestseed-footer {
+  border-top-color: rgba(210, 218, 238, 0.08);
+  color: #6f7887;
+}
+
+.interestseed-root.is-cosmic .interestseed-experiment-strip {
+  border-color: rgba(125, 207, 154, 0.22);
+  background: linear-gradient(100deg, rgba(125, 207, 154, 0.08), rgba(255, 255, 255, 0.018));
+}
+
+.interestseed-root.is-cosmic .interestseed-quickbar {
+  border-bottom-color: rgba(210, 218, 238, 0.08);
+}
+
 
 .interestseed-detail {
   width: 320px;
@@ -5182,4 +5282,32 @@ button.interestseed-inbox-node:hover {
   .interestseed-experiment-scale-label { width: 58px; }
   .interestseed-experiment-scale-options { gap: 4px; }
   .interestseed-experiment-scale-button { width: 27px; }
+}
+/* Cosmic view: keep the native side rail visually inside the same universe. */
+.interestseed-root.is-cosmic .interestseed-detail,
+.interestseed-root.is-cosmic .interestseed-detail-content {
+  background: linear-gradient(180deg, #0d1320 0%, #080c15 100%) !important;
+  color: #f2efe9 !important;
+}
+
+.interestseed-root.is-cosmic .interestseed-detail * {
+  --background-primary: #0d1320;
+  --background-primary-alt: #111826;
+  --background-secondary: #0b101b;
+  --background-secondary-alt: #111826;
+  --background-modifier-border: rgba(210, 218, 238, 0.12);
+  --text-normal: #f2efe9;
+  --text-muted: #9aa2b1;
+  --text-faint: #6f7887;
+}
+
+.interestseed-root.is-cosmic .interestseed-detail .interestseed-insight-card,
+.interestseed-root.is-cosmic .interestseed-detail .interestseed-relation-item {
+  background: rgba(255, 255, 255, 0.035);
+  border-color: rgba(210, 218, 238, 0.10);
+}
+.workspace-leaf-content .interestseed-detail,
+.workspace-leaf-content .interestseed-detail-content {
+  background: linear-gradient(180deg, #0d1320 0%, #080c15 100%) !important;
+  color: #f2efe9 !important;
 }

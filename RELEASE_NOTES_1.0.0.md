@@ -9,9 +9,10 @@
 - **图谱缺口教练**：从孤立节点和桥接节点出发，补一条真实连接；
 - **严谨的 7 天兴趣实验**：每日真实观察、兴趣强度/精力评分、一天一条记录，7 条完成才复盘；
 - **Agent 单入口**：通过 DSH ACP 连接你自己的 Agent、工具、沙箱和权限；
-- **免 Obsidian 宇宙星图**：Skill 自带单文件 HTML Viewer，行星、轨道、星云、粒子流，可直接打开/分享/导出 PNG。
+- **宇宙星图（插件内默认）**：Obsidian 打开即见行星、轨道、星云、粒子流和动态 HUD；
+- **Agent Skill 便携星图**：Skill 仍可生成单文件 `star-map.html`，供没有 Obsidian 的用户使用。
 
-## 免 Obsidian 使用
+## Agent Skill（无 Obsidian 时的便携输出）
 
 下载 `interestseed-skill-v1.0.0.zip`，把目录放进用户 Agent 的 skills 目录，阅读 `SKILL.md`，即可生成 `star-map.html`。
 
