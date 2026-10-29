@@ -46,8 +46,8 @@ describe('Seed Sprint', () => {
   it('always includes one next-step experiment node and a mystery hook', () => {
     const draft = buildSeedSprintDraft(COMPLETE);
     expect(draft.nodes.filter((node) => node.nextStep)).toHaveLength(1);
-    expect(draft.experiment.days).toBe(7);
-    expect(draft.experiment.steps).toHaveLength(7);
+    expect(draft.experiment.days).toBe(3);
+    expect(draft.experiment.steps).toHaveLength(3);
     expect(draft.mystery.title.length).toBeGreaterThan(0);
   });
 

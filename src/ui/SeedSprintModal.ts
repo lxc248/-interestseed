@@ -199,7 +199,7 @@ export class SeedSprintModal extends Modal {
     const stats = header.createDiv({ cls: 'interestseed-sprint-stats' });
     this.stat(stats, String(draft.nodes.length), '种子');
     this.stat(stats, String(draft.edges.length), '候选连接');
-    this.stat(stats, '1', '7 天实验');
+    this.stat(stats, '1', '3 天试跑');
 
     const body = shell.createDiv({ cls: 'interestseed-sprint-draft-body' });
     const nodesSection = body.createDiv({ cls: 'interestseed-sprint-section' });

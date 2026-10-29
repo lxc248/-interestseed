@@ -137,19 +137,43 @@ export class ExperimentModal extends Modal {
 
     form.createDiv({
       cls: 'interestseed-experiment-form-title',
-      text: `Day ${gate.day} · 今天的实验记录`,
+      text: `Day ${gate.day} · 今天怎么样？`,
     });
     form.createDiv({
       cls: 'interestseed-experiment-form-hint',
-      text: '不写“还行”“有点意思”。写一件今天真实发生的事。',
+      text: '点一下就能记录，不需要写长文。想补充观察时再展开。',
     });
-    this.renderScale(form, '兴趣强度', 'interest', this.interest, (value) => {
+
+    const quick = form.createDiv({ cls: 'interestseed-experiment-quick' });
+    const quickOptions = [
+      { key: 'did', label: '做了', detail: '今天真的做了一件', icon: 'check' },
+      { key: 'thought', label: '只想过', detail: '没有行动，但想起过', icon: 'cloud' },
+      { key: 'missed', label: '没做', detail: '今天没有发生', icon: 'minus' },
+    ] as const;
+    for (const option of quickOptions) {
+      const button = quick.createEl('button', {
+        cls: `interestseed-experiment-quick-button is-${option.key}`,
+        attr: {
+          type: 'button',
+          'aria-label': `记录：${option.label}。${option.detail}`,
+        },
+      });
+      const icon = button.createDiv({ cls: 'interestseed-experiment-quick-icon' });
+      setIcon(icon, option.icon);
+      button.createDiv({ cls: 'interestseed-experiment-quick-label', text: option.label });
+      button.createDiv({ cls: 'interestseed-experiment-quick-detail', text: option.detail });
+      button.addEventListener('click', () => this.recordQuick(option.key));
+    }
+
+    const details = form.createEl('details', { cls: 'interestseed-experiment-more' });
+    details.createEl('summary', { text: '补充详细观察（可选）' });
+    this.renderScale(details, '兴趣强度', 'interest', this.interest, (value) => {
       this.interest = value;
     });
-    this.renderScale(form, '精力值', 'energy', this.energy, (value) => {
+    this.renderScale(details, '精力值', 'energy', this.energy, (value) => {
       this.energy = value;
     });
-    const evidenceLabel = form.createEl('label', { cls: 'interestseed-experiment-field' });
+    const evidenceLabel = details.createEl('label', { cls: 'interestseed-experiment-field' });
     evidenceLabel.createSpan({ text: '具体证据 / 观察' });
     const evidence = evidenceLabel.createEl('textarea', {
       cls: 'interestseed-experiment-input',
@@ -161,8 +185,7 @@ export class ExperimentModal extends Modal {
     evidence.addEventListener('input', () => {
       this.evidence = evidence.value;
     });
-    evidence.focus();
-    const nextLabel = form.createEl('label', { cls: 'interestseed-experiment-field' });
+    const nextLabel = details.createEl('label', { cls: 'interestseed-experiment-field' });
     nextLabel.createSpan({ text: '下一步（可选）' });
     const next = nextLabel.createEl('input', {
       cls: 'interestseed-experiment-input',
@@ -172,16 +195,10 @@ export class ExperimentModal extends Modal {
       this.next = next.value;
     });
 
-    const actions = root.createDiv({ cls: 'interestseed-experiment-actions' });
-    const cancel = actions.createEl('button', {
-      cls: 'interestseed-sprint-secondary',
-      text: '稍后再记',
-      attr: { type: 'button' },
-    });
-    cancel.addEventListener('click', () => this.close());
+    const actions = details.createDiv({ cls: 'interestseed-experiment-actions' });
     const submit = actions.createEl('button', {
       cls: 'mod-cta interestseed-sprint-primary',
-      text: `记录第 ${gate.day} 天`,
+      text: `保存第 ${gate.day} 天观察`,
       attr: { type: 'button' },
     });
     submit.addEventListener('click', () => {
@@ -201,6 +218,41 @@ export class ExperimentModal extends Modal {
       this.next = '';
       this.render();
     });
+  }
+
+  private recordQuick(kind: 'did' | 'thought' | 'missed'): void {
+    const presets = {
+      did: {
+        interest: 4,
+        energy: 4,
+        evidence: '今天实际做了一件和这个兴趣有关的事。',
+        notice: '已记录：今天做了。',
+      },
+      thought: {
+        interest: 3,
+        energy: 2,
+        evidence: '今天没有行动，但想起过这个兴趣。',
+        notice: '已记录：只想过。',
+      },
+      missed: {
+        interest: 2,
+        energy: 1,
+        evidence: '今天没有做，也没有特别想起这个兴趣。',
+        notice: '已记录：今天没做。',
+      },
+    } as const;
+    const preset = presets[kind];
+    const ok = this.plugin.recordExperimentCheckIn({
+      interest: preset.interest,
+      energy: preset.energy,
+      evidence: preset.evidence,
+    });
+    if (!ok) {
+      new Notice('今天已经记录过了，或者实验已经结束。');
+      return;
+    }
+    new Notice(preset.notice);
+    this.render();
   }
 
   private renderScale(
@@ -238,7 +290,7 @@ export class ExperimentModal extends Modal {
     empty.createEl('h2', { cls: 'interestseed-experiment-title', text: '还没有进行中的实验' });
     empty.createEl('p', {
       cls: 'interestseed-experiment-hypothesis',
-      text: '冷启动问卷会生成一个 7 天实验；完成第一张星图后，这里会出现每天的记录入口。',
+      text: '冷启动问卷会生成一个 3 天试跑；完成第一张星图后，这里会出现每天的记录入口。',
     });
     const close = empty.createEl('button', {
       cls: 'mod-cta interestseed-sprint-primary',

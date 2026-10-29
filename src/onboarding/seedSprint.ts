@@ -410,19 +410,15 @@ export function buildSeedSprintDraft(selection: SeedSprintSelection): SeedSprint
   );
 
   const experiment: SeedSprintExperiment = {
-    title: '7 天兴趣实验',
-    hypothesis: `接下来的 7 天，我愿意用真实行动验证「${magnet?.seedTitle ?? '这个兴趣'}」是否值得继续投入。`,
-    metric: '每天记录一次兴趣强度、精力值和一个具体证据；连续 7 条才算完成。',
-    prompt: `用 7 天，把「${magnet?.seedTitle ?? '你的兴趣'}」从好奇变成一个可观察的小实验。`,
-    days: 7,
+    title: '3 天兴趣试跑',
+    hypothesis: `接下来的 3 天，我愿意用真实行动验证「${magnet?.seedTitle ?? '这个兴趣'}」是否值得继续投入。`,
+    metric: '每天点一下“做了 / 只想过 / 没做”；3 条记录就能完成试跑。',
+    prompt: `用 3 天，把「${magnet?.seedTitle ?? '你的兴趣'}」从好奇变成一个可观察的小实验。`,
+    days: 3,
     steps: [
-      '观察：记录一次让你停下来的内容。',
-      '拆解：写出它吸引你的一个具体原因。',
-      '连接：把它和你已有的一个项目或主题连起来。',
-      '动手：做一个 30 分钟的小尝试。',
-      '反馈：写下“我更喜欢 / 更不喜欢什么”。',
-      '表达：用一句话解释这个兴趣。',
-      '回看：决定继续、转向，还是暂时放下。',
+      '观察：今天有没有为它停下来？',
+      '动手：做一个很小的真实尝试。',
+      '回看：继续、转向，还是先放下。',
     ],
   };
   const experimentNode: SeedSprintNodeProposal = {

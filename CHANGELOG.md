@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.6.0 — Lower-friction experiments
+
+- New cold-start questionnaires create a 3-day trial by default.
+- Added one-tap “做了 / 只想过 / 没做” experiment check-ins.
+- Moved scales, evidence and next-step fields into optional details.
+- Added a compact, scroll-safe experiment modal.
+- Kept the strict one-record-per-day and no-fake-progress model.
+
 ## 1.5.3 — Cold-start questionnaire and validation track
 
 - Renamed “兴趣起跑” to “冷启动问卷”.

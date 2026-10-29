@@ -30,7 +30,7 @@ describe('Seed Sprint simulation', () => {
               expect(ids.has(edge.target)).toBe(true);
               expect(edge.source).not.toBe(edge.target);
             }
-            expect(draft.experiment.steps).toHaveLength(7);
+            expect(draft.experiment.steps).toHaveLength(3);
             combinations += 1;
           }
         }

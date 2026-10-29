@@ -737,6 +737,7 @@ export default class InterestSeedPlugin extends Plugin {
                   hypothesis: draft.experiment.hypothesis,
                   metric: draft.experiment.metric,
                   startedAt: now,
+                  targetDays: STARTER_DAYS,
                 }),
               }
             : {}),

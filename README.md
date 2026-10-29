@@ -8,7 +8,7 @@
 
 <p>
   <img alt="Obsidian" src="https://img.shields.io/badge/Obsidian-1.5%2B-7c3aed" />
-  <img alt="Version" src="https://img.shields.io/badge/version-1.5.3-0ea5e9" />
+  <img alt="Version" src="https://img.shields.io/badge/version-1.6.0-0ea5e9" />
   <img alt="Tests" src="https://img.shields.io/badge/tests-460%20passing-22c55e" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b" />
   <img alt="Local first" src="https://img.shields.io/badge/local--first-yes-14b8a6" />
@@ -30,7 +30,7 @@ InterestSeed 让你：
 做四个具体选择
 → 看见第一张兴趣星图
 → 确认哪些种子值得留下
-→ 领一个 7 天兴趣实验
+→ 领一个 3 天兴趣试跑
 → 让图谱在真实行动里继续生长
 ```
 
@@ -59,7 +59,7 @@ InterestSeed 让你：
 - 4–6 条带证据的候选连接；
 - 1 个“意外连接”；
 - 1 个未解锁的神秘方向；
-- 1 个可以马上开始的 7 天兴趣实验。
+- 1 个可以马上开始的 3 天兴趣试跑。
 
 ### 03 · AI 提案，不替你决定
 
@@ -80,7 +80,7 @@ InterestSeed 让你：
 | **冷启动问卷** | 4 个选择，生成第一张可确认图谱 |
 | **兴趣火花** | 粘贴短视频链接或一句话，留下一个种子 |
 | **图谱缺口教练** | 从孤立节点和桥接节点出发，补一条真实连接 |
-| **7 天兴趣实验** | 把兴趣变成行动，把行动反馈回图谱 |
+| **3 天兴趣试跑** | 一按就记，把行动反馈回图谱 |
 
 ```text
 短暂好奇
@@ -90,7 +90,7 @@ InterestSeed 让你：
 兴趣星图
    ↓ 缺口教练
 新连接
-   ↓ 7 天实验
+   ↓ 3 天试跑
 真实反馈
    ↓
 下一张更懂你的星图
@@ -153,9 +153,9 @@ InterestSeed 让你：
 
 ![冷启动问卷](assets/onboarding.png)
 
-### 严谨的 7 天实验
+### 一按就记的 3/7 天验证
 
-![7 天兴趣实验](assets/experiment.png)
+![3 天兴趣试跑](assets/experiment.png)
 
 不是点一下加一天：每天必须写下真实观察，记录兴趣强度与精力值，连续 7 条才完成。
 
@@ -173,7 +173,7 @@ InterestSeed 让你：
 
 ### 手动安装
 
-1. 下载最新 Release 的 `interestseed-v1.5.3.zip`；
+1. 下载最新 Release 的 `interestseed-v1.6.0.zip`；
 2. 解压到：
 
 ```text
@@ -192,7 +192,7 @@ styles.css
 
 ### 不安装 Obsidian
 
-[下载 `interestseed-skill-v1.5.3.zip`](https://github.com/lxc248/-interestseed/releases/download/v1.5.3/interestseed-skill-v1.5.3.zip)，放入用户 Agent 的 skills 目录，阅读 `skill/SKILL.md`。Agent 会生成一个独立的 `star-map.html`，双击即可查看行星、轨道和星云；不需要 Obsidian。
+[下载 `interestseed-skill-v1.6.0.zip`](https://github.com/lxc248/-interestseed/releases/download/v1.6.0/interestseed-skill-v1.6.0.zip)，放入用户 Agent 的 skills 目录，阅读 `skill/SKILL.md`。Agent 会生成一个独立的 `star-map.html`，双击即可查看行星、轨道和星云；不需要 Obsidian。
 
 ### 从源码构建
 
