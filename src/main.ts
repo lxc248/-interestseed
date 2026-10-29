@@ -591,8 +591,8 @@ export default class InterestSeedPlugin extends Plugin {
     new ShareInboxModal(this.app, this).open();
   }
 
-  enqueueShare(text: string, source: InboxSource = 'share'): ReturnType<ShareInbox['enqueue']> {
-    const result = this.inbox.enqueue(text, source);
+  enqueueShare(text: string, source: InboxSource = 'share', sourceRef = ''): ReturnType<ShareInbox['enqueue']> {
+    const result = this.inbox.enqueue(text, source, sourceRef);
     if (result) void this.persist();
     return result;
   }
@@ -603,15 +603,18 @@ export default class InterestSeedPlugin extends Plugin {
       new Notice('先打开一篇 Markdown 笔记，再加入收件箱。');
       return;
     }
-    const content = (await this.app.vault.cachedRead(file))
+    const raw = await this.app.vault.cachedRead(file);
+    const body = raw
+      .replace(/^\uFEFF?---\r?\n[\s\S]*?\r?\n---\s*/u, '')
+      .replace(/^#{1,6}\s+/gm, '')
       .replace(/\s+/g, ' ')
       .trim()
       .slice(0, 1600);
-    if (!content) {
+    if (!body) {
       new Notice('这篇笔记是空的，没有可加入的内容。');
       return;
     }
-    const result = this.enqueueShare(`${file.basename}\n${content}`, 'note');
+    const result = this.enqueueShare(`${file.basename}\n${body}`, 'note', file.path);
     if (!result) {
       new Notice('当前笔记没有可加入的内容。');
       return;

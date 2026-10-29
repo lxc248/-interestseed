@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.1.1 — Source provenance and readable menus
+
+- Added `sourceRef` to context packets so note imports retain their path.
+- Stripped frontmatter and heading markers from note imports.
+- Grouped the “更多” menu into 图谱 / 关系 / 发现 / 导出.
+- Fixed the menu being clipped by the horizontal quickbar.
+- Hardened release uploads with `gh release upload --clobber`.
+
 ## 2.1.0 — Source-aware Context Inbox
 
 - Added source metadata to Share Inbox items: share, clipboard, note.

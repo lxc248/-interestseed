@@ -9,6 +9,7 @@ export interface ShareInboxItem {
   addedAt: string;
   status: InboxStatus;
   source: InboxSource;
+  sourceRef?: string;
 }
 
 export interface EnqueueResult {
@@ -34,7 +35,7 @@ export class ShareInbox {
     this.maxItems = maxItems;
   }
 
-  enqueue(text: string, source: InboxSource = 'share', now = new Date().toISOString()): EnqueueResult | null {
+  enqueue(text: string, source: InboxSource = 'share', sourceRef = '', now = new Date().toISOString()): EnqueueResult | null {
     const value = text.trim();
     if (!value) return null;
     const key = normalizeKey(value);
@@ -48,6 +49,7 @@ export class ShareInbox {
       addedAt: now,
       status: 'pending',
       source,
+      ...(sourceRef ? { sourceRef } : {}),
     };
     this.items = [item, ...this.items].slice(0, this.maxItems);
     return { item, duplicate: false };
@@ -90,6 +92,7 @@ export class ShareInbox {
         source: (item.source === 'clipboard' || item.source === 'note'
           ? item.source
           : 'share') as InboxSource,
+        ...(item.sourceRef ? { sourceRef: String(item.sourceRef) } : {}),
       }))
       .filter((item) => item.id && item.text)
       .slice(0, this.maxItems);

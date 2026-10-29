@@ -236,7 +236,7 @@ function handle(message) {
     return response(id, {
       protocolVersion: PROTOCOL_VERSION,
       capabilities: { tools: {} },
-      serverInfo: { name: 'interestseed', version: '2.1.0' },
+      serverInfo: { name: 'interestseed', version: '2.1.1' },
     });
   }
   if (method === 'notifications/initialized') return null;

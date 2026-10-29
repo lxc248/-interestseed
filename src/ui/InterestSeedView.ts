@@ -270,34 +270,47 @@ export class InterestSeedView extends ItemView {
     setIcon(moreSummary, 'more-horizontal');
     moreSummary.createSpan({ text: '更多' });
     const moreMenu = more.createDiv({ cls: 'interestseed-more-menu' });
-    this.createQuickAction(moreMenu, 'refresh-cw', '重新扫描', () => this.plugin.promptRebuild());
-    this.createQuickAction(moreMenu, 'plus', '新建节点', () => this.plugin.promptCreateNode());
-    this.createQuickAction(moreMenu, 'git-fork', '刷新建议', () => this.plugin.refreshSuggestions());
-    this.quickInboxButton = this.createQuickAction(moreMenu, 'inbox', '待确认关系', () =>
+    const graphGroup = moreMenu.createDiv({ cls: 'interestseed-more-group' });
+    graphGroup.createDiv({ cls: 'interestseed-more-group-label', text: '图谱' });
+    this.createQuickAction(graphGroup, 'refresh-cw', '重新扫描', () => this.plugin.promptRebuild());
+    this.createQuickAction(graphGroup, 'plus', '新建节点', () => this.plugin.promptCreateNode());
+    this.createQuickAction(graphGroup, 'maximize-2', '适应画布', () => this.canvas?.zoomToFit());
+
+    const relationGroup = moreMenu.createDiv({ cls: 'interestseed-more-group' });
+    relationGroup.createDiv({ cls: 'interestseed-more-group-label', text: '关系' });
+    this.createQuickAction(relationGroup, 'git-fork', '刷新建议', () =>
+      this.plugin.refreshSuggestions(),
+    );
+    this.quickInboxButton = this.createQuickAction(relationGroup, 'inbox', '待确认关系', () =>
       this.toggleInbox(),
     );
-    this.quickUndoButton = this.createQuickAction(moreMenu, 'undo-2', '撤销', () =>
+    this.quickUndoButton = this.createQuickAction(relationGroup, 'undo-2', '撤销', () =>
       this.plugin.undo.undo(),
     );
-    this.quickRedoButton = this.createQuickAction(moreMenu, 'redo-2', '重做', () =>
+    this.quickRedoButton = this.createQuickAction(relationGroup, 'redo-2', '重做', () =>
       this.plugin.undo.redo(),
     );
-    this.createQuickAction(moreMenu, 'maximize-2', '适应画布', () => this.canvas?.zoomToFit());
-    this.quickDiscoveryButton = this.createQuickAction(moreMenu, 'lightbulb', '发现', () =>
+
+    const discoveryGroup = moreMenu.createDiv({ cls: 'interestseed-more-group' });
+    discoveryGroup.createDiv({ cls: 'interestseed-more-group-label', text: '发现' });
+    this.quickDiscoveryButton = this.createQuickAction(discoveryGroup, 'lightbulb', '发现', () =>
       this.toggleDiscoveries(),
     );
     this.quickDiscoveryButton.setAttribute('aria-pressed', 'false');
     this.quickInboxButton?.setAttribute('aria-pressed', 'false');
     this.discoveryButton?.setAttribute('aria-pressed', 'false');
     this.inboxButton?.setAttribute('aria-pressed', 'false');
-    this.createQuickAction(moreMenu, 'layout-dashboard', '兴趣总览', () =>
+    this.createQuickAction(discoveryGroup, 'layout-dashboard', '兴趣总览', () =>
       this.plugin.openDiscoveryOverview(),
     );
-    this.createQuickAction(moreMenu, 'compass', '兴趣探索', () =>
+    this.createQuickAction(discoveryGroup, 'compass', '兴趣探索', () =>
       this.plugin.openDiscoveryExplorer(),
     );
-    this.createQuickAction(moreMenu, 'download', '导出 JSON', () => this.plugin.exportGraph());
-    this.createQuickAction(moreMenu, 'share-2', '导出分享星图', () =>
+
+    const exportGroup = moreMenu.createDiv({ cls: 'interestseed-more-group' });
+    exportGroup.createDiv({ cls: 'interestseed-more-group-label', text: '导出' });
+    this.createQuickAction(exportGroup, 'download', '导出 JSON', () => this.plugin.exportGraph());
+    this.createQuickAction(exportGroup, 'share-2', '导出分享星图', () =>
       this.plugin.openShareCard(),
     );
 

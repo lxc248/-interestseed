@@ -41,11 +41,12 @@ describe('Share Inbox', () => {
 
   it('preserves the source of a context packet', () => {
     const inbox = new ShareInbox();
-    inbox.enqueue('课程笔记：观察用户如何停下', 'note');
+    inbox.enqueue('课程笔记：观察用户如何停下', 'note', '课程/观察.md');
     const raw = inbox.serialize();
     const restored = new ShareInbox();
     restored.load(raw);
     expect(restored.pending()[0]?.source).toBe('note');
+    expect(restored.pending()[0]?.sourceRef).toBe('课程/观察.md');
     expect(restored.pending()[0]?.text).toContain('课程笔记');
   });
 });

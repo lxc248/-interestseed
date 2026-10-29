@@ -100,7 +100,8 @@ export class ShareInboxModal extends Modal {
       const row = list.createDiv({ cls: 'interestseed-inbox-row' });
       const top = row.createDiv({ cls: 'interestseed-inbox-item-top' });
       top.createSpan({ cls: 'interestseed-inbox-platform', text: analysis.platformLabel });
-      top.createSpan({ cls: 'interestseed-inbox-source', text: sourceLabel(item.source) });
+      const source = top.createSpan({ cls: 'interestseed-inbox-source', text: sourceLabel(item.source) });
+    if (item.sourceRef) source.setAttribute('title', item.sourceRef);
       top.createSpan({
         cls: 'interestseed-inbox-item-date',
         text: item.addedAt ? item.addedAt.slice(0, 10) : '',
@@ -146,7 +147,8 @@ export class ShareInboxModal extends Modal {
     });
     const top = card.createDiv({ cls: 'interestseed-inbox-item-top' });
     top.createSpan({ cls: 'interestseed-inbox-platform', text: analysis.platformLabel });
-    top.createSpan({ cls: 'interestseed-inbox-source', text: sourceLabel(item.source) });
+    const source = top.createSpan({ cls: 'interestseed-inbox-source', text: sourceLabel(item.source) });
+    if (item.sourceRef) source.setAttribute('title', item.sourceRef);
     top.createSpan({
       cls: 'interestseed-inbox-item-date',
       text: item.addedAt ? item.addedAt.slice(0, 10) : '',

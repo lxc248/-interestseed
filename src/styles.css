@@ -6520,3 +6520,17 @@ body.theme-light .interestseed-sprint-option.is-selected {
   color: #8793a5;
   font-size: 8px;
 }
+.interestseed-more-menu { min-width: 190px; gap: 2px; }
+.interestseed-more-group { display: grid; gap: 1px; padding: 3px 0; }
+.interestseed-more-group + .interestseed-more-group { border-top: 1px solid rgba(210, 218, 238, 0.09); }
+.interestseed-more-group-label {
+  padding: 4px 8px 2px;
+  color: #6f7b8c;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+/* The overflow menu must escape the horizontally scrollable quickbar. */
+.interestseed-root .interestseed-quickbar { overflow: visible !important; }
+.interestseed-root .interestseed-more { position: relative; z-index: 70; }
+.interestseed-root .interestseed-more-menu { z-index: 80; }
