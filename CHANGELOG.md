@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.7.0 — Focus Deck
+
+- Rebuilt Share Inbox as a one-card Focus Deck.
+- Added swipe left/right and ArrowLeft/ArrowRight decisions.
+- Renamed the primary decision to “留下并连接”.
+- Moved adding another share below the current card.
+- Kept one-at-a-time queue, URL dedupe and no auto-scraping.
+
 ## 1.6.0 — Lower-friction experiments
 
 - New cold-start questionnaires create a 3-day trial by default.
