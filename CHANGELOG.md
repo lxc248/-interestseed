@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.7.0 — Share card redesign
+
+- Rebuilt social cards around a mobile-first hook, three proof stats, the graph, and a three-step close.
+- Added dedicated portrait and landscape layouts for all five platform presets.
+- Added label collision avoidance so labels never cover nodes.
+- Widened the share modal and improved preview size.
+- Added `assets/share-card-xiaohongshu.png` and refreshed `assets/social-card.png`.
+
 ## 2.6.2 — Global bug fixes
 
 - Restored the desktop filter/search entry point.

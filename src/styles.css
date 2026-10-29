@@ -5662,7 +5662,7 @@ body.theme-light .interestseed-sprint-option.is-selected {
 /* Social share card: platform-sized PNG, not a UI screenshot. */
 .interestseed-share-modal .modal-content { padding: 0; }
 .interestseed-share {
-  max-width: min(94vw, 820px);
+  max-width: min(94vw, 760px);
   padding: 18px 20px 16px;
   color: #f2efe9;
 }
@@ -5725,8 +5725,8 @@ body.theme-light .interestseed-sprint-option.is-selected {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 260px;
-  max-height: 44vh;
+  min-height: 300px;
+  max-height: 60vh;
   margin-top: 12px;
   padding: 10px;
   overflow: hidden;
@@ -5738,7 +5738,7 @@ body.theme-light .interestseed-sprint-option.is-selected {
   display: block;
   width: auto;
   max-width: 100%;
-  max-height: 42vh;
+  max-height: 58vh;
   border-radius: 6px;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
 }
@@ -5770,6 +5770,7 @@ body.theme-light .interestseed-sprint-option.is-selected {
   font-size: 9px;
 }
 .modal.interestseed-share-modal {
+  width: min(94vw, 760px);
   background: linear-gradient(180deg, #0d1320 0%, #080c15 100%) !important;
   color: #f2efe9 !important;
 }

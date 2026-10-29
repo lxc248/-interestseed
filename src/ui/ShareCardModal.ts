@@ -51,11 +51,11 @@ export class ShareCardModal extends Modal {
     const mark = header.createDiv({ cls: 'interestseed-share-mark' });
     setIcon(mark, 'share-2');
     const copy = header.createDiv();
-    copy.createDiv({ cls: 'interestseed-share-kicker', text: 'SHARE A CONSTELLATION' });
-    copy.createEl('h2', { cls: 'interestseed-share-title', text: '把你的星图，发给别人看。' });
+    copy.createDiv({ cls: 'interestseed-share-kicker', text: 'MAKE A PROOF CARD' });
+    copy.createEl('h2', { cls: 'interestseed-share-title', text: '把你的兴趣，做成一张会被看完的卡。' });
     copy.createEl('p', {
       cls: 'interestseed-share-lede',
-      text: '导出一张适合社交平台的 PNG。不是截图，是重新排版的星图卡片。',
+      text: '不是 UI 截图，是给短视频平台重新排版的证据卡：一个钩子、一组数字、一张星图。',
     });
 
     const platforms = root.createDiv({ cls: 'interestseed-share-platforms' });
