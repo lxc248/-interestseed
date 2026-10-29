@@ -48,14 +48,27 @@ jobs:
           cd release/skill
           zip -r "../interestseed-skill-${RELEASE_TAG}.zip" interestseed-skill
 
-      - uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ inputs.tag || github.ref_name }}
-          body_path: RELEASE_NOTES_2.1.0.md
-          files: |
-            release/interestseed-v*.zip
-            release/interestseed-skill-*.zip
-            assets/interestseed-launch.mp4
-            assets/interestseed-launch-cover.png
-            assets/cosmic-viewer.png
-            assets/plugin-cosmic.png
+      - name: Publish release assets with clobber
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          set -euo pipefail
+          NOTES="RELEASE_NOTES_${RELEASE_TAG#v}.md"
+          if [ ! -f "$NOTES" ]; then
+            echo "Missing release notes: $NOTES"
+            exit 1
+          fi
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release edit "$RELEASE_TAG" --notes-file "$NOTES"
+          else
+            gh release create "$RELEASE_TAG" --title "InterestSeed ${RELEASE_TAG#v}" --notes-file "$NOTES"
+          fi
+          gh release upload "$RELEASE_TAG" \
+            release/interestseed-*.zip \
+            release/interestseed-skill-*.zip \
+            assets/interestseed-launch.mp4 \
+            assets/interestseed-launch-cover.png \
+            assets/cosmic-viewer.png \
+            assets/plugin-cosmic.png \
+            --clobber
