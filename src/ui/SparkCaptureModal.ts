@@ -10,6 +10,7 @@ import { analyzeShareText } from '../services/shareAnalysis';
 export class SparkCaptureModal extends Modal {
   private text = '';
   private targetId = '';
+  private why = '';
   private previewEl: HTMLElement | null = null;
   private submitEl: HTMLButtonElement | null = null;
 
@@ -79,6 +80,18 @@ export class SparkCaptureModal extends Modal {
       this.targetId = target.value;
     });
 
+    const whyLabel = root.createEl('label', { cls: 'interestseed-spark-why' });
+    whyLabel.createSpan({ text: '为什么留下？（可选，帮下一次判断）' });
+    whyLabel.createEl('input', {
+      cls: 'interestseed-spark-why-input',
+      attr: {
+        type: 'text',
+        placeholder: '例如：不是想学这个工具，而是想让我做的东西更容易被看见',
+      },
+    }).addEventListener('input', (event) => {
+      this.why = (event.target as HTMLInputElement).value;
+    });
+
     const preview = root.createDiv({ cls: 'interestseed-spark-preview' });
     this.previewEl = preview;
     this.updatePreview();
@@ -133,7 +146,7 @@ export class SparkCaptureModal extends Modal {
   }
 
   private submit(): void {
-    const id = this.plugin.captureInterestSpark(this.text, this.targetId || undefined);
+    const id = this.plugin.captureInterestSpark(this.text, this.targetId || undefined, this.why);
     if (!id) return;
     this.plugin.setSelectedNode(id);
     new Notice(

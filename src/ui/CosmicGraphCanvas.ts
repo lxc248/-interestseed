@@ -98,6 +98,13 @@ function nodeRadius(type: NodeType, degree: number): number {
   return base[type] + Math.min(8, degree * 0.7);
 }
 
+function graphLabel(title: string): string {
+  const cut = title.search(/[：:，,。！？!?]/);
+  let value = cut >= 3 && cut <= 26 ? title.slice(0, cut) : title;
+  if (value.length > 18) value = `${value.slice(0, 18)}…`;
+  return value;
+}
+
 function clusterKey(node: InterestSeedNode): string {
   const tags = node.tags.map((tag) => tag.toLowerCase());
   if (tags.includes('兴趣起跑')) return 'genesis';
@@ -789,7 +796,7 @@ export class CosmicGraphCanvas {
       const important = node.id === this.selectedId || node.id === this.hoveredId || node.degree >= 2;
       if (!important && this.zoom < 0.52) continue;
       this.ctx.font = '600 9px "Inter","Noto Sans SC",sans-serif';
-      let label = node.title;
+      let label = graphLabel(node.title);
       const maxWidth = node.id === this.selectedId ? 140 : 106;
       while (this.ctx.measureText(label).width > maxWidth && label.length > 6) {
         label = label.slice(0, -1);

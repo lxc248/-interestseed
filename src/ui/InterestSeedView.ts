@@ -624,7 +624,7 @@ export class InterestSeedView extends ItemView {
 
     const selected = this.selectedId ? this.plugin.store.getNode(this.selectedId) : undefined;
     const selectedIsLoose = selected ? this.plugin.store.degree(selected.id) === 0 : false;
-    const sparks = graph.nodes.filter((node) => Boolean(node.metadata?.spark));
+    const sparks = graph.nodes.filter((node) => node.metadata?.spark === true);
     const looseSparks = sparks.filter((node) => this.plugin.store.degree(node.id) === 0);
     const isolated = graph.nodes.filter(
       (node) => this.plugin.store.degree(node.id) === 0 && !node.metadata?.nextStep,

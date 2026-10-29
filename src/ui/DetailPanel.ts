@@ -98,6 +98,8 @@ export class DetailPanel {
       }
     }
 
+    if (node.metadata.spark === true) this.renderSparkDecision(node);
+
     const summary =
       typeof node.metadata.summary === 'string' ? node.metadata.summary : '';
     if (summary) {
@@ -473,6 +475,43 @@ export class DetailPanel {
         this.runEdgeAction(reject, () => this.actions.rejectEdge(entry.edge.id)),
       );
     }
+  }
+
+  private renderSparkDecision(node: InterestSeedNode): void {
+    const section = this.root.createDiv({ cls: 'interestseed-spark-decision' });
+    section.createDiv({ cls: 'interestseed-spark-decision-kicker', text: 'ONE DECISION' });
+    section.createEl('p', {
+      cls: 'interestseed-spark-decision-title',
+      text: '这个火花还只是一个候选。它和你的哪个兴趣有关？',
+    });
+    const raw = typeof node.metadata.raw === 'string' ? node.metadata.raw : '';
+    if (raw) {
+      section.createEl('p', { cls: 'interestseed-spark-decision-raw', text: raw });
+    }
+    const why = typeof node.metadata.why === 'string' ? node.metadata.why : '';
+    if (why) {
+      section.createDiv({ cls: 'interestseed-spark-decision-why', text: `你留下它的原因：${why}` });
+    }
+    const actions = section.createDiv({ cls: 'interestseed-spark-decision-actions' });
+    const connect = actions.createEl('button', {
+      cls: 'mod-cta',
+      text: '留下并连接',
+      attr: { type: 'button' },
+    });
+    connect.addEventListener('click', () => this.actions.createRelation(node.id));
+    const pass = actions.createEl('button', {
+      text: '只是路过',
+      attr: { type: 'button' },
+    });
+    pass.addEventListener('click', () => {
+      void confirmAction(
+        this.app,
+        `把「${node.title}」移出图谱？它只是路过，不需要变成兴趣。`,
+        '只是路过',
+      ).then((confirmed) => {
+        if (confirmed) this.actions.deleteNode(node.id);
+      });
+    });
   }
 
   private renderActions(node: InterestSeedNode): void {

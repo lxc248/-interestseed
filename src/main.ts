@@ -515,7 +515,7 @@ export default class InterestSeedPlugin extends Plugin {
     return value.slice(0, 96);
   }
 
-  captureInterestSpark(text: string, targetId?: string): string | null {
+  captureInterestSpark(text: string, targetId?: string, why?: string): string | null {
     const value = text.trim();
     const title = this.describeSpark(value);
     if (!title) {
@@ -543,6 +543,7 @@ export default class InterestSeedPlugin extends Plugin {
           spark: true,
           raw: value,
           capturedAt: now,
+          ...(why?.trim() ? { why: why.trim() } : {}),
         },
       },
       '种下一个兴趣火花',
