@@ -161,4 +161,33 @@ describe('FilterBar / 搜索与过滤', () => {
     expect(matchesNode(node, createDefaultFilter())).toBe(true);
     expect(matchesNode(node, { ...createDefaultFilter(), folder: 'Projects' })).toBe(false);
   });
+
+  it('搜索来源、为什么和观察时间线', () => {
+    const node: InterestSeedNode = {
+      id: 'context',
+      type: 'topic',
+      title: '用户观察',
+      tags: ['设计'],
+      createdAt: NOW,
+      updatedAt: NOW,
+      metadata: {
+        why: '想让我做的东西被看见',
+        sourceRef: '研究/访谈.md',
+        observations: [
+          {
+            id: 'o1',
+            at: NOW,
+            source: 'note',
+            evidence: '今天真的观察了一次',
+            belief: 'stronger',
+          },
+        ],
+      },
+    };
+
+    expect(matchesNode(node, { ...createDefaultFilter(), query: '访谈' })).toBe(true);
+    expect(matchesNode(node, { ...createDefaultFilter(), query: '被看见' })).toBe(true);
+    expect(matchesNode(node, { ...createDefaultFilter(), query: '观察 今天' })).toBe(true);
+    expect(matchesNode(node, { ...createDefaultFilter(), query: '不存在' })).toBe(false);
+  });
 });

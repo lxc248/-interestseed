@@ -106,14 +106,30 @@ export function matchesNode(node: InterestSeedNode, filter: GraphFilter): boolea
   if (!query) return true;
 
   const queryTag = query.replace(/^#+/, '');
-  const summary =
-    typeof node.metadata.summary === 'string' ? node.metadata.summary : '';
+  const observations = Array.isArray(node.metadata.observations)
+    ? node.metadata.observations
+        .filter((item): item is Record<string, unknown> => Boolean(item && typeof item === 'object'))
+        .map((item) => String(item.evidence ?? ''))
+        .join(' ')
+    : '';
+  const searchable = [
+    node.title,
+    typeof node.metadata.summary === 'string' ? node.metadata.summary : '',
+    typeof node.metadata.why === 'string' ? node.metadata.why : '',
+    typeof node.metadata.raw === 'string' ? node.metadata.raw : '',
+    typeof node.metadata.sourceRef === 'string' ? node.metadata.sourceRef : '',
+    typeof node.metadata.contextSourceRef === 'string' ? node.metadata.contextSourceRef : '',
+    nodePath(node),
+    node.tags.join(' '),
+    observations,
+  ]
+    .join(' ')
+    .toLowerCase();
+  const terms = query.split(/\s+/).filter(Boolean);
 
   return (
-    node.title.toLowerCase().includes(query) ||
-    summary.toLowerCase().includes(query) ||
-    (queryTag !== '' &&
-      node.tags.some((item) => tagKey(item).includes(queryTag)))
+    terms.every((term) => searchable.includes(term)) ||
+    (queryTag !== '' && node.tags.some((item) => tagKey(item).includes(queryTag)))
   );
 }
 
@@ -204,7 +220,7 @@ export class FilterBar {
       cls: 'interestseed-search',
       attr: {
         type: 'search',
-        placeholder: '搜索标题、标签、摘要…',
+        placeholder: '搜索标题、标签、来源、观察…',
         'aria-label': '搜索节点',
       },
     });

@@ -104,6 +104,29 @@ plan-next-experiment
 
 MCP 仍然只读。
 
+
+## 上下文搜索
+
+搜索覆盖：
+
+`	ext
+title
+summary
+why
+raw
+sourceRef
+contextSourceRef
+path
+tags
+observations[].evidence
+`
+
+支持多词 AND，例如：
+
+`	ext
+观察 今天
+`
+
 ## 设计边界
 
 - 不引入中心化账号；

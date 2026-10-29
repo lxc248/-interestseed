@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.4.0 — Context search
+
+- Extended graph search to source refs, reasons, raw captures and observation evidence.
+- Added multi-word AND matching.
+- Kept search deterministic, local and dependency-free.
+- Documented the GitHub high-star gap scan.
+
 ## 2.3.1 — External source URI fix
 
 - Preserved `https://` and `http://` in `sourceUri`.
