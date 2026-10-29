@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.5.0 — Inbox, themes, share studio and read-only MCP
+
+- Added a persistent Share Inbox with URL dedupe, one-at-a-time processing and NEXT integration.
+- Added theme-first focus with visible theme counts.
+- Added share-card node hiding, caption copying and small-screen layout.
+- Added a local read-only MCP server with graph, next-step, search and experiment tools.
+- Added inbox persistence and queue size limits.
+- Added inbox and MCP documentation.
+
 ## 1.4.0 — Lighter passing, lighter sharing
 
 - Added “just passing” to the spark intake; it closes without writing a node.

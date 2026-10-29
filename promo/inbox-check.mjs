@@ -1,0 +1,24 @@
+import { chromium } from 'playwright-core';
+const browser = await chromium.connectOverCDP('http://127.0.0.1:9222');
+const page = browser.contexts()[0].pages()[0];
+await page.evaluate(() => {
+  const p = window.app.plugins.plugins.interestseed;
+  p.enqueueShare('美妆：早八底妆不卡粉 https://www.douyin.com/video/inbox-1');
+  p.enqueueShare('游戏：塞尔达为什么让我绕路 https://www.douyin.com/video/inbox-2');
+  p.openInbox();
+});
+await page.waitForTimeout(500);
+await page.screenshot({ path: 'C:\\Users\\30735\\Desktop\\interestseed\\review\\sim-artifacts\\14-share-inbox.png' });
+console.log('pending', await page.evaluate(() => window.app.plugins.plugins.interestseed.getPendingInboxItems().length));
+await page.getByText('处理这一条', { exact: true }).first().click({ force: true });
+await page.waitForTimeout(500);
+await page.screenshot({ path: 'C:\\Users\\30735\\Desktop\\interestseed\\review\\sim-artifacts\\15-inbox-process.png' });
+await page.getByText('只是路过', { exact: true }).click();
+await page.waitForTimeout(300);
+console.log('pending_after_pass', await page.evaluate(() => window.app.plugins.plugins.interestseed.getPendingInboxItems().length));
+await page.evaluate(() => window.app.plugins.plugins.interestseed.openInbox());
+await page.waitForTimeout(350);
+await page.screenshot({ path: 'C:\\Users\\30735\\Desktop\\interestseed\\review\\sim-artifacts\\16-inbox-after-pass.png' });
+console.log('list', await page.locator('.interestseed-inbox-item-title').allTextContents());
+await page.keyboard.press('Escape');
+await browser.close();

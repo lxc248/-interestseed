@@ -1,6 +1,7 @@
 import { Modal, Notice, setIcon } from 'obsidian';
 import type { App } from 'obsidian';
 import type InterestSeedPlugin from '../main';
+import type { InterestSeedGraph } from '../types/graph';
 import {
   SHARE_PRESETS,
   buildShareCaption,
@@ -22,6 +23,7 @@ export class ShareCardModal extends Modal {
   private canvas: HTMLCanvasElement | null = null;
   private statusEl: HTMLElement | null = null;
   private captionEl: HTMLElement | null = null;
+  private readonly hiddenIds = new Set<string>();
 
   constructor(
     app: App,
@@ -74,6 +76,25 @@ export class ShareCardModal extends Modal {
     const preview = root.createDiv({ cls: 'interestseed-share-preview' });
     this.previewEl = preview;
 
+    const settings = root.createEl('details', { cls: 'interestseed-share-settings' });
+    settings.createEl('summary', {
+      text: '分享设置 · 隐藏不想公开的节点',
+    });
+    const nodeList = settings.createDiv({ cls: 'interestseed-share-node-list' });
+    for (const node of [...this.plugin.store.listNodes()]
+      .sort((left, right) => left.title.localeCompare(right.title, 'zh'))
+      .slice(0, 10)) {
+      const label = nodeList.createEl('label', { cls: 'interestseed-share-node-option' });
+      const checkbox = label.createEl('input', { attr: { type: 'checkbox' } });
+      checkbox.checked = !this.hiddenIds.has(node.id);
+      checkbox.addEventListener('change', () => {
+        if (checkbox.checked) this.hiddenIds.delete(node.id);
+        else this.hiddenIds.add(node.id);
+        this.renderCard();
+      });
+      label.createSpan({ text: node.title });
+    }
+
     const info = root.createDiv({ cls: 'interestseed-share-info' });
     info.createSpan({ text: 'PNG · 无外链素材 · 可直接上传' });
     this.statusEl = info.createSpan({ cls: 'interestseed-share-status', text: '' });
@@ -108,10 +129,23 @@ export class ShareCardModal extends Modal {
     share.addEventListener('click', () => void this.systemShare());
   }
 
+  private visibleGraph(graph: InterestSeedGraph): InterestSeedGraph {
+    if (this.hiddenIds.size === 0) return graph;
+    const nodes = graph.nodes.filter((node) => !this.hiddenIds.has(node.id));
+    const ids = new Set(nodes.map((node) => node.id));
+    return {
+      ...graph,
+      nodes,
+      edges: graph.edges.filter(
+        (edge) => ids.has(edge.source) && ids.has(edge.target),
+      ),
+    };
+  }
+
   private renderCard(): void {
     if (!this.previewEl) return;
     this.previewEl.empty();
-    const graph = this.plugin.store.getGraph();
+    const graph = this.visibleGraph(this.plugin.store.getGraph());
     if (graph.nodes.length === 0) {
       this.previewEl.createDiv({
         cls: 'interestseed-share-empty',

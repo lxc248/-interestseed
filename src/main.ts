@@ -60,6 +60,8 @@ import { NodeCreateModal } from './ui/NodeCreateModal';
 import { SeedSprintModal } from './ui/SeedSprintModal';
 import { SparkCaptureModal } from './ui/SparkCaptureModal';
 import { ShareCardModal } from './ui/ShareCardModal';
+import { ShareInboxModal } from './ui/ShareInboxModal';
+import { ShareInbox } from './inbox/ShareInbox';
 import { analyzeShareText } from './services/shareAnalysis';
 import { GapCoachModal } from './ui/GapCoachModal';
 import { ExperimentModal } from './ui/ExperimentModal';
@@ -115,6 +117,7 @@ interface StoredPluginData {
   schemaVersion?: unknown;
   settings?: unknown;
   lastRebuiltAt?: unknown;
+  inbox?: unknown;
 }
 
 /**
@@ -124,6 +127,7 @@ interface StoredPluginData {
  */
 export default class InterestSeedPlugin extends Plugin {
   override settings: InterestSeedSettings = normalizeSettings(undefined);
+  readonly inbox = new ShareInbox();
 
   readonly store = new InterestSeedGraphStore();
   readonly undo = new UndoHistory({ maxDepth: 80 });
@@ -292,7 +296,8 @@ export default class InterestSeedPlugin extends Plugin {
     registerCommands(this, this);
     this.registerObsidianProtocolHandler('interestseed-share', (params) => {
       const text = typeof params.text === 'string' ? params.text : '';
-      this.openSparkCapture(text);
+      const result = this.enqueueShare(text);
+      this.openSparkCapture(text, result?.item.id);
     });
     this.addSettingTab(new InterestSeedSettingsTab(this.app, this));
 
@@ -567,8 +572,26 @@ export default class InterestSeedPlugin extends Plugin {
     return id;
   }
 
-  openSparkCapture(initialText = ''): void {
-    new SparkCaptureModal(this.app, this, initialText).open();
+  openSparkCapture(initialText = '', inboxId?: string): void {
+    new SparkCaptureModal(this.app, this, initialText, inboxId).open();
+  }
+
+  openInbox(): void {
+    new ShareInboxModal(this.app, this).open();
+  }
+
+  enqueueShare(text: string): ReturnType<ShareInbox['enqueue']> {
+    const result = this.inbox.enqueue(text);
+    if (result) void this.persist();
+    return result;
+  }
+
+  getPendingInboxItems(): ReturnType<ShareInbox['pending']> {
+    return this.inbox.pending();
+  }
+
+  resolveInboxItem(id: string, status: 'kept' | 'passed'): void {
+    if (this.inbox.resolve(id, status)) void this.persist();
   }
 
   async openSparkFromClipboard(): Promise<void> {
@@ -578,7 +601,8 @@ export default class InterestSeedPlugin extends Plugin {
         new Notice('剪贴板里没有可识别的分享内容。');
         return;
       }
-      this.openSparkCapture(text);
+      const result = this.enqueueShare(text);
+      this.openSparkCapture(text, result?.item.id);
     } catch {
       new Notice('无法读取剪贴板。请在手机快捷指令中使用 interestseed-share 链接，或手动粘贴。');
     }
@@ -1159,6 +1183,7 @@ export default class InterestSeedPlugin extends Plugin {
         schemaVersion: DATA_SCHEMA_VERSION,
         settings: this.settings,
         lastRebuiltAt: this.settingsLastRebuiltAt,
+        inbox: this.inbox.serialize(),
       });
     } catch (error) {
       console.error('[InterestSeed] 保存设置失败', error);
@@ -1217,6 +1242,7 @@ export default class InterestSeedPlugin extends Plugin {
     }
 
     this.settings = normalizeSettings(record.settings);
+    this.inbox.load(record.inbox);
 
     const lastRebuilt = record.lastRebuiltAt;
     if (typeof lastRebuilt === 'string' && !Number.isNaN(Date.parse(lastRebuilt))) {

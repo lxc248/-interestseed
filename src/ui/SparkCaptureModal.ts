@@ -18,6 +18,7 @@ export class SparkCaptureModal extends Modal {
     app: App,
     private readonly plugin: InterestSeedPlugin,
     initialText = '',
+    private readonly inboxId?: string,
   ) {
     super(app);
     this.text = initialText.trim();
@@ -110,6 +111,7 @@ export class SparkCaptureModal extends Modal {
       },
     });
     cancel.addEventListener('click', () => {
+      if (this.inboxId) this.plugin.resolveInboxItem(this.inboxId, 'passed');
       new Notice('没有写入图谱。下一次真正重要的内容，再留下。');
       this.close();
     });
@@ -159,6 +161,7 @@ export class SparkCaptureModal extends Modal {
   private submit(): void {
     const id = this.plugin.captureInterestSpark(this.text, this.targetId || undefined, this.why);
     if (!id) return;
+    if (this.inboxId) this.plugin.resolveInboxItem(this.inboxId, 'kept');
     this.plugin.setSelectedNode(id);
     new Notice(
       this.targetId

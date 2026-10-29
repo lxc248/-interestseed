@@ -129,6 +129,7 @@ export class InterestSeedView extends ItemView {
     });
     this.createAction(actions, 'plus', '新建节点', () => this.plugin.promptCreateNode());
     this.createAction(actions, 'sparkles', '记录兴趣火花', () => this.plugin.openSparkCapture());
+    this.createAction(actions, 'archive', '分享收件箱', () => this.plugin.openInbox());
     this.createAction(actions, 'git-fork', '刷新规则建议', () => {
       this.plugin.refreshSuggestions();
     });
@@ -625,7 +626,8 @@ export class InterestSeedView extends ItemView {
     const host = this.nextStepEl;
     if (!host) return;
     const graph = this.plugin.store.getGraph();
-    if (graph.nodes.length === 0) {
+    const pendingInbox = this.plugin.getPendingInboxItems().length;
+    if (graph.nodes.length === 0 && pendingInbox === 0) {
       host.addClass('is-hidden');
       return;
     }
@@ -645,7 +647,13 @@ export class InterestSeedView extends ItemView {
     let button = '记录火花';
     let action = () => this.plugin.openSparkCapture();
 
-    if (selectedIsLoose && selected) {
+    if (pendingInbox > 0) {
+      label = `NEXT · ${pendingInbox} 条分享待判断`;
+      title = '打开分享收件箱，一次处理一条';
+      detail = '刷到的东西先放进来；每次只做一个决定：留下并连接，或者只是路过。';
+      button = '打开收件箱';
+      action = () => this.plugin.openInbox();
+    } else if (selectedIsLoose && selected) {
       label = 'NEXT · 这个火花还没有连接';
       title = `给「${selected.title}」选一个已有兴趣`;
       detail = '不需要先决定它属于哪里；先选一个最接近的方向，之后还可以改。';
