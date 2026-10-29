@@ -60,3 +60,8 @@ graphs/
 /review/artifacts/2026-10-29/
 
 /review/artifacts/2026-10-29-final/
+
+# Viewer QA artifacts
+/promo/screenshot-*.mjs
+/promo/viewer-*.png
+/promo/star-map.html

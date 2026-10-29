@@ -38,11 +38,23 @@ jobs:
           cd dist
           zip -r "../release/interestseed-${RELEASE_TAG}.zip" main.js manifest.json styles.css
 
+      - name: Package Agent Skill and Cosmic Viewer
+        env:
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          mkdir -p release/skill/interestseed-skill
+          cp -r skill/. release/skill/interestseed-skill/
+          cp -r viewer release/skill/interestseed-skill/viewer
+          cd release/skill
+          zip -r "../interestseed-skill-${RELEASE_TAG}.zip" interestseed-skill
+
       - uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ inputs.tag || github.ref_name }}
           body_path: RELEASE_NOTES_1.0.0.md
           files: |
             release/interestseed-*.zip
+            release/interestseed-skill-*.zip
             assets/interestseed-launch.mp4
             assets/interestseed-launch-cover.png
+            assets/cosmic-viewer.png

@@ -122,6 +122,12 @@ InterestSeed 让你：
 
 ![主工作区](assets/screenshot-1.png)
 
+### 宇宙星图（不需要 Obsidian）
+
+![Cosmic Viewer](assets/cosmic-viewer.png)
+
+行星是兴趣，轨道是主题，粒子流是关系。独立 HTML Viewer 可以直接打开、搜索、缩放和导出 PNG；Obsidian 只是可选宿主。
+
 ### 兴趣起跑
 
 ![兴趣起跑](assets/onboarding.png)
@@ -162,6 +168,10 @@ styles.css
 ```
 
 4. 在 Obsidian 设置 → 第三方插件中启用 InterestSeed。
+
+### 不安装 Obsidian
+
+[下载 `interestseed-skill-v1.0.0.zip`](https://github.com/lxc248/-interestseed/releases/download/v1.0.0/interestseed-skill-v1.0.0.zip)，放入用户 Agent 的 skills 目录，阅读 `skill/SKILL.md`。Agent 会生成一个独立的 `star-map.html`，双击即可查看行星、轨道和星云；不需要 Obsidian。
 
 ### 从源码构建
 
@@ -236,6 +246,13 @@ promo/
   index.html      纯代码宣传片
   render.mjs      Playwright → FFmpeg
   synth_audio.py  120 BPM 配乐合成
+viewer/
+  index.html      独立宇宙星图 Viewer
+  cosmic.js       Canvas 行星/轨道/粒子渲染
+  cosmic.css      玻璃 HUD 与响应式界面
+skill/
+  SKILL.md        Agent 端星图 Skill
+  render.mjs      JSON → 单文件 star-map.html
 assets/
   interestseed-launch.mp4
   interestseed-launch-cover.png

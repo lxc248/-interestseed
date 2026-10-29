@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="dark" />
+  <title>InterestSeed · Cosmic Interest Map</title>
+  <link rel="stylesheet" href="cosmic.css" />
+</head>
+<body>
+  <canvas id="cosmos" aria-label="动态兴趣星图"></canvas>
+  <div class="cosmic-vignette" aria-hidden="true"></div>
+  <div class="cosmic-grain" aria-hidden="true"></div>
+
+  <header class="cosmic-topbar">
+    <div class="cosmic-brand">
+      <div class="cosmic-orbit-mark" aria-hidden="true">
+        <span class="cosmic-orbit-core"></span>
+        <span class="cosmic-orbit-ring"></span>
+        <span class="cosmic-orbit-moon"></span>
+      </div>
+      <div>
+        <div class="cosmic-kicker">INTERESTSEED / COSMIC MAP</div>
+        <h1>兴趣星图</h1>
+      </div>
+    </div>
+    <div class="cosmic-topbar-stats" id="stats">
+      <span><b>—</b> planets</span>
+      <span><b>—</b> orbits</span>
+    </div>
+    <div class="cosmic-topbar-actions">
+      <button class="cosmic-icon-button" id="fit" title="适应星图" aria-label="适应星图">⌖</button>
+      <button class="cosmic-icon-button" id="pause" title="暂停动态" aria-label="暂停动态">Ⅱ</button>
+      <button class="cosmic-export" id="export">保存星图</button>
+    </div>
+  </header>
+
+  <section class="cosmic-intro">
+    <div class="cosmic-eyebrow">A LIVING CONSTELLATION</div>
+    <p>每个行星，都是一个正在生长的兴趣。</p>
+  </section>
+
+  <aside class="cosmic-detail is-empty" id="detail">
+    <div class="cosmic-detail-empty">
+      <div class="cosmic-empty-star" aria-hidden="true">✦</div>
+      <div class="cosmic-detail-title">选择一个行星</div>
+      <p>点击星球，查看它和哪些兴趣相连。拖动空白处可以漫游星图。</p>
+    </div>
+  </aside>
+
+  <div class="cosmic-search-wrap">
+    <input id="search" type="search" placeholder="搜索兴趣、项目或证据…" autocomplete="off" spellcheck="false" />
+    <div class="cosmic-filter" id="filters">
+      <button class="is-active" data-filter="all">全部</button>
+      <button data-filter="project">项目</button>
+      <button data-filter="topic">主题</button>
+      <button data-filter="activity">行动</button>
+    </div>
+  </div>
+
+  <div class="cosmic-legend">
+    <span><i class="legend-dot is-project"></i>项目</span>
+    <span><i class="legend-dot is-topic"></i>主题</span>
+    <span><i class="legend-dot is-activity"></i>行动</span>
+    <span><i class="legend-dot is-document"></i>文档</span>
+    <span class="cosmic-legend-sep"></span>
+    <span>拖拽漫游 · 滚轮缩放 · 点击查看</span>
+  </div>
+
+  <div class="cosmic-toast" id="toast" role="status"></div>
+  <script src="graph-data.js"></script>
+  <script src="cosmic.js"></script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://interestseed.local/schema/graph.schema.json",
+  "title": "InterestSeed Graph",
+  "type": "object",
+  "required": ["schemaVersion", "nodes", "edges"],
+  "properties": {
+    "schemaVersion": { "const": 2 },
+    "updatedAt": { "type": "string" },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "title", "tags"],
+        "properties": {
+          "id": { "type": "string" },
+          "type": {
+            "enum": ["project", "document", "topic", "image", "audio", "video", "activity"]
+          },
+          "title": { "type": "string", "minLength": 1 },
+          "sourceUri": { "type": "string" },
+          "tags": { "type": "array", "items": { "type": "string" } },
+          "createdAt": { "type": "string" },
+          "updatedAt": { "type": "string" },
+          "metadata": { "type": "object" }
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "source", "target", "relation", "status"],
+        "properties": {
+          "id": { "type": "string" },
+          "source": { "type": "string" },
+          "target": { "type": "string" },
+          "relation": { "type": "string" },
+          "origin": { "enum": ["user", "rule", "ai"] },
+          "status": { "enum": ["confirmed", "suggested", "rejected"] },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+          "evidence": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  }
+}
