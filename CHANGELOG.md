@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.4.0 — Lighter passing, lighter sharing
+
+- Added “just passing” to the spark intake; it closes without writing a node.
+- Added suggested share caption copying with real graph topics.
+- Improved download compatibility and small-screen share modal layout.
+- Paused cosmic canvas drawing while Obsidian is hidden.
+- Improved share-card label collision avoidance.
+- Added caption and preset tests.
+
 ## 1.3.0 — Share a constellation
 
 - Added platform-sized PNG share cards for Xiaohongshu, Instagram, X, WeChat and Stories.

@@ -62,6 +62,29 @@ export function shareCardFilename(preset: SharePreset): string {
   return `interestseed-star-map-${preset.id}-${preset.width}x${preset.height}.png`;
 }
 
+export function buildShareCaption(graph: InterestSeedGraph, preset: SharePreset): string {
+  const ignored = new Set(['火花', '视频', '文本', '主题', '兴趣起跑', '项目', '下一步']);
+  const counts = new Map<string, number>();
+  for (const node of graph.nodes) {
+    for (const tag of node.tags) {
+      if (ignored.has(tag)) continue;
+      counts.set(tag, (counts.get(tag) ?? 0) + 1);
+    }
+  }
+  const topics = [...counts.entries()]
+    .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0], 'zh'))
+    .slice(0, 4)
+    .map(([tag]) => tag);
+  const topicLine = topics.length > 0 ? `最近在关注：${topics.join('、')}。` : '';
+  return [
+    `我的兴趣星图：${graph.nodes.length} 个节点，${graph.edges.length} 条关系。`,
+    topicLine,
+    `#InterestSeed #兴趣星图 #${preset.id === 'x' ? '个人成长' : '自我探索'}`,
+  ]
+    .filter(Boolean)
+    .join('\n');
+}
+
 interface Palette {
   color: string;
   glyph: string;

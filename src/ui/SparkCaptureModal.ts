@@ -101,11 +101,18 @@ export class SparkCaptureModal extends Modal {
 
     const footer = root.createDiv({ cls: 'interestseed-spark-footer' });
     const cancel = footer.createEl('button', {
-      cls: 'interestseed-sprint-secondary',
-      text: '取消',
-      attr: { type: 'button' },
+      cls: 'interestseed-sprint-secondary interestseed-spark-pass',
+      text: '只是路过',
+      attr: {
+        type: 'button',
+        title: '不写入图谱，也不需要解释',
+        'aria-label': '只是路过，不保存这个火花',
+      },
     });
-    cancel.addEventListener('click', () => this.close());
+    cancel.addEventListener('click', () => {
+      new Notice('没有写入图谱。下一次真正重要的内容，再留下。');
+      this.close();
+    });
     this.submitEl = footer.createEl('button', {
       cls: 'mod-cta interestseed-sprint-primary',
       text: '留下这个火花',

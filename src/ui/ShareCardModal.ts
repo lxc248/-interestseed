@@ -3,6 +3,7 @@ import type { App } from 'obsidian';
 import type InterestSeedPlugin from '../main';
 import {
   SHARE_PRESETS,
+  buildShareCaption,
   canvasToBlob,
   getSharePreset,
   renderShareCard,
@@ -20,6 +21,7 @@ export class ShareCardModal extends Modal {
   private previewEl: HTMLElement | null = null;
   private canvas: HTMLCanvasElement | null = null;
   private statusEl: HTMLElement | null = null;
+  private captionEl: HTMLElement | null = null;
 
   constructor(
     app: App,
@@ -71,11 +73,13 @@ export class ShareCardModal extends Modal {
 
     const preview = root.createDiv({ cls: 'interestseed-share-preview' });
     this.previewEl = preview;
-    this.renderCard();
 
     const info = root.createDiv({ cls: 'interestseed-share-info' });
     info.createSpan({ text: 'PNG · 无外链素材 · 可直接上传' });
     this.statusEl = info.createSpan({ cls: 'interestseed-share-status', text: '' });
+
+    this.captionEl = root.createDiv({ cls: 'interestseed-share-caption' });
+    this.renderCard();
 
     const actions = root.createDiv({ cls: 'interestseed-share-actions' });
     const download = actions.createEl('button', {
@@ -84,12 +88,18 @@ export class ShareCardModal extends Modal {
       attr: { type: 'button' },
     });
     download.addEventListener('click', () => void this.download());
-    const copyButton = actions.createEl('button', {
+    const copyImageButton = actions.createEl('button', {
       cls: 'interestseed-sprint-secondary',
       text: '复制图片',
       attr: { type: 'button' },
     });
-    copyButton.addEventListener('click', () => void this.copyImage());
+    copyImageButton.addEventListener('click', () => void this.copyImage());
+    const caption = actions.createEl('button', {
+      cls: 'interestseed-sprint-secondary',
+      text: '复制文案',
+      attr: { type: 'button' },
+    });
+    caption.addEventListener('click', () => void this.copyCaption());
     const share = actions.createEl('button', {
       cls: 'interestseed-sprint-secondary',
       text: '系统分享',
@@ -113,6 +123,7 @@ export class ShareCardModal extends Modal {
     const preset = getSharePreset(this.platform);
     const canvas = renderShareCard(graph, preset);
     this.canvas = canvas;
+    if (this.captionEl) this.captionEl.setText(buildShareCaption(graph, preset));
     canvas.addClass('interestseed-share-canvas');
     canvas.setAttribute('role', 'img');
     canvas.setAttribute('aria-label', `${preset.label} 兴趣星图分享卡片`);
@@ -128,11 +139,25 @@ export class ShareCardModal extends Modal {
       const link = document.createElement('a');
       link.href = url;
       link.download = shareCardFilename(getSharePreset(this.platform));
+      document.body.appendChild(link);
       link.click();
+      link.remove();
       window.setTimeout(() => URL.revokeObjectURL(url), 1000);
       this.setStatus('已下载 PNG');
     } catch (error) {
       new Notice(error instanceof Error ? error.message : '导出图片失败。');
+    }
+  }
+
+  private async copyCaption(): Promise<void> {
+    const graph = this.plugin.store.getGraph();
+    if (!graph.nodes.length) return;
+    const caption = buildShareCaption(graph, getSharePreset(this.platform));
+    try {
+      await navigator.clipboard.writeText(caption);
+      this.setStatus('文案已复制');
+    } catch {
+      new Notice('复制文案失败，请手动选择卡片下方文案。');
     }
   }
 

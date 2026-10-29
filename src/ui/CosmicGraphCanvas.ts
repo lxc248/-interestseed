@@ -431,6 +431,11 @@ export class CosmicGraphCanvas {
 
   private loop(): void {
     if (this.disposed) return;
+    if (document.hidden) {
+      this.lastTime = performance.now();
+      this.frame = requestAnimationFrame(() => this.loop());
+      return;
+    }
     const now = performance.now();
     this.time += Math.min(40, now - this.lastTime) / 1000;
     this.lastTime = now;
