@@ -62,6 +62,8 @@ export interface SeedSprintEdgeProposal {
 
 export interface SeedSprintExperiment {
   title: string;
+  hypothesis: string;
+  metric: string;
   prompt: string;
   days: number;
   steps: string[];
@@ -389,6 +391,8 @@ export function buildSeedSprintDraft(selection: SeedSprintSelection): SeedSprint
 
   const experiment: SeedSprintExperiment = {
     title: '7 天兴趣实验',
+    hypothesis: `接下来的 7 天，我愿意用真实行动验证「${magnet?.seedTitle ?? '这个兴趣'}」是否值得继续投入。`,
+    metric: '每天记录一次兴趣强度、精力值和一个具体证据；连续 7 条才算完成。',
     prompt: `用 7 天，把「${magnet?.seedTitle ?? '你的兴趣'}」从好奇变成一个可观察的小实验。`,
     days: 7,
     steps: [

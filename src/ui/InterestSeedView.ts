@@ -169,33 +169,42 @@ export class InterestSeedView extends ItemView {
     }
     const experiment = this.plugin.getActiveExperiment();
     if (experiment) {
+      root.addClass('has-experiment');
       const strip = root.createDiv({ cls: 'interestseed-experiment-strip' });
       const stripIcon = strip.createDiv({ cls: 'interestseed-experiment-strip-icon' });
       setIcon(stripIcon, 'flask-conical');
       const stripCopy = strip.createDiv({ cls: 'interestseed-experiment-strip-copy' });
       stripCopy.createDiv({
         cls: 'interestseed-experiment-strip-kicker',
-        text: experiment.status === 'complete' ? 'EXPERIMENT COMPLETE' : `INTEREST EXPERIMENT · DAY ${experiment.day} / 7`,
+        text:
+          experiment.state.status === 'complete'
+            ? 'EXPERIMENT COMPLETE · REVIEW'
+            : `INTEREST EXPERIMENT · DAY ${experiment.day} / 7`,
       });
       stripCopy.createDiv({
         cls: 'interestseed-experiment-strip-title',
-        text: experiment.node.title,
+        text: experiment.state.title,
       });
       const dots = stripCopy.createDiv({ cls: 'interestseed-experiment-dots' });
       for (let day = 1; day <= 7; day += 1) {
         const dot = dots.createSpan({ cls: 'interestseed-experiment-dot' });
-        if (day <= experiment.day) dot.addClass('is-done');
+        if (day <= experiment.state.logs.length) dot.addClass('is-done');
+        if (day === experiment.gate.day && experiment.state.status !== 'complete') {
+          dot.addClass('is-today');
+        }
       }
-      const advance = strip.createEl('button', {
+      const open = strip.createEl('button', {
         cls: 'interestseed-experiment-advance',
-        text: experiment.status === 'complete' ? '已完成' : '完成今天',
+        text:
+          experiment.state.status === 'complete'
+            ? '查看复盘'
+            : experiment.gate.ok
+              ? '记录今天'
+              : '今日已记录',
         attr: { type: 'button' },
       });
-      advance.disabled = experiment.status === 'complete';
-      advance.addEventListener('click', () => {
-        this.plugin.advanceExperiment();
-        void this.onOpen();
-      });
+      open.disabled = !experiment.gate.ok && experiment.state.status !== 'complete';
+      open.addEventListener('click', () => this.plugin.openExperiment());
     }
 
     const launchpad = root.createDiv({ cls: 'interestseed-launchpad' });
@@ -591,6 +600,8 @@ export class InterestSeedView extends ItemView {
     this.totalEdges = graph.edges.length;
     this.visibleNodes = filtered.nodeCount;
     this.visibleEdges = filtered.edgeCount;
+    this.contentEl.toggleClass('has-graph', total > 0);
+    this.contentEl.toggleClass('has-experiment', Boolean(this.plugin.getActiveExperiment()));
 
     if (
       this.selectedId &&

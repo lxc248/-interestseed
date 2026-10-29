@@ -60,7 +60,17 @@ import { NodeCreateModal } from './ui/NodeCreateModal';
 import { SeedSprintModal } from './ui/SeedSprintModal';
 import { SparkCaptureModal } from './ui/SparkCaptureModal';
 import { GapCoachModal } from './ui/GapCoachModal';
+import { ExperimentModal } from './ui/ExperimentModal';
 import type { Insight } from './core/InsightEngine';
+import {
+  canRecordToday,
+  createExperiment,
+  experimentSummary,
+  parseExperiment,
+  recordExperimentLog,
+  type ExperimentInput,
+  type ExperimentState,
+} from './experiment/experiment';
 import type { SeedSprintDraft } from './onboarding/seedSprint';
 import { edgeIdFor, hashString, nodeIdForUri } from './utils/ids';
 import { RelationCreateModal } from './ui/RelationCreateModal';
@@ -365,42 +375,67 @@ export default class InterestSeedPlugin extends Plugin {
     await workspace.revealLeaf(leaf);
   }
 
-  getActiveExperiment(): { node: InterestSeedNode; day: number; status: string } | null {
+  getActiveExperiment(): {
+    node: InterestSeedNode;
+    state: ExperimentState;
+    day: number;
+    gate: ReturnType<typeof canRecordToday>;
+    summary: ReturnType<typeof experimentSummary>;
+  } | null {
     const node = this.store
       .listNodes()
       .find((candidate) => candidate.metadata?.nextStep === true);
     if (!node) return null;
-    const rawDay = Number(node.metadata?.experimentDay ?? 1);
+    const state =
+      parseExperiment(node.metadata, node.title) ??
+      createExperiment({ title: node.title, hypothesis: '这个兴趣值得我投入一周的真实注意力。' });
     return {
       node,
-      day: Number.isFinite(rawDay) ? Math.min(7, Math.max(1, rawDay)) : 1,
-      status: String(node.metadata?.experimentStatus ?? 'active'),
+      state,
+      day: Math.min(7, state.logs.length + 1),
+      gate: canRecordToday(state),
+      summary: experimentSummary(state),
     };
   }
 
-  advanceExperiment(): void {
+  openExperiment(): void {
+    new ExperimentModal(this.app, this).open();
+  }
+
+  recordExperimentCheckIn(input: ExperimentInput): boolean {
     const active = this.getActiveExperiment();
-    if (!active || active.day >= 7) {
-      new Notice('这个兴趣实验已经完成 7 天。');
-      return;
+    if (!active) {
+      new Notice('没有进行中的兴趣实验。');
+      return false;
     }
-    const nextDay = active.day + 1;
-    this.session.updateNode(
-      active.node.id,
-      {
-        metadata: {
-          ...active.node.metadata,
-          experimentDay: nextDay,
-          experimentLastCheckInAt: new Date().toISOString(),
-          experimentStatus: nextDay >= 7 ? 'complete' : 'active',
+    try {
+      const state = recordExperimentLog(active.state, input);
+      this.session.updateNode(
+        active.node.id,
+        {
+          metadata: {
+            ...active.node.metadata,
+            experimentState: state,
+            experimentDay: state.logs.length,
+            experimentStatus: state.status,
+            experimentLastCheckInAt: new Date().toISOString(),
+          },
         },
-      },
-      `兴趣实验：完成第 ${active.day} 天`,
-    );
-    this.insightsCache = null;
-    this.notifyStatus();
-    void this.persist();
-    new Notice(nextDay >= 7 ? '7 天兴趣实验完成。你的图谱多了一段真实反馈。' : `完成第 ${active.day} 天，明天继续。`);
+        `兴趣实验：记录第 ${state.logs.length} 天`,
+      );
+      this.insightsCache = null;
+      this.notifyStatus();
+      void this.persist();
+      new Notice(
+        state.status === 'complete'
+          ? '7 天实验完成。现在可以回看你的兴趣曲线。'
+          : `第 ${state.logs.length} 天已记录。明天再来。`,
+      );
+      return true;
+    } catch (error) {
+      new Notice(error instanceof Error ? error.message : '实验记录失败。');
+      return false;
+    }
   }
 
   openGapCoach(insight: Insight): void {
@@ -570,7 +605,17 @@ export default class InterestSeedPlugin extends Plugin {
           confidence: proposal.confidence,
           nextStep: proposal.nextStep === true,
           ...(proposal.nextStep
-            ? { experimentDay: 1, experimentStartedAt: now, experimentStatus: 'active' }
+            ? {
+                experimentDay: 0,
+                experimentStartedAt: now,
+                experimentStatus: 'active',
+                experimentState: createExperiment({
+                  title: proposal.title,
+                  hypothesis: draft.experiment.hypothesis,
+                  metric: draft.experiment.metric,
+                  startedAt: now,
+                }),
+              }
             : {}),
         },
       });

@@ -9,7 +9,7 @@
 <p>
   <img alt="Obsidian" src="https://img.shields.io/badge/Obsidian-1.5%2B-7c3aed" />
   <img alt="Version" src="https://img.shields.io/badge/version-1.0.0-0ea5e9" />
-  <img alt="Tests" src="https://img.shields.io/badge/tests-443%20passing-22c55e" />
+  <img alt="Tests" src="https://img.shields.io/badge/tests-447%20passing-22c55e" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b" />
   <img alt="Local first" src="https://img.shields.io/badge/local--first-yes-14b8a6" />
 </p>
@@ -126,6 +126,12 @@ InterestSeed 让你：
 
 ![兴趣起跑](assets/onboarding.png)
 
+### 严谨的 7 天实验
+
+![7 天兴趣实验](assets/experiment.png)
+
+不是点一下加一天：每天必须写下真实观察，记录兴趣强度与精力值，连续 7 条才完成。
+
 ### 兴趣探索
 
 ![探索工作室](assets/screenshot-2.png)
@@ -173,7 +179,7 @@ npm run deploy
 npm run verify
 ```
 
-包含 typecheck、443 个测试、ESLint 与生产构建。
+包含 typecheck、447 个测试、ESLint 与生产构建。
 
 ---
 

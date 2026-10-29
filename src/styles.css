@@ -5061,3 +5061,125 @@ button.interestseed-inbox-node:hover {
 .interestseed-gap-input:focus { border-color: var(--gap-accent); outline: none; box-shadow: 0 0 0 2px rgba(217,119,87,0.1); }
 .interestseed-gap-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
 .interestseed-gap-footer button { min-height: 33px; font-size: 10px; }
+/* ============================================================
+   WORKSPACE FOCUS — graph first, not a dashboard wall
+   ============================================================ */
+.interestseed-root.has-graph .interestseed-launchpad { display: none; }
+.interestseed-root.has-graph:not(.is-filter-open) .interestseed-filter-host { display: none; }
+.interestseed-root.has-graph .interestseed-body { min-height: 0; }
+.interestseed-root.has-graph .interestseed-canvas-container { min-height: 420px; }
+.interestseed-root.has-graph .interestseed-quickbar { padding-top: 7px; padding-bottom: 7px; }
+.interestseed-root.has-graph .interestseed-sprint-banner { margin-bottom: 0; }
+.interestseed-root.has-experiment .interestseed-experiment-strip { margin-top: 8px; }
+.interestseed-root.has-graph .interestseed-experiment-strip {
+  margin: 8px 18px 0;
+  padding: 8px 12px;
+  border-color: color-mix(in srgb, #7dcf9a 24%, var(--background-modifier-border));
+  background: linear-gradient(100deg, rgba(125, 207, 154, 0.055), var(--background-secondary));
+}
+.interestseed-root.has-graph .interestseed-experiment-strip-title { font-size: 10px; }
+.interestseed-root.has-graph .interestseed-experiment-advance { border-color: rgba(125,207,154,0.28); }
+.interestseed-root.has-graph .interestseed-filter-host {
+  margin: 0 18px;
+  border: 1px solid var(--is-v2-line);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--background-secondary) 28%, var(--background-primary));
+}
+.interestseed-root.has-graph .interestseed-detail { width: 352px; }
+@media (max-width: 640px) {
+  .interestseed-root.has-graph .interestseed-launchpad { display: none; }
+  .interestseed-root.has-graph .interestseed-sprint-banner { display: none; }
+  .interestseed-root.has-graph .interestseed-body { min-height: 0; }
+  .interestseed-root.has-graph .interestseed-canvas-container { min-height: 340px; }
+}
+
+/* ============================================================
+   EXPERIMENT — strict daily protocol
+   ============================================================ */
+.interestseed-experiment-modal.modal {
+  width: min(820px, 94vw);
+  height: min(820px, 90vh);
+  padding: 0;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 18px;
+  background: var(--background-primary);
+  overflow: hidden;
+}
+.interestseed-experiment-modal .modal-content { height: 100%; padding: 0; overflow: hidden; }
+.interestseed-experiment {
+  --exp-accent: #d97757;
+  --exp-green: #7dcf9a;
+  --exp-ink: var(--text-normal);
+  --exp-muted: var(--text-muted);
+  box-sizing: border-box;
+  height: 100%;
+  overflow: auto;
+  padding: 32px 36px 28px;
+  background:
+    radial-gradient(80% 80% at 100% 0%, rgba(217,119,87,0.10), transparent 60%),
+    radial-gradient(60% 70% at 0% 100%, rgba(125,207,154,0.055), transparent 60%),
+    var(--background-primary);
+}
+.interestseed-experiment-header { display: flex; align-items: flex-start; gap: 14px; }
+.interestseed-experiment-mark {
+  display: grid; place-items: center; flex: 0 0 42px; width: 42px; height: 42px;
+  border: 1px solid rgba(125,207,154,0.38); border-radius: 12px; color: var(--exp-green);
+  background: rgba(125,207,154,0.08);
+}
+.interestseed-experiment-kicker { color: var(--exp-green); font-size: 9px; font-weight: 760; letter-spacing: 0.17em; }
+.interestseed-experiment-title { margin: 5px 0 0; color: var(--exp-ink); font-size: 25px; font-weight: 740; letter-spacing: -0.04em; }
+.interestseed-experiment-hypothesis { max-width: 650px; margin: 7px 0 0; color: var(--exp-muted); font-size: 12px; line-height: 1.65; }
+.interestseed-experiment-metric { margin-top: 7px; color: var(--exp-accent); font-size: 10px; font-weight: 620; }
+.interestseed-experiment-progress { display: grid; grid-template-columns: repeat(7, 1fr); gap: 7px; margin-top: 22px; }
+.interestseed-experiment-day {
+  display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 9px 4px 8px;
+  border: 1px solid var(--is-v2-line); border-radius: 9px; background: color-mix(in srgb, var(--text-normal) 2.5%, transparent);
+}
+.interestseed-experiment-day.is-done { border-color: rgba(125,207,154,0.32); background: rgba(125,207,154,0.07); }
+.interestseed-experiment-day.is-today { border-color: var(--exp-accent); box-shadow: 0 0 0 1px rgba(217,119,87,0.2); }
+.interestseed-experiment-day-number { color: var(--exp-muted); font-size: 16px; font-weight: 740; }
+.interestseed-experiment-day.is-done .interestseed-experiment-day-number { color: var(--exp-green); }
+.interestseed-experiment-day.is-today .interestseed-experiment-day-number { color: var(--exp-accent); }
+.interestseed-experiment-day-label { color: var(--exp-muted); font-size: 8px; }
+.interestseed-experiment-logs { display: flex; flex-direction: column; gap: 7px; max-height: 200px; overflow: auto; margin-top: 16px; padding-right: 3px; }
+.interestseed-experiment-log { display: flex; gap: 12px; padding: 9px 11px; border: 1px solid var(--is-v2-line); border-radius: 8px; background: color-mix(in srgb, var(--text-normal) 2.5%, transparent); }
+.interestseed-experiment-log-day { flex: 0 0 46px; color: var(--exp-green); font-size: 10px; font-weight: 700; }
+.interestseed-experiment-log-body { min-width: 0; }
+.interestseed-experiment-log-evidence { color: var(--exp-ink); font-size: 10px; line-height: 1.5; }
+.interestseed-experiment-log-meta { margin-top: 3px; color: var(--exp-muted); font-size: 8px; }
+.interestseed-experiment-form { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--is-v2-line); }
+.interestseed-experiment-form-title { color: var(--exp-ink); font-size: 15px; font-weight: 690; }
+.interestseed-experiment-form-hint { margin-top: 4px; color: var(--exp-muted); font-size: 10px; }
+.interestseed-experiment-scale { display: flex; align-items: center; gap: 14px; margin-top: 15px; }
+.interestseed-experiment-scale-label { width: 68px; color: var(--exp-muted); font-size: 10px; }
+.interestseed-experiment-scale-options { display: flex; gap: 6px; }
+.interestseed-experiment-scale-button { width: 31px; height: 29px; border: 1px solid var(--is-v2-line); border-radius: 7px; background: transparent; color: var(--exp-muted); font-size: 11px; font-weight: 650; cursor: pointer; }
+.interestseed-experiment-scale-button:hover { border-color: var(--exp-accent); color: var(--exp-ink); }
+.interestseed-experiment-scale-button.is-active { border-color: var(--exp-accent); background: rgba(217,119,87,0.12); color: var(--exp-accent); }
+.interestseed-experiment-field { display: flex; flex-direction: column; gap: 5px; margin-top: 13px; color: var(--exp-muted); font-size: 10px; }
+.interestseed-experiment-input {
+  box-sizing: border-box; width: 100%; padding: 9px 11px; border: 1px solid var(--is-v2-line);
+  border-radius: 8px; background: var(--background-secondary); color: var(--exp-ink);
+  font-family: var(--font-interface); font-size: 11px; line-height: 1.55;
+}
+.interestseed-experiment-input:focus { border-color: var(--exp-accent); outline: none; }
+.interestseed-experiment-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 18px; }
+.interestseed-experiment-actions button { min-height: 33px; font-size: 10px; }
+.interestseed-experiment-locked { margin-top: 18px; padding: 11px 13px; border: 1px dashed rgba(125,207,154,0.28); border-radius: 8px; color: var(--exp-green); font-size: 11px; }
+.interestseed-experiment-review { margin-top: 18px; padding: 15px; border: 1px solid rgba(125,207,154,0.28); border-radius: 10px; background: rgba(125,207,154,0.055); }
+.interestseed-experiment-review-title { color: var(--exp-green); font-size: 13px; font-weight: 680; }
+.interestseed-experiment-review-text { margin-top: 6px; color: var(--exp-muted); font-size: 10px; line-height: 1.6; }
+.interestseed-experiment-empty { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 38px 8px; }
+.interestseed-experiment-empty .interestseed-experiment-mark { margin-bottom: 4px; }
+.interestseed-experiment-empty .interestseed-experiment-hypothesis { max-width: 520px; }
+@media (max-width: 640px) {
+  .interestseed-experiment-modal.modal { width: 96vw; height: 94vh; border-radius: 12px; }
+  .interestseed-experiment { padding: 22px 17px; }
+  .interestseed-experiment-title { font-size: 20px; }
+  .interestseed-experiment-progress { gap: 3px; }
+  .interestseed-experiment-day { padding: 7px 1px; }
+  .interestseed-experiment-scale { gap: 8px; }
+  .interestseed-experiment-scale-label { width: 58px; }
+  .interestseed-experiment-scale-options { gap: 4px; }
+  .interestseed-experiment-scale-button { width: 27px; }
+}

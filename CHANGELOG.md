@@ -5,7 +5,7 @@
 - Seed Sprint: four choices → a first confirmable interest constellation.
 - Interest Spark: capture a short-video link or a sentence as a graph seed.
 - Gap Coach: turn bridge/orphan insights into one concrete observation.
-- 7-day interest experiment with persisted day-by-day progress.
+- Strict 7-day interest experiment: daily evidence, 1–5 interest/energy scores, one check-in per calendar day, and a completion review.
 - One Agent entry for connecting your own DSH-compatible agent via ACP.
 - Evidence-backed draft graph; no silent writeback; undoable application.
 - 40-second programmatic launch film and launch documentation.
