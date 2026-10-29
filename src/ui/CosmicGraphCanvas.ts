@@ -138,6 +138,7 @@ export class CosmicGraphCanvas {
   private moved = false;
   private lastPointer = { x: 0, y: 0 };
   private hasGraph = false;
+  private viewportInitialized = false;
   private resizeObserver: ResizeObserver | null = null;
   private viewportTimer: number | null = null;
   private time = 0;
@@ -290,16 +291,21 @@ export class CosmicGraphCanvas {
 
   setViewport(viewport: GraphViewport | undefined): void {
     if (!viewport) return;
+    if (this.nodes.length > 0 && this.nodes.length <= 45 && !this.viewportInitialized) {
+      this.viewportInitialized = true;
+      this.zoomToFit();
+      return;
+    }
     if (this.nodes.length > 0 && this.nodes.length <= 45 && viewport.zoom < 0.55) {
       this.zoomToFit();
       return;
     }
-    const hasVisibleNode = this.nodes.some((node) => {
+    const visibleCount = this.nodes.filter((node) => {
       const x = node.x * viewport.zoom + viewport.panX;
       const y = node.y * viewport.zoom + viewport.panY;
       return x > -160 && x < this.width + 160 && y > -160 && y < this.height + 160;
-    });
-    if (this.nodes.length > 0 && !hasVisibleNode) {
+    }).length;
+    if (this.nodes.length > 0 && visibleCount < this.nodes.length * 0.8) {
       this.zoomToFit();
       return;
     }
@@ -384,6 +390,8 @@ export class CosmicGraphCanvas {
     ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     ctx.clearRect(0, 0, width, height);
     this.drawBackdrop();
+    this.drawCoreThreads();
+    this.drawCore();
     this.drawOrbits();
     this.drawEdges();
     this.drawClusterStars();
@@ -453,6 +461,97 @@ export class CosmicGraphCanvas {
       ctx.stroke();
     }
     ctx.globalAlpha = 1;
+  }
+
+  private drawCoreThreads(): void {
+    const coreX = (WORLD_WIDTH / 2) * this.zoom + this.panX;
+    const coreY = (WORLD_HEIGHT / 2) * this.zoom + this.panY;
+    let index = 0;
+    for (const cluster of this.clusters.values()) {
+      const x = cluster.x * this.zoom + this.panX;
+      const y = cluster.y * this.zoom + this.panY;
+      const mx = (coreX + x) / 2;
+      const my = (coreY + y) / 2 - (index % 2 === 0 ? 34 : -26);
+      this.ctx.save();
+      this.ctx.strokeStyle = 'rgba(232,200,132,.20)';
+      this.ctx.lineWidth = 0.8;
+      this.ctx.setLineDash([2, 7]);
+      this.ctx.beginPath();
+      this.ctx.moveTo(coreX, coreY);
+      this.ctx.quadraticCurveTo(mx, my, x, y);
+      this.ctx.stroke();
+      this.ctx.setLineDash([]);
+      this.ctx.fillStyle = 'rgba(232,200,132,.7)';
+      this.ctx.beginPath();
+      this.ctx.arc(x, y, 1.4, 0, Math.PI * 2);
+      this.ctx.fill();
+      this.ctx.restore();
+      index += 1;
+    }
+  }
+
+  private drawCore(): void {
+    const x = (WORLD_WIDTH / 2) * this.zoom + this.panX;
+    const y = (WORLD_HEIGHT / 2) * this.zoom + this.panY;
+    const pulse = 0.94 + Math.sin(this.time * 1.2) * 0.06;
+    const haloRadius = 138 * this.zoom;
+    const halo = this.ctx.createRadialGradient(x, y, 0, x, y, haloRadius);
+    halo.addColorStop(0, 'rgba(255,244,210,.88)');
+    halo.addColorStop(0.08, 'rgba(255,217,143,.44)');
+    halo.addColorStop(0.38, 'rgba(189,169,255,.10)');
+    halo.addColorStop(1, 'rgba(189,169,255,0)');
+    this.ctx.fillStyle = halo;
+    this.ctx.beginPath();
+    this.ctx.arc(x, y, haloRadius, 0, Math.PI * 2);
+    this.ctx.fill();
+
+    this.ctx.save();
+    this.ctx.globalAlpha = 0.28;
+    this.ctx.strokeStyle = '#f0d6a0';
+    this.ctx.lineWidth = 0.8;
+    for (let ray = 0; ray < 8; ray += 1) {
+      const angle = (ray / 8) * Math.PI * 2 + this.time * 0.03;
+      const length = (ray % 2 === 0 ? 46 : 27) * this.zoom;
+      this.ctx.beginPath();
+      this.ctx.moveTo(x + Math.cos(angle) * 8 * this.zoom, y + Math.sin(angle) * 8 * this.zoom);
+      this.ctx.lineTo(x + Math.cos(angle) * length, y + Math.sin(angle) * length);
+      this.ctx.stroke();
+    }
+    this.ctx.restore();
+
+    this.ctx.save();
+    this.ctx.globalAlpha = 0.22;
+    this.ctx.strokeStyle = 'rgba(232,200,132,.72)';
+    this.ctx.lineWidth = 0.7;
+    this.ctx.beginPath();
+    this.ctx.ellipse(x, y, 26 * this.zoom, 10 * this.zoom, -0.28, 0, Math.PI * 2);
+    this.ctx.stroke();
+    this.ctx.beginPath();
+    this.ctx.ellipse(x, y, 38 * this.zoom, 15 * this.zoom, 0.22, 0, Math.PI * 2);
+    this.ctx.stroke();
+    this.ctx.restore();
+
+    const nucleus = this.ctx.createRadialGradient(
+      x - 2 * this.zoom,
+      y - 2 * this.zoom,
+      0,
+      x,
+      y,
+      15 * this.zoom,
+    );
+    nucleus.addColorStop(0, '#fffdf4');
+    nucleus.addColorStop(0.36, '#fff0c4');
+    nucleus.addColorStop(0.74, '#e8c884');
+    nucleus.addColorStop(1, 'rgba(232,200,132,0)');
+    this.ctx.fillStyle = nucleus;
+    this.ctx.beginPath();
+    this.ctx.arc(x, y, 16 * this.zoom * pulse, 0, Math.PI * 2);
+    this.ctx.fill();
+
+    this.ctx.font = '600 8px "Inter","Noto Sans SC",sans-serif';
+    this.ctx.textAlign = 'center';
+    this.ctx.fillStyle = 'rgba(240,214,160,.65)';
+    this.ctx.fillText('YOUR CORE', x, y + 25 * this.zoom);
   }
 
   private drawOrbits(): void {
@@ -526,13 +625,13 @@ export class CosmicGraphCanvas {
     const activeId = this.selectedId ?? this.hoveredId;
     for (const edge of this.edges) {
       const curve = this.edgeCurve(edge);
-      const style = TYPE_STYLE[edge.source.type] ?? TYPE_STYLE.topic;
+      const stroke = edge.edge.status === 'suggested' ? '#b98f3c' : '#e8c884';
       const active =
         activeId !== null &&
         (edge.source.id === activeId || edge.target.id === activeId);
       this.ctx.save();
       this.ctx.globalAlpha = active ? 0.95 : edge.edge.status === 'suggested' ? 0.20 : 0.33;
-      this.ctx.strokeStyle = active ? style.color : `${style.color}88`;
+      this.ctx.strokeStyle = active ? stroke : `${stroke}88`;
       this.ctx.lineWidth = active ? 1.7 : edge.edge.status === 'suggested' ? 0.8 : 1.0;
       if (edge.edge.status === 'suggested') this.ctx.setLineDash([4, 8]);
       this.ctx.beginPath();
@@ -553,8 +652,8 @@ export class CosmicGraphCanvas {
           2 * (1 - p) * p * curve.cy +
           p * p * curve.by;
         const glow = this.ctx.createRadialGradient(x, y, 0, x, y, 7);
-        glow.addColorStop(0, active ? style.color : `${style.color}aa`);
-        glow.addColorStop(1, `${style.color}00`);
+        glow.addColorStop(0, active ? stroke : `${stroke}aa`);
+        glow.addColorStop(1, `${stroke}00`);
         this.ctx.fillStyle = glow;
         this.ctx.beginPath();
         this.ctx.arc(x, y, 7, 0, Math.PI * 2);
@@ -567,7 +666,7 @@ export class CosmicGraphCanvas {
         this.ctx.fillStyle = 'rgba(5,7,13,.82)';
         this.roundRect(curve.cx - tw / 2 - 6, curve.cy - 12, tw + 12, 17, 7);
         this.ctx.fill();
-        this.ctx.fillStyle = style.color;
+        this.ctx.fillStyle = stroke;
         this.ctx.textAlign = 'center';
         this.ctx.fillText(text, curve.cx, curve.cy);
       }
@@ -613,6 +712,36 @@ export class CosmicGraphCanvas {
     this.ctx.beginPath();
     this.ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
     this.ctx.fill();
+
+    this.ctx.save();
+    this.ctx.beginPath();
+    this.ctx.arc(p.x, p.y, r * 0.96, 0, Math.PI * 2);
+    this.ctx.clip();
+    if (node.type === 'topic' || node.type === 'project') {
+      for (let band = 0; band < 3; band += 1) {
+        const bandY = p.y - r * 0.46 + band * r * 0.36;
+        this.ctx.fillStyle = `rgba(255,255,255,${0.045 + band * 0.018})`;
+        this.ctx.beginPath();
+        this.ctx.ellipse(p.x, bandY, r * 1.03, r * 0.10, 0, 0, Math.PI * 2);
+        this.ctx.fill();
+      }
+    } else if (node.type === 'document' || node.type === 'image') {
+      for (let crater = 0; crater < 4; crater += 1) {
+        const angle = hash(`${node.id}-crater-${crater}`) * Math.PI * 2;
+        const distance = hash(`${node.id}-distance-${crater}`) * r * 0.68;
+        this.ctx.fillStyle = 'rgba(3,7,14,.14)';
+        this.ctx.beginPath();
+        this.ctx.arc(
+          p.x + Math.cos(angle) * distance,
+          p.y + Math.sin(angle) * distance,
+          Math.max(1, r * (0.06 + hash(`${node.id}-size-${crater}`) * 0.06)),
+          0,
+          Math.PI * 2,
+        );
+        this.ctx.fill();
+      }
+    }
+    this.ctx.restore();
 
     this.ctx.fillStyle = 'rgba(2,4,9,.28)';
     this.ctx.beginPath();

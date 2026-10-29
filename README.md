@@ -126,7 +126,9 @@ InterestSeed 让你：
 
 ![Cosmic Viewer](assets/plugin-cosmic.png)
 
-打开 InterestSeed 就是宇宙星图：行星是兴趣，轨道是主题，粒子流是关系。选中、拖拽、缩放、筛选、详情面板都在 Obsidian 内完成。单文件 HTML Viewer 只作为 Agent Skill 的便携输出，不是主体验。
+打开 InterestSeed 就是一张个人宇宙：中心是星核，外围是主题行星系统，行星是兴趣，金色星座线是关系。参考了 `neural-creator-dashboard` 的视觉结构，但没有照搬成“神经网络节点”，而是保留行星的实体感与轨道语法。
+
+选中、拖拽、缩放、筛选、详情面板都在 Obsidian 内完成。单文件 HTML Viewer 只作为 Agent Skill 的便携输出，不是主体验。
 
 ### 兴趣起跑
 

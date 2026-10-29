@@ -8,7 +8,7 @@
 - Strict 7-day interest experiment: daily evidence, 1–5 interest/energy scores, one check-in per calendar day, and a completion review.
 - One Agent entry for connecting your own DSH-compatible agent via ACP.
 - Evidence-backed draft graph; no silent writeback; undoable application.
-- Obsidian main view now uses the cosmic canvas by default: planets, orbits, nebulae and travelling light.\n- Standalone cosmic viewer: planets, orbits, nebulae, particle trails and glass HUD.\n- Portable Agent Skill package with a single-file `star-map.html` renderer.\n- 40-second programmatic launch film and launch documentation.
+- Obsidian main view now uses the cosmic canvas by default: central star core, planetary systems, gold constellation threads, nebulae and travelling light.\n- Standalone cosmic viewer: planets, orbits, nebulae, particle trails and glass HUD.\n- Portable Agent Skill package with a single-file `star-map.html` renderer.\n- 40-second programmatic launch film and launch documentation.
 
 ## 0.2.0
 
