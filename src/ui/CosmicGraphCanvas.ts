@@ -150,6 +150,19 @@ export class CosmicGraphCanvas {
   private viewportTimer: number | null = null;
   private time = 0;
   private lastTime = performance.now();
+  private readonly motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  private motionReduced = this.motionQuery.matches;
+  private readonly handleMotionChange = (): void => {
+    this.motionReduced = this.motionQuery.matches;
+    if (this.motionReduced) {
+      if (this.frame !== null) cancelAnimationFrame(this.frame);
+      this.frame = null;
+      this.draw();
+    } else if (this.frame === null) {
+      this.lastTime = performance.now();
+      this.loop();
+    }
+  };
   private readonly positions = new Map<string, { x: number; y: number }>();
   private readonly stars: Array<{
     x: number;
@@ -192,7 +205,9 @@ export class CosmicGraphCanvas {
     this.resizeObserver.observe(container);
     this.bindEvents();
     this.resize();
-    this.loop();
+    this.motionQuery.addEventListener('change', this.handleMotionChange);
+    if (this.motionReduced) this.draw();
+    else this.loop();
   }
 
   setGraph(graph: InterestSeedGraph, selectedId: string | null = null): void {
@@ -357,8 +372,17 @@ export class CosmicGraphCanvas {
     if (this.frame !== null) cancelAnimationFrame(this.frame);
     this.frame = null;
     if (this.viewportTimer !== null) clearTimeout(this.viewportTimer);
+    this.motionQuery.removeEventListener('change', this.handleMotionChange);
     this.resizeObserver?.disconnect();
     this.resizeObserver = null;
+    this.canvas.removeEventListener('pointerdown', this.handlePointerDown);
+    this.canvas.removeEventListener('pointermove', this.handlePointerMove);
+    this.canvas.removeEventListener('pointerup', this.handlePointerUp);
+    this.canvas.removeEventListener('pointercancel', this.handlePointerUp);
+    this.canvas.removeEventListener('pointerleave', this.handlePointerLeave);
+    this.canvas.removeEventListener('wheel', this.handleWheel);
+    this.canvas.removeEventListener('dblclick', this.handleDoubleClick);
+    this.canvas.removeEventListener('click', this.handleClick);
     this.canvas.remove();
   }
 

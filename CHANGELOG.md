@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.0 — Clear next action
+
+- Global audit of the student and office-worker journeys.
+- Share analysis: platform, short title, inferred topics, `why saved` note and one explicit spark decision.
+- NEXT bar: one primary action at a time; duplicate experiment CTAs removed.
+- Experimental nodes are no longer counted as orphan nodes.
+- Compact graph labels keep the map readable; full titles remain in the detail panel.
+- Unified dark cosmic surfaces for onboarding, spark, experiment and toolbar.
+- Added share-analysis tests and a 1.1.0 release workflow.
+
 ## 1.0.0 — The first living constellation
 
 - Seed Sprint: four choices → a first confirmable interest constellation.

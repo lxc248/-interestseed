@@ -762,7 +762,7 @@ export class InterestSeedGraphStore implements GraphStore {
     for (const node of this.nodes.values()) byType[node.type] += 1;
 
     for (const node of this.nodes.values()) {
-      if (!confirmedNodes.has(node.id)) orphans += 1;
+      if (!confirmedNodes.has(node.id) && !node.metadata?.nextStep) orphans += 1;
     }
 
     return {
