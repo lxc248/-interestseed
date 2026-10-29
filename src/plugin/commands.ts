@@ -37,7 +37,7 @@ export interface CommandHost {
 export function registerCommands(plugin: Plugin, host: CommandHost): void {
   plugin.addCommand({
     id: 'interestseed-open',
-    name: '打开兴趣图谱',
+    name: '打开兴趣验证（图谱）',
     callback: () => {
       void host.activateView();
     },

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.6.0 — Interest validator positioning
+
+- Reframed the product from “interest graph” to “interest validator”.
+- Added “别收藏更多，验证一个。” to README and manifest.
+- Updated the main view subtitle to “一次只验证一个兴趣：收藏 → 行动 → 证据”.
+- Added docs/positioning.md with audience, moat and competition-stage strategy.
+
 ## 2.5.0 — View state convergence
 
 - Replaced competing inbox/discovery booleans with one graph / inbox / discoveries mode.

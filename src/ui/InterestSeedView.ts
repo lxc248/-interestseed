@@ -88,7 +88,7 @@ export class InterestSeedView extends ItemView {
   }
 
   override getDisplayText(): string {
-    return '兴趣图谱';
+    return '兴趣验证';
   }
 
   override getIcon(): string {
@@ -105,7 +105,7 @@ export class InterestSeedView extends ItemView {
     const heading = header.createDiv({ cls: 'interestseed-heading' });
     const icon = heading.createDiv({ cls: 'interestseed-heading-icon' });
     setIcon(icon, 'sprout');
-    heading.createEl('h2', { cls: 'interestseed-heading-title', text: '兴趣图谱' });
+    heading.createEl('h2', { cls: 'interestseed-heading-title', text: '兴趣验证' });
     heading.createSpan({
       cls: 'interestseed-heading-vault',
       text: this.app.vault.getName(),
@@ -113,7 +113,7 @@ export class InterestSeedView extends ItemView {
     this.countEl = heading.createSpan({ cls: 'interestseed-heading-count', text: '' });
     heading.createDiv({
       cls: 'interestseed-heading-subtitle',
-      text: '把零散笔记连接成可行动的兴趣结构',
+      text: '一次只验证一个兴趣：收藏 → 行动 → 证据',
     });
 
     const agentCta = header.createEl('button', {

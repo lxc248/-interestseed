@@ -1,6 +1,8 @@
 # InterestSeed
 
-**You do not need to know what you like. Make four choices and grow your first living interest constellation.**
+**Stop collecting. Start proving.**
+
+**InterestSeed is an interest validator: turn one saved post into a real 3-day action, then let evidence decide whether to keep it.**
 
 [English](README.en.md) · [简体中文](README.md) · [Watch the 40s film](assets/interestseed-launch.mp4) · [Product design](docs/seed-sprint.md)
 
@@ -8,7 +10,7 @@
 
 <p>
   <img alt="Obsidian" src="https://img.shields.io/badge/Obsidian-1.5%2B-7c3aed" />
-  <img alt="Version" src="https://img.shields.io/badge/version-2.5.0-0ea5e9" />
+  <img alt="Version" src="https://img.shields.io/badge/version-2.6.0-0ea5e9" />
   <img alt="Tests" src="https://img.shields.io/badge/tests-471%20passing-22c55e" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b" />
   <img alt="Local first" src="https://img.shields.io/badge/local--first-yes-14b8a6" />
@@ -16,7 +18,7 @@
 
 ---
 
-## Not another AI note-taking shell
+## Not another collection app
 
 Most interest tools open with a blank input and ask you to describe yourself. InterestSeed starts with four concrete choices, then turns them into a **draft constellation** you can confirm, edit, and grow.
 
@@ -86,7 +88,7 @@ The core rule:
 
 ## Install
 
-1. Download `interestseed-v2.5.0.zip` from Releases.
+1. Download `interestseed-v2.6.0.zip` from Releases.
 2. Extract into:
 
 ```text

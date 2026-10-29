@@ -1,14 +1,16 @@
 # InterestSeed
 
-**你不需要先知道自己喜欢什么。做四个选择，长出第一张会生长的兴趣星图。**
+**别收藏更多，验证一个。**
 
-[简体中文](README.md) · [English](README.en.md) · [看 40 秒演示](assets/interestseed-launch.mp4) · [产品设计](docs/seed-sprint.md)
+**InterestSeed 是兴趣验证器：把一条刷到的内容，变成 3 天内可以验证的真实行动，用证据决定继续还是放下。**
+
+[简体中文](README.md) · [English](README.en.md) · [看 40 秒演示](assets/interestseed-launch.mp4) · [产品设计](docs/seed-sprint.md) · [定位](docs/positioning.md)
 
 [![InterestSeed 演示封面](assets/interestseed-launch-cover.png)](assets/interestseed-launch.mp4)
 
 <p>
   <img alt="Obsidian" src="https://img.shields.io/badge/Obsidian-1.5%2B-7c3aed" />
-  <img alt="Version" src="https://img.shields.io/badge/version-2.5.0-0ea5e9" />
+  <img alt="Version" src="https://img.shields.io/badge/version-2.6.0-0ea5e9" />
   <img alt="Tests" src="https://img.shields.io/badge/tests-471%20passing-22c55e" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b" />
   <img alt="Local first" src="https://img.shields.io/badge/local--first-yes-14b8a6" />
@@ -16,7 +18,7 @@
 
 ---
 
-## 这不是又一个 AI 笔记插件
+## 这也不是又一个收藏夹
 
 大多数兴趣工具让你：
 
@@ -34,7 +36,9 @@ InterestSeed 让你：
 → 让图谱在真实行动里继续生长
 ```
 
-它把 **短视频时代的一次短暂好奇**，变成一张可确认、可追溯、可行动的兴趣图谱。
+它把 **短视频时代的一次短暂好奇**，变成一次真实行动和一条可追溯的证据。
+
+图谱只是证据的载体；产品本身是：**收藏 → 判断 → 3 天验证 → 证据 → 下一步**。
 
 ---
 
@@ -100,19 +104,20 @@ InterestSeed 让你：
 
 ## 为什么它与众不同
 
-| 常见 AI 图谱 | InterestSeed |
+| 常见 AI 图谱 / 收藏夹 | InterestSeed |
 | --- | --- |
 | AI 自动生成、自动写回 | **先提案，后确认；默认不写回** |
 | 只给“相关” | 每条边有 `origin`、`status`、`confidence`、`evidence` |
 | 拒绝后下次继续推荐 | 反馈记忆 + 抑制键，减少重复打扰 |
 | 只服务已有笔记 | 从 0 开始，用选择卡完成冷启动 |
-| 收藏夹越来越大 | 火花捕获把消费转成图谱结构 |
-| 图谱只是结果页 | 图谱旁边有缺口、下一步、实验和 Agent |
-| 聊天是主界面 | 图谱是主界面，Agent 是执行层 |
+| 收藏夹越来越大 | 一条内容进入一次判断，再进入 3 天验证 |
+| 以节点数、生成量衡量 | 以决策完成率、验证完成率、证据数衡量 |
+| 图谱只是结果页 | 图谱是证据载体，下一步是主界面 |
+| 聊天是主界面 | 验证是主界面，Agent 是执行层 |
 
 核心原则：
 
-> **AI 负责提出候选，人负责确认，反馈负责让下一轮更聪明。**
+> **AI 负责提出候选，人负责确认，证据负责决定留下还是放下。**
 
 ---
 
@@ -173,7 +178,7 @@ InterestSeed 让你：
 
 ### 手动安装
 
-1. 下载最新 Release 的 `interestseed-v2.5.0.zip`；
+1. 下载最新 Release 的 `interestseed-v2.6.0.zip`；
 2. 解压到：
 
 ```text
@@ -192,7 +197,7 @@ styles.css
 
 ### 不安装 Obsidian
 
-[下载 `interestseed-skill-v2.5.0.zip`](https://github.com/lxc248/-interestseed/releases/download/v2.5.0/interestseed-skill-v2.5.0.zip)，放入用户 Agent 的 skills 目录，阅读 `skill/SKILL.md`。Agent 会生成一个独立的 `star-map.html`，双击即可查看行星、轨道和星云；不需要 Obsidian。
+[下载 `interestseed-skill-v2.6.0.zip`](https://github.com/lxc248/-interestseed/releases/download/v2.6.0/interestseed-skill-v2.6.0.zip)，放入用户 Agent 的 skills 目录，阅读 `skill/SKILL.md`。Agent 会生成一个独立的 `star-map.html`，双击即可查看行星、轨道和星云；不需要 Obsidian。
 
 ### 从源码构建
 
