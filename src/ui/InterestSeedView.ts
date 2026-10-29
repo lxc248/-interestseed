@@ -126,6 +126,8 @@ export class InterestSeedView extends ItemView {
       void this.plugin.activateAgentView();
     });
 
+    root.createDiv({ cls: 'interestseed-narrow-hint', text: '面板较窄，拉宽分栏查看完整图谱。' });
+
     const nextStep = root.createDiv({ cls: 'interestseed-next-step is-hidden' });
     this.nextStepEl = nextStep;
     const nextMark = nextStep.createDiv({ cls: 'interestseed-next-step-mark' });

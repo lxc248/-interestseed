@@ -6623,3 +6623,53 @@ body.theme-light .interestseed-sprint-option.is-selected {
   color: #c5d2e6;
 }
 .interestseed-root .interestseed-discovery-panel .interestseed-discovery-action:hover { background: rgba(90, 130, 210, 0.18); }
+/* Very narrow panes: treat the plugin like an icon-first sidebar, not a desktop page. */
+@container (max-width: 360px) {
+  .interestseed-header { padding: 8px 10px; }
+  .interestseed-heading { gap: 7px; }
+  .interestseed-heading-icon { width: 24px; height: 24px; border-radius: 8px; }
+  .interestseed-heading-icon svg { width: 14px; height: 14px; }
+  .interestseed-heading-title { font-size: 13px; }
+  .interestseed-heading-vault,
+  .interestseed-heading-count,
+  .interestseed-heading-subtitle,
+  .interestseed-header-cta { display: none; }
+  .interestseed-next-step { padding: 8px; gap: 7px; align-items: flex-start; }
+  .interestseed-next-step-mark { display: none; }
+  .interestseed-next-step-label { font-size: 7px; }
+  .interestseed-next-step-title { font-size: 10px; line-height: 1.45; }
+  .interestseed-next-step-detail { display: none; }
+  .interestseed-next-step-button { min-height: 26px; padding: 0 8px; font-size: 9px; }
+  .interestseed-experiment-strip { padding: 7px 8px; gap: 7px; }
+  .interestseed-experiment-strip-icon { width: 24px; height: 24px; }
+  .interestseed-experiment-strip-kicker { display: none; }
+  .interestseed-experiment-strip-title { font-size: 10px; }
+  .interestseed-experiment-advance { min-height: 26px; padding: 0 7px; font-size: 8px; }
+  .interestseed-quickbar { padding: 6px 8px; gap: 4px; flex-wrap: wrap; }
+  .interestseed-quick-action { min-height: 28px; padding: 0 8px; gap: 0; }
+  .interestseed-quick-action > span:not(.interestseed-quick-badge) { display: none; }
+  .interestseed-quick-badge { position: static; margin-left: 2px; }
+  .interestseed-more-menu { min-width: 170px; }
+  .interestseed-filter-host { padding-inline: 8px; }
+}
+.interestseed-narrow-hint { display: none; }
+@container (max-width: 300px) {
+  .interestseed-header { padding: 8px; }
+  .interestseed-heading { flex-wrap: nowrap; align-items: center; min-width: 0; }
+  .interestseed-heading-icon { flex: 0 0 22px; width: 22px; height: 22px; }
+  .interestseed-heading-title { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .interestseed-next-step,
+  .interestseed-experiment-strip,
+  .interestseed-sprint-banner,
+  .interestseed-cluster-rail { display: none !important; }
+  .interestseed-narrow-hint {
+    display: block;
+    padding: 7px 9px;
+    color: #8290a5;
+    font-size: 9px;
+    line-height: 1.45;
+    border-bottom: 1px solid rgba(210, 218, 238, 0.08);
+  }
+  .interestseed-body { min-height: 320px; }
+  .interestseed-canvas-container { min-height: 300px; }
+}

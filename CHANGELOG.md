@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.6.1 — Adaptive narrow layout
+
+- Added icon-first layout for panes below 360px.
+- Added a structural fallback below 300px instead of compressing the desktop layout.
+- Kept the graph, quick actions and a width hint usable in narrow panes.
+- Verified Share Inbox at 480px wide.
+- Documented the adaptive audit.
+
 ## 2.6.0 — Interest validator positioning
 
 - Reframed the product from “interest graph” to “interest validator”.
