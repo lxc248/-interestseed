@@ -40,6 +40,11 @@ export class InterestSeedView extends ItemView {
   private detailContentHost: HTMLElement | null = null;
   private discoveryHost: HTMLElement | null = null;
   private countEl: HTMLElement | null = null;
+  private nextStepEl: HTMLElement | null = null;
+  private nextStepLabelEl: HTMLElement | null = null;
+  private nextStepTitleEl: HTMLElement | null = null;
+  private nextStepDetailEl: HTMLElement | null = null;
+  private nextStepButton: HTMLButtonElement | null = null;
   private footerScanEl: HTMLElement | null = null;
   private footerSaveEl: HTMLElement | null = null;
   private footerErrorEl: HTMLElement | null = null;
@@ -142,6 +147,20 @@ export class InterestSeedView extends ItemView {
     });
     this.createAction(actions, 'layout-dashboard', '兴趣总览', () => {
       this.plugin.openDiscoveryOverview();
+    });
+
+    const nextStep = root.createDiv({ cls: 'interestseed-next-step is-hidden' });
+    this.nextStepEl = nextStep;
+    const nextMark = nextStep.createDiv({ cls: 'interestseed-next-step-mark' });
+    setIcon(nextMark, 'arrow-up-right');
+    const nextCopy = nextStep.createDiv({ cls: 'interestseed-next-step-copy' });
+    this.nextStepLabelEl = nextCopy.createDiv({ cls: 'interestseed-next-step-label', text: 'NEXT' });
+    this.nextStepTitleEl = nextCopy.createDiv({ cls: 'interestseed-next-step-title', text: '' });
+    this.nextStepDetailEl = nextCopy.createDiv({ cls: 'interestseed-next-step-detail', text: '' });
+    this.nextStepButton = nextStep.createEl('button', {
+      cls: 'interestseed-next-step-button',
+      text: '',
+      attr: { type: 'button' },
     });
 
     if (!this.plugin.settings.seedSprintCompletedAt) {
@@ -594,6 +613,68 @@ export class InterestSeedView extends ItemView {
     }
   }
 
+  private renderNextStep(): void {
+    const host = this.nextStepEl;
+    if (!host) return;
+    const graph = this.plugin.store.getGraph();
+    if (graph.nodes.length === 0) {
+      host.addClass('is-hidden');
+      return;
+    }
+
+    const selected = this.selectedId ? this.plugin.store.getNode(this.selectedId) : undefined;
+    const selectedIsLoose = selected ? this.plugin.store.degree(selected.id) === 0 : false;
+    const sparks = graph.nodes.filter((node) => Boolean(node.metadata?.spark));
+    const looseSparks = sparks.filter((node) => this.plugin.store.degree(node.id) === 0);
+    const isolated = graph.nodes.filter((node) => this.plugin.store.degree(node.id) === 0);
+    const experiment = this.plugin.getActiveExperiment();
+
+    let label = 'NEXT · 把今天的内容变成线索';
+    let title = '再留下一个真实好奇';
+    let detail = '刷到一条抖音或小红书，不需要整理全部，只留下让你停下来的那一条。';
+    let button = '记录火花';
+    let action = () => this.plugin.openSparkCapture();
+
+    if (selectedIsLoose && selected) {
+      label = 'NEXT · 这个火花还没有连接';
+      title = `给「${selected.title}」选一个已有兴趣`;
+      detail = '不需要先决定它属于哪里；先选一个最接近的方向，之后还可以改。';
+      button = '补一条连接';
+      action = () => this.plugin.promptCreateRelation(selected.id);
+    } else if (looseSparks.length > 0) {
+      const spark = looseSparks[0];
+      label = `NEXT · 还有 ${looseSparks.length} 个火花待判断`;
+      title = `先处理「${spark?.title ?? '这个火花'}」`;
+      detail = '先判断它和哪个已有兴趣有关；不确定就选“只是路过”，不要让收件箱变成新的收藏夹。';
+      button = '处理这个火花';
+      action = () => {
+        if (spark) this.select(spark.id);
+      };
+    } else if (experiment?.gate.ok) {
+      label = `NEXT · DAY ${experiment.day} / 7`;
+      title = '今天还没有记录实验';
+      detail = '写一件真实发生的事，而不是“今天学了 AI”。兴趣和精力各打一个分。';
+      button = '记录今天';
+      action = () => this.plugin.openExperiment();
+    } else if (isolated.length > 0) {
+      const node = isolated[0];
+      label = `NEXT · ${isolated.length} 个孤立节点`;
+      title = `给「${node?.title ?? '这个节点'}」补一条连接`;
+      detail = '孤立节点不是错误，它只是还没有进入你的兴趣结构。';
+      button = '补一条连接';
+      action = () => {
+        if (node) this.plugin.promptCreateRelation(node.id);
+      };
+    }
+
+    this.nextStepLabelEl?.setText(label);
+    this.nextStepTitleEl?.setText(title);
+    this.nextStepDetailEl?.setText(detail);
+    this.nextStepButton?.setText(button);
+    if (this.nextStepButton) this.nextStepButton.onclick = action;
+    host.removeClass('is-hidden');
+  }
+
   private refresh(): void {
     if (!this.canvas || !this.emptyState) return;
     this.syncDiscoveryVisibility();
@@ -607,6 +688,7 @@ export class InterestSeedView extends ItemView {
     this.visibleEdges = filtered.edgeCount;
     this.contentEl.toggleClass('has-graph', total > 0);
     this.contentEl.toggleClass('has-experiment', Boolean(this.plugin.getActiveExperiment()));
+    this.renderNextStep();
 
     if (
       this.selectedId &&

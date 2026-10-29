@@ -74,7 +74,7 @@ await page.locator('.interestseed-spark-input').fill(
 );
 await page.waitForTimeout(250);
 await shot('06-spark-modal.png');
-await page.getByText('种下这个火花', { exact: true }).click();
+await page.getByText('留下这个火花', { exact: true }).click();
 await page.waitForTimeout(500);
 
 // Remaining observed Douyin items through the same public plugin API.

@@ -1,6 +1,7 @@
 import { Modal, Notice, setIcon } from 'obsidian';
 import type { App } from 'obsidian';
 import type InterestSeedPlugin from '../main';
+import { analyzeShareText } from '../services/shareAnalysis';
 
 /**
  * 兴趣火花：把短视频、文章、一次对话里让你停下来的东西，
@@ -44,6 +45,13 @@ export class SparkCaptureModal extends Modal {
       text: '刷到一条视频、读到一句话、听到一个问题——先记下它，再决定它和你的哪条兴趣有关。',
     });
 
+    const flow = root.createDiv({ cls: 'interestseed-spark-flow' });
+    for (const [index, label] of ['识别平台', '提炼兴趣', '你来决定', '进入星图'].entries()) {
+      const step = flow.createDiv({ cls: 'interestseed-spark-flow-step' });
+      step.createSpan({ cls: 'interestseed-spark-flow-index', text: String(index + 1) });
+      step.createSpan({ text: label });
+    }
+
     const input = root.createEl('textarea', {
       cls: 'interestseed-spark-input',
       attr: {
@@ -58,7 +66,7 @@ export class SparkCaptureModal extends Modal {
     input.focus();
 
     const target = root.createEl('select', { cls: 'interestseed-spark-target' });
-    target.createEl('option', { text: '先不连接，作为一个新种子', attr: { value: '' } });
+    target.createEl('option', { text: '先放收件箱，作为新种子', attr: { value: '' } });
     const nodes = this.plugin.store
       .listNodes()
       .filter((node) => !node.metadata?.spark)
@@ -84,7 +92,7 @@ export class SparkCaptureModal extends Modal {
     cancel.addEventListener('click', () => this.close());
     this.submitEl = footer.createEl('button', {
       cls: 'mod-cta interestseed-sprint-primary',
-      text: '种下这个火花',
+      text: '留下这个火花',
       attr: { type: 'button' },
     });
     this.submitEl.disabled = true;
@@ -93,34 +101,46 @@ export class SparkCaptureModal extends Modal {
 
   private updatePreview(): void {
     if (!this.previewEl) return;
-    const title = this.plugin.describeSpark(this.text);
+    const analysis = analyzeShareText(this.text);
     this.previewEl.empty();
-    if (!title) {
+    if (!this.text.trim()) {
       this.previewEl.addClass('is-empty');
       this.previewEl.createDiv({
         cls: 'interestseed-spark-preview-placeholder',
-        text: '这里会出现你的火花预览',
+        text: '粘贴一条抖音/小红书分享链接，或写下一句让你停下来的话',
       });
       if (this.submitEl) this.submitEl.disabled = true;
       return;
     }
     this.previewEl.removeClass('is-empty');
-    const icon = this.previewEl.createDiv({ cls: 'interestseed-spark-preview-icon' });
-    setIcon(icon, this.plugin.isVideoSpark(this.text) ? 'play' : 'quote');
+    const top = this.previewEl.createDiv({ cls: 'interestseed-spark-preview-top' });
+    const icon = top.createDiv({ cls: 'interestseed-spark-preview-icon' });
+    setIcon(icon, analysis.platform === 'text' ? 'quote' : 'play');
+    const platform = top.createDiv({ cls: 'interestseed-spark-platform', text: analysis.platformLabel });
+    top.appendChild(platform);
     const copy = this.previewEl.createDiv();
-    copy.createDiv({ cls: 'interestseed-spark-preview-kicker', text: this.plugin.isVideoSpark(this.text) ? 'VIDEO SPARK' : 'TEXT SPARK' });
-    copy.createDiv({ cls: 'interestseed-spark-preview-title', text: title });
-    copy.createDiv({
-      cls: 'interestseed-spark-preview-detail',
-      text: '保存后是一个候选种子；你可以在图谱里继续连接、确认或删除。',
-    });
+    copy.createDiv({ cls: 'interestseed-spark-preview-kicker', text: 'CANDIDATE SPARK' });
+    copy.createDiv({ cls: 'interestseed-spark-preview-title', text: analysis.title });
+    if (analysis.topics.length > 0) {
+      const topicRow = copy.createDiv({ cls: 'interestseed-spark-topics' });
+      for (const topic of analysis.topics) {
+        topicRow.createSpan({ text: topic });
+      }
+    }
+    copy.createDiv({ cls: 'interestseed-spark-preview-detail', text: analysis.why });
+    copy.createDiv({ cls: 'interestseed-spark-next-question', text: analysis.nextQuestion });
     if (this.submitEl) this.submitEl.disabled = false;
   }
 
   private submit(): void {
     const id = this.plugin.captureInterestSpark(this.text, this.targetId || undefined);
     if (!id) return;
-    new Notice('火花已种下。去图谱里看看它和什么连在一起。');
+    this.plugin.setSelectedNode(id);
+    new Notice(
+      this.targetId
+        ? '火花已留下，并且连上了一个已有兴趣。去图谱看看这条连接。'
+        : '火花已留下。下一步：给它选一个已有兴趣，或让它先待在收件箱。',
+    );
     void this.plugin.activateView();
     this.close();
   }
