@@ -193,7 +193,7 @@ export class InterestSeedView extends ItemView {
       });
       const sprintButton = sprintBanner.createEl('button', {
         cls: 'mod-cta interestseed-sprint-banner-button',
-        text: '兴趣起跑',
+        text: '开始建图',
         attr: { type: 'button' },
       });
       sprintButton.addEventListener('click', () => this.plugin.openSeedSprint());

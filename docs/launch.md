@@ -31,7 +31,7 @@
 
 - README 首屏：一句话 + 40 秒视频 + 3 分钟流程；
 - Topics：`obsidian-plugin`、`knowledge-graph`、`interest-graph`、`personal-knowledge-management`、`ai-agent`；
-- Release 说明包含“3 分钟兴趣起跑”和“火花捕获”。
+- Release 说明包含“3 分钟开始建图”和“火花捕获”。
 
 ### Obsidian 社区
 
@@ -76,7 +76,7 @@ Day 7  第一批用户反馈汇总
 ```text
 npm run verify
 真实 Obsidian 安装
-从 0 开始完成一次兴趣起跑
+从 0 开始完成一次开始建图
 火花捕获 → 图谱节点
 缺口教练 → suggested 关系
 7 天实验 Day 1 → Day 2

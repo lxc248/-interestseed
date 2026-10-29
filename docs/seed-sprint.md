@@ -1,4 +1,4 @@
-# 兴趣起跑：InterestSeed 的 0 → 1 机制
+# 开始建图：InterestSeed 的 0 → 1 机制
 
 ## 为什么需要它
 

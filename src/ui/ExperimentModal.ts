@@ -238,11 +238,11 @@ export class ExperimentModal extends Modal {
     empty.createEl('h2', { cls: 'interestseed-experiment-title', text: '还没有进行中的实验' });
     empty.createEl('p', {
       cls: 'interestseed-experiment-hypothesis',
-      text: '兴趣起跑会生成一个 7 天实验；完成第一张星图后，这里会出现每天的记录入口。',
+      text: '开始建图会生成一个 7 天实验；完成第一张星图后，这里会出现每天的记录入口。',
     });
     const close = empty.createEl('button', {
       cls: 'mod-cta interestseed-sprint-primary',
-      text: '开始兴趣起跑',
+      text: '开始建图',
       attr: { type: 'button' },
     });
     close.addEventListener('click', () => {

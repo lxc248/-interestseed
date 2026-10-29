@@ -777,7 +777,7 @@ export default class InterestSeedPlugin extends Plugin {
         nodes,
         edges,
       },
-      '兴趣起跑：种下第一张星图',
+      '开始建图：种下第一张星图',
     );
     this.settings.seedSprintCompletedAt = now;
     void this.saveSettings();

@@ -8,7 +8,7 @@
 
 <p>
   <img alt="Obsidian" src="https://img.shields.io/badge/Obsidian-1.5%2B-7c3aed" />
-  <img alt="Version" src="https://img.shields.io/badge/version-1.5.1-0ea5e9" />
+  <img alt="Version" src="https://img.shields.io/badge/version-1.5.2-0ea5e9" />
   <img alt="Tests" src="https://img.shields.io/badge/tests-460%20passing-22c55e" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b" />
   <img alt="Local first" src="https://img.shields.io/badge/local--first-yes-14b8a6" />
@@ -77,7 +77,7 @@ InterestSeed 让你：
 
 | 入口 | 作用 |
 | --- | --- |
-| **兴趣起跑** | 4 个选择，生成第一张可确认图谱 |
+| **开始建图** | 4 个选择，生成第一张可确认图谱 |
 | **兴趣火花** | 粘贴短视频链接或一句话，留下一个种子 |
 | **图谱缺口教练** | 从孤立节点和桥接节点出发，补一条真实连接 |
 | **7 天兴趣实验** | 把兴趣变成行动，把行动反馈回图谱 |
@@ -149,9 +149,9 @@ InterestSeed 让你：
 
 不是把链接变成又一个收藏，而是让用户每打开一次都知道现在该做什么。
 
-### 兴趣起跑
+### 开始建图
 
-![兴趣起跑](assets/onboarding.png)
+![开始建图](assets/onboarding.png)
 
 ### 严谨的 7 天实验
 
@@ -173,7 +173,7 @@ InterestSeed 让你：
 
 ### 手动安装
 
-1. 下载最新 Release 的 `interestseed-v1.5.1.zip`；
+1. 下载最新 Release 的 `interestseed-v1.5.2.zip`；
 2. 解压到：
 
 ```text
@@ -192,7 +192,7 @@ styles.css
 
 ### 不安装 Obsidian
 
-[下载 `interestseed-skill-v1.5.1.zip`](https://github.com/lxc248/-interestseed/releases/download/v1.5.1/interestseed-skill-v1.5.1.zip)，放入用户 Agent 的 skills 目录，阅读 `skill/SKILL.md`。Agent 会生成一个独立的 `star-map.html`，双击即可查看行星、轨道和星云；不需要 Obsidian。
+[下载 `interestseed-skill-v1.5.2.zip`](https://github.com/lxc248/-interestseed/releases/download/v1.5.2/interestseed-skill-v1.5.2.zip)，放入用户 Agent 的 skills 目录，阅读 `skill/SKILL.md`。Agent 会生成一个独立的 `star-map.html`，双击即可查看行星、轨道和星云；不需要 Obsidian。
 
 ### 从源码构建
 
@@ -253,7 +253,7 @@ Agent 工作目录是当前 Vault。InterestSeed 只负责会话、工具卡、�
 
 ```text
 src/
-  onboarding/     兴趣起跑引擎
+  onboarding/     开始建图引擎
   ui/             SeedSprint / Spark / GapCoach / Agent / Graph
   core/           图谱、关系、洞察、撤销
   discovery/      发现生命周期与反馈

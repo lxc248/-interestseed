@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.5.2 — Clearer onboarding and experiment labels
+
+- Renamed “兴趣起跑” to “开始建图”.
+- Renamed “实验轨道” to “我的实验”.
+- Kept internal tags and existing graph data compatible.
+- Updated commands, onboarding copy, docs and screenshots.
+
 ## 1.5.1 — Visual hierarchy and one primary action
 
 - Reduced the visible toolbar to Record / Inbox / More.
