@@ -10,7 +10,7 @@
 
 <p>
   <img alt="Obsidian" src="https://img.shields.io/badge/Obsidian-1.5%2B-7c3aed" />
-  <img alt="Version" src="https://img.shields.io/badge/version-2.6.1-0ea5e9" />
+  <img alt="Version" src="https://img.shields.io/badge/version-2.6.2-0ea5e9" />
   <img alt="Tests" src="https://img.shields.io/badge/tests-471%20passing-22c55e" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b" />
   <img alt="Local first" src="https://img.shields.io/badge/local--first-yes-14b8a6" />
@@ -46,7 +46,7 @@ InterestSeed 让你：
 
 如果你不想先读概念，按这个顺序做：
 
-1. **安装**：把 Release 的 `interestseed-v2.6.1.zip` 解压到 `.obsidian/plugins/interestseed/`，重启并启用插件；
+1. **安装**：把 Release 的 `interestseed-v2.6.2.zip` 解压到 `.obsidian/plugins/interestseed/`，重启并启用插件；
 2. **打开**：`Ctrl/Cmd + P` → `打开兴趣验证（图谱）`；
 3. **冷启动**：执行 `冷启动问卷：从 0 长出第一张星图`，做四个选择；
 4. **记录**：执行 `记录一个兴趣火花`，粘贴一条内容；
@@ -198,7 +198,7 @@ docs/tutorial.md
 
 ### 手动安装
 
-1. 下载最新 Release 的 `interestseed-v2.6.1.zip`；
+1. 下载最新 Release 的 `interestseed-v2.6.2.zip`；
 2. 解压到：
 
 ```text
@@ -217,7 +217,7 @@ styles.css
 
 ### 不安装 Obsidian
 
-[下载 `interestseed-skill-v2.6.1.zip`](https://github.com/lxc248/-interestseed/releases/download/v2.6.1/interestseed-skill-v2.6.1.zip)，放入用户 Agent 的 skills 目录，阅读 `skill/SKILL.md`。Agent 会生成一个独立的 `star-map.html`，双击即可查看行星、轨道和星云；不需要 Obsidian。
+[下载 `interestseed-skill-v2.6.2.zip`](https://github.com/lxc248/-interestseed/releases/download/v2.6.2/interestseed-skill-v2.6.2.zip)，放入用户 Agent 的 skills 目录，阅读 `skill/SKILL.md`。Agent 会生成一个独立的 `star-map.html`，双击即可查看行星、轨道和星云；不需要 Obsidian。
 
 ### 从源码构建
 

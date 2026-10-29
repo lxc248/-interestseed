@@ -50,7 +50,7 @@ InterestSeed 不抢占默认快捷键，避免和用户已有绑定冲突。
 记录一个兴趣火花      Ctrl/Cmd + Shift + S
 打开分享收件箱        Ctrl/Cmd + Shift + I
 验证行动：今天做了    Ctrl/Cmd + Shift + D
-打开兴趣图谱          Ctrl/Cmd + Shift + G
+打开兴趣验证（图谱）  Ctrl/Cmd + Shift + G
 ```
 
 ## Focus Deck 键盘

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.6.2 — Global bug fixes
+
+- Restored the desktop filter/search entry point.
+- Fixed light-host contrast inside the experiment modal.
+- Fixed light-theme filter inputs on the dark filter surface.
+- Added the full bug-audit report and screenshots.
+
 ## 2.6.1 — Adaptive narrow layout
 
 - Added icon-first layout for panes below 360px.

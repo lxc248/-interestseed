@@ -1,0 +1,73 @@
+{
+  "theme": {
+    "light": {
+      "light": true,
+      "rootBg": "rgb(7, 10, 18)"
+    },
+    "lightFilterBefore": "flex",
+    "lightFilterOpen": {
+      "host": "block",
+      "inputBg": "rgb(13, 22, 35)",
+      "inputColor": "rgb(219, 228, 242)"
+    },
+    "dark": {
+      "dark": true,
+      "rootBg": "rgb(7, 10, 18)",
+      "searchBg": "rgb(13, 22, 35)"
+    }
+  },
+  "modals": {
+    "experiment": {
+      "root": {
+        "color": "rgb(242, 239, 233)",
+        "background": "rgb(11, 15, 25)",
+        "display": "block"
+      },
+      "title": {
+        "color": "rgb(242, 239, 233)",
+        "background": "rgba(0, 0, 0, 0)",
+        "display": "block"
+      },
+      "primary": {
+        "color": "rgb(255, 255, 255)",
+        "background": "rgb(152, 115, 247)",
+        "display": "flex"
+      }
+    },
+    "inbox": {
+      "color": "rgb(242, 239, 233)",
+      "background": "rgb(11, 15, 25)",
+      "display": "block"
+    },
+    "spark": {
+      "color": "rgb(242, 239, 233)",
+      "background": "rgb(11, 15, 25)",
+      "display": "block"
+    },
+    "overview": {
+      "color": "rgb(242, 239, 233)",
+      "background": "rgb(11, 15, 25)",
+      "display": "block"
+    },
+    "explorer": {
+      "color": "rgb(242, 239, 233)",
+      "background": "rgb(11, 15, 25)",
+      "display": "block"
+    }
+  },
+  "modes": {
+    "relation": "关系建议",
+    "nodeTitle": "7 天兴趣实验",
+    "discoveryVisible": true,
+    "discoveryHidden": true
+  },
+  "narrow": {
+    "width": 480,
+    "bodyScrollWidth": 480,
+    "hint": "block",
+    "next": "none",
+    "quickbarWidth": 100
+  },
+  "errors": [],
+  "totalMs": 6638
+}

@@ -6673,3 +6673,25 @@ body.theme-light .interestseed-sprint-option.is-selected {
   .interestseed-body { min-height: 320px; }
   .interestseed-canvas-container { min-height: 300px; }
 }
+/* Search must stay reachable at desktop widths. */
+@container (min-width: 641px) {
+  .interestseed-root .interestseed-quick-action.is-filter-toggle { display: inline-flex; }
+}
+.interestseed-root.is-filter-open .interestseed-filter-host { display: block; }
+.interestseed-root.is-cosmic .interestseed-filter-host {
+  background: #0b111c;
+  border-bottom-color: rgba(210, 218, 238, 0.10);
+}
+.interestseed-root.is-cosmic .interestseed-search,
+.interestseed-root.is-cosmic .interestseed-filter-input {
+  background: #0d1623;
+  color: #dbe4f2;
+  border-color: rgba(210, 218, 238, 0.16);
+}
+.interestseed-root.is-cosmic .interestseed-search::placeholder,
+.interestseed-root.is-cosmic .interestseed-filter-input::placeholder { color: #76849a; }
+.interestseed-root.is-cosmic .interestseed-summary { color: #8c9ab0; }
+/* Experiment modal is a dark surface; set a dark-surface text fallback for
+   unstyled descendants when Obsidian is in a light host theme. */
+.interestseed-experiment-modal .modal-content,
+.interestseed-experiment { color: var(--exp-ink, #f2efe9); }
