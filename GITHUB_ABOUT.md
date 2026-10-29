@@ -11,76 +11,89 @@ interestseed
 
 ## About — English
 
-> A 3-minute interest constellation builder for Obsidian: choose four cards, confirm an evidence-backed graph, capture sparks, and grow it through 7-day experiments. Connect your own Agent through ACP.
+> InterestSeed is an interest validator for Obsidian: turn one saved post into a real 3-day action, then let evidence decide whether to keep it. Local-first, human-in-the-loop, MCP-ready.
 
 ## About — 简体中文
 
-> 面向 Obsidian 的 3 分钟兴趣星图起跑器：四个选择生成可确认图谱，捕获兴趣火花，用 7 天实验让图谱继续生长；通过 ACP 连接自己的 Agent。
+> InterestSeed 是 Obsidian 里的兴趣验证器：把一条收藏变成 3 天真实行动，用证据决定继续还是放下。本地优先、人做决定、MCP 可连接。
 
 ## Topics
 
 ```text
 obsidian
 obsidian-plugin
+interest-validation
 interest-graph
 knowledge-graph
 local-first
 personal-knowledge-management
+evidence
 discovery
-agent-client-protocol
-deepseek-harness
+mcp
+ai-agent
 typescript
 canvas
-ai-agent
-seed-sprint
+```
+
+## Homepage
+
+```text
+https://github.com/lxc248/-interestseed#readme
 ```
 
 ## Social preview
 
 ```text
-Asset: assets/social-card.png
-Alt (EN): InterestSeed — make four choices and grow a living interest constellation in Obsidian.
-Alt (ZH): InterestSeed — 四个选择，长出第一张会生长的兴趣星图。
+Asset: assets/launch-cover.png
+Alt (EN): InterestSeed — stop collecting, start proving. Turn one saved post into a real 3-day action.
+Alt (ZH): InterestSeed — 别收藏更多，验证一个。把一条收藏变成 3 天真实行动。
 ```
 
 ## Release title
 
 ```text
-InterestSeed 2.6.1 — your first living interest constellation
+InterestSeed 2.6.1 — 兴趣验证器
 ```
 
 ## Release body — English
 
-InterestSeed 2.6.1 turns a blank vault into a living interest constellation.
+InterestSeed 2.6.1 is an interest validator for Obsidian.
+
+It turns one saved post into a real 3-day action, then uses evidence to decide whether to keep it.
+
 This release includes:
 
-- 3-minute Seed Sprint: four choices → a first confirmable constellation;
-- evidence-backed graph relations with provenance, confidence and evidence;
-- Interest Spark capture from short-video links or a sentence;
-- Gap Coach: turn a graph insight into one concrete observation;
-- 7-day interest experiments with day-by-day progress;
-- discovery feedback semantics and soft undo;
-- human-in-the-loop graph application with recovery states;
-- Explore Studio with themes, project heatmap and rhythm;
-- local-first insights with optional anonymized AI explanation;
-- one Agent entry for connecting your own DSH-compatible agent, tools and task execution;
-- AGPL-3.0 licensing, attribution and brand protection notices.
+- one-at-a-time Share Inbox with list and focus modes;
+- 3-day starter experiments with one-tap daily check-ins;
+- Observation Timeline with source, reason and evidence;
+- context search across sources, observations and reasons;
+- explicit Interest Route Markdown MOC;
+- graph / relationship / discovery view modes;
+- source links back to the original note;
+- local-first storage, undo and backup;
+- MCP 2026-07-28 read-only context;
+- adaptive layouts for narrow panes;
+- AGPL-3.0 licensing.
 
 ## Release body — 简体中文
 
-InterestSeed 2.6.1 让空白 Vault 长出第一张活的兴趣星图。本次发布包含：
+InterestSeed 2.6.1 是 Obsidian 里的兴趣验证器。
 
-- 3 分钟兴趣起跑：四个选择生成第一张可确认星图；
-- 带来源、置信度与证据的可解释关系；
-- 从短视频链接或一句话捕获兴趣火花；
-- 缺口教练：把洞察变成一条具体观察；
-- 7 天兴趣实验与逐日进度；
-- 发现反馈语义与软撤销；
-- 人工确认的图谱应用与恢复状态；
-- 主题、项目热力矩阵与节奏组成的 Explore Studio；
-- 本地优先洞察与可选的匿名化 AI 解释；
-- 单一 Agent 入口，连接用户自己的 DSH 兼容 Agent、工具与任务执行；
-- AGPL-3.0 许可、署名与品牌保护声明。
+它把一条收藏变成 3 天真实行动，再用证据决定继续还是放下。
+
+本次发布包含：
+
+- 一次只处理一条的分享收件箱，支持列表和专注模式；
+- 3 天兴趣试跑，一键记录每天有没有做；
+- 带来源、原因和证据的观察时间线；
+- 覆盖来源、观察和“为什么留下”的上下文搜索；
+- 显式生成兴趣路线 Markdown MOC；
+- 图谱 / 关系建议 / 发现三种视图模式；
+- 从来源回到原笔记；
+- 本地优先存储、撤销和备份；
+- MCP 2026-07-28 只读上下文；
+- 窄分栏自适应布局；
+- AGPL-3.0 许可。
 
 ## Pinned issue / security notice
 

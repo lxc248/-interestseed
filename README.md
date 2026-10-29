@@ -4,7 +4,7 @@
 
 **InterestSeed 是兴趣验证器：把一条刷到的内容，变成 3 天内可以验证的真实行动，用证据决定继续还是放下。**
 
-[简体中文](README.md) · [English](README.en.md) · [看 40 秒演示](assets/interestseed-launch.mp4) · [产品设计](docs/seed-sprint.md) · [定位](docs/positioning.md)
+[简体中文](README.md) · [English](README.en.md) · [看 40 秒演示](assets/interestseed-launch.mp4) · [产品设计](docs/seed-sprint.md) · [定位](docs/positioning.md) · [完整教程](docs/tutorial.md)
 
 [![InterestSeed 演示封面](assets/interestseed-launch-cover.png)](assets/interestseed-launch.mp4)
 
@@ -39,6 +39,26 @@ InterestSeed 让你：
 它把 **短视频时代的一次短暂好奇**，变成一次真实行动和一条可追溯的证据。
 
 图谱只是证据的载体；产品本身是：**收藏 → 判断 → 3 天验证 → 证据 → 下一步**。
+
+---
+
+## 第一次使用：5 分钟
+
+如果你不想先读概念，按这个顺序做：
+
+1. **安装**：把 Release 的 `interestseed-v2.6.1.zip` 解压到 `.obsidian/plugins/interestseed/`，重启并启用插件；
+2. **打开**：`Ctrl/Cmd + P` → `打开兴趣验证（图谱）`；
+3. **冷启动**：执行 `冷启动问卷：从 0 长出第一张星图`，做四个选择；
+4. **记录**：执行 `记录一个兴趣火花`，粘贴一条内容；
+5. **判断**：执行 `打开分享收件箱（列表 / 专注）`，只处理一条，选择留下或路过；
+6. **验证**：执行 `打开 3/7 天验证行动`，今天点一下 `做了 / 只想过 / 没做`；
+7. **回看**：选中节点看时间线；需要时执行 `生成兴趣路线笔记（Markdown MOC）`。
+
+更细的每一步：
+
+```text
+docs/tutorial.md
+```
 
 ---
 
