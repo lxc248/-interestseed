@@ -53,7 +53,7 @@ export class SparkCaptureModal extends Modal {
       cls: 'interestseed-spark-input',
       attr: {
         placeholder: '粘贴分享链接，或写下让你停下来的那句话……',
-        rows: '5',
+        rows: '4',
       },
     });
     input.addEventListener('input', () => {

@@ -752,7 +752,7 @@ export class InterestSeedView extends ItemView {
     host.removeClass('is-hidden');
     const actualFocus = this.canvas.getClusterFocus();
     if (actualFocus !== this.clusterFocus) this.clusterFocus = actualFocus;
-    host.createSpan({ cls: 'interestseed-cluster-rail-label', text: '主题' });
+    host.createSpan({ cls: 'interestseed-cluster-rail-label', text: '主题优先' });
     const all = host.createEl('button', {
       cls: `interestseed-cluster-chip${this.clusterFocus === null ? ' is-active' : ''}`,
       text: `全部 ${total}`,

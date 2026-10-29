@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.5.1 — Visual hierarchy and one primary action
+
+- Reduced the visible toolbar to Record / Inbox / More.
+- Added progressive disclosure for advanced graph actions.
+- Simplified spark intake with optional details and Cmd/Ctrl+Enter.
+- Made Share Inbox one-candidate-at-a-time.
+- Increased minimum type sizes and secondary contrast.
+- Restyled detail-panel actions for dark surfaces.
+
 ## 1.5.0 — Inbox, themes, share studio and read-only MCP
 
 - Added a persistent Share Inbox with URL dedupe, one-at-a-time processing and NEXT integration.

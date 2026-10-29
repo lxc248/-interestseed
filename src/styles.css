@@ -5965,3 +5965,117 @@ body.theme-light .interestseed-sprint-option.is-selected {
   background: rgba(232, 200, 132, 0.18) !important;
   color: #fff4d8 !important;
 }
+/* Visual hierarchy pass: readable minimum sizes, calmer contrast, stronger primary action. */
+.interestseed-root .interestseed-quick-action {
+  min-height: 29px;
+  padding-inline: 10px;
+  font-size: 10px;
+}
+.interestseed-root .interestseed-cluster-chip {
+  min-height: 27px;
+  padding: 0 10px;
+  font-size: 10px;
+  color: #aab5c6 !important;
+}
+.interestseed-root .interestseed-cluster-rail-label {
+  color: #8995a8;
+  font-size: 9px;
+}
+.interestseed-root .interestseed-experiment-strip-kicker {
+  color: #aeb8c8;
+  font-size: 8px;
+}
+.interestseed-root .interestseed-experiment-strip-title {
+  font-size: 12px;
+}
+.interestseed-root .interestseed-experiment-advance {
+  min-height: 28px;
+  font-size: 10px;
+}
+.interestseed-root .interestseed-footer-item,
+.interestseed-root .interestseed-footer-error {
+  font-size: 9px;
+  color: #8793a5;
+}
+.interestseed-root .interestseed-detail-actions button {
+  min-height: 28px;
+  font-size: 10px;
+}
+.interestseed-root .interestseed-detail-insight-title,
+.interestseed-root .interestseed-insights h4 {
+  font-size: 11px;
+}
+.interestseed-root .interestseed-insight-detail {
+  font-size: 10px;
+  line-height: 1.55;
+  color: #a2adbd;
+}
+.interestseed-root .interestseed-detail-meta {
+  color: #8995a8;
+  font-size: 10px;
+}
+.interestseed-root .interestseed-insight-link {
+  font-size: 10px;
+}
+.interestseed-root .interestseed-next-step-label {
+  font-size: 9px;
+}
+.interestseed-root .interestseed-next-step-title {
+  font-size: 13px;
+}
+.interestseed-root .interestseed-next-step-detail {
+  font-size: 10px;
+  color: #9aa5b7;
+}
+.interestseed-root .interestseed-heading-subtitle {
+  color: #8995a8;
+  font-size: 10px;
+}
+.interestseed-root .interestseed-heading-count {
+  font-size: 9px;
+}
+.interestseed-spark-lede,
+.interestseed-share-lede,
+.interestseed-inbox-lede {
+  color: #aab5c6;
+  font-size: 11px;
+}
+.interestseed-spark-preview-title,
+.interestseed-inbox-item-title {
+  font-size: 12px;
+}
+.interestseed-spark-preview-detail,
+.interestseed-spark-next-question {
+  font-size: 10px;
+}
+.interestseed-share-caption {
+  font-size: 10px;
+}
+.interestseed-share-settings,
+.interestseed-share-node-option {
+  font-size: 10px;
+}
+/* Readable secondary actions in the dark detail panel. */
+.interestseed-root .interestseed-insight button,
+.interestseed-root .interestseed-suggestions button,
+.interestseed-root .interestseed-detail-actions button {
+  min-height: 27px;
+  padding: 0 8px;
+  border: 1px solid rgba(210, 218, 238, 0.18) !important;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.045) !important;
+  color: #c9d2df !important;
+  font-size: 10px;
+}
+.interestseed-root .interestseed-insight button:hover,
+.interestseed-root .interestseed-suggestions button:hover,
+.interestseed-root .interestseed-detail-actions button:hover {
+  border-color: rgba(232, 200, 132, 0.42) !important;
+  background: rgba(232, 200, 132, 0.10) !important;
+  color: #f0d6a0 !important;
+}
+.interestseed-root .interestseed-insight-link {
+  border: 0 !important;
+  background: transparent !important;
+  color: #d9c08a !important;
+}
