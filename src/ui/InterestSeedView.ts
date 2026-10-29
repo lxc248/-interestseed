@@ -626,7 +626,9 @@ export class InterestSeedView extends ItemView {
     const selectedIsLoose = selected ? this.plugin.store.degree(selected.id) === 0 : false;
     const sparks = graph.nodes.filter((node) => Boolean(node.metadata?.spark));
     const looseSparks = sparks.filter((node) => this.plugin.store.degree(node.id) === 0);
-    const isolated = graph.nodes.filter((node) => this.plugin.store.degree(node.id) === 0);
+    const isolated = graph.nodes.filter(
+      (node) => this.plugin.store.degree(node.id) === 0 && !node.metadata?.nextStep,
+    );
     const experiment = this.plugin.getActiveExperiment();
 
     let label = 'NEXT · 把今天的内容变成线索';
@@ -651,11 +653,10 @@ export class InterestSeedView extends ItemView {
         if (spark) this.select(spark.id);
       };
     } else if (experiment?.gate.ok) {
-      label = `NEXT · DAY ${experiment.day} / 7`;
-      title = '今天还没有记录实验';
-      detail = '写一件真实发生的事，而不是“今天学了 AI”。兴趣和精力各打一个分。';
-      button = '记录今天';
-      action = () => this.plugin.openExperiment();
+      // The experiment strip directly above already owns this action.
+      // Do not show two competing "record today" CTAs.
+      host.addClass('is-hidden');
+      return;
     } else if (isolated.length > 0) {
       const node = isolated[0];
       label = `NEXT · ${isolated.length} 个孤立节点`;

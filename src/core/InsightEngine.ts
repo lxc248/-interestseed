@@ -289,7 +289,10 @@ export class InsightEngine {
     }
 
     const orphans = nodes
-      .filter((node) => (adjacency.get(node.id)?.size ?? 0) === 0)
+      .filter(
+        (node) =>
+          (adjacency.get(node.id)?.size ?? 0) === 0 && !node.metadata?.nextStep,
+      )
       .sort((left, right) => compareText(left.title, right.title));
 
     if (orphans.length > 0) {
