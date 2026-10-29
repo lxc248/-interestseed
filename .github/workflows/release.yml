@@ -65,7 +65,7 @@ jobs:
             gh release create "$RELEASE_TAG" --title "InterestSeed ${RELEASE_TAG#v}" --notes-file "$NOTES"
           fi
           gh release upload "$RELEASE_TAG" \
-            release/interestseed-*.zip \
+            release/interestseed-v*.zip \
             release/interestseed-skill-*.zip \
             assets/interestseed-launch.mp4 \
             assets/interestseed-launch-cover.png \
