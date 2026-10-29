@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.7.2 — Conventional inbox by default
+
+- Restored a standard list as the default Share Inbox.
+- Moved Focus Deck behind an explicit “专注一条” action.
+- Kept all pending items visible in list mode.
+- Simplified the header language to Chinese.
+- Updated the inbox guide to explain list-first behavior.
+
 ## 1.7.1 — GitHub-grade command access
 
 - Added command-palette actions for opening the experiment and recording “做了 / 只想过 / 没做”.

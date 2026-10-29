@@ -6441,3 +6441,61 @@ body.theme-light .interestseed-sprint-option.is-selected {
 .interestseed-inbox-add-details { margin-bottom: 20px; }
 .interestseed-inbox-add-details { margin-bottom: 28px; }
 .interestseed-share-inbox { padding-bottom: 24px; }
+/* Familiar list mode is the default; the card deck is opt-in. */
+.interestseed-inbox-mode {
+  flex: 0 0 auto;
+  min-height: 28px;
+  padding: 0 8px;
+  border: 1px solid rgba(210, 218, 238, 0.16) !important;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.045) !important;
+  color: #b9c2d0 !important;
+  font-size: 9px;
+}
+.interestseed-inbox-mode:hover {
+  border-color: rgba(232, 200, 132, 0.38) !important;
+  color: #f0d6a0 !important;
+}
+.interestseed-inbox-list { display: grid; gap: 7px; margin-top: 10px; }
+.interestseed-inbox-row {
+  padding: 10px 11px;
+  border: 1px solid rgba(210, 218, 238, 0.13);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.035);
+}
+.interestseed-inbox-row .interestseed-inbox-item-title {
+  margin-top: 6px;
+  color: #f0eee8;
+  font-size: 12px;
+  font-weight: 620;
+  line-height: 1.35;
+  letter-spacing: 0;
+}
+.interestseed-inbox-row .interestseed-inbox-item-raw {
+  margin-top: 3px;
+  max-height: 30px;
+  overflow: hidden;
+  color: #8793a5;
+  font-size: 9px;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.interestseed-inbox-row .interestseed-inbox-topics { margin-top: 6px; }
+.interestseed-inbox-row-actions { display: flex; justify-content: flex-end; gap: 6px; margin-top: 9px; }
+.interestseed-inbox-row-actions button {
+  min-height: 27px;
+  padding: 0 8px;
+  border-radius: 6px;
+  font-size: 9px;
+}
+.interestseed-inbox-row-actions .interestseed-inbox-keep { flex: 0 0 auto; }
+.interestseed-inbox-list + .interestseed-inbox-queue { margin-top: 8px; }
+.interestseed-inbox-add:not(.is-empty) { margin-top: 9px; }
+.interestseed-inbox-controls {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: stretch;
+  gap: 5px;
+}
+.interestseed-inbox-mode { align-self: flex-end; margin-top: 6px; }

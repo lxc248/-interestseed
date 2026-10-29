@@ -11,6 +11,8 @@ import type { ShareInboxItem } from '../inbox/ShareInbox';
  * cards; adding another share is deliberately tucked away below the card.
  */
 export class ShareInboxModal extends Modal {
+  private mode: 'list' | 'focus' = 'list';
+
   constructor(
     app: App,
     private readonly plugin: InterestSeedPlugin,
@@ -38,19 +40,20 @@ export class ShareInboxModal extends Modal {
     const mark = header.createDiv({ cls: 'interestseed-inbox-mark' });
     setIcon(mark, 'inbox');
     const copy = header.createDiv({ cls: 'interestseed-inbox-header-copy' });
-    copy.createDiv({ cls: 'interestseed-inbox-kicker', text: 'FOCUS DECK / SHARE INBOX' });
+    copy.createDiv({ cls: 'interestseed-inbox-kicker', text: 'SHARE INBOX' });
     copy.createEl('h2', {
       cls: 'interestseed-inbox-title',
-      text: pending.length > 0 ? '一条一条来。' : '先放进来。',
+      text: '分享收件箱',
     });
     copy.createEl('p', {
       cls: 'interestseed-inbox-lede',
       text:
         pending.length > 0
-          ? '只看这一条。滑走，或留下并连接。'
+          ? '先处理这一条；也可以切到专注模式，一次只做一张卡。'
           : '下一次刷到让你停下来的内容，先放进来，再决定它是不是你的兴趣。',
     });
-    const count = header.createDiv({ cls: 'interestseed-inbox-count' });
+    const controls = header.createDiv({ cls: 'interestseed-inbox-controls' });
+    const count = controls.createDiv({ cls: 'interestseed-inbox-count' });
     count.createSpan({ text: String(pending.length) });
     count.createSpan({ cls: 'interestseed-inbox-count-label', text: '待判断' });
 
@@ -60,12 +63,67 @@ export class ShareInboxModal extends Modal {
       return;
     }
 
+    const modeButton = shell.createEl('button', {
+      cls: 'interestseed-inbox-mode',
+      text: this.mode === 'list' ? '专注一条' : '返回列表',
+      attr: { type: 'button' },
+    });
+    modeButton.addEventListener('click', () => {
+      this.mode = this.mode === 'list' ? 'focus' : 'list';
+      this.render();
+    });
+
+    if (this.mode === 'list') {
+      this.renderAdd(shell, false);
+      this.renderList(shell, pending);
+      return;
+    }
+
     const first = pending[0];
     if (first) this.renderCard(shell, first, pending.length);
 
     const add = shell.createEl('details', { cls: 'interestseed-inbox-add-details' });
     add.createEl('summary', { text: '再放一条进来' });
     this.renderAdd(add, false);
+  }
+
+  private renderList(host: HTMLElement, pending: ShareInboxItem[]): void {
+    const list = host.createDiv({ cls: 'interestseed-inbox-list' });
+    for (const item of pending.slice(0, 30)) {
+      const analysis = analyzeShareText(item.text);
+      const row = list.createDiv({ cls: 'interestseed-inbox-row' });
+      const top = row.createDiv({ cls: 'interestseed-inbox-item-top' });
+      top.createSpan({ cls: 'interestseed-inbox-platform', text: analysis.platformLabel });
+      top.createSpan({
+        cls: 'interestseed-inbox-item-date',
+        text: item.addedAt ? item.addedAt.slice(0, 10) : '',
+      });
+      row.createDiv({ cls: 'interestseed-inbox-item-title', text: analysis.title });
+      row.createDiv({ cls: 'interestseed-inbox-item-raw', text: item.text });
+      if (analysis.topics.length > 0) {
+        const topics = row.createDiv({ cls: 'interestseed-inbox-topics' });
+        for (const topic of analysis.topics) topics.createSpan({ text: topic });
+      }
+      const actions = row.createDiv({ cls: 'interestseed-inbox-row-actions' });
+      const process = actions.createEl('button', {
+        cls: 'mod-cta interestseed-inbox-keep',
+        text: '留下并连接',
+        attr: { type: 'button' },
+      });
+      process.addEventListener('click', () => this.keep(item));
+      const pass = actions.createEl('button', {
+        cls: 'interestseed-inbox-pass',
+        text: '只是路过',
+        attr: { type: 'button' },
+      });
+      pass.addEventListener('click', () => this.pass(item));
+    }
+    if (pending.length > 30) {
+      host.createDiv({
+        cls: 'interestseed-inbox-queue',
+        text: `只显示前 30 条，先处理最前面的。`,
+      });
+    }
   }
 
   private renderCard(host: HTMLElement, item: ShareInboxItem, total: number): void {
