@@ -55,14 +55,14 @@ const TYPE_STYLE: Record<NodeType, { color: string; glyph: string }> = {
 };
 
 const CLUSTER_STYLE: Record<string, { label: string; color: string }> = {
-  genesis: { label: '开始建图', color: '#e18061' },
+  genesis: { label: '冷启动问卷', color: '#e18061' },
   projects: { label: '项目轨道', color: '#9c8cff' },
   expression: { label: '表达轨道', color: '#e6b66a' },
   beauty: { label: '风格轨道', color: '#e9a0b4' },
   body: { label: '身体轨道', color: '#7dd9ad' },
   game: { label: '游戏轨道', color: '#8f9cff' },
   city: { label: '城市轨道', color: '#5ed1df' },
-  experiment: { label: '我的实验', color: '#7dd9ad' },
+  experiment: { label: '3/7 天验证行动', color: '#7dd9ad' },
   other: { label: '其他轨道', color: '#969ca8' },
 };
 

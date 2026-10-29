@@ -777,7 +777,7 @@ export default class InterestSeedPlugin extends Plugin {
         nodes,
         edges,
       },
-      '开始建图：种下第一张星图',
+      '冷启动问卷：种下第一张星图',
     );
     this.settings.seedSprintCompletedAt = now;
     void this.saveSettings();

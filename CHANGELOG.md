@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.5.3 — Cold-start questionnaire and validation track
+
+- Renamed “兴趣起跑” to “冷启动问卷”.
+- Renamed “实验轨道” to “3/7 天验证行动”.
+- Kept internal tags and existing graph data compatible.
+- Updated commands, onboarding copy, docs and screenshots.
+
 ## 1.5.2 — Clearer onboarding and experiment labels
 
 - Renamed “兴趣起跑” to “开始建图”.

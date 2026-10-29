@@ -40,7 +40,7 @@ export function registerCommands(plugin: Plugin, host: CommandHost): void {
 
   plugin.addCommand({
     id: 'interestseed-seed-sprint',
-    name: '开始建图：从 0 长出第一张星图',
+    name: '冷启动问卷：从 0 长出第一张星图',
     callback: () => host.openSeedSprint(),
   });
 

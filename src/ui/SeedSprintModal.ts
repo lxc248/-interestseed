@@ -9,7 +9,7 @@ import {
 } from '../onboarding/seedSprint';
 
 /**
- * 开始建图引导。
+ * 冷启动问卷引导。
  *
  * 这是 InterestSeed 的 0 → 1 入口：用户做四个选择，看到一张会生长的
  * 兴趣星图，再逐项确认要写入图谱的种子和关系。所有写入都发生在最后一步。
@@ -32,7 +32,7 @@ export class SeedSprintModal extends Modal {
   }
 
   override onOpen(): void {
-    this.modalEl.setAttribute('aria-label', '开始建图');
+    this.modalEl.setAttribute('aria-label', '冷启动问卷');
     this.render();
   }
 

@@ -8,7 +8,7 @@
 
 <p>
   <img alt="Obsidian" src="https://img.shields.io/badge/Obsidian-1.5%2B-7c3aed" />
-  <img alt="Version" src="https://img.shields.io/badge/version-1.5.2-0ea5e9" />
+  <img alt="Version" src="https://img.shields.io/badge/version-1.5.3-0ea5e9" />
   <img alt="Tests" src="https://img.shields.io/badge/tests-460%20passing-22c55e" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b" />
   <img alt="Local first" src="https://img.shields.io/badge/local--first-yes-14b8a6" />
@@ -44,7 +44,7 @@ The core rule:
 
 | Entry | What it does |
 | --- | --- |
-| **Start Mapping** | Four choices → first confirmable graph |
+| **Cold-start questionnaire** | Four choices → first confirmable graph |
 | **Interest Spark** | Paste a short-video link or a sentence → one seed |
 | **Gap Coach** | Turn an orphan/bridge insight into one concrete observation |
 | **7-Day Experiment** | Turn an interest into action and feedback |
@@ -70,9 +70,9 @@ The core rule:
 
 ![Workspace](assets/screenshot-1.png)
 
-### Start Mapping
+### Cold-start questionnaire
 
-![Start Mapping](assets/onboarding.png)
+![Cold-start questionnaire](assets/onboarding.png)
 
 ### Explore Studio
 
@@ -86,7 +86,7 @@ The core rule:
 
 ## Install
 
-1. Download `interestseed-v1.5.2.zip` from Releases.
+1. Download `interestseed-v1.5.3.zip` from Releases.
 2. Extract into:
 
 ```text

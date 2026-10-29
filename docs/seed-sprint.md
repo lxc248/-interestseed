@@ -1,4 +1,4 @@
-# 开始建图：InterestSeed 的 0 → 1 机制
+# 冷启动问卷：InterestSeed 的 0 → 1 机制
 
 ## 为什么需要它
 
