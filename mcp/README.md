@@ -39,26 +39,52 @@ interestseed_get_graph
 interestseed_next_step
 interestseed_search_interest
 interestseed_get_experiment
+interestseed_get_context
 ```
 
-示例问题：
+## Resources
+
+```text
+interestseed://graph
+interestseed://experiment
+interestseed://next
+interestseed://context
+```
+
+## Prompts
+
+```text
+review-interest
+plan-next-experiment
+```
+
+## 协议
+
+```text
+MCP 2026-07-28
+```
+
+保留 tools，同时提供 resources 和 prompts；仍然是只读。
+
+## 示例问题
 
 ```text
 我现在最值得处理的兴趣是什么？
 我的图谱里哪些主题还没有连接？
 把美妆相关的节点找出来。
 7 天实验现在进行到哪一天？
+把当前兴趣的上下文包给我。
 ```
 
 ## 安全边界
 
 - 只读，没有写入工具；
 - 不读取 Vault 其他笔记；
-- 不暴露 `sourceUri`；
+- 只返回用户显式导入的 `sourceRef`，不遍历文件系统；
 - 不访问网络；
 - 不抓取抖音；
 - 用户必须自己启动这个本地进程。
 
 ## 版本
 
-随插件版本发布；当前 `2.2.x`。
+随插件版本发布；当前 `2.3.x`。

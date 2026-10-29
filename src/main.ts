@@ -6,6 +6,7 @@ import { InterestSeedGraphBuilder } from './core/GraphBuilder';
 import { GraphSession } from './core/GraphSession';
 import { InterestSeedGraphStore } from './core/GraphStore';
 import { InsightEngine, type GraphInsights } from './core/InsightEngine';
+import { appendObservation } from './core/observations';
 import { InterestSeedRelationEngine } from './core/RelationEngine';
 import { UndoHistory } from './core/UndoManager';
 import { DiscoveryEngine } from './discovery/DiscoveryEngine';
@@ -63,6 +64,7 @@ import { ShareCardModal } from './ui/ShareCardModal';
 import { ShareInboxModal } from './ui/ShareInboxModal';
 import { ShareInbox, type InboxSource } from './inbox/ShareInbox';
 import { analyzeShareText } from './services/shareAnalysis';
+import { renderInterestRoute } from './services/interestRoute';
 import { GapCoachModal } from './ui/GapCoachModal';
 import { ExperimentModal } from './ui/ExperimentModal';
 import type { Insight } from './core/InsightEngine';
@@ -80,6 +82,7 @@ import {
 } from './experiment/experiment';
 import type { SeedSprintDraft } from './onboarding/seedSprint';
 import { edgeIdFor, hashString, nodeIdForUri } from './utils/ids';
+import { slugifyFileName } from './utils/paths';
 import { RelationCreateModal } from './ui/RelationCreateModal';
 import { RelationEditModal } from './ui/RelationEditModal';
 import { ScanConfirmModal } from './ui/ScanConfirmModal';
@@ -435,6 +438,11 @@ export default class InterestSeedPlugin extends Plugin {
             experimentLastCheckInAt: new Date().toISOString(),
             taskState: state.status === 'complete' ? 'reviewed' : 'experimenting',
             taskStateUpdatedAt: new Date().toISOString(),
+            observations: appendObservation(active.node.metadata, {
+              source: 'experiment',
+              evidence: input.evidence,
+              belief: input.interest >= 4 ? 'stronger' : input.interest <= 2 ? 'weaker' : 'changed',
+            }),
           },
         },
         `兴趣实验：记录第 ${state.logs.length} 天`,
@@ -660,6 +668,54 @@ export default class InterestSeedPlugin extends Plugin {
     new ShareCardModal(this.app, this).open();
   }
 
+  async createInterestRoute(): Promise<void> {
+    const selectedId = this.getSelectedNodeId();
+    const selected = selectedId ? this.store.getNode(selectedId) : undefined;
+    const tag = selected?.tags.find((value) => value.trim().length > 0);
+    const theme = tag ?? '全部兴趣';
+    const allNodes = this.store.listNodes();
+    const filtered = tag ? allNodes.filter((node) => node.tags.includes(tag)) : allNodes;
+    const nodes = filtered.length > 0 ? filtered : allNodes;
+    if (nodes.length === 0) {
+      new Notice('图谱里还没有可以生成路线的节点。');
+      return;
+    }
+    const active = this.getActiveExperiment();
+    const connectedIds = new Set(
+      nodes
+        .filter((node) => this.store.neighbors(node.id, { statuses: ['confirmed'] }).length > 0)
+        .map((node) => node.id),
+    );
+    const markdown = renderInterestRoute({
+      theme,
+      nodes,
+      connectedIds,
+      experiment: active
+        ? {
+            title: active.state.title,
+            day: active.state.logs.length,
+            targetDays: active.state.targetDays,
+            status: active.state.status,
+          }
+        : null,
+    });
+    const folder = 'InterestSeed';
+    if (!this.app.vault.getAbstractFileByPath(folder)) {
+      await this.app.vault.createFolder(folder);
+    }
+    const date = new Date().toISOString().slice(0, 10);
+    const base = `${folder}/兴趣路线 - ${slugifyFileName(theme)} - ${date}`;
+    let path = `${base}.md`;
+    let suffix = 2;
+    while (this.app.vault.getAbstractFileByPath(path)) {
+      path = `${base} ${suffix}.md`;
+      suffix += 1;
+    }
+    const file = await this.app.vault.create(path, markdown);
+    new Notice(`已生成兴趣路线：${path}`);
+    await this.app.workspace.openLinkText(file.path, '', false);
+  }
+
   isVideoSpark(text: string): boolean {
     return /(youtube\.com|youtu\.be|bilibili\.com|douyin\.com|tiktok\.com|vimeo\.com)/i.test(
       text,
@@ -722,6 +778,12 @@ export default class InterestSeedPlugin extends Plugin {
           taskStateUpdatedAt: now,
           contextSource: context?.source ?? 'share',
           ...(context?.sourceRef ? { contextSourceRef: context.sourceRef } : {}),
+          observations: appendObservation(undefined, {
+            source: context?.source ?? 'share',
+            ...(context?.sourceRef ? { sourceRef: context.sourceRef } : {}),
+            evidence: value.slice(0, 280),
+            belief: 'changed',
+          }),
           ...(why?.trim() ? { why: why.trim() } : {}),
         },
       },
@@ -786,6 +848,11 @@ export default class InterestSeedPlugin extends Plugin {
           nextStep: proposal.nextStep === true,
           taskState: proposal.nextStep ? 'experimenting' : 'judged',
           taskStateUpdatedAt: now,
+          observations: appendObservation(undefined, {
+            source: 'seed-sprint',
+            evidence: proposal.evidence,
+            belief: 'changed',
+          }),
           ...(proposal.nextStep
             ? {
                 experimentDay: 0,

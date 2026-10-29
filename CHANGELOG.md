@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.3.0 — Timeline, route and agent context
+
+- Added append-only observation timelines to graph nodes.
+- Added “生成兴趣路线笔记（Markdown MOC）” with explicit user action.
+- Upgraded the local MCP server to 2026-07-28 resources, prompts and context.
+- Added the Agent Context packet as an MCP tool and resource.
+- Kept all writes explicit, local and reversible.
+
 ## 2.2.0 — Task state and cross-surface context
 
 - Added clickable source labels that open the original note.

@@ -310,6 +310,9 @@ export class InterestSeedView extends ItemView {
     const exportGroup = moreMenu.createDiv({ cls: 'interestseed-more-group' });
     exportGroup.createDiv({ cls: 'interestseed-more-group-label', text: '导出' });
     this.createQuickAction(exportGroup, 'download', '导出 JSON', () => this.plugin.exportGraph());
+    this.createQuickAction(exportGroup, 'map', '生成兴趣路线', () =>
+      void this.plugin.createInterestRoute(),
+    );
     this.createQuickAction(exportGroup, 'share-2', '导出分享星图', () =>
       this.plugin.openShareCard(),
     );

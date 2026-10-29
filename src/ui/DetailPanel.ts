@@ -4,6 +4,7 @@ import type { GraphInsights, Insight } from '../core/InsightEngine';
 import type { NeighborEntry, InterestSeedGraphStore } from '../core/GraphStore';
 import type { InterestSeedNode, RelationOrigin, RelationStatus } from '../types/graph';
 import { resolveTaskState, TASK_STATE_LABELS } from '../core/taskState';
+import { normalizeObservations, OBSERVATION_BELIEF_LABELS } from '../core/observations';
 import { pathFromUri } from '../utils/paths';
 import { TYPE_LABELS } from './FilterBar';
 import { confirmAction } from './ConfirmModal';
@@ -102,6 +103,8 @@ export class DetailPanel {
         tags.createSpan({ cls: 'interestseed-tag', text: `#${tag}` });
       }
     }
+
+    this.renderObservations(node);
 
     if (node.metadata.spark === true) this.renderSparkDecision(node);
 
@@ -479,6 +482,32 @@ export class DetailPanel {
       reject.addEventListener('click', () =>
         this.runEdgeAction(reject, () => this.actions.rejectEdge(entry.edge.id)),
       );
+    }
+  }
+
+  private renderObservations(node: InterestSeedNode): void {
+    const observations = normalizeObservations(node.metadata.observations);
+    if (observations.length === 0) return;
+    const section = this.root.createDiv({ cls: 'interestseed-observations' });
+    const header = section.createDiv({ cls: 'interestseed-observations-header' });
+    header.createSpan({ text: '时间线' });
+    header.createSpan({ cls: 'interestseed-observations-count', text: `${observations.length} 条观察` });
+    for (const observation of observations.slice(0, 4)) {
+      const row = section.createDiv({ cls: 'interestseed-observation' });
+      const top = row.createDiv({ cls: 'interestseed-observation-top' });
+      top.createSpan({
+        cls: `interestseed-observation-belief is-${observation.belief}`,
+        text: OBSERVATION_BELIEF_LABELS[observation.belief],
+      });
+      const date = new Date(observation.at);
+      top.createSpan({
+        cls: 'interestseed-observation-date',
+        text: Number.isNaN(date.getTime()) ? observation.at.slice(0, 10) : date.toLocaleDateString('zh-CN'),
+      });
+      row.createDiv({ cls: 'interestseed-observation-evidence', text: observation.evidence });
+      if (observation.sourceRef) {
+        row.createDiv({ cls: 'interestseed-observation-source', text: observation.sourceRef });
+      }
     }
   }
 

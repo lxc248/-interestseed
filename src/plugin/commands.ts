@@ -10,6 +10,7 @@ export interface CommandHost {
   openSparkCapture(initialText?: string): void;
   openSparkFromClipboard(): Promise<void>;
   openShareCard(): void;
+  createInterestRoute(): Promise<void> | void;
   openInbox(): void;
   enqueueActiveNote(): Promise<void> | void;
   openExperiment(): void;
@@ -59,6 +60,14 @@ export function registerCommands(plugin: Plugin, host: CommandHost): void {
     name: '从剪贴板记录分享（移动端快捷指令）',
     callback: () => {
       void host.openSparkFromClipboard();
+    },
+  });
+
+  plugin.addCommand({
+    id: 'interestseed-route',
+    name: '生成兴趣路线笔记（Markdown MOC）',
+    callback: () => {
+      void host.createInterestRoute();
     },
   });
 

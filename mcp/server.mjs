@@ -13,7 +13,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-const PROTOCOL_VERSION = '2024-11-05';
+const PROTOCOL_VERSION = '2026-07-28';
 const args = process.argv.slice(2);
 const graphArgIndex = args.indexOf('--graph');
 const graphPath = resolve(
@@ -108,6 +108,37 @@ function getExperiment(graph) {
   };
 }
 
+function agentContext(graph) {
+  const degrees = degreeMap(graph);
+  const experiment = getExperiment(graph);
+  const next = nextStep(graph);
+  const nodes = graph.nodes
+    .slice()
+    .sort((left, right) => (degrees.get(right.id) ?? 0) - (degrees.get(left.id) ?? 0))
+    .slice(0, 20)
+    .map((node) => ({
+      ...publicNode(node, degrees.get(node.id) ?? 0),
+      observations: Array.isArray(node.metadata?.observations)
+        ? node.metadata.observations.slice(0, 3)
+        : [],
+    }));
+  const confirmed = graph.edges
+    .filter((edge) => edge.status === 'confirmed')
+    .slice(0, 40)
+    .map((edge) => ({
+      source: edge.source,
+      target: edge.target,
+      relation: edge.relation,
+    }));
+  return {
+    generatedAt: new Date().toISOString(),
+    next,
+    experiment,
+    nodes,
+    confirmed,
+  };
+}
+
 function nextStep(graph) {
   const degrees = degreeMap(graph);
   const sparks = graph.nodes.filter(
@@ -194,6 +225,11 @@ const tools = [
     description: '读取当前 3/7 天兴趣实验状态和日志。',
     inputSchema: { type: 'object', properties: {} },
   },
+  {
+    name: 'interestseed_get_context',
+    description: '读取一次可交给 Agent 的兴趣上下文包；只读。',
+    inputSchema: { type: 'object', properties: {} },
+  },
 ];
 
 function toolResult(value) {
@@ -235,7 +271,88 @@ function callTool(name, input) {
     return toolResult(search(graph, input?.query));
   }
   if (name === 'interestseed_get_experiment') return toolResult(getExperiment(graph));
+  if (name === 'interestseed_get_context') return toolResult(agentContext(graph));
   throw new Error(`未知工具：${name}`);
+}
+
+const resources = [
+  {
+    uri: 'interestseed://graph',
+    name: 'InterestSeed 图谱',
+    description: '本地兴趣图谱摘要与节点。',
+    mimeType: 'application/json',
+  },
+  {
+    uri: 'interestseed://experiment',
+    name: 'InterestSeed 实验',
+    description: '当前 3/7 天兴趣实验和日志。',
+    mimeType: 'application/json',
+  },
+  {
+    uri: 'interestseed://next',
+    name: 'InterestSeed 下一步',
+    description: '当前唯一最值得做的下一步。',
+    mimeType: 'application/json',
+  },
+  {
+    uri: 'interestseed://context',
+    name: 'InterestSeed Agent Context',
+    description: '可交给 Agent 的上下文包。',
+    mimeType: 'application/json',
+  },
+];
+
+const prompts = [
+  {
+    name: 'review-interest',
+    description: '回看一条兴趣，区分旧判断和现在的事实。',
+    arguments: [{ name: 'interest', description: '兴趣标题，可留空使用当前下一步', required: false }],
+  },
+  {
+    name: 'plan-next-experiment',
+    description: '为当前兴趣设计一个最小、可记录的验证行动。',
+    arguments: [{ name: 'interest', description: '兴趣标题，可留空使用当前下一步', required: false }],
+  },
+];
+
+function readResource(uri) {
+  const graph = readGraph();
+  if (uri === 'interestseed://graph') {
+    return { contents: [{ uri, mimeType: 'application/json', text: JSON.stringify({
+      summary: summarize(graph),
+      nodes: graph.nodes.slice(0, 50).map((node) => publicNode(node, degreeMap(graph).get(node.id) ?? 0)),
+    }, null, 2) }] };
+  }
+  if (uri === 'interestseed://experiment') {
+    return { contents: [{ uri, mimeType: 'application/json', text: JSON.stringify(getExperiment(graph), null, 2) }] };
+  }
+  if (uri === 'interestseed://next') {
+    return { contents: [{ uri, mimeType: 'application/json', text: JSON.stringify(nextStep(graph), null, 2) }] };
+  }
+  if (uri === 'interestseed://context') {
+    return { contents: [{ uri, mimeType: 'application/json', text: JSON.stringify(agentContext(graph), null, 2) }] };
+  }
+  throw new Error(`未知资源：${uri}`);
+}
+
+function getPrompt(name, args) {
+  const graph = readGraph();
+  const requested = typeof args?.interest === 'string' ? args.interest.trim() : '';
+  const next = nextStep(graph);
+  const interest = requested || next?.target?.title || '当前兴趣';
+  if (name === 'review-interest') {
+    return {
+      description: '回看一条兴趣',
+      messages: [{ role: 'user', content: { type: 'text', text: `请基于 InterestSeed 只读上下文，回看「${interest}」：哪些是旧判断，哪些是最近的真实证据？不要替我做决定。` } }],
+    };
+  }
+  if (name === 'plan-next-experiment') {
+    return {
+      description: '设计一个最小验证行动',
+      messages: [{ role: 'user', content: { type: 'text', text: `请为「${interest}」设计一个 3 天内可完成、可记录证据的最小行动；只给一个，不自动写入。` } }],
+    };
+  }
+  throw new Error(`未知 prompt：${name}`);
 }
 
 function response(id, result) {
@@ -250,13 +367,33 @@ function handle(message) {
   if (method === 'initialize') {
     return response(id, {
       protocolVersion: PROTOCOL_VERSION,
-      capabilities: { tools: {} },
-      serverInfo: { name: 'interestseed', version: '2.2.0' },
+      capabilities: {
+        tools: {},
+        resources: { subscribe: false, listChanged: false },
+        prompts: { listChanged: false },
+      },
+      serverInfo: { name: 'interestseed', version: '2.3.0' },
     });
   }
   if (method === 'notifications/initialized') return null;
   if (method === 'ping') return response(id, {});
   if (method === 'tools/list') return response(id, { tools });
+  if (method === 'resources/list') return response(id, { resources });
+  if (method === 'resources/read') {
+    try {
+      return response(id, readResource(params?.uri));
+    } catch (cause) {
+      return error(id, -32602, cause instanceof Error ? cause.message : String(cause));
+    }
+  }
+  if (method === 'prompts/list') return response(id, { prompts });
+  if (method === 'prompts/get') {
+    try {
+      return response(id, getPrompt(params?.name, params?.arguments ?? {}));
+    } catch (cause) {
+      return error(id, -32602, cause instanceof Error ? cause.message : String(cause));
+    }
+  }
   if (method === 'tools/call') {
     try {
       return response(id, callTool(params?.name, params?.arguments ?? {}));

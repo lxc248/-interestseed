@@ -6550,3 +6550,56 @@ body.theme-light .interestseed-sprint-option.is-selected {
 .interestseed-root .interestseed-inbox-source.is-link:hover {
   background: rgba(80, 130, 220, 0.16);
 }
+.interestseed-root .interestseed-observations {
+  margin: 14px 0 6px;
+  padding: 12px;
+  border: 1px solid rgba(210, 218, 238, 0.10);
+  border-radius: 12px;
+  background: rgba(16, 24, 39, 0.55);
+}
+.interestseed-root .interestseed-observations-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  color: #cdd7e8;
+  font-size: 11px;
+  font-weight: 700;
+}
+.interestseed-root .interestseed-observations-count {
+  color: #6f7b8c;
+  font-size: 9px;
+  font-weight: 500;
+}
+.interestseed-root .interestseed-observation {
+  margin-top: 9px;
+  padding-top: 9px;
+  border-top: 1px solid rgba(210, 218, 238, 0.07);
+}
+.interestseed-root .interestseed-observation-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.interestseed-root .interestseed-observation-belief {
+  padding: 2px 6px;
+  border-radius: 999px;
+  font-size: 8px;
+}
+.interestseed-root .interestseed-observation-belief.is-stronger { color: #8fe3b0; background: rgba(50, 160, 100, 0.13); }
+.interestseed-root .interestseed-observation-belief.is-weaker { color: #f0a6ad; background: rgba(190, 70, 90, 0.13); }
+.interestseed-root .interestseed-observation-belief.is-changed { color: #b9c8ea; background: rgba(90, 120, 190, 0.13); }
+.interestseed-root .interestseed-observation-date {
+  color: #6f7b8c;
+  font-size: 9px;
+}
+.interestseed-root .interestseed-observation-evidence {
+  margin-top: 5px;
+  color: #b7c1d2;
+  font-size: 10px;
+  line-height: 1.5;
+}
+.interestseed-root .interestseed-observation-source {
+  margin-top: 3px;
+  color: #6f7b8c;
+  font-size: 8px;
+}
