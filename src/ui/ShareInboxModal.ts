@@ -16,6 +16,29 @@ function sourceLabel(source: InboxSource): string {
   return '分享';
 }
 
+function attachSourceLink(
+  app: App,
+  element: HTMLElement,
+  sourceRef: string | undefined,
+  close: () => void,
+): void {
+  if (!sourceRef) return;
+  element.addClass('is-link');
+  element.setAttribute('role', 'button');
+  element.setAttribute('tabindex', '0');
+  element.setAttribute('title', `打开来源：${sourceRef}`);
+  const open = (event: Event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    close();
+    void app.workspace.openLinkText(sourceRef, '', false);
+  };
+  element.addEventListener('click', open);
+  element.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' || event.key === ' ') open(event);
+  });
+}
+
 export class ShareInboxModal extends Modal {
   private mode: 'list' | 'focus' = 'list';
 
@@ -101,7 +124,7 @@ export class ShareInboxModal extends Modal {
       const top = row.createDiv({ cls: 'interestseed-inbox-item-top' });
       top.createSpan({ cls: 'interestseed-inbox-platform', text: analysis.platformLabel });
       const source = top.createSpan({ cls: 'interestseed-inbox-source', text: sourceLabel(item.source) });
-    if (item.sourceRef) source.setAttribute('title', item.sourceRef);
+    attachSourceLink(this.app, source, item.sourceRef, () => this.close());
       top.createSpan({
         cls: 'interestseed-inbox-item-date',
         text: item.addedAt ? item.addedAt.slice(0, 10) : '',
@@ -148,7 +171,7 @@ export class ShareInboxModal extends Modal {
     const top = card.createDiv({ cls: 'interestseed-inbox-item-top' });
     top.createSpan({ cls: 'interestseed-inbox-platform', text: analysis.platformLabel });
     const source = top.createSpan({ cls: 'interestseed-inbox-source', text: sourceLabel(item.source) });
-    if (item.sourceRef) source.setAttribute('title', item.sourceRef);
+    attachSourceLink(this.app, source, item.sourceRef, () => this.close());
     top.createSpan({
       cls: 'interestseed-inbox-item-date',
       text: item.addedAt ? item.addedAt.slice(0, 10) : '',
@@ -273,7 +296,7 @@ export class ShareInboxModal extends Modal {
 
   private keep(item: ShareInboxItem): void {
     this.close();
-    this.plugin.openSparkCapture(item.text, item.id);
+    this.plugin.openSparkCapture(item.text, item.id, item.source, item.sourceRef);
   }
 
   private pass(item: ShareInboxItem): void {

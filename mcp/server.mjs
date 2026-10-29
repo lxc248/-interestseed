@@ -42,6 +42,18 @@ function degreeMap(graph) {
   return degrees;
 }
 
+function taskState(node, degree) {
+  const state = ['captured', 'judged', 'connected', 'experimenting', 'reviewed'].includes(
+    node.metadata?.taskState,
+  )
+    ? node.metadata.taskState
+    : null;
+  if (state === 'experimenting' || state === 'reviewed') return state;
+  if (node.metadata?.nextStep === true) return 'experimenting';
+  if (degree > 0) return 'connected';
+  return state ?? 'captured';
+}
+
 function publicNode(node, degree) {
   return {
     id: node.id,
@@ -49,6 +61,9 @@ function publicNode(node, degree) {
     title: node.title,
     tags: node.tags ?? [],
     degree,
+    taskState: taskState(node, degree),
+    source: node.metadata?.contextSource,
+    sourceRef: node.metadata?.contextSourceRef,
     summary: typeof node.metadata?.summary === 'string' ? node.metadata.summary : undefined,
     spark: node.metadata?.spark === true || undefined,
   };
@@ -236,7 +251,7 @@ function handle(message) {
     return response(id, {
       protocolVersion: PROTOCOL_VERSION,
       capabilities: { tools: {} },
-      serverInfo: { name: 'interestseed', version: '2.1.1' },
+      serverInfo: { name: 'interestseed', version: '2.2.0' },
     });
   }
   if (method === 'notifications/initialized') return null;

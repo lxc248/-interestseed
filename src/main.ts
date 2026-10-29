@@ -299,7 +299,7 @@ export default class InterestSeedPlugin extends Plugin {
     this.registerObsidianProtocolHandler('interestseed-share', (params) => {
       const text = typeof params.text === 'string' ? params.text : '';
       const result = this.enqueueShare(text, 'clipboard');
-      this.openSparkCapture(text, result?.item.id);
+      this.openSparkCapture(text, result?.item.id, 'clipboard');
     });
     this.addSettingTab(new InterestSeedSettingsTab(this.app, this));
 
@@ -433,6 +433,8 @@ export default class InterestSeedPlugin extends Plugin {
             experimentDay: state.logs.length,
             experimentStatus: state.status,
             experimentLastCheckInAt: new Date().toISOString(),
+            taskState: state.status === 'complete' ? 'reviewed' : 'experimenting',
+            taskStateUpdatedAt: new Date().toISOString(),
           },
         },
         `兴趣实验：记录第 ${state.logs.length} 天`,
@@ -488,6 +490,8 @@ export default class InterestSeedPlugin extends Plugin {
           ...active.node.metadata,
           experimentState: state,
           experimentStatus: state.status,
+          taskState: 'experimenting',
+          taskStateUpdatedAt: new Date().toISOString(),
         },
       },
       '开始 3 天兴趣试跑',
@@ -521,6 +525,8 @@ export default class InterestSeedPlugin extends Plugin {
           ...active.node.metadata,
           experimentState: state,
           experimentStatus: state.status,
+          taskState: 'experimenting',
+          taskStateUpdatedAt: new Date().toISOString(),
         },
       },
       '把 3 天试跑延长为 7 天实验',
@@ -583,8 +589,13 @@ export default class InterestSeedPlugin extends Plugin {
     return id;
   }
 
-  openSparkCapture(initialText = '', inboxId?: string): void {
-    new SparkCaptureModal(this.app, this, initialText, inboxId).open();
+  openSparkCapture(
+    initialText = '',
+    inboxId?: string,
+    source: InboxSource = 'share',
+    sourceRef = '',
+  ): void {
+    new SparkCaptureModal(this.app, this, initialText, inboxId, source, sourceRef).open();
   }
 
   openInbox(): void {
@@ -639,7 +650,7 @@ export default class InterestSeedPlugin extends Plugin {
         return;
       }
       const result = this.enqueueShare(text, 'clipboard');
-      this.openSparkCapture(text, result?.item.id);
+      this.openSparkCapture(text, result?.item.id, 'clipboard');
     } catch {
       new Notice('无法读取剪贴板。请在手机快捷指令中使用 interestseed-share 链接，或手动粘贴。');
     }
@@ -671,7 +682,12 @@ export default class InterestSeedPlugin extends Plugin {
     return value.slice(0, 96);
   }
 
-  captureInterestSpark(text: string, targetId?: string, why?: string): string | null {
+  captureInterestSpark(
+    text: string,
+    targetId?: string,
+    why?: string,
+    context?: { source?: InboxSource; sourceRef?: string },
+  ): string | null {
     const value = text.trim();
     const title = this.describeSpark(value);
     if (!title) {
@@ -702,6 +718,10 @@ export default class InterestSeedPlugin extends Plugin {
           capturedAt: now,
           platform: analysis.platform,
           topics: analysis.topics,
+          taskState: targetId ? 'connected' : 'captured',
+          taskStateUpdatedAt: now,
+          contextSource: context?.source ?? 'share',
+          ...(context?.sourceRef ? { contextSourceRef: context.sourceRef } : {}),
           ...(why?.trim() ? { why: why.trim() } : {}),
         },
       },
@@ -764,6 +784,8 @@ export default class InterestSeedPlugin extends Plugin {
           evidence: proposal.evidence,
           confidence: proposal.confidence,
           nextStep: proposal.nextStep === true,
+          taskState: proposal.nextStep ? 'experimenting' : 'judged',
+          taskStateUpdatedAt: now,
           ...(proposal.nextStep
             ? {
                 experimentDay: 0,

@@ -1,5 +1,6 @@
 import { Modal, Notice, setIcon } from 'obsidian';
 import type { App } from 'obsidian';
+import type { InboxSource } from '../inbox/ShareInbox';
 import type InterestSeedPlugin from '../main';
 import { analyzeShareText } from '../services/shareAnalysis';
 
@@ -19,6 +20,8 @@ export class SparkCaptureModal extends Modal {
     private readonly plugin: InterestSeedPlugin,
     initialText = '',
     private readonly inboxId?: string,
+    private readonly source: InboxSource = 'share',
+    private readonly sourceRef = '',
   ) {
     super(app);
     this.text = initialText.trim();
@@ -160,7 +163,12 @@ export class SparkCaptureModal extends Modal {
   }
 
   private submit(): void {
-    const id = this.plugin.captureInterestSpark(this.text, this.targetId || undefined, this.why);
+    const id = this.plugin.captureInterestSpark(
+      this.text,
+      this.targetId || undefined,
+      this.why,
+      { source: this.source, sourceRef: this.sourceRef },
+    );
     if (!id) return;
     if (this.inboxId) this.plugin.resolveInboxItem(this.inboxId, 'kept');
     this.plugin.setSelectedNode(id);

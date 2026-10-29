@@ -3,6 +3,7 @@ import type { App } from 'obsidian';
 import type { GraphInsights, Insight } from '../core/InsightEngine';
 import type { NeighborEntry, InterestSeedGraphStore } from '../core/GraphStore';
 import type { InterestSeedNode, RelationOrigin, RelationStatus } from '../types/graph';
+import { resolveTaskState, TASK_STATE_LABELS } from '../core/taskState';
 import { pathFromUri } from '../utils/paths';
 import { TYPE_LABELS } from './FilterBar';
 import { confirmAction } from './ConfirmModal';
@@ -74,6 +75,10 @@ export class DetailPanel {
       text: `${this.store.neighbors(node.id, { statuses: ['confirmed'] }).length} 条已确认关系`,
     });
     meta.createSpan({ text: `${node.tags.length} 个标签` });
+    meta.createSpan({
+      cls: 'interestseed-task-state',
+      text: TASK_STATE_LABELS[resolveTaskState(node.metadata, this.store.degree(node.id) > 0)],
+    });
 
     if (node.sourceUri) {
       const source = this.root.createDiv({ cls: 'interestseed-source' });

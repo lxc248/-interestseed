@@ -61,4 +61,4 @@ interestseed_get_experiment
 
 ## 版本
 
-随插件版本发布；当前 `2.1.x`。
+随插件版本发布；当前 `2.2.x`。

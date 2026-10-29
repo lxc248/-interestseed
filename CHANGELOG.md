@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.2.0 — Task state and cross-surface context
+
+- Added clickable source labels that open the original note.
+- Added Interest Task State: captured / judged / connected / experimenting / reviewed.
+- Displayed task state in the node detail panel.
+- Wrote task state and source provenance into new spark nodes.
+- Exposed task state and source fields through the read-only MCP graph tool.
+- Kept old graphs compatible through inferred states.
+
 ## 2.1.1 — Source provenance and readable menus
 
 - Added `sourceRef` to context packets so note imports retain their path.
