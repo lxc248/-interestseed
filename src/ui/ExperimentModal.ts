@@ -1,6 +1,7 @@
 import { Modal, Notice, setIcon } from 'obsidian';
 import type { App } from 'obsidian';
 import type InterestSeedPlugin from '../main';
+import type { QuickCheckInKind } from '../experiment/experiment';
 
 /**
  * Strict 7-day experiment workspace.
@@ -220,38 +221,11 @@ export class ExperimentModal extends Modal {
     });
   }
 
-  private recordQuick(kind: 'did' | 'thought' | 'missed'): void {
-    const presets = {
-      did: {
-        interest: 4,
-        energy: 4,
-        evidence: '今天实际做了一件和这个兴趣有关的事。',
-        notice: '已记录：今天做了。',
-      },
-      thought: {
-        interest: 3,
-        energy: 2,
-        evidence: '今天没有行动，但想起过这个兴趣。',
-        notice: '已记录：只想过。',
-      },
-      missed: {
-        interest: 2,
-        energy: 1,
-        evidence: '今天没有做，也没有特别想起这个兴趣。',
-        notice: '已记录：今天没做。',
-      },
-    } as const;
-    const preset = presets[kind];
-    const ok = this.plugin.recordExperimentCheckIn({
-      interest: preset.interest,
-      energy: preset.energy,
-      evidence: preset.evidence,
-    });
-    if (!ok) {
+  private recordQuick(kind: QuickCheckInKind): void {
+    if (!this.plugin.recordQuickExperiment(kind)) {
       new Notice('今天已经记录过了，或者实验已经结束。');
       return;
     }
-    new Notice(preset.notice);
     this.render();
   }
 

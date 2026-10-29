@@ -1,6 +1,7 @@
 import { Notice } from 'obsidian';
 import type { Plugin } from 'obsidian';
 import type { UndoHistory } from '../core/UndoManager';
+import type { QuickCheckInKind } from '../experiment/experiment';
 
 export interface CommandHost {
   activateView(): Promise<void> | void;
@@ -10,6 +11,8 @@ export interface CommandHost {
   openSparkFromClipboard(): Promise<void>;
   openShareCard(): void;
   openInbox(): void;
+  openExperiment(): void;
+  recordQuickExperiment(kind: QuickCheckInKind): boolean;
   rebuildGraph(silent?: boolean): Promise<void>;
   exportGraph(): void;
   promptRebuild(): void;
@@ -66,8 +69,38 @@ export function registerCommands(plugin: Plugin, host: CommandHost): void {
 
   plugin.addCommand({
     id: 'interestseed-inbox',
-    name: '打开分享收件箱（一次处理一条）',
+    name: '打开分享收件箱（Focus Deck）',
     callback: () => host.openInbox(),
+  });
+
+  plugin.addCommand({
+    id: 'interestseed-experiment',
+    name: '打开 3/7 天验证行动',
+    callback: () => host.openExperiment(),
+  });
+
+  plugin.addCommand({
+    id: 'interestseed-quick-did',
+    name: '验证行动：今天做了',
+    callback: () => {
+      if (!host.recordQuickExperiment('did')) new Notice('今天已经记录过了，或没有进行中的实验。');
+    },
+  });
+
+  plugin.addCommand({
+    id: 'interestseed-quick-thought',
+    name: '验证行动：只想过',
+    callback: () => {
+      if (!host.recordQuickExperiment('thought')) new Notice('今天已经记录过了，或没有进行中的实验。');
+    },
+  });
+
+  plugin.addCommand({
+    id: 'interestseed-quick-missed',
+    name: '验证行动：今天没做',
+    callback: () => {
+      if (!host.recordQuickExperiment('missed')) new Notice('今天已经记录过了，或没有进行中的实验。');
+    },
   });
 
   plugin.addCommand({

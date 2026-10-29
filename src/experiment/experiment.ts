@@ -39,6 +39,32 @@ export interface ExperimentInput {
   next?: string;
 }
 
+export type QuickCheckInKind = 'did' | 'thought' | 'missed';
+
+export const QUICK_CHECK_INS: Record<
+  QuickCheckInKind,
+  { interest: number; energy: number; evidence: string; notice: string }
+> = {
+  did: {
+    interest: 4,
+    energy: 4,
+    evidence: '今天实际做了一件和这个兴趣有关的事。',
+    notice: '已记录：今天做了。',
+  },
+  thought: {
+    interest: 3,
+    energy: 2,
+    evidence: '今天没有行动，但想起过这个兴趣。',
+    notice: '已记录：只想过。',
+  },
+  missed: {
+    interest: 2,
+    energy: 1,
+    evidence: '今天没有做，也没有特别想起这个兴趣。',
+    notice: '已记录：今天没做。',
+  },
+};
+
 function localDate(now: Date): string {
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, '0');

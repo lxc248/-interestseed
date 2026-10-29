@@ -67,6 +67,7 @@ import { GapCoachModal } from './ui/GapCoachModal';
 import { ExperimentModal } from './ui/ExperimentModal';
 import type { Insight } from './core/InsightEngine';
 import {
+  QUICK_CHECK_INS,
   STARTER_DAYS,
   canRecordToday,
   createExperiment,
@@ -75,6 +76,7 @@ import {
   recordExperimentLog,
   type ExperimentInput,
   type ExperimentState,
+  type QuickCheckInKind,
 } from './experiment/experiment';
 import type { SeedSprintDraft } from './onboarding/seedSprint';
 import { edgeIdFor, hashString, nodeIdForUri } from './utils/ids';
@@ -448,6 +450,15 @@ export default class InterestSeedPlugin extends Plugin {
       new Notice(error instanceof Error ? error.message : '实验记录失败。');
       return false;
     }
+  }
+
+  recordQuickExperiment(kind: QuickCheckInKind): boolean {
+    const preset = QUICK_CHECK_INS[kind];
+    return this.recordExperimentCheckIn({
+      interest: preset.interest,
+      energy: preset.energy,
+      evidence: preset.evidence,
+    });
   }
 
   startStarterExperiment(): boolean {

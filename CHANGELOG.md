@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.7.1 — GitHub-grade command access
+
+- Added command-palette actions for opening the experiment and recording “做了 / 只想过 / 没做”.
+- Added a command reference with recommended user-assigned hotkeys.
+- Kept all default hotkeys unbound to avoid conflicts.
+- Fixed stale test count in the README.
+- Added more bottom breathing room to the Focus Deck.
+
 ## 1.7.0 — Focus Deck
 
 - Rebuilt Share Inbox as a one-card Focus Deck.
