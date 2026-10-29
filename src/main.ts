@@ -59,6 +59,7 @@ import { AgentView, INTERESTSEED_AGENT_VIEW_TYPE } from './ui/AgentView';
 import { NodeCreateModal } from './ui/NodeCreateModal';
 import { SeedSprintModal } from './ui/SeedSprintModal';
 import { SparkCaptureModal } from './ui/SparkCaptureModal';
+import { ShareCardModal } from './ui/ShareCardModal';
 import { analyzeShareText } from './services/shareAnalysis';
 import { GapCoachModal } from './ui/GapCoachModal';
 import { ExperimentModal } from './ui/ExperimentModal';
@@ -581,6 +582,10 @@ export default class InterestSeedPlugin extends Plugin {
     } catch {
       new Notice('无法读取剪贴板。请在手机快捷指令中使用 interestseed-share 链接，或手动粘贴。');
     }
+  }
+
+  openShareCard(): void {
+    new ShareCardModal(this.app, this).open();
   }
 
   isVideoSpark(text: string): boolean {

@@ -8,6 +8,7 @@ export interface CommandHost {
   openSeedSprint(): void;
   openSparkCapture(initialText?: string): void;
   openSparkFromClipboard(): Promise<void>;
+  openShareCard(): void;
   rebuildGraph(silent?: boolean): Promise<void>;
   exportGraph(): void;
   promptRebuild(): void;
@@ -54,6 +55,12 @@ export function registerCommands(plugin: Plugin, host: CommandHost): void {
     callback: () => {
       void host.openSparkFromClipboard();
     },
+  });
+
+  plugin.addCommand({
+    id: 'interestseed-share-card',
+    name: '导出分享星图（社交平台 PNG）',
+    callback: () => host.openShareCard(),
   });
 
   plugin.addCommand({

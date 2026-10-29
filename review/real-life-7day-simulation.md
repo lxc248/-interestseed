@@ -259,6 +259,40 @@ InterestSeed: 从剪贴板记录分享
 docs/mobile-share.md
 ```
 
+## 9.5 导出社交分享卡片
+
+![分享卡片弹窗](real-life-sim-artifacts/35-share-modal-real-life.png)
+
+这不是把 Obsidian 界面截图发出去，而是按平台尺寸重新排版：
+
+| 平台 | 尺寸 |
+| --- | --- |
+| 小红书 | 1080 × 1440 |
+| Instagram | 1080 × 1350 |
+| X / 微博 | 1600 × 900 |
+| 微信朋友圈 | 1080 × 1080 |
+| Story | 1080 × 1920 |
+
+实际导出的真实生活图谱：
+
+![小红书分享卡片](real-life-sim-artifacts/36-share-card-real-life-xiaohongshu.png)
+
+![X 分享卡片](real-life-sim-artifacts/37-share-card-real-life-x.png)
+
+特点：
+
+- 纯 Canvas 绘制，不加载外链图片，导出不会被 Canvas taint 拦截；
+- 自动跳过重叠标签，避免密集图变成标签墙；
+- 保留中心星核、主题行星和金色关系线；
+- 底部有平台比例与 InterestSeed 来源；
+- 支持「下载 PNG」「复制图片」「系统分享」。
+
+说明文档：
+
+```text
+docs/share-cards.md
+```
+
 ## 10. 最终图谱
 
 ![最终图谱](real-life-sim-artifacts/34-final-graph.png)
@@ -373,4 +407,7 @@ docs/mobile-share.md
 32-seven-day-complete.png          7 天复盘
 33-mobile-share-prefilled.png      移动分享预填
 34-final-graph.png                 最终图谱
+35-share-modal-real-life.png       分享卡片弹窗
+36-share-card-real-life-xiaohongshu.png  小红书分享 PNG
+37-share-card-real-life-x.png      X / 微博分享 PNG
 ```

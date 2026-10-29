@@ -145,6 +145,9 @@ export class InterestSeedView extends ItemView {
     this.createAction(actions, 'download', '导出图谱 JSON', () => {
       this.plugin.exportGraph();
     });
+    this.createAction(actions, 'share-2', '导出分享星图', () => {
+      this.plugin.openShareCard();
+    });
     this.discoveryButton = this.createAction(actions, 'lightbulb', '发现', () => {
       this.toggleDiscoveries();
     });

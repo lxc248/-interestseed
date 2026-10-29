@@ -1,6 +1,6 @@
 import { chromium } from 'playwright-core';
 import path from 'node:path';
-import { mkdir, readFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 
 const outDir = 'C:\\Users\\30735\\Desktop\\interestseed\\review\\real-life-sim-artifacts';
 const backupPath = 'C:\\Users\\30735\\Desktop\\windows-mcp\\sim-original-graph.json';
@@ -263,6 +263,29 @@ await closeModals();
 await page.evaluate(() => window.app.commands.executeCommandById('interestseed:interestseed-open'));
 await page.waitForTimeout(600);
 await shot('34-final-graph.png');
+
+// Export platform-sized PNG cards from the real-life graph.
+await page.evaluate(() => window.app.plugins.plugins.interestseed.openShareCard());
+await page.waitForTimeout(500);
+await shot('35-share-modal-real-life.png');
+const shareData = await page.locator('.interestseed-share-canvas').evaluate((canvas) =>
+  canvas.toDataURL('image/png'),
+);
+await writeFile(
+  `${outDir}\\36-share-card-real-life-xiaohongshu.png`,
+  Buffer.from(shareData.split(',')[1], 'base64'),
+);
+await page.getByText('X / 微博', { exact: true }).click();
+await page.waitForTimeout(300);
+const wideData = await page.locator('.interestseed-share-canvas').evaluate((canvas) =>
+  canvas.toDataURL('image/png'),
+);
+await writeFile(
+  `${outDir}\\37-share-card-real-life-x.png`,
+  Buffer.from(wideData.split(',')[1], 'base64'),
+);
+await page.keyboard.press('Escape');
+await page.waitForTimeout(250);
 
 // Restore the disposable vault graph and real clock.
 await page.evaluate(() => {

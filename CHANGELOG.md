@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.3.0 — Share a constellation
+
+- Added platform-sized PNG share cards for Xiaohongshu, Instagram, X, WeChat and Stories.
+- Share cards are re-rendered from graph data, never UI screenshots.
+- Added label collision avoidance for dense graphs.
+- Added download, copy-image and system-share paths with environment fallbacks.
+- Added a dark, platform-aware share modal.
+- Added presets and filename tests.
+
 ## 1.2.0 — Three-day starter and theme-first map
 
 - Added a 3-day starter experiment that can be extended to 7 days after review.
