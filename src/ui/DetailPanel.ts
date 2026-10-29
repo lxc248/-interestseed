@@ -111,12 +111,12 @@ export class DetailPanel {
     this.renderActions(node);
   }
 
-  /** 全局建议收件箱：列出全部 suggested 关系，不依赖当前选中节点。 */
+  /** 全局关系建议：列出全部 suggested 关系，不依赖当前选中节点。 */
   renderSuggestionInbox(): void {
     this.root.empty();
 
     const header = this.root.createDiv({ cls: 'interestseed-detail-header' });
-    header.createEl('h3', { cls: 'interestseed-detail-title', text: '建议收件箱' });
+    header.createEl('h3', { cls: 'interestseed-detail-title', text: '关系建议' });
 
     const rows = collectSuggestedEdges(this.store);
     if (rows.length === 0) {

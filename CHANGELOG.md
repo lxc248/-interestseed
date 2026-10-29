@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.0.0 — Full acceptance release
+
+- Completed a full build, typecheck, lint and test pass.
+- Default Share Inbox is a conventional list; Focus Deck is optional.
+- Onboarding skip now opens a real spark capture.
+- Kept the 3-day trial and one-tap daily check-in.
+- Unified overview, explorer and modal surfaces in the dark theme.
+- Added command-palette actions for experiment check-ins.
+- Renamed the suggestion inbox to “关系建议”.
+- Synced plugin, MCP, docs and release metadata to 2.0.0.
+
 ## 1.8.0 — Familiar-first UX, validated by two personas
 
 - Made the conventional Share Inbox list the default.

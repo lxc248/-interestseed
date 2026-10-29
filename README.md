@@ -8,7 +8,7 @@
 
 <p>
   <img alt="Obsidian" src="https://img.shields.io/badge/Obsidian-1.5%2B-7c3aed" />
-  <img alt="Version" src="https://img.shields.io/badge/version-1.8.0-0ea5e9" />
+  <img alt="Version" src="https://img.shields.io/badge/version-2.0.0-0ea5e9" />
   <img alt="Tests" src="https://img.shields.io/badge/tests-460%20passing-22c55e" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b" />
   <img alt="Local first" src="https://img.shields.io/badge/local--first-yes-14b8a6" />
@@ -173,7 +173,7 @@ InterestSeed 让你：
 
 ### 手动安装
 
-1. 下载最新 Release 的 `interestseed-v1.8.0.zip`；
+1. 下载最新 Release 的 `interestseed-v2.0.0.zip`；
 2. 解压到：
 
 ```text
@@ -192,7 +192,7 @@ styles.css
 
 ### 不安装 Obsidian
 
-[下载 `interestseed-skill-v1.8.0.zip`](https://github.com/lxc248/-interestseed/releases/download/v1.8.0/interestseed-skill-v1.8.0.zip)，放入用户 Agent 的 skills 目录，阅读 `skill/SKILL.md`。Agent 会生成一个独立的 `star-map.html`，双击即可查看行星、轨道和星云；不需要 Obsidian。
+[下载 `interestseed-skill-v2.0.0.zip`](https://github.com/lxc248/-interestseed/releases/download/v2.0.0/interestseed-skill-v2.0.0.zip)，放入用户 Agent 的 skills 目录，阅读 `skill/SKILL.md`。Agent 会生成一个独立的 `star-map.html`，双击即可查看行星、轨道和星云；不需要 Obsidian。
 
 ### 从源码构建
 

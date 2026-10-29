@@ -69,7 +69,7 @@ export function registerCommands(plugin: Plugin, host: CommandHost): void {
 
   plugin.addCommand({
     id: 'interestseed-inbox',
-    name: '打开分享收件箱（Focus Deck）',
+    name: '打开分享收件箱（列表 / 专注）',
     callback: () => host.openInbox(),
   });
 

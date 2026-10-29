@@ -5,7 +5,7 @@ import { analyzeShareText } from '../services/shareAnalysis';
 import type { ShareInboxItem } from '../inbox/ShareInbox';
 
 /**
- * Focus Deck for unjudged shares.
+ * Share Inbox: a familiar list by default, with an optional Focus Deck.
  *
  * One card, one decision, swipe or press. The queue never becomes a wall of
  * cards; adding another share is deliberately tucked away below the card.

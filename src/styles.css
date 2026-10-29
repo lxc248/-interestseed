@@ -6511,3 +6511,5 @@ body.theme-light .interestseed-sprint-option.is-selected {
 }
 .interestseed-experiment-more { margin-bottom: 28px; }
 .interestseed-experiment-more { margin-bottom: 44px; }
+.interestseed-experiment-more > summary { padding-bottom: 10px; }
+.interestseed-inbox-add-details > summary { padding-bottom: 8px; }

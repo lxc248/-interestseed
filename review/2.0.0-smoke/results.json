@@ -1,0 +1,20 @@
+{
+  "steps": [
+    "main",
+    "cold-start",
+    "skip",
+    "inbox-list",
+    "inbox-focus",
+    "experiment",
+    "share-card",
+    "overview",
+    "explorer"
+  ],
+  "state": {
+    "nodes": 18,
+    "edges": 23,
+    "pending": 2,
+    "experimentLogs": 0
+  },
+  "errors": []
+}

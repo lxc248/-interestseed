@@ -125,39 +125,6 @@ export class InterestSeedView extends ItemView {
       void this.plugin.activateAgentView();
     });
 
-    const actions = header.createDiv({ cls: 'interestseed-header-actions' });
-    this.createAction(actions, 'refresh-cw', '重新扫描', () => {
-      this.plugin.promptRebuild();
-    });
-    this.createAction(actions, 'plus', '新建节点', () => this.plugin.promptCreateNode());
-    this.createAction(actions, 'sparkles', '记录兴趣火花', () => this.plugin.openSparkCapture());
-    this.createAction(actions, 'archive', '分享收件箱', () => this.plugin.openInbox());
-    this.createAction(actions, 'git-fork', '刷新规则建议', () => {
-      this.plugin.refreshSuggestions();
-    });
-    this.inboxButton = this.createAction(actions, 'inbox', '建议收件箱', () => {
-      this.toggleInbox();
-    });
-    this.undoButton = this.createAction(actions, 'undo-2', '撤销图谱操作', () => {
-      this.plugin.undo.undo();
-    });
-    this.redoButton = this.createAction(actions, 'redo-2', '重做图谱操作', () => {
-      this.plugin.undo.redo();
-    });
-    this.createAction(actions, 'maximize-2', '适应画布', () => this.canvas?.zoomToFit());
-    this.createAction(actions, 'download', '导出图谱 JSON', () => {
-      this.plugin.exportGraph();
-    });
-    this.createAction(actions, 'share-2', '导出分享星图', () => {
-      this.plugin.openShareCard();
-    });
-    this.discoveryButton = this.createAction(actions, 'lightbulb', '发现', () => {
-      this.toggleDiscoveries();
-    });
-    this.createAction(actions, 'layout-dashboard', '兴趣总览', () => {
-      this.plugin.openDiscoveryOverview();
-    });
-
     const nextStep = root.createDiv({ cls: 'interestseed-next-step is-hidden' });
     this.nextStepEl = nextStep;
     const nextMark = nextStep.createDiv({ cls: 'interestseed-next-step-mark' });
@@ -941,21 +908,6 @@ export class InterestSeedView extends ItemView {
         state.redoLabel ? `重做：${state.redoLabel}` : '重做',
       );
     }
-  }
-
-  private createAction(
-    parent: HTMLElement,
-    icon: string,
-    label: string,
-    onClick: () => void,
-  ): HTMLButtonElement {
-    const button = parent.createEl('button', {
-      cls: 'interestseed-action',
-      attr: { 'aria-label': label, title: label },
-    });
-    setIcon(button, icon);
-    button.addEventListener('click', onClick);
-    return button;
   }
 
   private createLaunchCard(
