@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.7.14 — Project traits and learning map
+
+- Added docs/project-characteristics.md mapping project traits to learned practices.
+- Centralized MCP tool error handling in toolFail.
+
 ## 2.7.13 — Node engineering hardening
 
 - Centralized MCP error handling with stderr-only detail.

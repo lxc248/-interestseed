@@ -388,6 +388,20 @@ function fail(id, code, userMessage, kind, cause) {
   return error(id, code, userMessage);
 }
 
+function toolFail(id, cause) {
+  const detail = cause instanceof Error ? cause.message : String(cause ?? '');
+  process.stderr.write(`InterestSeed MCP tool error: ${detail}\n`);
+  return response(id, {
+    content: [
+      {
+        type: 'text',
+        text: 'InterestSeed MCP 错误：请求无法完成。详细信息已写入服务端日志。',
+      },
+    ],
+    isError: true,
+  });
+}
+
 function handle(message) {
   const { id, method, params } = message;
   if (method === 'initialize') {
@@ -398,7 +412,7 @@ function handle(message) {
         resources: { subscribe: false, listChanged: false },
         prompts: { listChanged: false },
       },
-      serverInfo: { name: 'interestseed', version: '2.7.13' },
+      serverInfo: { name: 'interestseed', version: '2.7.14' },
     });
   }
   if (method === 'notifications/initialized') return null;
@@ -424,16 +438,7 @@ function handle(message) {
     try {
       return response(id, callTool(params?.name, params?.arguments ?? {}));
     } catch (cause) {
-      process.stderr.write(`InterestSeed MCP tool error: ${cause instanceof Error ? cause.message : String(cause)}\n`);
-      return response(id, {
-        content: [
-          {
-            type: 'text',
-            text: 'InterestSeed MCP 错误：请求无法完成。详细信息已写入服务端日志。',
-          },
-        ],
-        isError: true,
-      });
+      return toolFail(id, cause);
     }
   }
   if (id !== undefined) return error(id, -32601, `Method not found: ${method}`);

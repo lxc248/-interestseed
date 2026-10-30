@@ -1,6 +1,6 @@
 {
   "name": "interestseed",
-  "version": "2.7.13",
+  "version": "2.7.14",
   "description": "An interest validator for Obsidian: turn one saved post into a real 3-day action, then let evidence decide whether to keep it.",
   "type": "module",
   "main": "dist/main.js",
