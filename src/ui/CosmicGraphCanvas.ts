@@ -140,6 +140,7 @@ export class CosmicGraphCanvas {
   private selectedId: string | null = null;
   private hoveredId: string | null = null;
   private focusNeighbors = new Set<string>();
+  private frameCount = 0;
   private width = 0;
   private height = 0;
   private dpr = 1;
@@ -443,7 +444,10 @@ export class CosmicGraphCanvas {
     const now = performance.now();
     this.time += Math.min(40, now - this.lastTime) / 1000;
     this.lastTime = now;
-    this.draw();
+    // Update animation time at display rate, but redraw every other frame:
+    // the constellation stays smooth enough while cutting canvas cost in half.
+    this.frameCount += 1;
+    if (this.frameCount % 2 === 0) this.draw();
     this.frame = requestAnimationFrame(() => this.loop());
   }
 

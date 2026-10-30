@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.7.9 — Performance canvas budget
+
+- Reduced canvas redraws to every other animation frame.
+- Reused the graph snapshot inside refresh instead of cloning it twice.
+
 ## 2.7.8 — Visualization focus emphasis
 
 - Added node/edge/label dimming when a node is selected or hovered.

@@ -2,6 +2,7 @@ import { ItemView, Notice, setIcon } from 'obsidian';
 import type { WorkspaceLeaf } from 'obsidian';
 import type InterestSeedPlugin from '../main';
 import type { InterestSeedStatus } from '../main';
+import type { InterestSeedGraph } from '../types/graph';
 import type { GraphViewport } from '../types/graph';
 import { DetailPanel } from './DetailPanel';
 import { EmptyState } from './EmptyState';
@@ -618,10 +619,9 @@ export class InterestSeedView extends ItemView {
     }
   }
 
-  private renderNextStep(): void {
+  private renderNextStep(graph: InterestSeedGraph): void {
     const host = this.nextStepEl;
     if (!host) return;
-    const graph = this.plugin.store.getGraph();
     const pendingInbox = this.plugin.getPendingInboxItems().length;
     if (this.shareInboxBadgeEl) {
       this.shareInboxBadgeEl.setText(String(pendingInbox));
@@ -767,7 +767,7 @@ export class InterestSeedView extends ItemView {
     this.visibleEdges = filtered.edgeCount;
     this.contentEl.toggleClass('has-graph', total > 0);
     this.contentEl.toggleClass('has-experiment', Boolean(this.plugin.getActiveExperiment()));
-    this.renderNextStep();
+    this.renderNextStep(graph);
     if (total === 0) this.renderClusterRail(0);
 
     if (
