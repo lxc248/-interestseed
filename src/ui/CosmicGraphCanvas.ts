@@ -225,12 +225,15 @@ export class CosmicGraphCanvas {
       degrees.set(edge.target, (degrees.get(edge.target) ?? 0) + 1);
     }
 
+    // A small graph is a user's first impression, so draw it larger and
+    // more readable instead of leaving the canvas feeling empty.
+    const sparseScale = graph.nodes.length <= 10 ? 1.35 : graph.nodes.length <= 20 ? 1.12 : 1;
     const nextNodes: CosmicNode[] = graph.nodes.map((node) => {
       const existing = this.positions.get(node.id);
       return {
         ...node,
         degree: degrees.get(node.id) ?? 0,
-        radius: nodeRadius(node.type, degrees.get(node.id) ?? 0),
+        radius: nodeRadius(node.type, degrees.get(node.id) ?? 0) * sparseScale,
         cluster: clusterKey(node),
         phase: hash(node.id) * Math.PI * 2,
         x: existing?.x ?? 0,
@@ -861,13 +864,14 @@ export class CosmicGraphCanvas {
         (b.id === this.selectedId ? 1 : 0) - (a.id === this.selectedId ? 1 : 0) ||
         b.degree - a.degree,
     );
+    const sparse = this.nodes.length <= 10;
     for (const node of ordered) {
       const p = this.screen(node);
       const important = node.id === this.selectedId || node.id === this.hoveredId || node.degree >= 2;
-      if (!important && this.zoom < 0.52) continue;
-      this.ctx.font = '600 9px "Inter","Noto Sans SC",sans-serif';
+      if (!important && this.zoom < (sparse ? 0.36 : 0.52)) continue;
+      this.ctx.font = `600 ${sparse ? 11 : 9}px "Inter","Noto Sans SC",sans-serif`;
       let label = graphLabel(node.title);
-      const maxWidth = node.id === this.selectedId ? 140 : 106;
+      const maxWidth = node.id === this.selectedId ? (sparse ? 170 : 140) : sparse ? 132 : 106;
       while (this.ctx.measureText(label).width > maxWidth && label.length > 6) {
         label = label.slice(0, -1);
       }
@@ -886,7 +890,8 @@ export class CosmicGraphCanvas {
             box.y > b.y + b.h
           ),
       );
-      if (collision && node.id !== this.selectedId) continue;
+      // In a sparse graph, hiding labels makes the canvas feel unfinished.
+      if (collision && node.id !== this.selectedId && !sparse) continue;
       boxes.push(box);
       this.ctx.fillStyle =
         node.id === this.selectedId ? 'rgba(225,128,97,.16)' : 'rgba(5,7,13,.56)';

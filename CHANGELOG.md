@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.7.2 — Sparse graph readability
+
+- Enlarged nodes dynamically for graphs with 10 or fewer nodes.
+- Increased sparse-graph label size and maximum width.
+- Kept all labels visible in sparse graphs instead of hiding them by collision.
+
 ## 2.7.1 — Share card polish
 
 - Added a real “最近在关注” topic line to portrait and landscape cards.
