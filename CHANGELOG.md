@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.7.16 — Author attribution
+
+- Set project author to aicoder across manifest, package, NOTICE, banner, and README.
+
 ## 2.7.15 — Smooth frontend onboarding
 
 - Added first-open loading overlay.
