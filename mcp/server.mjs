@@ -377,6 +377,17 @@ function error(id, code, message) {
   return { jsonrpc: '2.0', id, error: { code, message } };
 }
 
+/**
+ * Centralized error path from nodebestpractices:
+ * the client only gets a stable, non-revealing message; the useful detail
+ * goes to stderr so an operator can debug the local process.
+ */
+function fail(id, code, userMessage, kind, cause) {
+  const detail = cause instanceof Error ? cause.message : String(cause ?? '');
+  process.stderr.write(`InterestSeed MCP ${kind}: ${detail}\n`);
+  return error(id, code, userMessage);
+}
+
 function handle(message) {
   const { id, method, params } = message;
   if (method === 'initialize') {
@@ -387,7 +398,7 @@ function handle(message) {
         resources: { subscribe: false, listChanged: false },
         prompts: { listChanged: false },
       },
-      serverInfo: { name: 'interestseed', version: '2.7.12' },
+      serverInfo: { name: 'interestseed', version: '2.7.13' },
     });
   }
   if (method === 'notifications/initialized') return null;
@@ -398,8 +409,7 @@ function handle(message) {
     try {
       return response(id, readResource(params?.uri));
     } catch (cause) {
-      process.stderr.write(`InterestSeed MCP resource error: ${cause instanceof Error ? cause.message : String(cause)}\n`);
-      return error(id, -32602, '资源读取失败');
+      return fail(id, -32602, '资源读取失败', 'resource error', cause);
     }
   }
   if (method === 'prompts/list') return response(id, { prompts });
@@ -407,8 +417,7 @@ function handle(message) {
     try {
       return response(id, getPrompt(params?.name, params?.arguments ?? {}));
     } catch (cause) {
-      process.stderr.write(`InterestSeed MCP prompt error: ${cause instanceof Error ? cause.message : String(cause)}\n`);
-      return error(id, -32602, 'Prompt 读取失败');
+      return fail(id, -32602, 'Prompt 读取失败', 'prompt error', cause);
     }
   }
   if (method === 'tools/call') {
@@ -455,3 +464,25 @@ process.stdin.on('data', (chunk) => {
   }
 });
 process.stdin.on('end', () => process.exit(0));
+process.stdin.on('error', (cause) => {
+  process.stderr.write(`InterestSeed MCP stdin error: ${cause instanceof Error ? cause.message : String(cause)}\n`);
+  process.exit(1);
+});
+
+for (const signal of ['SIGINT', 'SIGTERM']) {
+  process.on(signal, () => {
+    // Flush stdout before leaving so the client never reads a truncated line.
+    process.exitCode = 0;
+    process.stdout.write('\n');
+    process.exit(0);
+  });
+}
+
+process.on('uncaughtException', (cause) => {
+  process.stderr.write(`InterestSeed MCP uncaught exception: ${cause instanceof Error ? cause.message : String(cause)}\n`);
+  process.exit(1);
+});
+process.on('unhandledRejection', (cause) => {
+  process.stderr.write(`InterestSeed MCP unhandled rejection: ${cause instanceof Error ? cause.message : String(cause)}\n`);
+  process.exit(1);
+});

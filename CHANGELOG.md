@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.7.13 — Node engineering hardening
+
+- Centralized MCP error handling with stderr-only detail.
+- Added graceful shutdown and process-level error guards.
+
 ## 2.7.12 — Accessibility pass
 
 - Added visible keyboard focus styles.
