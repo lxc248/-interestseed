@@ -52,12 +52,12 @@ Alt (ZH): InterestSeed — 18 个兴趣，我先验证 1 个。给短视频平�
 ## Release title
 
 ```text
-InterestSeed 2.7.2 — 兴趣验证器
+InterestSeed 2.7.3 — 兴趣验证器
 ```
 
 ## Release body — English
 
-InterestSeed 2.7.2 is an interest validator for Obsidian.
+InterestSeed 2.7.3 is an interest validator for Obsidian.
 
 It turns one saved post into a real 3-day action, then uses evidence to decide whether to keep it.
 
@@ -77,7 +77,7 @@ This release includes:
 
 ## Release body — 简体中文
 
-InterestSeed 2.7.2 是 Obsidian 里的兴趣验证器。
+InterestSeed 2.7.3 是 Obsidian 里的兴趣验证器。
 
 它把一条收藏变成 3 天真实行动，再用证据决定继续还是放下。
 

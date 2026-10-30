@@ -669,7 +669,10 @@ export class CosmicGraphCanvas {
       this.ctx.beginPath();
       this.ctx.arc(x, y, r, 0, Math.PI * 2);
       this.ctx.fill();
-      this.ctx.fillStyle = 'rgba(242,239,233,.42)';
+      // In dense graphs the cluster rail already owns this signal; repeating it
+      // on canvas just competes with node labels.
+      if (this.nodes.length > 10 && this.zoom < 1.1) continue;
+      this.ctx.fillStyle = 'rgba(242,239,233,.38)';
       this.ctx.font = '600 8px "Inter","Noto Sans SC",sans-serif';
       this.ctx.textAlign = 'center';
       this.ctx.fillText(cluster.label, x, y + r + 16);
@@ -865,13 +868,29 @@ export class CosmicGraphCanvas {
         b.degree - a.degree,
     );
     const sparse = this.nodes.length <= 10;
-    for (const node of ordered) {
+    const dense = !sparse;
+    // Dense graphs are usually full of similar-looking nodes. Ranking labels by
+    // degree keeps the important structure visible without turning the canvas
+    // into a tag wall. Selected/hovered labels always stay.
+    const maxLabels = dense ? Math.min(12, Math.max(6, Math.ceil(this.nodes.length * 0.55))) : Number.POSITIVE_INFINITY;
+    const candidates = dense
+      ? [
+          ...ordered.slice(0, maxLabels),
+          ...ordered.filter(
+            (node) => node.id === this.selectedId || node.id === this.hoveredId,
+          ),
+        ].filter(
+          (node, index, list) =>
+            list.findIndex((other) => other.id === node.id) === index,
+        )
+      : ordered;
+    for (const node of candidates) {
       const p = this.screen(node);
       const important = node.id === this.selectedId || node.id === this.hoveredId || node.degree >= 2;
       if (!important && this.zoom < (sparse ? 0.36 : 0.52)) continue;
-      this.ctx.font = `600 ${sparse ? 11 : 9}px "Inter","Noto Sans SC",sans-serif`;
+      this.ctx.font = `600 ${sparse ? 11 : 10}px "Inter","Noto Sans SC",sans-serif`;
       let label = graphLabel(node.title);
-      const maxWidth = node.id === this.selectedId ? (sparse ? 170 : 140) : sparse ? 132 : 106;
+      const maxWidth = node.id === this.selectedId ? (sparse ? 170 : 150) : sparse ? 132 : 118;
       while (this.ctx.measureText(label).width > maxWidth && label.length > 6) {
         label = label.slice(0, -1);
       }

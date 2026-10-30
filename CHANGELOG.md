@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.7.3 — Dense graph readability
+
+- Ranked labels by degree and kept selected/hovered labels always visible.
+- Limited dense graphs to at most 12 node labels.
+- Increased dense label size slightly for readability.
+- Hid generic orbit labels in dense graphs to avoid competing with node titles.
+
 ## 2.7.2 — Sparse graph readability
 
 - Enlarged nodes dynamically for graphs with 10 or fewer nodes.
