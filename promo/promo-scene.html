@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<style>
+  :root {
+    --bg: #0e0e12;
+    --ink: #f5f1e8;
+    --muted: #9aa0ad;
+    --accent: #7c5cff;
+    --gold: #f0d6a0;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; }
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans SC", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+  .stage { position: relative; width: 1080px; height: 1920px; }
+  .bg { position: absolute; inset: 0; }
+  .bg-dark {
+    background:
+      radial-gradient(1200px 900px at 50% 12%, rgba(124,92,255,0.22), transparent 60%),
+      radial-gradient(900px 700px at 82% 80%, rgba(240,214,160,0.10), transparent 55%),
+      #0e0e12;
+  }
+  .screenshot {
+    position: absolute; left: 0; top: 0;
+    width: 1080px; height: 1920px;
+    object-fit: cover;
+    filter: saturate(1.05) contrast(1.02);
+  }
+  .scrim {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    height: 980px;
+    background: linear-gradient(180deg, rgba(14,14,18,0) 0%, rgba(14,14,18,0.72) 38%, rgba(14,14,18,0.96) 100%);
+  }
+  .topbar {
+    position: absolute; left: 64px; top: 72px; right: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .brand {
+    display: inline-flex; align-items: center; gap: 16px;
+    font-size: 30px; font-weight: 800; letter-spacing: 0.02em;
+  }
+  .brand .dot {
+    width: 18px; height: 18px; border-radius: 999px;
+    background: linear-gradient(135deg, #7c5cff, #22d3ee);
+    box-shadow: 0 0 26px rgba(124,92,255,0.65);
+  }
+  .tag {
+    font-size: 24px; color: var(--muted); letter-spacing: 0.12em;
+    border: 1px solid rgba(255,255,255,0.16); border-radius: 999px;
+    padding: 8px 18px; background: rgba(255,255,255,0.04);
+  }
+  .copy {
+    position: absolute; left: 80px; right: 80px; bottom: 210px;
+    display: flex; flex-direction: column; gap: 34px;
+  }
+  .hook {
+    font-size: 104px; line-height: 1.18; font-weight: 900; letter-spacing: -0.02em;
+    text-shadow: 0 12px 60px rgba(0,0,0,0.45);
+  }
+  .hook .accent { color: var(--gold); }
+  .sub {
+    font-size: 44px; line-height: 1.45; color: #c9c4d6;
+    font-weight: 500;
+  }
+  .feature-badge {
+    align-self: flex-start;
+    display: inline-flex; align-items: center; gap: 14px;
+    font-size: 30px; font-weight: 800; color: var(--gold);
+    background: rgba(240,214,160,0.10);
+    border: 1px solid rgba(240,214,160,0.28);
+    border-radius: 999px; padding: 14px 26px;
+  }
+  .footer {
+    position: absolute; left: 80px; right: 80px; bottom: 88px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .cta {
+    font-size: 34px; font-weight: 800; color: #1a1712;
+    background: linear-gradient(135deg, #f0d6a0, #e3b56a);
+    border-radius: 20px; padding: 20px 38px;
+    box-shadow: 0 16px 60px rgba(240,214,160,0.25);
+  }
+  .url {
+    font-size: 30px; color: var(--muted); letter-spacing: 0.03em;
+  }
+</style>
+</head>
+<body>
+<div class="stage" id="stage"></div>
+<script>
+  const params = new URLSearchParams(location.search);
+  const scene = Number(params.get('scene') || 1);
+  const stage = document.getElementById('stage');
+
+  function bg() {
+    const d = document.createElement('div');
+    d.className = 'bg bg-dark';
+    stage.appendChild(d);
+  }
+  function screenshot(src) {
+    const img = document.createElement('img');
+    img.className = 'screenshot';
+    img.src = src;
+    stage.appendChild(img);
+    const scrim = document.createElement('div');
+    scrim.className = 'scrim';
+    stage.appendChild(scrim);
+  }
+  function topbar() {
+    const bar = document.createElement('div');
+    bar.className = 'topbar';
+    bar.innerHTML = '<div class="brand"><span class="dot"></span><span>InterestSeed</span></div><div class="tag">兴趣验证器</div>';
+    stage.appendChild(bar);
+  }
+  function copy(html) {
+    const c = document.createElement('div');
+    c.className = 'copy';
+    c.innerHTML = html;
+    stage.appendChild(c);
+  }
+  function footer(cta, url) {
+    const f = document.createElement('div');
+    f.className = 'footer';
+    f.innerHTML = `<div class="cta">${cta}</div><div class="url">${url}</div>`;
+    stage.appendChild(f);
+  }
+
+  const scenes = {
+    1: () => {
+      bg();
+      topbar();
+      copy('<div class="hook">收藏越来越多，<br><span class="accent">真正行动的</span><br>没有几个？</div>');
+      footer('看它怎么做', 'InterestSeed');
+    },
+    2: () => {
+      bg();
+      topbar();
+      copy('<div class="hook">你不是缺兴趣，<br>是缺一个<br><span class="accent">判断机制</span></div>');
+      footer('一次只判断一条', 'InterestSeed');
+    },
+    3: () => {
+      screenshot('../review/2.0.0-smoke/04-inbox-list.png');
+      topbar();
+      copy('<div class="feature-badge">分享收件箱 · 一次处理一条</div><div class="hook">刷到就扔进来，<br><span class="accent">留下或路过</span></div>');
+      footer('打开收件箱', 'InterestSeed');
+    },
+    4: () => {
+      screenshot('../assets/cosmic-viewer.png');
+      topbar();
+      copy('<div class="feature-badge">宇宙星图 · 兴趣结构</div><div class="hook">你的兴趣，<br>变成一张<span class="accent">星图</span></div>');
+      footer('看全局', 'InterestSeed');
+    },
+    5: () => {
+      screenshot('../review/persona-newuser-2.7.8/06-canvas.png');
+      topbar();
+      copy('<div class="feature-badge">JSON Canvas · 可迁移</div><div class="hook">不锁数据，<br>一键导出<span class="accent">Canvas</span></div>');
+      footer('开放格式', 'InterestSeed');
+    },
+    6: () => {
+      screenshot('../assets/share-card-xiaohongshu.png');
+      topbar();
+      copy('<div class="feature-badge">分享卡 · 本地生成</div><div class="hook">把成长，<br>发成一张<span class="accent">好看的卡</span></div>');
+      footer('分享出去', 'InterestSeed');
+    },
+    7: () => {
+      bg();
+      topbar();
+      copy('<div class="hook">让每一个收藏，<br>都有<span class="accent">一个答案</span></div><div class="sub">InterestSeed · 本地优先 · 兴趣验证器</div>');
+      footer('现在下载', 'github.com/lxc248/-interestseed');
+    },
+  };
+
+  (scenes[scene] || scenes[1])();
+  window.__ready = true;
+</script>
+</body>
+</html>

@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.0 — Complete
+
+- Final complete release with new vertical promo video (no beat-flash).
+- Fixed deploy.ps1 UTF-8 manifest parsing for packaging.
+- Audited GitHub upload/release pipeline end to end.
+
 ## 2.7.16 — Author attribution
 
 - Set project author to aicoder across manifest, package, NOTICE, banner, and README.

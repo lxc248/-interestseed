@@ -84,6 +84,7 @@ graphs/
 !RELEASE_NOTES_2.7.14.md
 !RELEASE_NOTES_2.7.15.md
 !RELEASE_NOTES_2.7.16.md
+!RELEASE_NOTES_3.0.0.md
 !COMMUNITY_SUBMISSION.md
 /1/
 /T2-B-BCF-*
@@ -113,3 +114,10 @@ graphs/
 /review/office-sim-artifacts/
 
 /review/real-life-sim-artifacts/
+
+# promo build artifacts (final mp4 lives in assets/)
+promo/promo-scenes/
+promo/promo-clips/
+promo/promo-audio.wav
+promo/promo-video-noaudio.mp4
+promo/interestseed-launch.mp4

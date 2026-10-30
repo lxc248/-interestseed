@@ -9,7 +9,8 @@ if (-not $Vault) {
 }
 $plugin = Join-Path $Vault '.obsidian\plugins\interestseed'
 $releaseDir = Join-Path $Repo 'release'
-$version = (Get-Content (Join-Path $Repo 'manifest.json') -Raw | ConvertFrom-Json).version
+$manifestPath = Join-Path $Repo 'manifest.json'
+$version = ([IO.File]::ReadAllText($manifestPath, [Text.Encoding]::UTF8) | ConvertFrom-Json).version
 $zip = Join-Path $releaseDir "interestseed-$version.zip"
 
 Set-Location $Repo
