@@ -419,6 +419,7 @@ export class CosmicGraphCanvas {
     this.canvas.removeEventListener('wheel', this.handleWheel);
     this.canvas.removeEventListener('dblclick', this.handleDoubleClick);
     this.canvas.removeEventListener('click', this.handleClick);
+    this.canvas.removeEventListener('keydown', this.handleKeyDown);
     this.canvas.remove();
   }
 

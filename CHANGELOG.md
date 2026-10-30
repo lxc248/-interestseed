@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.4 — Full code audit
+
+- Reviewed all source and test files.
+- Fixed CosmicGraphCanvas keydown listener cleanup.
+- Expanded UI component tests (486 tests, 73.17% lines).
+
 ## 3.0.3 — View layout fix
 
 - Reused the active plugin leaf for Agent/Graph view switching.
