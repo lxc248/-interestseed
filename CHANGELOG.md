@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.7.8 — Visualization focus emphasis
+
+- Added node/edge/label dimming when a node is selected or hovered.
+- Kept the focus node and its direct neighbors highlighted.
+- Documented the visualization practice in review/2.7.8-visualization.md.
+
 ## 2.7.7 — JSON Canvas export
 
 - Added an explicit JSON Canvas export command.

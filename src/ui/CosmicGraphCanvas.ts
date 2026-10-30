@@ -139,6 +139,7 @@ export class CosmicGraphCanvas {
   private focusCluster: string | null = null;
   private selectedId: string | null = null;
   private hoveredId: string | null = null;
+  private focusNeighbors = new Set<string>();
   private width = 0;
   private height = 0;
   private dpr = 1;
@@ -471,11 +472,22 @@ export class CosmicGraphCanvas {
     this.drawBackdrop();
     this.drawCoreThreads();
     this.drawCore();
+    this.updateFocusNeighbors();
     this.drawOrbits();
     this.drawEdges();
     this.drawClusterStars();
     for (const node of this.visibleNodes()) this.drawPlanet(node);
     this.drawLabels();
+  }
+
+  private updateFocusNeighbors(): void {
+    const focusId = this.selectedId ?? this.hoveredId;
+    this.focusNeighbors = new Set<string>();
+    if (!focusId) return;
+    for (const edge of this.edges) {
+      if (edge.source.id === focusId) this.focusNeighbors.add(edge.target.id);
+      if (edge.target.id === focusId) this.focusNeighbors.add(edge.source.id);
+    }
   }
 
   private drawBackdrop(): void {
@@ -713,7 +725,14 @@ export class CosmicGraphCanvas {
         activeId !== null &&
         (edge.source.id === activeId || edge.target.id === activeId);
       this.ctx.save();
-      this.ctx.globalAlpha = active ? 0.95 : edge.edge.status === 'suggested' ? 0.20 : 0.33;
+      const unrelated = activeId !== null && !active;
+      this.ctx.globalAlpha = active
+        ? 0.95
+        : unrelated
+          ? 0.07
+          : edge.edge.status === 'suggested'
+            ? 0.20
+            : 0.33;
       this.ctx.strokeStyle = active ? stroke : `${stroke}88`;
       this.ctx.lineWidth = active ? 1.7 : edge.edge.status === 'suggested' ? 0.8 : 1.0;
       if (edge.edge.status === 'suggested') this.ctx.setLineDash([4, 8]);
@@ -765,6 +784,11 @@ export class CosmicGraphCanvas {
     const r = Math.max(4, node.radius * this.zoom);
     const active = node.id === this.selectedId;
     const hot = node.id === this.hoveredId;
+    const focusId = this.selectedId ?? this.hoveredId;
+    const dimmed =
+      focusId !== null && node.id !== focusId && !this.focusNeighbors.has(node.id);
+    this.ctx.save();
+    if (dimmed) this.ctx.globalAlpha = 0.20;
     const halo = this.ctx.createRadialGradient(p.x, p.y, r * 0.5, p.x, p.y, r * 4.7);
     halo.addColorStop(0, `${style.color}${active ? '5a' : hot ? '3a' : '22'}`);
     halo.addColorStop(1, `${style.color}00`);
@@ -858,6 +882,7 @@ export class CosmicGraphCanvas {
       this.ctx.arc(p.x, p.y, r + 10 + Math.sin(this.time * 2) * 1.3, 0, Math.PI * 2);
       this.ctx.stroke();
     }
+    this.ctx.restore();
   }
 
   private drawLabels(): void {
@@ -886,6 +911,10 @@ export class CosmicGraphCanvas {
       : ordered;
     for (const node of candidates) {
       const p = this.screen(node);
+      const focusId = this.selectedId ?? this.hoveredId;
+      const related =
+        focusId === null || node.id === focusId || this.focusNeighbors.has(node.id);
+      if (!related) continue;
       const important = node.id === this.selectedId || node.id === this.hoveredId || node.degree >= 2;
       if (!important && this.zoom < (sparse ? 0.36 : 0.52)) continue;
       this.ctx.font = `600 ${sparse ? 11 : 10}px "Inter","Noto Sans SC",sans-serif`;
