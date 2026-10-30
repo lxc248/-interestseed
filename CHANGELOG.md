@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.0.1 — Quality and CI
+
+- Added CI workflow on push/PR.
+- Added MCP smoke tests.
+- Fixed MCP stdin trailing-line processing.
+- Strict scorecard: 78 → 86.
+
 ## 3.0.0 — Complete
 
 - Final complete release with new vertical promo video (no beat-flash).

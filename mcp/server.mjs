@@ -412,7 +412,7 @@ function handle(message) {
         resources: { subscribe: false, listChanged: false },
         prompts: { listChanged: false },
       },
-      serverInfo: { name: 'interestseed', version: '3.0.0' },
+      serverInfo: { name: 'interestseed', version: '3.0.1' },
     });
   }
   if (method === 'notifications/initialized') return null;
@@ -468,7 +468,21 @@ process.stdin.on('data', (chunk) => {
     }
   }
 });
-process.stdin.on('end', () => process.exit(0));
+process.stdin.on('end', () => {
+  // Process the final line even when the client did not send a trailing newline.
+  const tail = buffer.trim();
+  if (tail) {
+    try {
+      const result = handle(JSON.parse(tail));
+      if (result) process.stdout.write(`${JSON.stringify(result)}\n`);
+    } catch (cause) {
+      process.stdout.write(
+        `${JSON.stringify(error(null, -32700, cause instanceof Error ? cause.message : 'parse error'))}\n`,
+      );
+    }
+  }
+  process.exit(0);
+});
 process.stdin.on('error', (cause) => {
   process.stderr.write(`InterestSeed MCP stdin error: ${cause instanceof Error ? cause.message : String(cause)}\n`);
   process.exit(1);
