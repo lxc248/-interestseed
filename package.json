@@ -1,7 +1,7 @@
 {
   "name": "interestseed",
   "version": "2.7.7",
-  "description": "Turn scattered notes into a living interest graph: seeds, relations and next-step insights for Obsidian.",
+  "description": "An interest validator for Obsidian: turn one saved post into a real 3-day action, then let evidence decide whether to keep it.",
   "type": "module",
   "main": "dist/main.js",
   "files": [
@@ -21,9 +21,12 @@
   "keywords": [
     "obsidian",
     "obsidian-plugin",
-    "graph",
-    "interests",
-    "knowledge-management"
+    "interest-validation",
+    "interest-graph",
+    "local-first",
+    "knowledge-management",
+    "mcp",
+    "typescript"
   ],
   "license": "AGPL-3.0-only",
   "engines": {
