@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.7.15 — Smooth frontend onboarding
+
+- Added first-open loading overlay.
+- Added first-render entrance animations with reduced-motion support.
+
 ## 2.7.14 — Project traits and learning map
 
 - Added docs/project-characteristics.md mapping project traits to learned practices.

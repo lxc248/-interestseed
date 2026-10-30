@@ -36,6 +36,7 @@ export class InterestSeedView extends ItemView {
   private filterBar: FilterBar | null = null;
   private detail: DetailPanel | null = null;
   private emptyState: EmptyState | null = null;
+  private loadingEl: HTMLElement | null = null;
   private discoveryPanel: DiscoveryPanel | null = null;
 
   private canvasHost: HTMLElement | null = null;
@@ -101,6 +102,10 @@ export class InterestSeedView extends ItemView {
     root.empty();
     root.addClass('interestseed-root');
     root.addClass('is-cosmic');
+
+    this.loadingEl = root.createDiv({ cls: 'interestseed-loading' });
+    this.loadingEl.createDiv({ cls: 'interestseed-loading-spinner' });
+    this.loadingEl.createDiv({ cls: 'interestseed-loading-text', text: '正在绘制你的兴趣地图…' });
 
     const header = root.createDiv({ cls: 'interestseed-header' });
     const heading = header.createDiv({ cls: 'interestseed-heading' });
@@ -759,6 +764,11 @@ export class InterestSeedView extends ItemView {
 
   private refresh(): void {
     if (!this.canvas || !this.emptyState) return;
+    if (this.loadingEl) {
+      this.loadingEl.remove();
+      this.loadingEl = null;
+      this.contentEl.addClass('is-ready');
+    }
     this.syncDiscoveryVisibility();
 
     const graph = this.plugin.store.getGraph();

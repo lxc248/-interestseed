@@ -4488,6 +4488,12 @@ button.interestseed-inbox-node:hover {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .interestseed-loading-spinner,
+  .interestseed-root.is-ready .interestseed-header,
+  .interestseed-root.is-ready .interestseed-filterbar,
+  .interestseed-root.is-ready .interestseed-launchpad,
+  .interestseed-root.is-ready .interestseed-next-step,
+  .interestseed-root.is-ready .interestseed-cluster-rail { animation: none; }
   .interestseed-launch-card,
   .interestseed-launch-arrow,
   .interestseed-agent-suggestion { transition: none; }
@@ -5458,6 +5464,54 @@ body.theme-light .interestseed-sprint-option.is-selected {
   cursor: pointer;
 }
 .interestseed-next-step-button:hover { background: rgba(232, 200, 132, 0.18); }
+
+/* First-open loading overlay keeps the view from flashing partial UI. */
+.interestseed-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 12px;
+  background:
+    radial-gradient(360px 220px at 50% 42%, color-mix(in srgb, var(--interactive-accent) 10%, transparent), transparent 70%),
+    var(--background-primary);
+  pointer-events: all;
+}
+.interestseed-loading-spinner {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  border: 2px solid color-mix(in srgb, var(--interactive-accent) 24%, transparent);
+  border-top-color: var(--interactive-accent);
+  animation: interestseed-spin 0.8s linear infinite;
+}
+.interestseed-loading-text {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+@keyframes interestseed-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Silky first-render entrance. */
+.interestseed-root.is-ready .interestseed-header,
+.interestseed-root.is-ready .interestseed-filterbar,
+.interestseed-root.is-ready .interestseed-launchpad,
+.interestseed-root.is-ready .interestseed-next-step,
+.interestseed-root.is-ready .interestseed-cluster-rail {
+  animation: interestseed-rise 0.28s ease both;
+}
+.interestseed-root.is-ready .interestseed-launchpad { animation-delay: 0.04s; }
+.interestseed-root.is-ready .interestseed-next-step { animation-delay: 0.08s; }
+
+@keyframes interestseed-rise {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
 /* Keyboard focus stays visible inside the custom dark surface. */
 .interestseed-root :is(button, input, summary, [role='button']):focus-visible {
