@@ -1,7 +1,7 @@
 {
   "id": "interestseed",
   "name": "InterestSeed",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "minAppVersion": "1.5.0",
   "description": "把一条收藏变成 3 天真实行动：一次只验证一个兴趣，用证据决定继续或放下。",
   "author": "aicoder",

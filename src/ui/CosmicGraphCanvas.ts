@@ -191,6 +191,7 @@ export class CosmicGraphCanvas {
     this.canvas.setAttribute('role', 'img');
     this.canvas.setAttribute('tabindex', '0');
     this.canvas.setAttribute('aria-label', '宇宙兴趣星图：行星是兴趣，轨道是主题，点击查看详情');
+    this.canvas.setAttribute('aria-keyshortcuts', 'ArrowLeft ArrowRight ArrowUp ArrowDown Enter Space');
     const context = this.canvas.getContext('2d');
     if (!context) throw new Error('当前环境不支持 Canvas 2D');
     this.ctx = context;
@@ -1010,7 +1011,43 @@ export class CosmicGraphCanvas {
     this.canvas.addEventListener('wheel', this.handleWheel, { passive: false });
     this.canvas.addEventListener('dblclick', this.handleDoubleClick);
     this.canvas.addEventListener('click', this.handleClick);
+    this.canvas.addEventListener('keydown', this.handleKeyDown);
   }
+
+  private readonly handleKeyDown = (event: KeyboardEvent): void => {
+    const keys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Enter', ' '];
+    if (!keys.includes(event.key)) return;
+    event.preventDefault();
+
+    const list = this.visibleNodes();
+    if (list.length === 0) return;
+
+    const currentIndex = this.selectedId
+      ? list.findIndex((node) => node.id === this.selectedId)
+      : -1;
+
+    if (event.key === 'Enter' || event.key === ' ') {
+      const target = (currentIndex >= 0 ? list[currentIndex] : list[0]);
+      if (!target) return;
+      this.selectedId = target.id;
+      this.options.onSelect(target.id);
+      return;
+    }
+
+    let nextIndex: number;
+    if (currentIndex < 0) {
+      nextIndex = event.key === 'ArrowLeft' || event.key === 'ArrowUp' ? list.length - 1 : 0;
+    } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+      nextIndex = (currentIndex - 1 + list.length) % list.length;
+    } else {
+      nextIndex = (currentIndex + 1) % list.length;
+    }
+
+    const target = list[nextIndex];
+    if (!target) return;
+    this.selectedId = target.id;
+    this.options.onSelect(target.id);
+  };
 
   private readonly handlePointerDown = (event: PointerEvent): void => {
     const point = this.toLocal(event);

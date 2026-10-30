@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.0.2 — Canvas keyboard navigation
+
+- Added arrow-key node cycling and Enter/Space selection.
+- Added aria-keyshortcuts to the graph canvas.
+
 ## 3.0.1 — Quality and CI
 
 - Added CI workflow on push/PR.
