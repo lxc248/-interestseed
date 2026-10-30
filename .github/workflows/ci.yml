@@ -21,6 +21,7 @@ jobs:
 
       - run: npm ci
       - run: npm run verify
+      - run: npm run coverage
 
   mcp:
     runs-on: ubuntu-latest
