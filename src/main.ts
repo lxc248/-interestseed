@@ -386,9 +386,11 @@ export default class InterestSeedPlugin extends Plugin {
     let leaf: WorkspaceLeaf | null = existing[0] ?? null;
 
     if (!leaf) {
-      leaf = workspace.getLeaf('tab');
-      await leaf.setViewState({ type: INTERESTSEED_VIEW_TYPE, active: true });
+      // Keep the plugin inside one visible leaf; do not create a second pane.
+      const active = (workspace as unknown as { activeLeaf?: WorkspaceLeaf }).activeLeaf;
+      leaf = active ?? workspace.getLeaf('tab');
     }
+    await leaf.setViewState({ type: INTERESTSEED_VIEW_TYPE, active: true });
 
     await workspace.revealLeaf(leaf);
   }
@@ -946,9 +948,12 @@ export default class InterestSeedPlugin extends Plugin {
     const existing = workspace.getLeavesOfType(INTERESTSEED_AGENT_VIEW_TYPE);
     let leaf: WorkspaceLeaf | null = existing[0] ?? null;
     if (!leaf) {
-      leaf = workspace.getLeaf('tab');
-      await leaf.setViewState({ type: INTERESTSEED_AGENT_VIEW_TYPE, active: true });
+      // Reuse the current plugin leaf so opening the agent never splits the
+      // workspace into stacked panes; the graph view becomes the agent view.
+      const active = (workspace as unknown as { activeLeaf?: WorkspaceLeaf }).activeLeaf;
+      leaf = active ?? workspace.getLeaf('tab');
     }
+    await leaf.setViewState({ type: INTERESTSEED_AGENT_VIEW_TYPE, active: true });
     await workspace.revealLeaf(leaf);
   }
 

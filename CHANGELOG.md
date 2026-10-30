@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.0.3 — View layout fix
+
+- Reused the active plugin leaf for Agent/Graph view switching.
+- Prevented stacked panes when switching between Agent and Graph views.
+
 ## 3.0.2 — Canvas keyboard navigation
 
 - Added arrow-key node cycling and Enter/Space selection.
