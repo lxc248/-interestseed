@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.7.4 — Security hardening
+
+- Opened external Share Inbox sources with `window.open(noopener,noreferrer)`.
+- Added a prompt-injection data boundary to MCP prompts.
+- Added the scoped security audit report.
+
 ## 2.7.3 — Dense graph readability
 
 - Ranked labels by degree and kept selected/hovered labels always visible.

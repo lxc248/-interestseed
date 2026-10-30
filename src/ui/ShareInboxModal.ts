@@ -31,6 +31,12 @@ function attachSourceLink(
     event.preventDefault();
     event.stopPropagation();
     close();
+    if (/^https?:\/\//i.test(sourceRef)) {
+      // External sources come from user-captured text. Open them in a real
+      // browser window with the opener severed, never as a vault path.
+      window.open(sourceRef, '_blank', 'noopener,noreferrer');
+      return;
+    }
     void app.workspace.openLinkText(sourceRef, '', false);
   };
   element.addEventListener('click', open);
