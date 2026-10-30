@@ -90,12 +90,55 @@ function nodePath(node: InterestSeedNode): string {
   return node.sourceUri ? pathFromUri(node.sourceUri) : '';
 }
 
-export function matchesNode(node: InterestSeedNode, filter: GraphFilter): boolean {
+interface NodeSearchIndex {
+  path: string;
+  searchable: string;
+}
+
+const nodeSearchIndexCache = new Map<string, NodeSearchIndex>();
+const NODE_SEARCH_INDEX_LIMIT = 2048;
+
+function buildNodeSearchIndex(node: InterestSeedNode): NodeSearchIndex {
+  const observations = Array.isArray(node.metadata.observations)
+    ? node.metadata.observations
+        .filter((item): item is Record<string, unknown> => Boolean(item && typeof item === 'object'))
+        .map((item) => String(item.evidence ?? ''))
+        .join(' ')
+    : '';
+  return {
+    path: nodePath(node).toLowerCase(),
+    searchable: [
+      node.title,
+      typeof node.metadata.summary === 'string' ? node.metadata.summary : '',
+      typeof node.metadata.why === 'string' ? node.metadata.why : '',
+      typeof node.metadata.raw === 'string' ? node.metadata.raw : '',
+      typeof node.metadata.sourceRef === 'string' ? node.metadata.sourceRef : '',
+      typeof node.metadata.contextSourceRef === 'string' ? node.metadata.contextSourceRef : '',
+      nodePath(node),
+      node.tags.join(' '),
+      observations,
+    ]
+      .join(' ')
+      .toLowerCase(),
+  };
+}
+
+function cachedNodeSearchIndex(graphUpdatedAt: string, node: InterestSeedNode): NodeSearchIndex {
+  const key = `${graphUpdatedAt}\u0000${node.id}`;
+  const cached = nodeSearchIndexCache.get(key);
+  if (cached) return cached;
+  const built = buildNodeSearchIndex(node);
+  if (nodeSearchIndexCache.size >= NODE_SEARCH_INDEX_LIMIT) nodeSearchIndexCache.clear();
+  nodeSearchIndexCache.set(key, built);
+  return built;
+}
+
+export function matchesNode(node: InterestSeedNode, filter: GraphFilter, index?: NodeSearchIndex): boolean {
   if (filter.types.length > 0 && !filter.types.includes(node.type)) return false;
 
   const folder = normalizePath(filter.folder.trim()).toLowerCase();
   if (folder) {
-    const path = nodePath(node).toLowerCase();
+    const path = index?.path ?? nodePath(node).toLowerCase();
     if (path !== folder && !path.startsWith(`${folder}/`)) return false;
   }
 
@@ -106,25 +149,7 @@ export function matchesNode(node: InterestSeedNode, filter: GraphFilter): boolea
   if (!query) return true;
 
   const queryTag = query.replace(/^#+/, '');
-  const observations = Array.isArray(node.metadata.observations)
-    ? node.metadata.observations
-        .filter((item): item is Record<string, unknown> => Boolean(item && typeof item === 'object'))
-        .map((item) => String(item.evidence ?? ''))
-        .join(' ')
-    : '';
-  const searchable = [
-    node.title,
-    typeof node.metadata.summary === 'string' ? node.metadata.summary : '',
-    typeof node.metadata.why === 'string' ? node.metadata.why : '',
-    typeof node.metadata.raw === 'string' ? node.metadata.raw : '',
-    typeof node.metadata.sourceRef === 'string' ? node.metadata.sourceRef : '',
-    typeof node.metadata.contextSourceRef === 'string' ? node.metadata.contextSourceRef : '',
-    nodePath(node),
-    node.tags.join(' '),
-    observations,
-  ]
-    .join(' ')
-    .toLowerCase();
+  const searchable = index?.searchable ?? buildNodeSearchIndex(node).searchable;
   const terms = query.split(/\s+/).filter(Boolean);
 
   return (
@@ -141,7 +166,9 @@ export interface FilteredGraph {
 }
 
 export function filterGraph(graph: InterestSeedGraph, filter: GraphFilter): FilteredGraph {
-  const nodes = graph.nodes.filter((node) => matchesNode(node, filter));
+  const nodes = graph.nodes.filter((node) =>
+    matchesNode(node, filter, cachedNodeSearchIndex(graph.updatedAt, node)),
+  );
   const visible = new Set(nodes.map((node) => node.id));
 
   const edges = graph.edges.filter((edge) => {

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.7.6 — Performance practice
+
+- Added a cached search index for graph filtering.
+- Cached MCP graph reads by file mtime.
+- Documented the performance practice in review/2.7.6-performance.md.
+
 ## 2.7.5 — Security hardening (full batch)
 
 - Hardened Share Inbox external links and MCP prompt/output boundaries.

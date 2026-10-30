@@ -10,7 +10,7 @@
  *   node mcp/server.mjs --graph "<vault>/.obsidian/plugins/interestseed/graphs/default.json"
  *   INTERESTSEED_GRAPH=... node mcp/server.mjs
  */
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const PROTOCOL_VERSION = '2026-07-28';
@@ -22,12 +22,17 @@ const graphPath = resolve(
     resolve(process.cwd(), '.obsidian/plugins/interestseed/graphs/default.json'),
 );
 
+let graphCache = { mtimeMs: 0, graph: null };
 function readGraph() {
+  let mtimeMs = 0;
+  if (existsSync(graphPath)) mtimeMs = statSync(graphPath).mtimeMs;
+  if (graphCache.graph && graphCache.mtimeMs === mtimeMs) return graphCache.graph;
   const raw = readFileSync(graphPath, 'utf8');
   const graph = JSON.parse(raw);
   if (!graph || !Array.isArray(graph.nodes) || !Array.isArray(graph.edges)) {
     throw new Error('图谱文件缺少 nodes / edges');
   }
+  graphCache = { mtimeMs, graph };
   return graph;
 }
 
@@ -382,7 +387,7 @@ function handle(message) {
         resources: { subscribe: false, listChanged: false },
         prompts: { listChanged: false },
       },
-      serverInfo: { name: 'interestseed', version: '2.7.5' },
+      serverInfo: { name: 'interestseed', version: '2.7.6' },
     });
   }
   if (method === 'notifications/initialized') return null;
