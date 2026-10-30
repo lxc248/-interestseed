@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.7.10 — Learn performance from Solid/Fastify
+
+- Cached GraphStore.stats by graph revision (Solid derived-state principle).
+- Kept MCP graph reads cached by mtime (Fastify low-overhead principle).
+- Documented the study in review/2.7.10-solid-fastify-study.md.
+
 ## 2.7.9 — Performance canvas budget
 
 - Reduced canvas redraws to every other animation frame.

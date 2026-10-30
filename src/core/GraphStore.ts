@@ -732,7 +732,12 @@ export class InterestSeedGraphStore implements GraphStore {
     this.emit({ type: 'graph:replaced', graph: this.toJSON() });
   }
 
+  private statsCache: { key: string; value: GraphStats } | null = null;
+  private revision = 0;
+
   stats(): GraphStats {
+    const cacheKey = `${this.updatedAt}:${this.revision}`;
+    if (this.statsCache?.key === cacheKey) return this.statsCache.value;
     const nodes = this.nodes.size;
     const edges = this.edges.size;
     let confirmed = 0;
@@ -766,7 +771,7 @@ export class InterestSeedGraphStore implements GraphStore {
       if (!confirmedNodes.has(node.id) && !node.metadata?.nextStep) orphans += 1;
     }
 
-    return {
+    const value: GraphStats = {
       nodes,
       edges,
       confirmed,
@@ -776,6 +781,8 @@ export class InterestSeedGraphStore implements GraphStore {
       averageDegree: nodes === 0 ? 0 : (confirmed * 2) / nodes,
       byType,
     };
+    this.statsCache = { key: cacheKey, value };
+    return value;
   }
 
   // ---------------------------------------------------------------- 订阅
@@ -820,6 +827,7 @@ export class InterestSeedGraphStore implements GraphStore {
   }
 
   private touch(): void {
+    this.revision += 1;
     this.updatedAt = this.now();
   }
 
