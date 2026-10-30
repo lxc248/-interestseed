@@ -1,7 +1,8 @@
 # GitHub Repository Metadata
 
-Use this file as the source of truth for the repository **About** panel, social
-preview and release descriptions. Keep both language versions aligned.
+This file is the source of truth for the repository About panel, social preview,
+and release description. Keep the English and Chinese descriptions aligned with
+the current product positioning.
 
 ## Repository name
 
@@ -11,11 +12,18 @@ interestseed
 
 ## About — English
 
-> InterestSeed is an interest validator for Obsidian: turn one saved post into a real 3-day action, then let evidence decide whether to keep it. Local-first, human-in-the-loop, MCP-ready.
+```text
+InterestSeed is an interest validator for Obsidian. Turn one saved post into a
+real 3-day action, then let evidence decide whether to keep it. Local-first,
+human-in-the-loop, MCP-ready.
+```
 
 ## About — 简体中文
 
-> InterestSeed 是 Obsidian 里的兴趣验证器：把一条收藏变成 3 天真实行动，用证据决定继续还是放下。本地优先、人做决定、MCP 可连接。
+```text
+InterestSeed 是 Obsidian 里的兴趣验证器：把一条收藏变成 3 天真实行动，用证据
+决定继续还是放下。本地优先、人做决定、MCP 可连接。
+```
 
 ## Topics
 
@@ -45,54 +53,53 @@ https://github.com/lxc248/-interestseed#readme
 
 ```text
 Asset: assets/share-card-xiaohongshu.png
-Alt (EN): InterestSeed — 18 interests, one thing to prove. A social cover card with a clear hook.
-Alt (ZH): InterestSeed — 18 个兴趣，我先验证 1 个。给短视频平台重新排版的分享卡。
+Alt (EN): InterestSeed — turn one saved post into a real 3-day action.
+Alt (ZH): InterestSeed — 把一条收藏变成 3 天真实行动。
 ```
 
 ## Release title
 
 ```text
-InterestSeed 2.7.3 — 兴趣验证器
+InterestSeed 2.7.3 — an interest validator for Obsidian
 ```
 
 ## Release body — English
 
-InterestSeed 2.7.3 is an interest validator for Obsidian.
-
-It turns one saved post into a real 3-day action, then uses evidence to decide whether to keep it.
+InterestSeed turns a saved post into a real three-day action, then lets evidence
+decide whether to keep it.
 
 This release includes:
 
 - one-at-a-time Share Inbox with list and focus modes;
-- 3-day starter experiments with one-tap daily check-ins;
-- Observation Timeline with source, reason and evidence;
-- context search across sources, observations and reasons;
+- source provenance and click-through back to the original note;
+- deterministic interest task states;
+- append-only Observation Timeline with belief direction;
+- three-day starter experiments with daily real check-ins;
+- multi-field context search without embeddings;
 - explicit Interest Route Markdown MOC;
 - graph / relationship / discovery view modes;
-- source links back to the original note;
-- local-first storage, undo and backup;
-- MCP 2026-07-28 read-only context;
-- adaptive layouts for narrow panes;
+- adaptive layouts for desktop and narrow panes;
+- five platform-specific share cards;
+- read-only MCP interface (protocol 2026-07-28);
 - AGPL-3.0 licensing.
 
 ## Release body — 简体中文
 
-InterestSeed 2.7.3 是 Obsidian 里的兴趣验证器。
+InterestSeed 把一条收藏变成 3 天真实行动，再用证据决定继续还是放下。
 
-它把一条收藏变成 3 天真实行动，再用证据决定继续还是放下。
-
-本次发布包含：
+本版本包含：
 
 - 一次只处理一条的分享收件箱，支持列表和专注模式；
-- 3 天兴趣试跑，一键记录每天有没有做；
-- 带来源、原因和证据的观察时间线；
-- 覆盖来源、观察和“为什么留下”的上下文搜索；
-- 显式生成兴趣路线 Markdown MOC；
+- 来源溯源与回到原笔记的跳转；
+- 确定性兴趣任务状态；
+- 带信念方向的追加式观察时间线；
+- 三天初始实验与每日真实打卡；
+- 无需 embedding 的多字段上下文搜索；
+- 显式生成的兴趣路线 Markdown MOC；
 - 图谱 / 关系建议 / 发现三种视图模式；
-- 从来源回到原笔记；
-- 本地优先存储、撤销和备份；
-- MCP 2026-07-28 只读上下文；
-- 窄分栏自适应布局；
+- 桌面与窄栏自适应布局；
+- 五种平台规格的分享卡；
+- 只读 MCP 接口（协议 2026-07-28）；
 - AGPL-3.0 许可。
 
 ## Pinned issue / security notice

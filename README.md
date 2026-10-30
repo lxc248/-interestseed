@@ -1,12 +1,12 @@
 # InterestSeed
 
-**别收藏更多，验证一个。**
+**An interest validator for Obsidian.**
 
-**InterestSeed 是兴趣验证器：把一条刷到的内容，变成 3 天内可以验证的真实行动，用证据决定继续还是放下。**
+> Turn one saved post into a real three-day action, then let evidence decide whether to keep it.
 
-[简体中文](README.md) · [English](README.en.md) · [看 40 秒演示](assets/interestseed-launch.mp4) · [产品设计](docs/seed-sprint.md) · [定位](docs/positioning.md) · [完整教程](docs/tutorial.md)
+[简体中文](README.md) · [English](README.en.md) · [40-second demo](assets/interestseed-launch.mp4) · [Product design](docs/seed-sprint.md) · [Positioning](docs/positioning.md) · [Full tutorial](docs/tutorial.md)
 
-[![InterestSeed 演示封面](assets/interestseed-launch-cover.png)](assets/interestseed-launch.mp4)
+[![InterestSeed demo cover](assets/interestseed-launch-cover.png)](assets/interestseed-launch.mp4)
 
 <p>
   <img alt="Obsidian" src="https://img.shields.io/badge/Obsidian-1.5%2B-7c3aed" />
@@ -18,320 +18,269 @@
 
 ---
 
-## 这也不是又一个收藏夹
+## 1. What problem it solves
 
-大多数兴趣工具让你：
+InterestSeed targets a specific failure pattern: **people collect far more than they pursue.**
 
-```text
-打开空白输入框 → 想不出写什么 → 关掉
-```
+Existing tools optimize recall, organization, or memory. They answer:
 
-InterestSeed 让你：
+- “Where is the thing I saved?”
+- “What is related to it?”
 
-```text
-做四个具体选择
-→ 看见第一张兴趣星图
-→ 确认哪些种子值得留下
-→ 领一个 3 天兴趣试跑
-→ 让图谱在真实行动里继续生长
-```
+InterestSeed answers a different question:
 
-它把 **短视频时代的一次短暂好奇**，变成一次真实行动和一条可追溯的证据。
+- “Is this interest worth doing, and after I actually try it, does it still hold?”
 
-图谱只是证据的载体；产品本身是：**收藏 → 判断 → 3 天验证 → 证据 → 下一步**。
+It therefore optimizes for **decision completion**, not node count.
 
 ---
 
-## 第一次使用：5 分钟
-
-如果你不想先读概念，按这个顺序做：
-
-1. **安装**：把 Release 的 `interestseed-v2.7.3.zip` 解压到 `.obsidian/plugins/interestseed/`，重启并启用插件；
-2. **打开**：`Ctrl/Cmd + P` → `打开兴趣验证（图谱）`；
-3. **冷启动**：执行 `冷启动问卷：从 0 长出第一张星图`，做四个选择；
-4. **记录**：执行 `记录一个兴趣火花`，粘贴一条内容；
-5. **判断**：执行 `打开分享收件箱（列表 / 专注）`，只处理一条，选择留下或路过；
-6. **验证**：执行 `打开 3/7 天验证行动`，今天点一下 `做了 / 只想过 / 没做`；
-7. **回看**：选中节点看时间线；需要时执行 `生成兴趣路线笔记（Markdown MOC）`。
-
-更细的每一步：
+## 2. Product model
 
 ```text
-docs/tutorial.md
+Capture → Decide → Connect → Verify → Review → Next action
 ```
 
----
-
-## 3 分钟，从 0 到 1
-
-### 01 · 四个选择，不写长文
-
-不是问“你对什么感兴趣”，而是给你具体的场景卡片：
-
-```text
-现在的你，更接近哪种状态？
-什么最容易让你忘记时间？
-最近什么内容最容易让你停下来？
-你希望这张图先长成什么？
-```
-
-### 02 · 看见兴趣开始有形状
-
-选完后，InterestSeed 生成一张 **草稿星图**：
-
-- 5 个种子节点；
-- 4–6 条带证据的候选连接；
-- 1 个“意外连接”；
-- 1 个未解锁的神秘方向；
-- 1 个可以马上开始的 3 天兴趣试跑。
-
-### 03 · AI 提案，不替你决定
-
-每条关系都有：
-
-```text
-证据 · 置信度 · 来源 · 状态
-```
-
-草稿默认不写回图谱。你可以逐项保留、删除、修改；写入后仍然可以撤销。
-
----
-
-## 四个让它持续生长的入口
-
-| 入口 | 作用 |
+| Stage | Behavior |
 | --- | --- |
-| **冷启动问卷** | 4 个选择，生成第一张可确认图谱 |
-| **兴趣火花** | 粘贴短视频链接或一句话，留下一个种子 |
-| **图谱缺口教练** | 从孤立节点和桥接节点出发，补一条真实连接 |
-| **3 天兴趣试跑** | 一按就记，把行动反馈回图谱 |
+| **Capture** | A Share Inbox receives short-video links, article quotes, or notes. One item at a time. |
+| **Decide** | Keep and connect, or pass. Passing is a valid outcome, not a failure. |
+| **Connect** | Each kept spark is connected to an existing interest or becomes a new one. |
+| **Verify** | A three-day starter experiment records one real action per day: did, thought, or did not. |
+| **Review** | An append-only Observation Timeline stores evidence with belief direction. |
+| **Next action** | An explicit Markdown Interest Route summarizes status, evidence, and the next step. |
+
+The graph is not the product. It is the evidence layer that makes each decision inspectable.
+
+---
+
+## 3. Core capabilities
+
+### One decision at a time
+
+The Share Inbox has list and focus modes. Focus mode supports `←` pass and `→` keep. No batch processing.
+
+### Source provenance
+
+Every captured item stores:
 
 ```text
-短暂好奇
-   ↓ 火花
-候选种子
-   ↓ 确认
-兴趣星图
-   ↓ 缺口教练
-新连接
-   ↓ 3 天试跑
-真实反馈
-   ↓
-下一张更懂你的星图
+source
+sourceRef
+text
+capturedAt
+status
+```
+
+Source links return to the original note or external URL.
+
+### Interest task state
+
+```text
+captured → judged → connected → experimenting → reviewed
+```
+
+States are resolved deterministically from node metadata and connections.
+
+### Observation Timeline
+
+Evidence entries are append-only, capped at 40, and record:
+
+```text
+stronger / weaker / changed
+date
+evidence
+```
+
+The timeline answers why an interest was kept, what happened, and whether it still holds.
+
+### Three-day verification
+
+Experiments are time-boxed and non-fabricated. Users record what actually happened; there is no automatic progress.
+
+### Context Search
+
+Deterministic multi-field search over:
+
+```text
+title
+tags
+summary
+why
+raw text
+source path
+observation evidence
+```
+
+No embeddings and no external API are required.
+
+### Interest Route
+
+An explicit Markdown MOC generated only on command. It never writes or overwrites notes automatically.
+
+### Unified view modes
+
+```text
+graph
+inbox (relationship suggestions)
+discoveries
+```
+
+Selecting a node always returns to graph detail, regardless of the active mode.
+
+### Adaptive layout
+
+The workspace adapts from desktop to very narrow panes:
+
+```text
+wide: full validation loop
+narrow: icon-first quick actions
+very narrow: structural fallback with a width hint
+```
+
+### Share cards
+
+Five platform-specific cover cards are rendered locally on Canvas:
+
+```text
+Xiaohongshu 1080×1440
+Instagram   1080×1350
+X / Weibo   1600×900
+WeChat      1080×1080
+Story       1080×1920
+```
+
+They are re-composed from the graph, not screenshots of the UI.
+
+---
+
+## 4. Design principles
+
+```text
+Human-in-the-loop
+Local-first
+Explicit over automatic
+Evidence over volume
+Deterministic retrieval
+```
+
+InterestSeed does not scrape platforms, store cookies, auto-publish, auto-write the graph, or auto-generate routes. The user keeps the decision rights.
+
+---
+
+## 5. Quick start
+
+1. Download `interestseed-v2.7.3.zip` from [Releases](https://github.com/lxc248/-interestseed/releases).
+2. Extract into:
+
+```text
+<your-vault>/.obsidian/plugins/interestseed/
+```
+
+3. Ensure `main.js`, `manifest.json`, and `styles.css` are present.
+4. Enable the plugin under Obsidian → Community plugins.
+5. Run the cold-start questionnaire or record a spark.
+6. Process the Share Inbox, then start a three-day experiment.
+
+The full walkthrough is in [docs/tutorial.md](docs/tutorial.md).
+
+---
+
+## 6. MCP interface
+
+InterestSeed ships a zero-dependency MCP server implementing protocol `2026-07-28`.
+
+```bash
+node mcp/server.mjs --graph "<vault>/.obsidian/plugins/interestseed/graphs/default.json"
+```
+
+Tools:
+
+```text
+interestseed_get_graph
+interestseed_next_step
+interestseed_search_interest
+interestseed_get_experiment
+interestseed_get_context
+```
+
+Resources:
+
+```text
+interestseed://graph
+interestseed://experiment
+interestseed://next
+interestseed://context
+```
+
+Prompts:
+
+```text
+review-interest
+plan-next-experiment
+```
+
+The MCP surface is read-only. Core product functionality requires no account, no API key, and no model credentials.
+
+---
+
+## 7. Repository structure
+
+```text
+src/core          domain model: graph, observations, task state
+src/services      analysis and route generation
+src/ui            Obsidian view, canvas, modals, filters
+mcp/              read-only MCP server
+tests/            Vitest unit and simulation tests
+docs/             product and usage documentation
+promo/            reproducible UI and persona test scripts
+review/           acceptance reports and visual evidence
 ```
 
 ---
 
-## 为什么它与众不同
-
-| 常见 AI 图谱 / 收藏夹 | InterestSeed |
-| --- | --- |
-| AI 自动生成、自动写回 | **先提案，后确认；默认不写回** |
-| 只给“相关” | 每条边有 `origin`、`status`、`confidence`、`evidence` |
-| 拒绝后下次继续推荐 | 反馈记忆 + 抑制键，减少重复打扰 |
-| 只服务已有笔记 | 从 0 开始，用选择卡完成冷启动 |
-| 收藏夹越来越大 | 一条内容进入一次判断，再进入 3 天验证 |
-| 以节点数、生成量衡量 | 以决策完成率、验证完成率、证据数衡量 |
-| 图谱只是结果页 | 图谱是证据载体，下一步是主界面 |
-| 聊天是主界面 | 验证是主界面，Agent 是执行层 |
-
-核心原则：
-
-> **AI 负责提出候选，人负责确认，证据负责决定留下还是放下。**
-
----
-
-## 产品截图
-
-### 主工作区
-
-![主工作区](assets/screenshot-1.png)
-
-### 宇宙星图（插件内默认）
-
-![Cosmic Viewer](assets/plugin-cosmic.png)
-
-打开 InterestSeed 就是一张个人宇宙：中心是星核，外围是主题行星系统，行星是兴趣，金色星座线是关系。参考了 `neural-creator-dashboard` 的视觉结构，但没有照搬成“神经网络节点”，而是保留行星的实体感与轨道语法。
-
-选中、拖拽、缩放、筛选、详情面板都在 Obsidian 内完成。单文件 HTML Viewer 只作为 Agent Skill 的便携输出，不是主体验。
-
-### 抖音 / 小红书分享 → 下一步
-
-![分享链接分析](assets/plugin-cosmic.png)
-
-粘贴分享文本后，插件会先做四件事：
-
-```text
-识别平台 → 提炼候选兴趣 → 生成一张判断卡 → 告诉你下一步
-```
-
-主视图顶部始终有一条 `NEXT`：
-
-- 有未判断的火花：处理这一个；
-- 有孤立节点：补一条连接；
-- 今天没做实验：记录今天；
-- 没有任务：再留下一个真实好奇。
-
-不是把链接变成又一个收藏，而是让用户每打开一次都知道现在该做什么。
-
-### 冷启动问卷
-
-![冷启动问卷](assets/onboarding.png)
-
-### 分享卡：给短视频平台的首图
-
-![分享卡](assets/share-card-xiaohongshu.png)
-
-不是 UI 截图，而是按平台比例重新排版：
-
-```text
-一个钩子：18 个兴趣，我先验证 1 个
-一组数字：兴趣 / 确认关系 / 3 天行动
-一张星图：真实节点与关系
-一个下一步：收藏 → 验证 → 决定
-```
-
-支持小红书 3:4、Instagram 4:5、X 16:9、朋友圈 1:1、Story 9:16。
-
-### 一按就记的 3/7 天验证
-
-![3 天兴趣试跑](assets/experiment.png)
-
-不是点一下加一天：每天必须写下真实观察，记录兴趣强度与精力值，连续 7 条才完成。
-
-### 兴趣探索
-
-![探索工作室](assets/screenshot-2.png)
-
-### 连接自己的 Agent
-
-![Agent](assets/screenshot-3.png)
-
----
-
-## 安装
-
-### 手动安装
-
-1. 下载最新 Release 的 `interestseed-v2.7.3.zip`；
-2. 解压到：
-
-```text
-<你的 Vault>/.obsidian/plugins/interestseed/
-```
-
-3. 确认目录内有：
-
-```text
-main.js
-manifest.json
-styles.css
-```
-
-4. 在 Obsidian 设置 → 第三方插件中启用 InterestSeed。
-
-### 不安装 Obsidian
-
-[下载 `interestseed-skill-v2.7.3.zip`](https://github.com/lxc248/-interestseed/releases/download/v2.7.3/interestseed-skill-v2.7.3.zip)，放入用户 Agent 的 skills 目录，阅读 `skill/SKILL.md`。Agent 会生成一个独立的 `star-map.html`，双击即可查看行星、轨道和星云；不需要 Obsidian。
-
-### 从源码构建
+## 8. Development
 
 ```bash
 npm install
-npm run build
-npm run deploy
-```
-
-要求 Node.js 20+。
-
-### 命令面板
-
-所有核心动作都可以通过 Obsidian 命令面板完成，不要求记忆工具栏：
-
-```text
-Ctrl/Cmd + P → 搜索 InterestSeed
-```
-
-完整命令与推荐快捷键见 [docs/commands.md](docs/commands.md)。
-
-### 开发校验
-
-```bash
 npm run verify
+npm run build
 ```
 
-包含 typecheck、471 个测试、ESLint 与生产构建。
-
----
-
-## 连接自己的 Agent
-
-InterestSeed 不绑定模型平台，也不托管你的模型凭据。
+`npm run verify` runs:
 
 ```text
-InterestSeed UI
-    → DSH ACP / 你的 Agent 命令
-    → ACP v1
-    → 你的模型、工具、沙箱、权限
+typecheck
+tests
+lint
+build
 ```
 
-设置页配置：
+Current state:
 
 ```text
-启用 DSH Agent
-DSH 命令
-DSH profile（默认 acp）
-DSH 模型
+56 test files
+471 tests passing
 ```
 
-Agent 工作目录是当前 Vault。InterestSeed 只负责会话、工具卡、权限卡和任务可视化；DSH 自己管理模型与 Key。
+Requires Node.js 20+.
 
 ---
 
-## 本地优先与隐私
-
-- 默认不读取笔记正文；
-- AI 数据发送必须显式授权；
-- 火花只保存你主动粘贴的文本/链接；
-- 图谱、反馈和实验进度保存在本地 Vault；
-- 所有写入经过可撤销的 GraphSession；
-- 没有 Agent 也能完整使用图谱、发现和探索。
-
----
-
-## 目录
+## 9. Documentation
 
 ```text
-src/
-  onboarding/     冷启动问卷引擎
-  ui/             SeedSprint / Spark / GapCoach / Agent / Graph
-  core/           图谱、关系、洞察、撤销
-  discovery/      发现生命周期与反馈
-  storage/        持久化、迁移、恢复
-  plugin/         命令与控制器
-docs/
-  seed-sprint.md  产品机制
-  short-video.md  短视频脚本
-  launch.md       发布与传播计划
-promo/
-  index.html      纯代码宣传片
-  render.mjs      Playwright → FFmpeg
-  synth_audio.py  120 BPM 配乐合成
-viewer/
-  index.html      独立宇宙星图 Viewer（Skill 便携输出）
-  cosmic.js       Canvas 行星/轨道/粒子渲染
-  cosmic.css      玻璃 HUD 与响应式界面
-skill/
-  SKILL.md        Agent 端星图 Skill
-  render.mjs      JSON → 单文件 star-map.html
-assets/
-  interestseed-launch.mp4
-  interestseed-launch-cover.png
-  screenshot-1..3.png
+docs/positioning.md     product positioning and competitive analysis
+docs/tutorial.md        end-to-end usage tutorial
+docs/seed-sprint.md     cold-start design
+docs/view-modes.md      graph / inbox / discoveries invariants
+docs/context-packet.md  data model and task state
+docs/share-cards.md     social export behavior
+docs/commands.md        command palette reference
 ```
 
 ---
 
-## License
+## 10. License
 
 AGPL-3.0-only. See [LICENSE](LICENSE).
