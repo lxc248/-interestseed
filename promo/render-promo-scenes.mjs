@@ -13,7 +13,7 @@ await page.setViewportSize({ width: 1080, height: 1920 });
 
 const htmlUrl = pathToFileURL(join(root, 'promo-scene.html')).href;
 
-for (let scene = 1; scene <= 7; scene += 1) {
+for (let scene = 1; scene <= 10; scene += 1) {
   const url = `${htmlUrl}?scene=${scene}`;
   await page.goto(url, { waitUntil: 'networkidle' });
   await page.waitForFunction(() => window.__ready === true);
