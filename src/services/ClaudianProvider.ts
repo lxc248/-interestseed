@@ -3,6 +3,7 @@ import type { App, EventRef } from 'obsidian';
 import {
   ModelProviderError,
   parseExplorationInsight,
+  sanitizeExplorationRequest,
   type ExplorationInsight,
   type ExplorationRequest,
 } from './ModelProvider';
@@ -38,6 +39,7 @@ export function hasClaudianApi(app: App): boolean {
 }
 
 function buildPrompt(request: ExplorationRequest): string {
+  const safe = sanitizeExplorationRequest(request);
   return [
     'You are the explanation layer for a local-first personal knowledge explorer.',
     'Return exactly one JSON object. No prose, no Markdown, no code fences.',
@@ -46,7 +48,7 @@ function buildPrompt(request: ExplorationRequest): string {
     'Every opportunity must cite at least one numeric observation from the input in evidence.',
     'Do not invent facts, note content, sources or causes. If evidence is insufficient, use confidence below 0.5 and 0-2 opportunities.',
     '',
-    JSON.stringify(request),
+    JSON.stringify(safe),
   ].join('\n');
 }
 

@@ -90,10 +90,17 @@ export class DshAcpClient {
         options?: SpawnOptions,
       ) => ChildProcessWithoutNullStreams;
     };
+    const childEnv: Record<string, string | undefined> = {};
+    for (const key of ['PATH', 'PATHEXT', 'SYSTEMROOT', 'SystemRoot', 'TEMP', 'TMP', 'USERPROFILE', 'HOME']) {
+      if (process.env[key] !== undefined) childEnv[key] = process.env[key];
+    }
+    for (const [key, value] of Object.entries(process.env)) {
+      if (key.startsWith('DSH_') || key.startsWith('INTERESTSEED_')) childEnv[key] = value;
+    }
     const child = spawn(this.options.command, ['--profile', this.options.profile], {
       cwd: this.options.cwd,
       env: {
-        ...process.env,
+        ...childEnv,
         ...this.options.env,
       },
       stdio: ['pipe', 'pipe', 'pipe'],

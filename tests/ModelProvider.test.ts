@@ -83,14 +83,14 @@ describe('OpenAI-compatible experimental provider', () => {
     vi.unstubAllEnvs();
   });
 
-  it('prefers INTERESTSEED_AI_API_KEY and falls back to DEEPSEEK_API_KEY', () => {
+  it('prefers INTERESTSEED_AI_API_KEY and never falls back to a cloud key', () => {
     vi.stubEnv('INTERESTSEED_AI_API_KEY', 'test-primary');
     vi.stubEnv('DEEPSEEK_API_KEY', 'test-fallback');
     expect(resolveLocalApiKey()).toBe('test-primary');
 
     vi.unstubAllEnvs();
     vi.stubEnv('DEEPSEEK_API_KEY', 'test-fallback');
-    expect(resolveLocalApiKey()).toBe('test-fallback');
+    expect(resolveLocalApiKey()).toBeUndefined();
   });
 
   it('uses the requested model/base URL and sends only id/title/tags', async () => {

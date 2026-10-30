@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.7.5 — Security hardening (full batch)
+
+- Hardened Share Inbox external links and MCP prompt/output boundaries.
+- Added MCP stdin line cap and generic error messages.
+- Allowlisted the DSH agent child environment.
+- Removed cloud API key fallback for the local AI service.
+- Sanitized Claudian exploration requests.
+- Pinned GitHub Actions to immutable SHAs, added SHA256SUMS, removed `--clobber`.
+- Fixed deploy script and Vite banner version sources.
+
 ## 2.7.4 — Security hardening
 
 - Opened external Share Inbox sources with `window.open(noopener,noreferrer)`.

@@ -1,4 +1,4 @@
-import { copyFileSync, existsSync, mkdirSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { builtinModules } from 'node:module';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -6,6 +6,7 @@ import { defineConfig } from 'vite';
 import type { Plugin } from 'vite';
 
 const root = fileURLToPath(new URL('.', import.meta.url));
+const pkg = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8')) as { version: string };
 
 /**
  * Obsidian 要求插件根目录同时存在 main.js / manifest.json / styles.css。
@@ -45,7 +46,7 @@ export default defineConfig({
       external: ['obsidian', 'electron', /^node:/, ...builtinModules],
       output: {
         exports: 'named',
-        banner: '/*! InterestSeed 0.1.0 | Copyright (C) 2026 InterestSeed | AGPL-3.0-only | Original work; see NOTICE and LICENSE. */',
+        banner: `/*! InterestSeed ${pkg.version} | Copyright (C) 2026 InterestSeed | AGPL-3.0-only | Original work; see NOTICE and LICENSE. */`,
       },
     },
   },

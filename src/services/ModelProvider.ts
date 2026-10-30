@@ -138,7 +138,11 @@ export function resolveLocalApiKey(): string | undefined {
       process?: { env?: Record<string, string | undefined> };
     }
   ).process?.env;
-  const value = env?.INTERESTSEED_AI_API_KEY ?? env?.DEEPSEEK_API_KEY;
+  // Use only a dedicated local-service key. Never fall back to a cloud
+  // provider key such as DEEPSEEK_API_KEY: the configured endpoint is a
+  // localhost service over plaintext HTTP and must not receive unrelated
+  // cloud credentials.
+  const value = env?.INTERESTSEED_AI_API_KEY;
   return value && value.trim() ? value.trim() : undefined;
 }
 
@@ -450,7 +454,7 @@ function countNumber(value: number | undefined): number {
     : 0;
 }
 
-function sanitizeExplorationRequest(input: ExplorationRequest): ExplorationRequest {
+export function sanitizeExplorationRequest(input: ExplorationRequest): ExplorationRequest {
   if (!input || !Array.isArray(input.themes) || !Array.isArray(input.projects) || !Array.isArray(input.activity)) {
     throw new ModelProviderError('invalid-request', 'AI 探索请求无效');
   }

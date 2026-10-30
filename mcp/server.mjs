@@ -382,7 +382,7 @@ function handle(message) {
         resources: { subscribe: false, listChanged: false },
         prompts: { listChanged: false },
       },
-      serverInfo: { name: 'interestseed', version: '2.7.4' },
+      serverInfo: { name: 'interestseed', version: '2.7.5' },
     });
   }
   if (method === 'notifications/initialized') return null;
@@ -393,7 +393,8 @@ function handle(message) {
     try {
       return response(id, readResource(params?.uri));
     } catch (cause) {
-      return error(id, -32602, cause instanceof Error ? cause.message : String(cause));
+      process.stderr.write(`InterestSeed MCP resource error: ${cause instanceof Error ? cause.message : String(cause)}\n`);
+      return error(id, -32602, '资源读取失败');
     }
   }
   if (method === 'prompts/list') return response(id, { prompts });
@@ -401,18 +402,20 @@ function handle(message) {
     try {
       return response(id, getPrompt(params?.name, params?.arguments ?? {}));
     } catch (cause) {
-      return error(id, -32602, cause instanceof Error ? cause.message : String(cause));
+      process.stderr.write(`InterestSeed MCP prompt error: ${cause instanceof Error ? cause.message : String(cause)}\n`);
+      return error(id, -32602, 'Prompt 读取失败');
     }
   }
   if (method === 'tools/call') {
     try {
       return response(id, callTool(params?.name, params?.arguments ?? {}));
     } catch (cause) {
+      process.stderr.write(`InterestSeed MCP tool error: ${cause instanceof Error ? cause.message : String(cause)}\n`);
       return response(id, {
         content: [
           {
             type: 'text',
-            text: `InterestSeed MCP 错误：${cause instanceof Error ? cause.message : String(cause)}`,
+            text: 'InterestSeed MCP 错误：请求无法完成。详细信息已写入服务端日志。',
           },
         ],
         isError: true,
@@ -423,10 +426,15 @@ function handle(message) {
   return null;
 }
 
+const MAX_LINE_BYTES = 1024 * 1024;
 let buffer = '';
 process.stdin.setEncoding('utf8');
 process.stdin.on('data', (chunk) => {
   buffer += chunk;
+  if (buffer.length > MAX_LINE_BYTES) {
+    process.stderr.write('InterestSeed MCP: input line exceeds 1 MiB limit\n');
+    process.exit(2);
+  }
   const lines = buffer.split('\n');
   buffer = lines.pop() ?? '';
   for (const line of lines) {
