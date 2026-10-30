@@ -1,10 +1,5 @@
-import type { InterestSeedGraph, NodeType, RelationStatus } from '../types/graph';
+import type { InterestSeedGraph, NodeType, RelationStatus } from '../types/graph';import { compareText } from '../utils/text';
 import { InterestSeedGraphStore, type GraphStats } from './GraphStore';
-
-function compareText(left: string, right: string): number {
-  if (left === right) return 0;
-  return left < right ? -1 : 1;
-}
 
 export type InsightKind = 'cluster' | 'bridge' | 'suggestion' | 'orphan' | 'coverage';
 

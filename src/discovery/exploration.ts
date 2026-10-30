@@ -1,4 +1,5 @@
 import type { Discovery, DiscoveryFile } from './types';
+import { compareText } from '../utils/text';
 
 export interface ExplorationTheme {
   key: string;
@@ -90,10 +91,6 @@ export function normalizeThemeKey(raw: string): string {
 
 export function themeLabel(key: string): string {
   return key === UNCATEGORIZED_THEME ? UNCATEGORIZED_THEME : key;
-}
-
-function compareText(left: string, right: string): number {
-  return left < right ? -1 : left > right ? 1 : 0;
 }
 
 /**

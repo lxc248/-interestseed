@@ -60,7 +60,7 @@ Alt (ZH): InterestSeed — 把一条收藏变成 3 天真实行动。
 ## Release title
 
 ```text
-InterestSeed 3.0.7 — an interest validator for Obsidian
+InterestSeed 3.0.8 — an interest validator for Obsidian
 ```
 
 ## Release body — English

@@ -5,6 +5,7 @@ import type {
   NodeType,
   RelationStatus,
 } from '../types/graph';
+import { clamp } from '../utils/math';
 import { clamp01 } from '../utils/validation';
 
 export interface GraphCanvasOptions {
@@ -59,12 +60,6 @@ export function readNodePosition(node: InterestSeedNode): {
   if (typeof position.x !== 'number' || typeof position.y !== 'number') return null;
   if (!Number.isFinite(position.x) || !Number.isFinite(position.y)) return null;
   return { x: position.x, y: position.y };
-}
-
-function clamp(value: number, min: number, max: number): number {
-  if (value < min) return min;
-  if (value > max) return max;
-  return value;
 }
 
 /**

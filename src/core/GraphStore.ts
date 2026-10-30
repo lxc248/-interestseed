@@ -3,7 +3,7 @@ import {
   isNodeType,
   isRelationOrigin,
   isRelationStatus,
-} from '../types/graph';
+} from '../types/graph';import { compareText } from '../utils/text';
 import type {
   GraphViewport,
   InterestSeedEdge,
@@ -137,11 +137,6 @@ const ORIGIN_PRIORITY: Record<RelationOrigin, number> = {
   ai: 2,
   rule: 1,
 };
-
-function compareText(left: string, right: string): number {
-  if (left === right) return 0;
-  return left < right ? -1 : 1;
-}
 
 export function mergeStatus(
   left: RelationStatus,

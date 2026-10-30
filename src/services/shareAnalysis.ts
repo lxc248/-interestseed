@@ -91,3 +91,25 @@ export function analyzeShareText(raw: string): ShareAnalysis {
         : '这条内容和你已经留下的哪个兴趣有关？',
   };
 }
+
+/** True when the pasted text points at a video platform. */
+export function isVideoSpark(text: string): boolean {
+  return /(youtube\.com|youtu\.be|bilibili\.com|douyin\.com|tiktok\.com|vimeo\.com)/i.test(text);
+}
+
+/** A short human label for a spark, without fetching the source page. */
+export function describeSpark(text: string): string {
+  const value = text.trim();
+  if (!value) return '';
+  const url = value.match(/https?:\/\/[^\s]+/i)?.[0];
+  if (url) {
+    try {
+      const host = new URL(url).hostname.replace(/^www\./, '');
+      const prefix = value.replace(url, '').trim();
+      return (prefix || `视频火花 · ${host}`).slice(0, 96);
+    } catch {
+      return '视频火花';
+    }
+  }
+  return value.slice(0, 96);
+}

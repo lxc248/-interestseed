@@ -1,7 +1,7 @@
 import type { InterestSeedEdge, InterestSeedNode } from '../types/graph';
 import { edgeIdFor, hash64 } from '../utils/ids';
 import { linkTargetToPath, noteTitleFromPath, pathFromUri, stripExtension } from '../utils/paths';
-import { clamp01, tagKey } from '../utils/validation';
+import { clamp01, tagKey } from '../utils/validation';import { compareText } from '../utils/text';
 
 export interface RelationCandidate {
   edge: InterestSeedEdge;
@@ -42,11 +42,6 @@ interface SharedPair {
   key: string;
   shared: number;
   hash: string;
-}
-
-function compareText(left: string, right: string): number {
-  if (left === right) return 0;
-  return left < right ? -1 : 1;
 }
 
 function pairKey(left: string, right: string): string {

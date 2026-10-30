@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.8 — Code structure optimization
+
+- Consolidated duplicate compareText, clamp, hash, palette, and share-topic logic.
+- Moved spark text helpers out of main.ts into shareAnalysis.ts.
+- Pure refactor; persistence format and user paths unchanged.
+
 ## 3.0.7 — Bug hunt round
 
 - Fixed Canvas export IDs collapsing to 16 unique values.

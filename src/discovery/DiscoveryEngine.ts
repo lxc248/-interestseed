@@ -1,6 +1,6 @@
 import type { InterestSeedEdge, InterestSeedGraph, InterestSeedNode } from '../types/graph';
 import { pathFromUri } from '../utils/paths';
-import { tagKey } from '../utils/validation';
+import { tagKey } from '../utils/validation';import { compareText } from '../utils/text';
 import {
   DISCOVERY_IDENTITY_VERSION,
   DISCOVERY_SCHEMA_VERSION,
@@ -21,11 +21,6 @@ import {
 export const DISCOVERY_RULE_VERSION = 'cross-project-topic-v1';
 
 const MAX_DISCOVERIES = 20;
-
-function compareText(left: string, right: string): number {
-  if (left === right) return 0;
-  return left < right ? -1 : 1;
-}
 
 function uniqueEvidence(items: DiscoveryEvidence[]): DiscoveryEvidence[] {
   const seen = new Set<string>();

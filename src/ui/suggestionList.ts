@@ -1,5 +1,6 @@
 import type { InterestSeedGraphStore } from '../core/GraphStore';
 import type { InterestSeedEdge, InterestSeedNode } from '../types/graph';
+import { compareText } from '../utils/text';
 
 export interface SuggestionRow {
   edge: InterestSeedEdge;
@@ -8,11 +9,6 @@ export interface SuggestionRow {
 }
 
 export type SuggestionStore = Pick<InterestSeedGraphStore, 'getNode' | 'listEdges'>;
-
-function compareText(left: string, right: string): number {
-  if (left === right) return 0;
-  return left < right ? -1 : 1;
-}
 
 /**
  * 收件箱数据源：全图谱所有 suggested 边，不做 Top N 截断。

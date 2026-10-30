@@ -3,6 +3,10 @@ import type {
   InterestSeedNode,
   NodeType,
 } from '../types/graph';
+import { clamp, hash01 } from '../utils/math';
+
+export { clamp };
+export const hash = hash01;
 
 export interface CosmicNode extends InterestSeedNode {
   x: number;
@@ -34,15 +38,7 @@ export interface Cluster {
 export const WORLD_WIDTH = 1600;
 export const WORLD_HEIGHT = 1000;
 
-export const TYPE_STYLE: Record<NodeType, { color: string; glyph: string }> = {
-  project: { color: '#e18061', glyph: '项' },
-  document: { color: '#5ed1df', glyph: '文' },
-  topic: { color: '#9c8cff', glyph: '主' },
-  image: { color: '#e6b66a', glyph: '图' },
-  audio: { color: '#ee82a4', glyph: '音' },
-  video: { color: '#ee82a4', glyph: '视' },
-  activity: { color: '#7dd9ad', glyph: '活' },
-};
+export { NODE_TYPE_STYLE as TYPE_STYLE } from './nodeStyle';
 
 export const CLUSTER_STYLE: Record<string, { label: string; color: string }> = {
   genesis: { label: '冷启动问卷', color: '#e18061' },
@@ -64,19 +60,6 @@ export const CLUSTER_CENTERS: Array<[number, number]> = [
   [880, 580],
   [230, 740],
 ];
-
-export function clamp(value: number, min: number, max: number): number {
-  return Math.max(min, Math.min(max, value));
-}
-
-export function hash(value: string): number {
-  let h = 2166136261;
-  for (let index = 0; index < value.length; index += 1) {
-    h ^= value.charCodeAt(index);
-    h = Math.imul(h, 16777619);
-  }
-  return (h >>> 0) / 4294967295;
-}
 
 export function nodeRadius(type: NodeType, degree: number): number {
   const base: Record<NodeType, number> = {

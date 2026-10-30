@@ -63,7 +63,7 @@ import { SparkCaptureModal } from './ui/SparkCaptureModal';
 import { ShareCardModal } from './ui/ShareCardModal';
 import { ShareInboxModal } from './ui/ShareInboxModal';
 import { ShareInbox, type InboxSource } from './inbox/ShareInbox';
-import { analyzeShareText } from './services/shareAnalysis';
+import { analyzeShareText, describeSpark, isVideoSpark } from './services/shareAnalysis';
 import { renderInterestRoute } from './services/interestRoute';
 import { buildJsonCanvas } from './services/jsonCanvas';
 import { GapCoachModal } from './ui/GapCoachModal';
@@ -745,28 +745,6 @@ export default class InterestSeedPlugin extends Plugin {
     await this.app.workspace.openLinkText(file.path, '', false);
   }
 
-  isVideoSpark(text: string): boolean {
-    return /(youtube\.com|youtu\.be|bilibili\.com|douyin\.com|tiktok\.com|vimeo\.com)/i.test(
-      text,
-    );
-  }
-
-  describeSpark(text: string): string {
-    const value = text.trim();
-    if (!value) return '';
-    const url = value.match(/https?:\/\/[^\s]+/i)?.[0];
-    if (url) {
-      try {
-        const host = new URL(url).hostname.replace(/^www\./, '');
-        const prefix = value.replace(url, '').trim();
-        return (prefix || `视频火花 · ${host}`).slice(0, 96);
-      } catch {
-        return '视频火花';
-      }
-    }
-    return value.slice(0, 96);
-  }
-
   captureInterestSpark(
     text: string,
     targetId?: string,
@@ -774,7 +752,7 @@ export default class InterestSeedPlugin extends Plugin {
     context?: { source?: InboxSource; sourceRef?: string },
   ): string | null {
     const value = text.trim();
-    const title = this.describeSpark(value);
+    const title = describeSpark(value);
     if (!title) {
       new Notice('先写下一句话，或粘贴一个链接。');
       return null;
@@ -786,7 +764,7 @@ export default class InterestSeedPlugin extends Plugin {
       return id;
     }
     const now = new Date().toISOString();
-    const video = this.isVideoSpark(value);
+    const video = isVideoSpark(value);
     const analysis = analyzeShareText(value);
     this.session.addNode(
       {
