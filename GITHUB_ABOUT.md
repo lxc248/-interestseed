@@ -60,7 +60,7 @@ Set via: GitHub → Settings → Social preview
 ## Release title
 
 ```text
-InterestSeed 3.0.8 — turn one saved post into a real 3-day action
+InterestSeed 3.0.8 — 把一条收藏变成 3 天真实行动
 ```
 
 ## Release body — English
