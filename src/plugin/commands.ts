@@ -10,6 +10,7 @@ export interface CommandHost {
   openSparkCapture(initialText?: string): void;
   openSparkFromClipboard(): Promise<void>;
   openShareCard(): void;
+  exportJsonCanvas(): Promise<void> | void;
   createInterestRoute(): Promise<void> | void;
   openInbox(): void;
   enqueueActiveNote(): Promise<void> | void;
@@ -60,6 +61,14 @@ export function registerCommands(plugin: Plugin, host: CommandHost): void {
     name: '从剪贴板记录分享（移动端快捷指令）',
     callback: () => {
       void host.openSparkFromClipboard();
+    },
+  });
+
+  plugin.addCommand({
+    id: 'interestseed-canvas-export',
+    name: '导出 JSON Canvas（Obsidian Canvas）',
+    callback: () => {
+      void host.exportJsonCanvas();
     },
   });
 

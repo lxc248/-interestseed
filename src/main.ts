@@ -65,6 +65,7 @@ import { ShareInboxModal } from './ui/ShareInboxModal';
 import { ShareInbox, type InboxSource } from './inbox/ShareInbox';
 import { analyzeShareText } from './services/shareAnalysis';
 import { renderInterestRoute } from './services/interestRoute';
+import { buildJsonCanvas } from './services/jsonCanvas';
 import { GapCoachModal } from './ui/GapCoachModal';
 import { ExperimentModal } from './ui/ExperimentModal';
 import type { Insight } from './core/InsightEngine';
@@ -666,6 +667,29 @@ export default class InterestSeedPlugin extends Plugin {
 
   openShareCard(): void {
     new ShareCardModal(this.app, this).open();
+  }
+
+  async exportJsonCanvas(): Promise<void> {
+    const graph = this.store.getGraph();
+    if (graph.nodes.length === 0) {
+      new Notice('图谱里还没有节点，先留下一个火花。');
+      return;
+    }
+    const canvas = buildJsonCanvas(graph);
+    const folder = 'InterestSeed';
+    if (!this.app.vault.getAbstractFileByPath(folder)) {
+      await this.app.vault.createFolder(folder);
+    }
+    const stamp = new Date().toISOString().slice(0, 10);
+    let path = `${folder}/兴趣图谱-${stamp}.canvas`;
+    let suffix = 2;
+    while (this.app.vault.getAbstractFileByPath(path)) {
+      path = `${folder}/兴趣图谱-${stamp}-${suffix}.canvas`;
+      suffix += 1;
+    }
+    await this.app.vault.create(path, JSON.stringify(canvas, null, 2));
+    await this.app.workspace.openLinkText(path, '', false);
+    new Notice(`已导出 JSON Canvas：${path}`);
   }
 
   async createInterestRoute(): Promise<void> {

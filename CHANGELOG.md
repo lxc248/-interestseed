@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.7.7 — JSON Canvas export
+
+- Added an explicit JSON Canvas export command.
+- Added deterministic canvas node/edge generation with validation tests.
+
 ## 2.7.6 — Performance practice
 
 - Added a cached search index for graph filtering.
