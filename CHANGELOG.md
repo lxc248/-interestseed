@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.7.11 — Button contrast fix
+
+- Fixed Agent and next-step buttons turning white-on-white in light theme.
+
 ## 2.7.10 — Learn performance from Solid/Fastify
 
 - Cached GraphStore.stats by graph revision (Solid derived-state principle).

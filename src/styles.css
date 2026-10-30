@@ -5459,6 +5459,25 @@ body.theme-light .interestseed-sprint-option.is-selected {
 }
 .interestseed-next-step-button:hover { background: rgba(232, 200, 132, 0.18); }
 
+/* Obsidian light theme uses `.theme-light button` which outranks single-class
+   custom buttons and forces white background + near-white text. Re-assert the
+   custom look with the root scope so text remains readable in both themes. */
+.interestseed-root .interestseed-header-cta {
+  background: color-mix(in srgb, var(--interactive-accent) 14%, transparent);
+  color: var(--interactive-accent);
+}
+.interestseed-root .interestseed-header-cta:hover {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent, #fff);
+}
+.interestseed-root .interestseed-next-step-button {
+  background: rgba(232, 200, 132, 0.10);
+  color: #f0d6a0;
+}
+.interestseed-root .interestseed-next-step-button:hover {
+  background: rgba(232, 200, 132, 0.18);
+}
+
 .interestseed-spark-flow {
   display: flex;
   flex-wrap: wrap;
