@@ -1,0 +1,42 @@
+{
+  "results": [
+    {
+      "scenario": "new-light-native",
+      "ok": true,
+      "errors": [],
+      "fixture": "P2/theme-b-two.md",
+      "created": "node_1s4p4ed0ugl27w",
+      "summary": "2/19 节点",
+      "logs": 1,
+      "restored": 0,
+      "canvas": {
+        "path": "InterestSeed/兴趣图谱-2026-10-30.canvas",
+        "nodes": 19,
+        "edges": 23
+      }
+    },
+    {
+      "scenario": "returning-light-narrow",
+      "ok": true,
+      "errors": [],
+      "pending": 1,
+      "created": "node_0e388h402gha9b",
+      "focus": {
+        "id": "node_1koz3o61n3olzi",
+        "neighbors": 2
+      }
+    },
+    {
+      "scenario": "returning-dark-medium",
+      "ok": true,
+      "errors": [],
+      "pending": 1,
+      "created": "node_0e388h402gha9b",
+      "focus": {
+        "id": "node_1koz3o61n3olzi",
+        "neighbors": 2
+      }
+    }
+  ],
+  "totalMs": 16070
+}
