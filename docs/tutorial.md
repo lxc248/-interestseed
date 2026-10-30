@@ -19,7 +19,7 @@
 2. 下载最新：
 
 ```text
-interestseed-v3.0.5.zip
+interestseed-v3.0.6.zip
 ```
 
 3. 解压后得到：

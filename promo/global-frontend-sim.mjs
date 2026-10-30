@@ -11,8 +11,24 @@ const results = [];
 const shot = (dir, name) => page.screenshot({ path: join(dir, name) });
 
 async function reset() {
+  for (let index = 0; index < 4; index += 1) {
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(120);
+  }
   await page.evaluate(async () => {
     const plugin = window.app.plugins.plugins.interestseed;
+    document.querySelectorAll('.modal-close-button').forEach((button) => button.click());
+    for (const node of plugin.store.listNodes()) {
+      if (node.metadata?.nextStep === true || node.metadata?.experimentState) {
+        const metadata = { ...node.metadata };
+        delete metadata.experimentState;
+        delete metadata.experimentDay;
+        delete metadata.experimentStatus;
+        delete metadata.experimentLastCheckInAt;
+        metadata.taskState = 'connected';
+        plugin.store.updateNode(node.id, { metadata });
+      }
+    }
     await plugin.inbox.load([]);
     await plugin.saveSettings();
     const route = window.app.vault.getMarkdownFiles().find((f) => f.path.startsWith('InterestSeed/兴趣路线'));
@@ -34,7 +50,7 @@ async function newJourney(dir) {
   await page.evaluate(() => window.app.plugins.plugins.interestseed.openSeedSprint());
   await page.waitForTimeout(400);
   await shot(dir, '01-onboarding.png');
-  await page.getByText('先跳过，记录一条', { exact: true }).click();
+  await page.getByText('先跳过，记录一条', { exact: true }).first().click();
   await page.waitForTimeout(250);
   await page.keyboard.press('Escape');
   await page.waitForTimeout(200);
@@ -49,7 +65,7 @@ async function newJourney(dir) {
   await page.waitForTimeout(400);
   await page.getByText('留下并连接', { exact: true }).first().click();
   await page.waitForTimeout(300);
-  await page.getByText('留下这个火花', { exact: true }).click();
+  await page.getByText('留下这个火花', { exact: true }).first().click();
   await page.waitForTimeout(500);
   const created = await page.evaluate(async () => {
     const plugin = window.app.plugins.plugins.interestseed;
@@ -111,17 +127,17 @@ async function returningJourney(dir) {
   });
   await page.waitForTimeout(400);
   await shot(dir, '01-inbox.png');
-  await page.getByText('专注一条', { exact: true }).click();
+  await page.getByText('专注一条', { exact: true }).first().click();
   await page.waitForTimeout(250);
   await page.locator('.interestseed-inbox-card').focus();
   await page.keyboard.press('ArrowLeft');
   await page.waitForTimeout(250);
   const pending = await page.evaluate(() => window.app.plugins.plugins.interestseed.getPendingInboxItems().length);
-  await page.getByText('返回列表', { exact: true }).click();
+  await page.getByText('返回列表', { exact: true }).first().click();
   await page.waitForTimeout(200);
   await page.getByText('留下并连接', { exact: true }).first().click();
   await page.waitForTimeout(250);
-  await page.getByText('留下这个火花', { exact: true }).click();
+  await page.getByText('留下这个火花', { exact: true }).first().click();
   await page.waitForTimeout(450);
   const created = await page.evaluate(async () => {
     const plugin = window.app.plugins.plugins.interestseed;

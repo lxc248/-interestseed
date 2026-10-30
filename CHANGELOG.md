@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.6 — 95-path closeout
+
+- Split canvas model into cosmicGraphModel.ts and added 1000-node benchmark.
+- Dynamic external-link audit, axe three-view audit, contrast fixes.
+- Dual-role end-to-end tests pass; objective score 92.
+
 ## 3.0.5 — UI coverage above 40%
 
 - Added jsdom component tests for modals, FilterBar, and UI helpers.

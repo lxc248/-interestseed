@@ -5987,6 +5987,26 @@ body.theme-light .interestseed-sprint-option.is-selected {
   list-style: none;
   cursor: pointer;
 }
+/* Primary modal actions and muted dates were failing AA in light theme. */
+.interestseed-sprint-primary,
+.interestseed-modal-button.is-primary {
+  background: #6b49d8 !important;
+  color: #ffffff !important;
+}
+.interestseed-inbox-deck-shell .interestseed-inbox-item-date {
+  color: #a7b3c7 !important;
+}
+
+/* The "更多" summary inherits a light theme background; force a dark surface
+   at root specificity so the text keeps AA contrast in both themes. */
+.interestseed-root .interestseed-more > summary {
+  background: rgba(20, 24, 34, 0.92) !important;
+  color: #e6e9ef !important;
+}
+.interestseed-root .interestseed-more[open] > summary {
+  background: rgba(232, 200, 132, 0.14) !important;
+  color: #f0d6a0 !important;
+}
 .interestseed-more > summary::-webkit-details-marker { display: none; }
 .interestseed-more[open] > summary {
   border-color: rgba(232, 200, 132, 0.42) !important;
