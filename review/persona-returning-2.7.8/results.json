@@ -1,0 +1,82 @@
+{
+  "persona": "工作 2–3 年的产品/运营上班族，回访用户",
+  "pendingAfterSwipe": 1,
+  "created": "node_17zl3ty0gr62hd",
+  "timelineCount": 1,
+  "searchSummary": "1/19 节点",
+  "afterLogs": 1,
+  "restoredLogs": 0,
+  "route": {
+    "path": "InterestSeed/兴趣路线 - 产品与商业 - 2026-10-30.md",
+    "head": [
+      "# 兴趣路线 · 产品与商业",
+      "",
+      "> 由 InterestSeed 生成于 2026-10-30。这是一份只读快照，不会自动修改你的笔记。",
+      "",
+      "## 正在验证",
+      "",
+      "- **7 天兴趣实验** · Day 0 / 7",
+      "- 状态：进行中",
+      "",
+      "## 等待判断"
+    ]
+  },
+  "canvasExport": {
+    "path": "InterestSeed/兴趣图谱-2026-10-30.canvas",
+    "nodes": 19,
+    "edges": 23
+  },
+  "focus": {
+    "selected": "node_1koz3o61n3olzi",
+    "neighbors": 2
+  },
+  "modes": {
+    "relationTitle": "关系建议",
+    "nodeTitle": "7 天兴趣实验",
+    "discoveryVisible": true,
+    "discoveryHidden": true
+  },
+  "steps": [
+    {
+      "name": "inbox-list",
+      "at": 955
+    },
+    {
+      "name": "focus-mode",
+      "at": 1640
+    },
+    {
+      "name": "swipe-left",
+      "at": 1971
+    },
+    {
+      "name": "timeline",
+      "at": 4182
+    },
+    {
+      "name": "context-search",
+      "at": 5406
+    },
+    {
+      "name": "experiment",
+      "at": 6266
+    },
+    {
+      "name": "route",
+      "at": 6976
+    },
+    {
+      "name": "canvas-export",
+      "at": 7763
+    },
+    {
+      "name": "focus-emphasis",
+      "at": 8288
+    },
+    {
+      "name": "view-modes",
+      "at": 8736
+    }
+  ],
+  "totalMs": 8814
+}

@@ -1,0 +1,80 @@
+{
+  "persona": "第一次使用 InterestSeed 的视觉设计学生",
+  "sparkOpen": 1,
+  "sourceClickable": true,
+  "fixture": "P2/theme-b-two.md",
+  "created": "node_1s4p4ed0ugl27w",
+  "timelineCount": 1,
+  "searchSummary": "2/19 节点",
+  "afterLogs": 1,
+  "restoredLogs": 0,
+  "route": {
+    "path": "InterestSeed/兴趣路线 - 全部兴趣 - 2026-10-30.md",
+    "head": [
+      "# 兴趣路线 · 全部兴趣",
+      "",
+      "> 由 InterestSeed 生成于 2026-10-30。这是一份只读快照，不会自动修改你的笔记。",
+      "",
+      "## 正在验证",
+      "",
+      "- **7 天兴趣实验** · Day 0 / 7",
+      "- 状态：进行中",
+      "",
+      "## 验证中的线索"
+    ]
+  },
+  "canvasExport": {
+    "path": "InterestSeed/兴趣图谱-2026-10-30.canvas",
+    "nodes": 19,
+    "edges": 23
+  },
+  "modes": {
+    "relationTitle": "关系建议",
+    "nodeTitle": "7 天兴趣实验",
+    "discoveryVisible": true,
+    "discoveryHidden": true
+  },
+  "steps": [
+    {
+      "name": "cold-start",
+      "at": 879
+    },
+    {
+      "name": "skip-to-spark",
+      "at": 1485
+    },
+    {
+      "name": "note-to-inbox",
+      "at": 2298
+    },
+    {
+      "name": "source-open-original",
+      "at": 2584
+    },
+    {
+      "name": "timeline",
+      "at": 4972
+    },
+    {
+      "name": "context-search",
+      "at": 6191
+    },
+    {
+      "name": "experiment",
+      "at": 7073
+    },
+    {
+      "name": "route",
+      "at": 8097
+    },
+    {
+      "name": "canvas-export",
+      "at": 9166
+    },
+    {
+      "name": "view-modes",
+      "at": 9878
+    }
+  ],
+  "totalMs": 9952
+}
