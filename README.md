@@ -1,160 +1,157 @@
-# InterestSeed
+<div align="center">
 
-**An interest validator for Obsidian.**
+<img src="assets/plugin-cosmic.png" alt="InterestSeed 兴趣图谱" width="920" />
 
-> Turn one saved post into a real three-day action, then let evidence decide whether to keep it.
+<h1>InterestSeed</h1>
 
-[简体中文](README.md) · [English](README.en.md) · [40-second demo](assets/interestseed-launch.mp4) · [Product design](docs/seed-sprint.md) · [Positioning](docs/positioning.md) · [Full tutorial](docs/tutorial.md)
+<p><strong>Obsidian 里的兴趣验证器</strong></p>
 
-[![InterestSeed demo cover](assets/interestseed-launch-cover.png)](assets/interestseed-launch.mp4)
+<p>把一条收藏，变成 3 天真实行动；<br/>再用证据决定：继续，还是放下。</p>
 
 <p>
-  <img alt="Obsidian" src="https://img.shields.io/badge/Obsidian-1.5%2B-7c3aed" />
-  <img alt="Version" src="https://img.shields.io/badge/version-3.0.8-0ea5e9" />
-  <img alt="Tests" src="https://img.shields.io/badge/tests-472%20passing-22c55e" />
-  <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b" />
-  <img alt="Local first" src="https://img.shields.io/badge/local--first-yes-14b8a6" />
+  <a href="assets/interestseed-launch.mp4"><img alt="Demo" src="https://img.shields.io/badge/%E2%96%B6%2040%20%E7%A7%92%E6%BC%94%E7%A4%BA-111827?style=for-the-badge" /></a>
+  <img alt="Version" src="https://img.shields.io/badge/version-3.0.8-0ea5e9?style=for-the-badge" />
+  <img alt="Tests" src="https://img.shields.io/badge/tests-511%20passing-22c55e?style=for-the-badge" />
+  <img alt="Coverage" src="https://img.shields.io/badge/coverage-74.7%25-14b8a6?style=for-the-badge" />
+  <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b?style=for-the-badge" />
 </p>
 
----
+<p>
+  <a href="README.en.md">English</a> ·
+  <a href="assets/interestseed-launch.mp4">40 秒演示</a> ·
+  <a href="docs/tutorial.md">完整教程</a> ·
+  <a href="docs/positioning.md">产品定位</a> ·
+  <a href="https://github.com/lxc248/-interestseed/releases">下载</a>
+</p>
 
-## 1. What problem it solves
-
-InterestSeed targets a specific failure pattern: **people collect far more than they pursue.**
-
-Existing tools optimize recall, organization, or memory. They answer:
-
-- “Where is the thing I saved?”
-- “What is related to it?”
-
-InterestSeed answers a different question:
-
-- “Is this interest worth doing, and after I actually try it, does it still hold?”
-
-It therefore optimizes for **decision completion**, not node count.
+</div>
 
 ---
 
-## 2. Product model
+> 大多数工具帮你**存下来**。  
+> InterestSeed 帮你**验一下**。
+
+## 为什么不是另一个收藏夹
+
+| | 收藏夹 | 双向链接笔记 | **InterestSeed** |
+| --- | --- | --- | --- |
+| 回答的问题 | 存在哪 | 和什么相关 | **值不值得做** |
+| 成功标准 | 收集数量 | 连接数量 | **完成一次真实验证** |
+| 结束状态 | 待读 | 一张网 | **继续 / 放下 + 下一步** |
+| 默认动作 | 保存 | 链接 | **做一个小实验** |
+
+InterestSeed 不优化“节点数”，它优化**决策完成率**。
+
+## 产品闭环
 
 ```text
 Capture → Decide → Connect → Verify → Review → Next action
 ```
 
-| Stage | Behavior |
+| 阶段 | 发生什么 |
 | --- | --- |
-| **Capture** | A Share Inbox receives short-video links, article quotes, or notes. One item at a time. |
-| **Decide** | Keep and connect, or pass. Passing is a valid outcome, not a failure. |
-| **Connect** | Each kept spark is connected to an existing interest or becomes a new one. |
-| **Verify** | A three-day starter experiment records one real action per day: did, thought, or did not. |
-| **Review** | An append-only Observation Timeline stores evidence with belief direction. |
-| **Next action** | An explicit Markdown Interest Route summarizes status, evidence, and the next step. |
+| **Capture** | 分享收件箱接收短视频链接、文章摘录或笔记，一次只处理一条 |
+| **Decide** | 留下并连接，或路过；路过也是有效决定 |
+| **Connect** | 留下的小火花连接到已有兴趣，或长成新的兴趣 |
+| **Verify** | 3 天 starter experiment，每天记录一次真实行动 |
+| **Review** | 追加式观察时间线，记录证据与信念方向 |
+| **Next action** | 显式生成 Markdown 兴趣路线，写清状态、证据和下一步 |
 
-The graph is not the product. It is the evidence layer that makes each decision inspectable.
+图谱不是产品，它是让每个决定可复查的**证据层**。
 
----
+## 看一眼
 
-## 3. Core capabilities
+<table>
+  <tr>
+    <td width="50%">
+      <img src="assets/onboarding.png" alt="3 分钟冷启动" /><br/>
+      <sub><b>3 分钟冷启动</b>：不需要先知道自己喜欢什么。</sub>
+    </td>
+    <td width="50%">
+      <img src="assets/experiment.png" alt="3 天兴趣实验" /><br/>
+      <sub><b>3 天实验</b>：每天一条真实证据，不自动编进度。</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <img src="assets/plugin-cosmic.png" alt="宇宙图谱与下一步" /><br/>
+      <sub><b>宇宙图谱</b>：节点、轨道、桥接与下一步。</sub>
+    </td>
+    <td width="50%">
+      <img src="assets/share-card-xiaohongshu.png" alt="小红书分享卡" /><br/>
+      <sub><b>本地分享卡</b>：五种平台规格，Canvas 本地渲染。</sub>
+    </td>
+  </tr>
+</table>
 
-### One decision at a time
+## 核心能力
 
-The Share Inbox has list and focus modes. Focus mode supports `←` pass and `→` keep. No batch processing.
+| 能力 | 说明 |
+| --- | --- |
+| **一次一条** | 分享收件箱支持列表与专注模式；`←` 路过，`→` 留下，不做批量处理 |
+| **来源溯源** | 每条记录保留 source / sourceRef / capturedAt / status，可回到原笔记或外链 |
+| **兴趣任务状态** | `captured → judged → connected → experimenting → reviewed`，由元数据与连接确定性推导 |
+| **观察时间线** | 追加式证据，记录 `stronger / weaker / changed` 与日期，最多 40 条 |
+| **3 天验证** | 时间盒实验，只记录真实发生的事，没有自动完成 |
+| **上下文搜索** | 标题、标签、摘要、为什么、原文、来源路径、观察证据，多字段确定性搜索，无需 embedding |
+| **兴趣路线** | 显式命令生成 Markdown MOC，从不自动写笔记 |
+| **五种分享卡** | 小红书、Instagram、X、微信、Story，全部本地 Canvas 渲染 |
+| **MCP 接口** | 零依赖只读 MCP server，协议 `2026-07-28` |
+| **自适应布局** | 桌面、窄栏、极窄栏三档，图标优先，不横向溢出 |
 
-### Source provenance
+## 安装
 
-Every captured item stores:
-
-```text
-source
-sourceRef
-text
-capturedAt
-status
-```
-
-Source links return to the original note or external URL.
-
-### Interest task state
-
-```text
-captured → judged → connected → experimenting → reviewed
-```
-
-States are resolved deterministically from node metadata and connections.
-
-### Observation Timeline
-
-Evidence entries are append-only, capped at 40, and record:
-
-```text
-stronger / weaker / changed
-date
-evidence
-```
-
-The timeline answers why an interest was kept, what happened, and whether it still holds.
-
-### Three-day verification
-
-Experiments are time-boxed and non-fabricated. Users record what actually happened; there is no automatic progress.
-
-### Context Search
-
-Deterministic multi-field search over:
+1. 从 [Releases](https://github.com/lxc248/-interestseed/releases) 下载 `interestseed-v3.0.8.zip`。
+2. 解压到：
 
 ```text
-title
-tags
-summary
-why
-raw text
-source path
-observation evidence
+<your-vault>/.obsidian/plugins/interestseed/
 ```
 
-No embeddings and no external API are required.
+3. 确认目录里有 `main.js`、`manifest.json`、`styles.css`。
+4. Obsidian → 设置 → 第三方插件 → 启用 **InterestSeed**。
+5. 运行冷启动问卷，或记录第一条火花。
+6. 处理分享收件箱，然后开始 3 天实验。
 
-### Interest Route
+完整走查：[docs/tutorial.md](docs/tutorial.md)
 
-An explicit Markdown MOC generated only on command. It never writes or overwrites notes automatically.
+## MCP
 
-### Unified view modes
+```bash
+node mcp/server.mjs --graph "<vault>/.obsidian/plugins/interestseed/graphs/default.json"
+```
 
 ```text
-graph
-inbox (relationship suggestions)
-discoveries
+tools:      interestseed_get_graph / next_step / search_interest / get_experiment / get_context
+resources:  interestseed://graph / experiment / next / context
+prompts:    review-interest / plan-next-experiment
 ```
 
-Selecting a node always returns to graph detail, regardless of the active mode.
+MCP 是只读的。核心功能不需要账号、API key 或模型凭据。
 
-### Adaptive layout
-
-The workspace adapts from desktop to very narrow panes:
+## 工程状态
 
 ```text
-wide: full validation loop
-narrow: icon-first quick actions
-very narrow: structural fallback with a width hint
+511 tests passing
+74.74% line coverage
+92.25% core coverage
+43.81% UI coverage
+axe: graph / inbox / share-card 0 violations
+semgrep: 0 findings
+gitleaks: no leaks
+CI + Release: green
 ```
 
-### Share cards
-
-Five platform-specific cover cards are rendered locally on Canvas:
-
-```text
-Xiaohongshu 1080×1440
-Instagram   1080×1350
-X / Weibo   1600×900
-WeChat      1080×1080
-Story       1080×1920
+```bash
+npm install
+npm run verify      # typecheck + tests + lint + build
+npm run coverage
+node --test mcp/smoke.test.mjs
 ```
 
-They are re-composed from the graph, not screenshots of the UI.
+要求 Node.js 22+。
 
----
-
-## 4. Design principles
+## 设计原则
 
 ```text
 Human-in-the-loop
@@ -164,123 +161,24 @@ Evidence over volume
 Deterministic retrieval
 ```
 
-InterestSeed does not scrape platforms, store cookies, auto-publish, auto-write the graph, or auto-generate routes. The user keeps the decision rights.
+InterestSeed 不抓取平台、不保存 cookie、不自动发布、不自动写图谱、不自动生成路线。  
+决定权始终在用户手里。
 
----
+## 文档
 
-## 5. Quick start
+| 文档 | 内容 |
+| --- | --- |
+| [docs/tutorial.md](docs/tutorial.md) | 端到端使用教程 |
+| [docs/positioning.md](docs/positioning.md) | 产品定位与竞品分析 |
+| [docs/seed-sprint.md](docs/seed-sprint.md) | 冷启动设计 |
+| [docs/view-modes.md](docs/view-modes.md) | 图谱 / 收件箱 / 发现三种视图的不变量 |
+| [docs/context-packet.md](docs/context-packet.md) | 数据模型与任务状态 |
+| [docs/share-cards.md](docs/share-cards.md) | 分享卡导出行为 |
+| [docs/commands.md](docs/commands.md) | 命令面板参考 |
+| [SECURITY.md](SECURITY.md) | 安全模型与漏洞披露 |
 
-1. Download `interestseed-v3.0.8.zip` from [Releases](https://github.com/lxc248/-interestseed/releases).
-2. Extract into:
+## License
 
-```text
-<your-vault>/.obsidian/plugins/interestseed/
-```
+AGPL-3.0-only. Author: [aicoder](https://github.com/lxc248).
 
-3. Ensure `main.js`, `manifest.json`, and `styles.css` are present.
-4. Enable the plugin under Obsidian → Community plugins.
-5. Run the cold-start questionnaire or record a spark.
-6. Process the Share Inbox, then start a three-day experiment.
-
-The full walkthrough is in [docs/tutorial.md](docs/tutorial.md).
-
----
-
-## 6. MCP interface
-
-InterestSeed ships a zero-dependency MCP server implementing protocol `2026-07-28`.
-
-```bash
-node mcp/server.mjs --graph "<vault>/.obsidian/plugins/interestseed/graphs/default.json"
-```
-
-Tools:
-
-```text
-interestseed_get_graph
-interestseed_next_step
-interestseed_search_interest
-interestseed_get_experiment
-interestseed_get_context
-```
-
-Resources:
-
-```text
-interestseed://graph
-interestseed://experiment
-interestseed://next
-interestseed://context
-```
-
-Prompts:
-
-```text
-review-interest
-plan-next-experiment
-```
-
-The MCP surface is read-only. Core product functionality requires no account, no API key, and no model credentials.
-
----
-
-## 7. Repository structure
-
-```text
-src/core          domain model: graph, observations, task state
-src/services      analysis and route generation
-src/ui            Obsidian view, canvas, modals, filters
-mcp/              read-only MCP server
-tests/            Vitest unit and simulation tests
-docs/             product and usage documentation
-promo/            reproducible UI and persona test scripts
-review/           acceptance reports and visual evidence
-```
-
----
-
-## 8. Development
-
-```bash
-npm install
-npm run verify
-npm run build
-```
-
-`npm run verify` runs:
-
-```text
-typecheck
-tests
-lint
-build
-```
-
-Current state:
-
-```text
-56 test files
-472 tests passing
-```
-
-Requires Node.js 20+.
-
----
-
-## 9. Documentation
-
-```text
-docs/positioning.md     product positioning and competitive analysis
-docs/tutorial.md        end-to-end usage tutorial
-docs/seed-sprint.md     cold-start design
-docs/view-modes.md      graph / inbox / discoveries invariants
-docs/context-packet.md  data model and task state
-docs/share-cards.md     social export behavior
-docs/commands.md        command palette reference
-```
-
----
-
-## 10. License
-
-AGPL-3.0-only. Author: aicoder. See [LICENSE](LICENSE).
+如果这个项目让你重新思考“收藏之后该做什么”，欢迎 star、试用、提 issue。
