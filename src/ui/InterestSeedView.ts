@@ -133,7 +133,10 @@ export class InterestSeedView extends ItemView {
     this.nextStepEl = nextStep;
     const nextMark = nextStep.createDiv({ cls: 'interestseed-next-step-mark' });
     setIcon(nextMark, 'arrow-up-right');
-    const nextCopy = nextStep.createDiv({ cls: 'interestseed-next-step-copy' });
+    const nextCopy = nextStep.createDiv({
+      cls: 'interestseed-next-step-copy',
+      attr: { 'aria-live': 'polite' },
+    });
     this.nextStepLabelEl = nextCopy.createDiv({ cls: 'interestseed-next-step-label', text: 'NEXT' });
     this.nextStepTitleEl = nextCopy.createDiv({ cls: 'interestseed-next-step-title', text: '' });
     this.nextStepDetailEl = nextCopy.createDiv({ cls: 'interestseed-next-step-detail', text: '' });

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.7.12 — Accessibility pass
+
+- Added visible keyboard focus styles.
+- Added polite live regions for filter summary and next-step copy.
+- Audited with axe-core WCAG A/AA (0 violations).
+
 ## 2.7.11 — Button contrast fix
 
 - Fixed Agent and next-step buttons turning white-on-white in light theme.

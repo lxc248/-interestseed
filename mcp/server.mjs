@@ -387,7 +387,7 @@ function handle(message) {
         resources: { subscribe: false, listChanged: false },
         prompts: { listChanged: false },
       },
-      serverInfo: { name: 'interestseed', version: '2.7.11' },
+      serverInfo: { name: 'interestseed', version: '2.7.12' },
     });
   }
   if (method === 'notifications/initialized') return null;

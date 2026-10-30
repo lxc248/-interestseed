@@ -277,7 +277,11 @@ export class FilterBar {
     });
     this.tagInput.addEventListener('input', () => this.scheduleUpdate());
 
-    this.summaryEl = firstRow.createSpan({ cls: 'interestseed-summary', text: '' });
+    this.summaryEl = firstRow.createSpan({
+      cls: 'interestseed-summary',
+      text: '',
+      attr: { 'aria-live': 'polite' },
+    });
 
     const typeRow = this.container.createDiv({ cls: 'interestseed-filter-group' });
     typeRow.createSpan({ cls: 'interestseed-filter-label', text: '类型' });
