@@ -71,6 +71,8 @@ a real 3-day action, then lets evidence decide whether to keep it.
 
 ![InterestSeed](https://raw.githubusercontent.com/lxc248/-interestseed/main/assets/github-social-preview.png)
 
+![InterestSeed demo](https://raw.githubusercontent.com/lxc248/-interestseed/main/assets/interestseed-demo.gif)
+
 ### What is new in 3.0.8
 
 - Consolidated duplicate helpers into `utils/text`, `utils/math`, and `ui/nodeStyle`.
@@ -98,6 +100,8 @@ AGPL-3.0-only. Author: aicoder.
 InterestSeed 是 Obsidian 里的兴趣验证器：把一条收藏变成 3 天真实行动，再用证据决定继续还是放下。
 
 ![InterestSeed](https://raw.githubusercontent.com/lxc248/-interestseed/main/assets/github-social-preview.png)
+
+![InterestSeed demo](https://raw.githubusercontent.com/lxc248/-interestseed/main/assets/interestseed-demo.gif)
 
 ### 3.0.8 更新
 

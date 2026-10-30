@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/plugin-cosmic.png" alt="InterestSeed 兴趣图谱" width="920" />
+<a href="assets/interestseed-launch.mp4"><img src="assets/interestseed-demo.gif" alt="InterestSeed 40 秒演示" width="360" /></a>
 
 <h1>InterestSeed</h1>
 
@@ -10,7 +10,8 @@
 
 <p>
   <a href="assets/interestseed-launch.mp4"><img alt="Demo" src="https://img.shields.io/badge/%E2%96%B6%2040%20%E7%A7%92%E6%BC%94%E7%A4%BA-111827?style=for-the-badge" /></a>
-  <img alt="Version" src="https://img.shields.io/badge/version-3.0.8-0ea5e9?style=for-the-badge" />
+  <img alt="CI" src="https://github.com/lxc248/-interestseed/actions/workflows/ci.yml/badge.svg?branch=main" />
+  <img alt="Release" src="https://img.shields.io/github/v/release/lxc248/-interestseed?style=for-the-badge" />
   <img alt="Tests" src="https://img.shields.io/badge/tests-511%20passing-22c55e?style=for-the-badge" />
   <img alt="Coverage" src="https://img.shields.io/badge/coverage-74.7%25-14b8a6?style=for-the-badge" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b?style=for-the-badge" />
@@ -168,6 +169,7 @@ InterestSeed 不抓取平台、不保存 cookie、不自动发布、不自动写
 
 | 文档 | 内容 |
 | --- | --- |
+| [docs/architecture.md](docs/architecture.md) | 模块地图、数据流、不变量与扩展点 |
 | [docs/tutorial.md](docs/tutorial.md) | 端到端使用教程 |
 | [docs/positioning.md](docs/positioning.md) | 产品定位与竞品分析 |
 | [docs/seed-sprint.md](docs/seed-sprint.md) | 冷启动设计 |
@@ -181,4 +183,5 @@ InterestSeed 不抓取平台、不保存 cookie、不自动发布、不自动写
 
 AGPL-3.0-only. Author: [aicoder](https://github.com/lxc248).
 
-如果这个项目让你重新思考“收藏之后该做什么”，欢迎 star、试用、提 issue。
+如果这个项目让你重新思考“收藏之后该做什么”，欢迎 star、试用、提 issue。  
+参与贡献前请读 [CONTRIBUTING.md](CONTRIBUTING.md) 与 [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)。

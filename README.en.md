@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/plugin-cosmic.png" alt="InterestSeed interest graph" width="920" />
+<a href="assets/interestseed-launch.mp4"><img src="assets/interestseed-demo.gif" alt="InterestSeed 40-second demo" width="360" /></a>
 
 <h1>InterestSeed</h1>
 
@@ -10,7 +10,8 @@
 
 <p>
   <a href="assets/interestseed-launch.mp4"><img alt="Demo" src="https://img.shields.io/badge/%E2%96%B6%2040s%20demo-111827?style=for-the-badge" /></a>
-  <img alt="Version" src="https://img.shields.io/badge/version-3.0.8-0ea5e9?style=for-the-badge" />
+  <img alt="CI" src="https://github.com/lxc248/-interestseed/actions/workflows/ci.yml/badge.svg?branch=main" />
+  <img alt="Release" src="https://img.shields.io/github/v/release/lxc248/-interestseed?style=for-the-badge" />
   <img alt="Tests" src="https://img.shields.io/badge/tests-511%20passing-22c55e?style=for-the-badge" />
   <img alt="Coverage" src="https://img.shields.io/badge/coverage-74.7%25-14b8a6?style=for-the-badge" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b?style=for-the-badge" />
@@ -168,6 +169,7 @@ The user keeps the decision rights.
 
 | Document | Contents |
 | --- | --- |
+| [docs/architecture.md](docs/architecture.md) | Module map, data flow, invariants, extension points |
 | [docs/tutorial.md](docs/tutorial.md) | End-to-end tutorial |
 | [docs/positioning.md](docs/positioning.md) | Positioning and competitive analysis |
 | [docs/seed-sprint.md](docs/seed-sprint.md) | Cold-start design |
@@ -181,4 +183,5 @@ The user keeps the decision rights.
 
 AGPL-3.0-only. Author: [aicoder](https://github.com/lxc248).
 
-If this project makes you rethink what should happen after “save”, star it, try it, or open an issue.
+If this project makes you rethink what should happen after “save”, star it, try it, or open an issue.  
+Before contributing, read [CONTRIBUTING.md](CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).

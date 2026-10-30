@@ -41,6 +41,12 @@ graphs/
 # 本地审计与验收记录（不进入社区插件仓库）
 /*.md
 !README.md
+!README.en.md
+!CONTRIBUTING.md
+!CODE_OF_CONDUCT.md
+!GITHUB_ABOUT.md
+!SECURITY.md
+!CHANGELOG.md
 !RELEASE_NOTES_0.1.0.md
 !RELEASE_NOTES_1.0.0.md
 !RELEASE_NOTES_1.1.0.md

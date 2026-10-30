@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/lxc248/-interestseed/security/policy
+    about: Report vulnerabilities privately; do not open a public issue.
+  - name: Usage tutorial
+    url: https://github.com/lxc248/-interestseed/blob/main/docs/tutorial.md
+    about: Install, cold start, inbox, and the 3-day experiment.
+  - name: Architecture
+    url: https://github.com/lxc248/-interestseed/blob/main/docs/architecture.md
+    about: Module map, invariants, persistence, and extension points.
