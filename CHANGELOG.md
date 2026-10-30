@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.7 — Bug hunt round
+
+- Fixed Canvas export IDs collapsing to 16 unique values.
+- Fixed duplicate inbox IDs, BOM JSON parsing, and absolute source paths.
+- Added 507-test regression suite and real-app exploratory checks.
+
 ## 3.0.6 — 95-path closeout
 
 - Split canvas model into cosmicGraphModel.ts and added 1000-node benchmark.

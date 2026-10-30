@@ -27,7 +27,7 @@ function readGraph() {
   let mtimeMs = 0;
   if (existsSync(graphPath)) mtimeMs = statSync(graphPath).mtimeMs;
   if (graphCache.graph && graphCache.mtimeMs === mtimeMs) return graphCache.graph;
-  const raw = readFileSync(graphPath, 'utf8');
+  const raw = readFileSync(graphPath, 'utf8').replace(/^\uFEFF/, '');
   const graph = JSON.parse(raw);
   if (!graph || !Array.isArray(graph.nodes) || !Array.isArray(graph.edges)) {
     throw new Error('图谱文件缺少 nodes / edges');
@@ -412,7 +412,7 @@ function handle(message) {
         resources: { subscribe: false, listChanged: false },
         prompts: { listChanged: false },
       },
-      serverInfo: { name: 'interestseed', version: '3.0.6' },
+      serverInfo: { name: 'interestseed', version: '3.0.7' },
     });
   }
   if (method === 'notifications/initialized') return null;
@@ -459,7 +459,7 @@ process.stdin.on('data', (chunk) => {
   for (const line of lines) {
     if (!line.trim()) continue;
     try {
-      const result = handle(JSON.parse(line));
+      const result = handle(JSON.parse(line.replace(/^\uFEFF/, '')));
       if (result) process.stdout.write(`${JSON.stringify(result)}\n`);
     } catch (cause) {
       process.stdout.write(
@@ -473,7 +473,7 @@ process.stdin.on('end', () => {
   const tail = buffer.trim();
   if (tail) {
     try {
-      const result = handle(JSON.parse(tail));
+      const result = handle(JSON.parse(tail.replace(/^\uFEFF/, '')));
       if (result) process.stdout.write(`${JSON.stringify(result)}\n`);
     } catch (cause) {
       process.stdout.write(

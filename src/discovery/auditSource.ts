@@ -267,7 +267,7 @@ export async function loadDiscoveryAuditSource(
 
   let parsed: unknown;
   try {
-    parsed = JSON.parse(raw);
+    parsed = JSON.parse(raw.replace(/^\uFEFF/, ""));
   } catch {
     return {
       ok: false,

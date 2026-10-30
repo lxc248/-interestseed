@@ -57,4 +57,23 @@ describe('json canvas export', () => {
       expect(ids.has(edge.toNode)).toBe(true);
     }
   });
+
+  it('keeps IDs unique for a large graph', () => {
+    const large: InterestSeedGraph = {
+      ...graph,
+      nodes: Array.from({ length: 5000 }, (_, index) => ({
+        id: `n${index}`,
+        type: 'topic' as const,
+        title: `节点 ${index}`,
+        tags: [],
+        createdAt: now,
+        updatedAt: now,
+        metadata: {},
+      })),
+      edges: [],
+    };
+    const canvas = buildJsonCanvas(large);
+    expect(new Set(canvas.nodes.map((node) => node.id)).size).toBe(5000);
+    expect(canvas.nodes[0]?.id).toHaveLength(16);
+  });
 });

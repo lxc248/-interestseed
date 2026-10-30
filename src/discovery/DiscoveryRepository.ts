@@ -138,7 +138,7 @@ export class DiscoveryRepository {
 
     let parsed: unknown;
     try {
-      parsed = JSON.parse(raw);
+      parsed = JSON.parse(raw.replace(/^\uFEFF/, ""));
     } catch {
       const backupKey = await this.backupCorrupt(raw);
       this.blockedReason = '发现数据不是合法 JSON，已暂停写入以保护原文件';

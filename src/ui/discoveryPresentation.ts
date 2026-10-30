@@ -20,6 +20,11 @@ export function isValidSourceUri(uri: string | undefined): boolean {
   const trimmed = uri.trim();
   if (!trimmed) return false;
   if (/^[a-z][a-z0-9+.-]*:\/\//i.test(trimmed)) return false;
+  const raw = trimmed.toLowerCase().startsWith('vault:')
+    ? trimmed.slice('vault:'.length)
+    : trimmed;
+  if (raw.startsWith('/') || raw.startsWith('\\')) return false;
+  if (/^[a-z]:[\\/]/i.test(raw)) return false;
   return pathFromUri(trimmed).length > 0;
 }
 

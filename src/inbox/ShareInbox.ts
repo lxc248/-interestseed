@@ -80,6 +80,7 @@ export class ShareInbox {
 
   load(raw: unknown): void {
     if (!Array.isArray(raw)) return;
+    const seenIds = new Set<string>();
     this.items = raw
       .filter((item): item is Record<string, unknown> => Boolean(item && typeof item === 'object'))
       .map((item) => ({
@@ -94,7 +95,11 @@ export class ShareInbox {
           : 'share') as InboxSource,
         ...(item.sourceRef ? { sourceRef: String(item.sourceRef) } : {}),
       }))
-      .filter((item) => item.id && item.text)
+      .filter((item) => {
+        if (!item.id || !item.text || seenIds.has(item.id)) return false;
+        seenIds.add(item.id);
+        return true;
+      })
       .slice(0, this.maxItems);
   }
 }

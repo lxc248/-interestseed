@@ -35,13 +35,12 @@ function fnv1a(value: string): number {
 }
 
 function hexId(seed: string): string {
-  let value = fnv1a(seed);
-  let out = '';
-  for (let index = 0; index < 8; index += 1) {
-    out += (value & 0xf).toString(16);
-    value = Math.imul(value, 1664525) + 1013904223;
-  }
-  return out;
+  // Two independent 32-bit FNV-1a hashes form a 64-bit ID. The previous LCG
+  // only exposed the low nibble, whose period is 16, so large vaults collapsed
+  // to at most 16 unique Canvas IDs.
+  const first = fnv1a(`a:${seed}`).toString(16).padStart(8, '0');
+  const second = fnv1a(`b:${seed}`).toString(16).padStart(8, '0');
+  return `${first}${second}`;
 }
 
 function typeLabel(node: InterestSeedNode): string {

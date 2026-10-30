@@ -10,7 +10,7 @@
 
 <p>
   <img alt="Obsidian" src="https://img.shields.io/badge/Obsidian-1.5%2B-7c3aed" />
-  <img alt="Version" src="https://img.shields.io/badge/version-3.0.6-0ea5e9" />
+  <img alt="Version" src="https://img.shields.io/badge/version-3.0.7-0ea5e9" />
   <img alt="Tests" src="https://img.shields.io/badge/tests-472%20passing-22c55e" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b" />
   <img alt="Local first" src="https://img.shields.io/badge/local--first-yes-14b8a6" />
@@ -168,7 +168,7 @@ InterestSeed does not scrape platforms, store cookies, auto-publish, auto-write 
 
 ## 5. Quick start
 
-1. Download `interestseed-v3.0.6.zip` from [Releases](https://github.com/lxc248/-interestseed/releases).
+1. Download `interestseed-v3.0.7.zip` from [Releases](https://github.com/lxc248/-interestseed/releases).
 2. Extract into:
 
 ```text

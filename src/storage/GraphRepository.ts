@@ -128,7 +128,7 @@ export class VaultGraphRepository implements GraphRepository {
 
     let parsed: unknown;
     try {
-      parsed = JSON.parse(raw);
+      parsed = JSON.parse(raw.replace(/^\uFEFF/, ""));
     } catch {
       return this.recoverFromBackup(raw);
     }
@@ -386,7 +386,7 @@ export class VaultGraphRepository implements GraphRepository {
 
     let backupParsed: unknown;
     try {
-      backupParsed = JSON.parse(backupRaw);
+      backupParsed = JSON.parse(backupRaw.replace(/^\uFEFF/, ""));
     } catch {
       this.blockedReason = '图谱主文件与备份均损坏，已暂停写入以保护原文件';
       const result = this.recovered(
