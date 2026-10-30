@@ -16,6 +16,9 @@ export class Modal {
     if (!this.bodyElement) this.bodyElement = document.createElement('div');
     return this.bodyElement;
   }
+  get modalEl(): HTMLElement {
+    return this.contentEl;
+  }
   open(): void {
     (this as unknown as { onOpen?: () => void }).onOpen?.();
   }

@@ -1,4 +1,11 @@
-type ElInfo = { cls?: string; text?: string; attr?: Record<string, string | number | boolean> };
+type ElInfo = {
+  cls?: string;
+  text?: string;
+  attr?: Record<string, string | number | boolean>;
+  type?: string;
+  value?: string;
+  placeholder?: string;
+};
 
 function shim(name: string, fn: (...args: never[]) => unknown) {
   Object.defineProperty(HTMLElement.prototype, name, {
@@ -31,6 +38,11 @@ export function installDomShims(): void {
     const el = document.createElement(tag);
     if (options?.cls) el.className = options.cls;
     if (options?.text !== undefined) el.textContent = String(options.text);
+    if (options?.type) el.setAttribute('type', options.type);
+    if (options?.placeholder) el.setAttribute('placeholder', options.placeholder);
+    if (options?.value !== undefined) {
+      (el as HTMLInputElement).value = String(options.value);
+    }
     if (options?.attr) {
       for (const [key, value] of Object.entries(options.attr)) {
         el.setAttribute(key, String(value));

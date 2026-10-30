@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.0.5 — UI coverage above 40%
+
+- Added jsdom component tests for modals, FilterBar, and UI helpers.
+- UI line coverage reached 42.43% (499 tests, 74.32% overall).
+
 ## 3.0.4 — Full code audit
 
 - Reviewed all source and test files.
