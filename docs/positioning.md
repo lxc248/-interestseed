@@ -149,7 +149,7 @@ MCP 只读
 | 收藏 / 稍后读 | Readwise、MyMind | 捕获和回忆 | 真实行动 |
 | 习惯 / 任务 | Things、habit tracker | 执行 | 兴趣判断与证据 |
 | AI memory | Mem0、Graphiti、Cognee | 记住、检索、时间化 | 人的决定与真实世界验证 |
-| Agent 工作台 | Claudian | 把 Agent 放进 vault | 兴趣验证闭环 |
+| Agent 工作台 | Claude Code、Cursor | 把 Agent 放进 vault | 兴趣验证闭环 |
 | 原生数据库 | Obsidian Bases | 表格 / 看板 | 判断、实验、证据 |
 
 InterestSeed 占的是交叉点：

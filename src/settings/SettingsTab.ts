@@ -144,12 +144,37 @@ export class InterestSeedSettingsTab extends PluginSettingTab {
       );
   }
 
+  private renderAiModelPanel(containerEl: HTMLElement): void {
+    const panel = containerEl.createDiv({ cls: 'interestseed-ai-model-panel' });
+    panel.createEl('div', { cls: 'interestseed-ai-model-eyebrow', text: 'MODEL' });
+    const row = panel.createDiv({ cls: 'interestseed-ai-model-row' });
+    const main = row.createDiv({ cls: 'interestseed-ai-model-main' });
+    main.createEl('strong', { text: '本地模型' });
+    main.createEl('span', {
+      cls: 'interestseed-ai-model-id',
+      text: this.plugin.settings.aiModel,
+    });
+    main.createEl('span', {
+      cls: 'interestseed-ai-model-endpoint',
+      text: DEEPSEEK_V4_PRO_CONFIG.baseUrl,
+    });
+    const status = row.createEl('span', {
+      cls: 'interestseed-ai-model-status',
+      text: '检查中…',
+    });
+    void this.plugin.getAiApiKey().then((key) => {
+      status.textContent = key ? '已保存 Key' : '未配置 Key';
+      status.addClass(key ? 'is-ready' : 'is-missing');
+    });
+  }
+
   private renderAiSettings(containerEl: HTMLElement): void {
     containerEl.createEl('h3', { text: 'AI 关系建议' });
     containerEl.createEl('p', {
       cls: 'setting-item-description',
-      text: '默认开启。只把节点 id、标题、标签发送给所选模型；不会发送笔记正文、完整 Vault 或个人记录。AI 只生成候选关系，你确认后才会写入图谱。',
+      text: '默认开启。只把节点 id、标题、标签发送给本地模型；不会发送笔记正文、完整 Vault 或个人记录。AI 只生成候选关系，你确认后才会写入图谱。',
     });
+    this.renderAiModelPanel(containerEl);
 
     new Setting(containerEl)
       .setName('启用 AI 关系建议')
@@ -160,21 +185,6 @@ export class InterestSeedSettingsTab extends PluginSettingTab {
           await this.plugin.saveSettings();
           this.display();
         }),
-      );
-
-    new Setting(containerEl)
-      .setName('模型提供方')
-      .setDesc('本地模型走 localhost:7863；Claudian 使用已安装的 Claudian 插件。')
-      .addDropdown((dropdown) =>
-        dropdown
-          .addOption('local', '本地模型（localhost:7863）')
-          .addOption('claudian', 'Claudian')
-          .setValue(this.plugin.settings.aiProvider)
-          .onChange(async (value) => {
-            this.plugin.settings.aiProvider = value === 'claudian' ? 'claudian' : 'local';
-            await this.plugin.saveSettings();
-            this.display();
-          }),
       );
 
     new Setting(containerEl)
@@ -229,18 +239,14 @@ export class InterestSeedSettingsTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName('接入我的 API')
-      .setDesc('打开引导窗口，填写本地服务 Key，或切换到 Claudian。')
+      .setDesc('打开引导窗口，填写本地服务 Key。')
       .addButton((button) =>
         button.setButtonText('打开接入引导').onClick(() => this.plugin.openAiSetup()),
       );
 
-    const provider =
-      this.plugin.settings.aiProvider === 'claudian'
-        ? 'Claudian（使用其现有模型配置）'
-        : `本地模型 · ${this.plugin.settings.aiModel} · ${DEEPSEEK_V4_PRO_CONFIG.baseUrl}`;
     containerEl.createEl('p', {
       cls: 'setting-item-description',
-      text: `当前模型：${provider}。本地服务需要先在电脑上启动；AI 不可用时会自动保留本地规则发现。`,
+      text: `当前模型：本地模型 · ${this.plugin.settings.aiModel} · ${DEEPSEEK_V4_PRO_CONFIG.baseUrl}。本地服务需要先在电脑上启动；AI 不可用时会自动保留本地规则发现。`,
     });
   }
 

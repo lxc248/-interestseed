@@ -38,8 +38,7 @@ export function normalizeSettings(raw: unknown): InterestSeedSettings {
         : DEFAULT_SETTINGS.enableRuleSuggestions,
     enableAI:
       typeof source.enableAI === 'boolean' ? source.enableAI : DEFAULT_SETTINGS.enableAI,
-    aiProvider:
-      source.aiProvider === 'claudian' ? 'claudian' : 'local',
+    aiProvider: 'local',
     aiModel:
       typeof source.aiModel === 'string' && source.aiModel.trim()
         ? source.aiModel.trim()

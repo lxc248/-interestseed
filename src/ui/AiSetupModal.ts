@@ -7,7 +7,6 @@ export interface AiSetupModalOptions {
   consentGranted: boolean;
   hasKey: boolean;
   onSaveKey(key: string): Promise<void>;
-  onUseClaudian?(): Promise<void>;
   onOpenSettings(): void;
 }
 
@@ -120,15 +119,6 @@ export class AiSetupModal extends Modal {
       this.close();
     });
 
-    if (this.options.providerLabel !== 'Claudian' && this.options.onUseClaudian) {
-      actions.createEl('button', {
-        text: '改用 Claudian',
-        attr: { type: 'button' },
-      }).addEventListener('click', () => {
-        void this.useClaudian();
-      });
-    }
-
     actions.createEl('button', {
       text: '稍后',
       attr: { type: 'button' },
@@ -164,11 +154,6 @@ export class AiSetupModal extends Modal {
   private async clearKey(): Promise<void> {
     await this.options.onSaveKey('');
     new Notice('AI API Key 已清除。');
-    this.close();
-  }
-
-  private async useClaudian(): Promise<void> {
-    await this.options.onUseClaudian?.();
     this.close();
   }
 }

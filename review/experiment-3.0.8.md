@@ -1,4 +1,4 @@
-# InterestSeed 3.0.8 全功能模拟实验报告
+﻿# InterestSeed 3.0.8 全功能模拟实验报告
 
 ## 1. 实验信息
 
@@ -97,7 +97,8 @@ review/experiment-3.0.8/results-onboarding.json
 | 52 | AI 单条建议界面 | ✅ 1/5、无“待确认”列表 | 61-ai-single-suggestion.png |
 | 53 | 连上后状态 | ✅ 33 条关系、可撤销 | 62-ai-single-connected.png |
 | 54 | 撤销后状态 | ✅ 32 条关系、回到下一条 | 63-ai-single-undone.png |
-| 55 | MCP smoke | ✅ 4/4 | 命令行输出 |
+| 55 | 本地模型状态面板 | ✅ MODEL / 模型 ID / 地址 / Key 状态 | 64-ai-local-model-panel.png |
+| 56 | MCP smoke | ✅ 4/4 | 命令行输出 |
 
 ## 4. 关键流程
 
@@ -228,7 +229,7 @@ review/experiment-3.0.8/
 ## 7. 验证
 
 ```text
-71 test files / 525 tests passing
+70 test files / 522 tests passing
 MCP smoke 4/4
 npm run verify 通过
 ```
@@ -244,12 +245,13 @@ npm run verify 通过
 ## 9. 结论
 
 ```text
-55 项功能路径覆盖
+56 项功能路径覆盖
 1 个真实高优 UX bug 被发现并修复
 收件箱、实验、分享卡、发现、导出、冷启动、撤销/重做全部通过
 窄屏与暗色无布局回归
 实验后图谱已恢复
 ```
+
 
 
 

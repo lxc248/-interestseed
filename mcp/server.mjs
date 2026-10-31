@@ -412,7 +412,7 @@ function handle(message) {
         resources: { subscribe: false, listChanged: false },
         prompts: { listChanged: false },
       },
-      serverInfo: { name: 'interestseed', version: '3.5.0' },
+      serverInfo: { name: 'interestseed', version: '3.6.0' },
     });
   }
   if (method === 'notifications/initialized') return null;

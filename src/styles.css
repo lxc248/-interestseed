@@ -7037,3 +7037,59 @@ body.theme-light .interestseed-sprint-option.is-selected {
   gap: 6px;
   flex: 0 0 auto;
 }
+
+/* Local model panel */
+.interestseed-ai-model-panel {
+  margin: 10px 0 16px;
+  padding: 14px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 14px;
+  background: var(--background-secondary);
+}
+.interestseed-ai-model-eyebrow {
+  margin-bottom: 8px;
+  color: var(--text-faint);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+.interestseed-ai-model-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+.interestseed-ai-model-main {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+.interestseed-ai-model-main strong {
+  color: var(--text-normal);
+  font-size: 14px;
+}
+.interestseed-ai-model-id {
+  color: var(--text-accent);
+  font-family: var(--font-monospace);
+  font-size: 12px;
+  word-break: break-all;
+}
+.interestseed-ai-model-endpoint {
+  color: var(--text-muted);
+  font-size: 11px;
+  word-break: break-all;
+}
+.interestseed-ai-model-status {
+  flex: 0 0 auto;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--background-primary);
+  color: var(--text-muted);
+  font-size: 11px;
+}
+.interestseed-ai-model-status.is-ready {
+  color: var(--color-green, #22c55e);
+}
+.interestseed-ai-model-status.is-missing {
+  color: var(--color-orange, #f59e0b);
+}

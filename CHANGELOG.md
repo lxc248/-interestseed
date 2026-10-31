@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.6.0 — Local model only
+
+- Removed the Claudian provider, detection, settings option, and tests.
+- AI uses only the user's local OpenAI-compatible endpoint and key.
+- Added a local model status panel inspired by Claudian's layout.
+- 522 tests passing.
+
 ## 3.5.0 — One AI suggestion at a time
 
 - Replaced the batch pending list with a single suggestion card.

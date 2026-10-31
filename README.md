@@ -12,8 +12,8 @@
   <a href="assets/interestseed-launch.mp4"><img alt="Demo" src="https://img.shields.io/badge/%E2%96%B6%2040%20%E7%A7%92%E6%BC%94%E7%A4%BA-111827?style=for-the-badge" /></a>
   <img alt="CI" src="https://github.com/lxc248/-interestseed/actions/workflows/ci.yml/badge.svg?branch=main" />
   <img alt="Release" src="https://img.shields.io/github/v/release/lxc248/-interestseed?style=for-the-badge" />
-  <img alt="Tests" src="https://img.shields.io/badge/tests-525%20passing-22c55e?style=for-the-badge" />
-  <img alt="Coverage" src="https://img.shields.io/badge/coverage-75.2%25-14b8a6?style=for-the-badge" />
+  <img alt="Tests" src="https://img.shields.io/badge/tests-522%20passing-22c55e?style=for-the-badge" />
+  <img alt="Coverage" src="https://img.shields.io/badge/coverage-74.8%25-14b8a6?style=for-the-badge" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b?style=for-the-badge" />
 </p>
 
@@ -97,8 +97,8 @@ Capture → Decide → Connect → Verify → Review → Next action
       <sub><b>AI 建议</b>：一次只给一条，连上 / 换一个 / 先不用。</sub>
     </td>
     <td width="50%">
-      <img src="assets/ai-setup.png" alt="接入自己的 AI" /><br/>
-      <sub><b>接入自己的 AI</b>：Key 存本机安全存储，模型可选。</sub>
+      <img src="assets/ai-model-panel.png" alt="本地模型面板" /><br/>
+      <sub><b>本地模型</b>：模型、地址、Key 状态一眼可见。</sub>
     </td>
   </tr>
 </table>
@@ -117,7 +117,7 @@ Capture → Decide → Connect → Verify → Review → Next action
 | **上下文搜索** | 标题、标签、摘要、为什么、原文、来源路径、观察证据，多字段确定性搜索，无需 embedding |
 | **兴趣路线** | 显式命令生成 Markdown MOC，从不自动写笔记 |
 | **五种分享卡** | 小红书、Instagram、X、微信、Story，全部本地 Canvas 渲染 |
-| **AI 建议** | 默认开启；一次只给一条；可改关系名；连上后可撤销；默认模型 `cn:deepseek-v4.1-flash` |
+| **AI 建议** | 默认开启；只使用你自己的本地模型；一次只给一条；可改关系名；连上后可撤销；默认 `cn:deepseek-v4.1-flash` |
 | **MCP 接口** | 零依赖只读 MCP server，协议 `2026-07-28` |
 | **自适应布局** | 桌面、窄栏、极窄栏三档，图标优先，不横向溢出 |
 
@@ -125,7 +125,7 @@ Capture → Decide → Connect → Verify → Review → Next action
 
 三分钟能跑起来。
 
-1. 从 [Releases](https://github.com/lxc248/-interestseed/releases) 下载 `interestseed-v3.5.0.zip`。
+1. 从 [Releases](https://github.com/lxc248/-interestseed/releases) 下载 `interestseed-v3.6.0.zip`。
 2. 解压到：
 
 ```text
@@ -161,10 +161,10 @@ AI 关系建议默认开启，只在你点击 AI 时请求所选模型；接入�
 这些数字不是装饰。每次改完，我都会重新跑一遍。
 
 ```text
-525 tests passing
-75.17% line coverage
+522 tests passing
+74.83% line coverage
 92.25% core coverage
-46.43% UI coverage
+46.42% UI coverage
 axe: graph / inbox / share-card 0 violations
 semgrep: 0 findings
 gitleaks: no leaks
@@ -213,6 +213,7 @@ AGPL-3.0-only. Author: [aicoder](https://github.com/lxc248).
 
 如果你也有过“收藏了就等于学了”的错觉，欢迎试试它。  
 觉得有用就 star；发现问题就提 issue；想一起改，先读 [CONTRIBUTING.md](CONTRIBUTING.md) 和 [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)。
+
 
 
 

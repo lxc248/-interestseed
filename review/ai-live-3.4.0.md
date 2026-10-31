@@ -59,12 +59,22 @@ v4.1 Flash 返回了 `source`、`target`、`reason`，但省略了 `relation` �
 撤销后回到下一条，图谱恢复 32 条关系
 ```
 
+## 3.6.0 只使用本地模型
+
+```text
+Claudian 已移除
+只保留 localhost:7863/v1
+模型 ID 可配置
+设置页新增 MODEL 面板：模型 / 地址 / Key 状态
+```
+
 ## 截图
 
 ```text
 review/experiment-3.0.8/61-ai-single-suggestion.png
 review/experiment-3.0.8/62-ai-single-connected.png
 review/experiment-3.0.8/63-ai-single-undone.png
+review/experiment-3.0.8/64-ai-local-model-panel.png
 ```
 
 ## 验证

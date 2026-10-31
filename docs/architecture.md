@@ -50,7 +50,7 @@ Graph snapshot
 
 ```text
 default: on
-providers: local OpenAI-compatible service (localhost:7863) or Claudian
+providers: local OpenAI-compatible service (localhost:7863)
 model: default cn:deepseek-v4.1-flash; configurable in settings
 setup: guided modal; key saved in Obsidian SecretStorage, env fallback
 sent: node id, title, tags

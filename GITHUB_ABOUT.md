@@ -60,7 +60,7 @@ Set via: GitHub → Settings → Social preview
 ## Release title
 
 ```text
-InterestSeed 3.5.0 — AI 一次只给一条建议
+InterestSeed 3.6.0 — 只使用用户自己的本地模型
 ```
 
 ## Release body — English
@@ -74,18 +74,17 @@ save a 3-day test, then lets the evidence decide.
 
 ![InterestSeed demo](https://raw.githubusercontent.com/lxc248/-interestseed/main/assets/interestseed-demo.gif)
 
-### What 3.5.0 actually changes
+### What 3.6.0 actually changes
 
-AI now gives one suggestion at a time:
+AI now runs only against the user's local model:
 
-- one card, `1 / 5`, no batch pending list;
-- actions: connect / next / not now;
-- relation name editable before connecting;
-- connecting shows a success bar with undo, then moves to the next suggestion;
-- live run: 5 focused candidates, 32 → 33 → 32 edges;
-- no "pending confirmation" wall, no accepted/undone status chrome;
-- README shows the single-suggestion flow;
-- 525 tests passing, CI and Release green.
+- Claudian provider, detection, settings option, and tests are gone;
+- one endpoint: local OpenAI-compatible service at `localhost:7863/v1`;
+- one key: the user's own key in Obsidian SecretStorage;
+- model ID is configurable; default `cn:deepseek-v4.1-flash`;
+- a local model status panel shows model, endpoint, and key state;
+- AI still gives one suggestion at a time: connect / next / not now;
+- 522 tests passing, CI and Release green.
 
 ### The loop
 
@@ -93,7 +92,7 @@ AI now gives one suggestion at a time:
 
 ### Install
 
-1. Download `interestseed-v3.5.0.zip`.
+1. Download `interestseed-v3.6.0.zip`.
 2. Extract into `<vault>/.obsidian/plugins/interestseed/`.
 3. Enable InterestSeed in Community plugins.
 4. Run the cold-start questionnaire, then process the Share Inbox.
@@ -112,15 +111,15 @@ InterestSeed 是 Obsidian 里的一个小插件，专门处理那个很具体的
 
 ![InterestSeed demo](https://raw.githubusercontent.com/lxc248/-interestseed/main/assets/interestseed-demo.gif)
 
-### 这次 3.5.0，AI 一次只给一条建议
+### 这次 3.6.0，只使用用户自己的本地模型
 
-- 一张卡，`1 / 5`，没有批量“待确认”列表
-- 三个动作：连上 / 换一个 / 先不用
-- 关系名可以在连上之前直接改
-- 连上后显示“已连上这条关系”，可撤销，然后自动看下一条
-- 本地实测：5 条聚焦候选，关系 32 → 33 → 32
-- 不再有“待确认”状态墙
-- 525 个测试通过，CI 和 Release 都是绿的。
+- Claudian 提供方、检测、设置项和测试都已移除
+- 只保留一个入口：本地 OpenAI-compatible 服务 `localhost:7863/v1`
+- 只使用用户自己的 API Key，存在 Obsidian SecretStorage
+- 模型 ID 可配置，默认 `cn:deepseek-v4.1-flash`
+- 设置页新增本地模型状态面板：模型、地址、Key 状态
+- AI 仍然一次只给一条：连上 / 换一个 / 先不用
+- 522 个测试通过，CI 和 Release 都是绿的。
 
 ### 它怎么跑
 
@@ -128,7 +127,7 @@ InterestSeed 是 Obsidian 里的一个小插件，专门处理那个很具体的
 
 ### 装起来
 
-1. 下载 `interestseed-v3.5.0.zip`；
+1. 下载 `interestseed-v3.6.0.zip`；
 2. 解压到 `<vault>/.obsidian/plugins/interestseed/`；
 3. 在第三方插件里启用 InterestSeed；
 4. 跑一遍冷启动，然后处理分享收件箱。

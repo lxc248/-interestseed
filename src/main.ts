@@ -103,7 +103,6 @@ import {
   type ExplorationInsight,
   type ExplorationRequest,
 } from './services/ModelProvider';
-import { exploreWithClaudian, hasClaudianApi } from './services/ClaudianProvider';
 import { isRecord } from './utils/validation';
 
 const DATA_SCHEMA_VERSION = 1;
@@ -1015,17 +1014,12 @@ export default class InterestSeedPlugin extends Plugin {
     const file = this.discoveryQueue.getState();
     const overview = buildDiscoveryOverview(file, this.store.getGraph());
     const data = buildExploration(file);
-    const claudianReady =
-      this.settings.aiProvider !== 'claudian' || hasClaudianApi(this.app);
-    const aiAvailable =
-      this.settings.enableAI && this.settings.aiConsentGranted && claudianReady;
+    const aiAvailable = this.settings.enableAI && this.settings.aiConsentGranted;
     const aiUnavailableReason = !this.settings.enableAI
       ? 'AI 未启用'
       : !this.settings.aiConsentGranted
         ? 'AI 未授权'
-        : !claudianReady
-          ? '未检测到 Claudian'
-          : undefined;
+        : undefined;
     new DiscoveryExplorerModal(this.app, data, overview, {
       onThemeSelect: (theme) => {
         void this.showDiscoveriesForTheme(theme);
@@ -1046,9 +1040,6 @@ export default class InterestSeedPlugin extends Plugin {
   private async generateExplorationInsight(
     request: ExplorationRequest,
   ): Promise<ExplorationInsight> {
-    if (this.settings.aiProvider === 'claudian') {
-      return exploreWithClaudian(this.app, request);
-    }
     const apiKey = await this.getAiApiKey();
     const provider = createModelProvider(
       {
@@ -1355,19 +1346,11 @@ export default class InterestSeedPlugin extends Plugin {
     void this.getAiApiKey().then((key) => {
       new AiSetupModal(this.app, {
         endpoint: DEEPSEEK_V4_PRO_CONFIG.baseUrl,
-        providerLabel:
-          this.settings.aiProvider === 'claudian'
-            ? 'Claudian'
-            : `本地模型 · ${this.settings.aiModel}`,
+        providerLabel: `本地模型 · ${this.settings.aiModel}`,
         enabled: this.settings.enableAI,
         consentGranted: this.settings.aiConsentGranted,
         hasKey: Boolean(key),
         onSaveKey: (value) => this.saveAiApiKey(value),
-        onUseClaudian: async () => {
-          this.settings.aiProvider = 'claudian';
-          await this.saveSettings();
-          new Notice('已切换到 Claudian；请确认 Claudian 插件可用。');
-        },
         onOpenSettings: () => {
           const setting = (
             this.app as unknown as {
