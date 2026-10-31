@@ -12,7 +12,7 @@
  *   INTERESTSEED_GRAPH=... node mcp/server.mjs
  */
 import { existsSync, readFileSync, statSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 
 const PROTOCOL_VERSION = '2026-07-28';
 const args = process.argv.slice(2);
@@ -38,6 +38,16 @@ function readGraph() {
   }
   graphCache = { mtimeMs, graph };
   return graph;
+}
+
+function readStandaloneJson(fileName) {
+  const path = join(dirname(graphPath), fileName);
+  if (!existsSync(path)) return { experiments: [], discoveries: [] }[fileName] ?? [];
+  const raw = readFileSync(path, 'utf8').replace(/^\uFEFF/, '');
+  const parsed = JSON.parse(raw);
+  if (fileName === 'experiments.json') return Array.isArray(parsed.experiments) ? parsed.experiments : [];
+  if (fileName === 'discoveries.json') return Array.isArray(parsed.discoveries) ? parsed.discoveries : [];
+  return [];
 }
 
 function degreeMap(graph) {
@@ -309,6 +319,18 @@ const resources = [
     description: '可交给 Agent 的上下文包。',
     mimeType: 'application/json',
   },
+  {
+    uri: 'interestseed://experiments',
+    name: 'InterestSeed 实验列表（独立版）',
+    description: '.interestseed/experiments.json 的完整实验记录。',
+    mimeType: 'application/json',
+  },
+  {
+    uri: 'interestseed://discoveries',
+    name: 'InterestSeed 发现列表（独立版）',
+    description: '.interestseed/discoveries.json 的跨目录发现。',
+    mimeType: 'application/json',
+  },
 ];
 
 const prompts = [
@@ -340,6 +362,12 @@ function readResource(uri) {
   }
   if (uri === 'interestseed://context') {
     return { contents: [{ uri, mimeType: 'application/json', text: JSON.stringify(agentContext(graph), null, 2) }] };
+  }
+  if (uri === 'interestseed://experiments') {
+    return { contents: [{ uri, mimeType: 'application/json', text: JSON.stringify(readStandaloneJson('experiments.json'), null, 2) }] };
+  }
+  if (uri === 'interestseed://discoveries') {
+    return { contents: [{ uri, mimeType: 'application/json', text: JSON.stringify(readStandaloneJson('discoveries.json'), null, 2) }] };
   }
   throw new Error(`未知资源：${uri}`);
 }

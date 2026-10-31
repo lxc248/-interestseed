@@ -18,6 +18,7 @@ import {
   applyDiscovery,
   dismissDiscovery,
   discoveryView,
+  feedbackDiscovery,
   listDiscoveries,
   refreshDiscoveries,
 } from './discoveries';
@@ -146,6 +147,17 @@ async function route(
       typeof body.id === 'string' ? body.id : '',
     );
     return sendJson(response, 200, result);
+  }
+  if (url.pathname === '/api/discoveries/feedback' && request.method === 'POST') {
+    const body = await readJson(request);
+    const action = body.action as 'accepted' | 'rejected' | 'low-value' | 'needs-verification' | 'corrected';
+    const result = await feedbackDiscovery(
+      options.vaultPath,
+      typeof body.id === 'string' ? body.id : '',
+      action,
+      typeof body.correction === 'string' ? body.correction : undefined,
+    );
+    return sendJson(response, 200, { ...result, ...(await statePayload(options.vaultPath)) });
   }
   if (url.pathname === '/api/inbox' && request.method === 'GET') {
     return sendJson(response, 200, { items: await listInbox(options.vaultPath) });

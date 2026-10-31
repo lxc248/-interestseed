@@ -7,9 +7,9 @@ const FEEDBACK_LABELS: Record<string, string> = {
   none: '未反馈',
   accepted: '已接受',
   rejected: '已拒绝',
-  corrected: '已修正',
-  'low-value': '低价值',
-  'needs-verification': '待验证',
+  corrected: '已改过',
+  'low-value': '先放着',
+  'needs-verification': '想再看看',
 };
 
 /** 只读兴趣总览；不修改发现或图谱。 */

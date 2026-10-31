@@ -32,7 +32,7 @@ function themeEvidence(theme: ExplorationTheme): string[] {
   ];
   if (theme.accepted > 0) evidence.push(`${theme.accepted} 条已接受`);
   if (theme.rejected > 0) evidence.push(`${theme.rejected} 条已拒绝`);
-  if (theme.lowValue > 0) evidence.push(`${theme.lowValue} 条低价值`);
+  if (theme.lowValue > 0) evidence.push(`${theme.lowValue} 条先放着`);
   if (theme.corrected > 0) evidence.push(`${theme.corrected} 条修正`);
   return evidence;
 }
@@ -106,7 +106,7 @@ export function buildLocalExplorationInsights(
       id: `quality:${lowQuality.key}`,
       kind: 'quality',
       title: `「${lowQuality.label}」需要更窄的边界`,
-      why: `这个主题的低价值反馈偏多（${lowQuality.lowValue}/${lowQuality.total}）。不是它不重要，而是当前发现太宽，难以指导下一步。`,
+      why: `这个主题的先放着的反馈偏多（${lowQuality.lowValue}/${lowQuality.total}）。不是它不重要，而是当前发现太宽，难以指导下一步。`,
       nextStep: `把「${lowQuality.label}」收窄成一个更具体的问题，或者先补一条能说明“为什么相关”的证据。`,
       themes: [lowQuality.key],
       evidence: themeEvidence(lowQuality),

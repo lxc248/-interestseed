@@ -63,6 +63,22 @@ nothing important was dropped in that move.
 6. **No insights strip.** Added top nodes, themes, and orphan counts to
    `/api/state` and rendered them as chips below the stat cards.
 
+7. **Discovery feedback was shallow.** Added feedback actions (accepted /
+   needs-verification / low-value / corrected / rejected) with a health summary,
+   and friendly Chinese labels: 留下 / 想再看看 / 先放着 / 改一下 / 先不看.
+
+8. **No share-card image.** Added a share-card modal with a canvas render and
+   PNG download for inbox items.
+
+9. **No cold start.** Added a Seed Sprint modal (兴趣 / 为什么 / 第一步) when the
+   vault has no nodes.
+
+10. **MCP only exposed the graph.** Added `interestseed://experiments` and
+    `interestseed://discoveries` resources backed by `.interestseed/*.json`.
+
+11. **No persistent header status.** Added a header pill showing key state,
+    discovery count, and pending inbox count.
+
 ## Remaining differences that are intentional
 
 - Obsidian-only entry points (file menu, command palette, SecretStorage) do not

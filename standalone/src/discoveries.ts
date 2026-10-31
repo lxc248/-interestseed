@@ -6,6 +6,7 @@ import { sortDiscoveries } from '../../src/discovery/ranking';
 import {
   emptyDiscoveryFile,
   type Discovery,
+  type DiscoveryFeedbackAction,
   type DiscoveryFile,
 } from '../../src/discovery/types';
 import type { InterestSeedEdge, InterestSeedGraph } from '../../src/types/graph';
@@ -187,6 +188,39 @@ export async function dismissDiscovery(
   return { ok: true };
 }
 
+export async function feedbackDiscovery(
+  vaultPath: string,
+  id: string,
+  action: DiscoveryFeedbackAction,
+  correction?: string,
+): Promise<DiscoveryActionResult> {
+  const file = await loadDiscoveries(vaultPath);
+  const discovery = file.discoveries.find((item) => item.id === id);
+  if (!discovery) return { ok: false, message: 'Discovery not found.' };
+  const now = new Date().toISOString();
+  const previousStatus = discovery.feedbackStatus;
+  discovery.feedbackStatus = action;
+  discovery.updatedAt = now;
+  discovery.feedbackHistory = [
+    ...(discovery.feedbackHistory ?? []),
+    { id: `feedback_${Date.now()}`, action, at: now, previousStatus },
+  ];
+  if (action === 'rejected') {
+    discovery.status = 'dismissed';
+  } else {
+    discovery.status = 'active';
+  }
+  if (action === 'corrected' && correction?.trim()) {
+    discovery.correction = {
+      title: discovery.title,
+      description: correction.trim(),
+      createdAt: now,
+    };
+  }
+  await saveDiscoveries(vaultPath, file);
+  return { ok: true };
+}
+
 export function discoveryView(discovery: Discovery): Record<string, unknown> {
   return {
     id: discovery.id,
@@ -198,7 +232,9 @@ export function discoveryView(discovery: Discovery): Record<string, unknown> {
     evidence: discovery.evidence,
     strength: discovery.strength,
     feedbackStatus: discovery.feedbackStatus,
+    status: discovery.status,
     application: discovery.application ?? { state: 'none' },
+    ...(discovery.correction ? { correction: discovery.correction } : {}),
     updatedAt: discovery.updatedAt,
   };
 }

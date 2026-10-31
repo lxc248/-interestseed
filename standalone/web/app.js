@@ -32,9 +32,18 @@ function render() {
   if (!state.data) return;
   $('#model-badge').textContent = state.data.model;
   $('#model-badge').title = state.data.baseUrl;
+  const discoveries = state.data.discoveries ?? [];
+  const inboxPending = state.data.inbox?.pending ?? 0;
+  const headerStatus = $('#header-status');
+  headerStatus.textContent = state.data.keyReady
+    ? `Key 已保存 · 发现 ${discoveries.length} · 待处理 ${inboxPending}`
+    : '未配置 Key';
+  headerStatus.className = `pill ${state.data.keyReady ? 'ready' : 'missing'}`;
   const keyStatus = $('#key-status');
   keyStatus.textContent = state.data.keyReady ? 'Key 已保存' : '未配置 Key';
   keyStatus.className = `pill ${state.data.keyReady ? 'ready' : 'missing'}`;
+  const sprintButton = $('#sprint-button');
+  sprintButton.hidden = (state.data.graph.nodes?.length ?? 0) > 0;
   renderStats();
   renderInsights();
   renderChainStrip();
@@ -201,6 +210,17 @@ async function logExperiment(input) {
   }
 }
 
+function friendlyFeedback(status) {
+  return {
+    none: '新发现',
+    accepted: '已留下',
+    rejected: '先不看',
+    'low-value': '先放着',
+    'needs-verification': '想再看看',
+    corrected: '已改过',
+  }[status] ?? '新发现';
+}
+
 function renderDiscoveries() {
   const list = $('#discoveries-list');
   list.innerHTML = '';
@@ -209,10 +229,21 @@ function renderDiscoveries() {
     list.innerHTML = `<p class="empty-copy">还没有跨目录发现。先确认几条关系，再点刷新。发现只使用共享标签和已确认关系，不读正文。</p>`;
     return;
   }
+  const counts = { accepted: 0, 'needs-verification': 0, 'low-value': 0, rejected: 0 };
+  for (const item of discoveries) {
+    const key = item.feedbackStatus ?? 'none';
+    if (counts[key] !== undefined) counts[key] += 1;
+  }
+  const audit = document.createElement('div');
+  audit.className = 'audit-chips';
+  audit.innerHTML = `<span>体检：</span><span>已留下 ${counts.accepted}</span><span>想再看看 ${counts['needs-verification']}</span><span>先放着 ${counts['low-value']}</span><span>先不看 ${counts.rejected}</span>`;
+  list.appendChild(audit);
+
   for (const item of discoveries) {
     const card = document.createElement('div');
     card.className = 'discovery-card';
-    card.innerHTML = `<h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.description)}</p>`;
+    const badge = friendlyFeedback(item.feedbackStatus ?? 'none');
+    card.innerHTML = `<h3>${escapeHtml(item.title)} <span class="feedback-badge">${badge}</span></h3><p>${escapeHtml(item.description)}</p>`;
     const tags = document.createElement('div');
     tags.className = 'tag-row';
     for (const tag of item.subjectKeys ?? []) {
@@ -229,17 +260,35 @@ function renderDiscoveries() {
       .map((entry) => entry.text)
       .join(' · ');
     card.appendChild(evidence);
+    if (item.correction?.description) {
+      const correction = document.createElement('p');
+      correction.className = 'next';
+      correction.textContent = `你改过：${item.correction.description}`;
+      card.appendChild(correction);
+    }
     const actions = document.createElement('div');
     actions.className = 'card-actions';
     const apply = document.createElement('button');
     apply.className = 'button primary';
     apply.textContent = '连上这两个节点';
     apply.addEventListener('click', () => applyDiscovery(item.id));
+    const review = document.createElement('button');
+    review.className = 'button ghost';
+    review.textContent = '想再看看';
+    review.addEventListener('click', () => feedbackDiscovery(item.id, 'needs-verification'));
+    const park = document.createElement('button');
+    park.className = 'button ghost';
+    park.textContent = '先放着';
+    park.addEventListener('click', () => feedbackDiscovery(item.id, 'low-value'));
+    const edit = document.createElement('button');
+    edit.className = 'button ghost';
+    edit.textContent = '改一下';
+    edit.addEventListener('click', () => openCorrection(item.id));
     const dismiss = document.createElement('button');
     dismiss.className = 'button ghost';
     dismiss.textContent = '先不看';
     dismiss.addEventListener('click', () => dismissDiscovery(item.id));
-    actions.append(apply, dismiss);
+    actions.append(apply, review, park, edit, dismiss);
     card.appendChild(actions);
     list.appendChild(card);
   }
@@ -269,7 +318,11 @@ function renderInbox() {
     pass.className = 'button ghost';
     pass.textContent = '先不放';
     pass.addEventListener('click', () => resolveInboxItem(item.id, 'passed'));
-    actions.append(keep, pass);
+    const share = document.createElement('button');
+    share.className = 'button ghost';
+    share.textContent = '做成图';
+    share.addEventListener('click', () => openShareCard(item));
+    actions.append(keep, pass, share);
     card.appendChild(actions);
     list.appendChild(card);
   }
@@ -304,6 +357,42 @@ async function applyDiscovery(id) {
     await api('/api/discoveries/apply', { method: 'POST', body: JSON.stringify({ id }) });
     await load();
     toast('已连上这两个节点');
+  } catch (error) {
+    toast(error.message, true);
+  } finally {
+    setBusy(false);
+  }
+}
+
+async function feedbackDiscovery(id, action) {
+  try {
+    setBusy(true);
+    await api('/api/discoveries/feedback', { method: 'POST', body: JSON.stringify({ id, action }) });
+    await load();
+    toast(friendlyFeedback(action));
+  } catch (error) {
+    toast(error.message, true);
+  } finally {
+    setBusy(false);
+  }
+}
+
+function openCorrection(id) {
+  document.getElementById('correction-id').value = id;
+  document.getElementById('correction-text').value = '';
+  openModal('correction-modal');
+}
+
+async function submitCorrection() {
+  const id = document.getElementById('correction-id').value;
+  const correction = document.getElementById('correction-text').value.trim();
+  if (!id || !correction) return toast('先写下你的修改。', true);
+  try {
+    setBusy(true);
+    await api('/api/discoveries/feedback', { method: 'POST', body: JSON.stringify({ id, action: 'corrected', correction }) });
+    closeModal('correction-modal');
+    await load();
+    toast('已保存修改');
   } catch (error) {
     toast(error.message, true);
   } finally {
@@ -851,13 +940,82 @@ function toast(message, error = false) {
   toastTimer = setTimeout(() => { element.hidden = true; }, 3500);
 }
 
+function openShareCard(item) {
+  openModal('share-card-modal');
+  drawShareCard(item.text);
+}
+
+function drawShareCard(text) {
+  const canvas = document.getElementById('share-card-canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+  gradient.addColorStop(0, '#0f1420');
+  gradient.addColorStop(1, '#080b12');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = 'rgba(167,139,250,.16)';
+  ctx.beginPath();
+  ctx.arc(1020, 120, 240, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#c4b5fd';
+  ctx.font = '700 42px system-ui, sans-serif';
+  ctx.fillText('InterestSeed', 70, 96);
+  ctx.fillStyle = '#8b96ad';
+  ctx.font = '400 22px system-ui, sans-serif';
+  ctx.fillText('把收藏变成一次真实行动', 70, 138);
+  ctx.fillStyle = '#eef2ff';
+  ctx.font = '600 40px system-ui, sans-serif';
+  const lines = wrapText(ctx, text, 46, 1060);
+  let y = 270;
+  for (const line of lines.slice(0, 6)) {
+    ctx.fillText(line, 70, y);
+    y += 62;
+  }
+  ctx.fillStyle = '#8b96ad';
+  ctx.font = '400 18px system-ui, sans-serif';
+  ctx.fillText(new Date().toLocaleDateString(), 70, 560);
+  ctx.fillStyle = '#34d399';
+  ctx.fillText('3 天实验 · 本地优先', 70, 590);
+}
+
+function wrapText(ctx, text, fontSize, maxWidth) {
+  ctx.font = `600 ${fontSize}px system-ui, sans-serif`;
+  const words = text.split(/\s+/);
+  const lines = [];
+  let current = '';
+  for (const word of words) {
+    const test = current ? `${current} ${word}` : word;
+    if (ctx.measureText(test).width > maxWidth && current) {
+      lines.push(current);
+      current = word;
+    } else {
+      current = test;
+    }
+  }
+  if (current) lines.push(current);
+  return lines;
+}
+
+function downloadShareCard() {
+  const canvas = document.getElementById('share-card-canvas');
+  const anchor = document.createElement('a');
+  anchor.download = `interestseed-${new Date().toISOString().slice(0, 10)}.png`;
+  anchor.href = canvas.toDataURL('image/png');
+  anchor.click();
+}
+
+$('#share-card-download').addEventListener('click', downloadShareCard);
 $('#scan-button').addEventListener('click', scanVault);
 $('#capture-button').addEventListener('click', () => openModal('capture-modal'));
+$('#sprint-button').addEventListener('click', () => openModal('sprint-modal'));
+$('#sprint-submit').addEventListener('click', submitSprint);
 $('#settings-button').addEventListener('click', openSettings);
 $('#model-badge').addEventListener('click', openSettings);
 $('#capture-submit').addEventListener('click', submitCapture);
 $('#settings-submit').addEventListener('click', saveSettings);
 $('#experiment-submit').addEventListener('click', submitExperimentStart);
+$('#correction-submit').addEventListener('click', submitCorrection);
 $('#settings-clear-key').addEventListener('click', clearKey);
 for (const button of document.querySelectorAll('.modal-close')) {
   button.addEventListener('click', () => {
@@ -930,6 +1088,28 @@ async function clearKey() {
     closeModal('settings-modal');
     await load();
     toast('Key 已清除');
+  } catch (error) {
+    toast(error.message, true);
+  } finally {
+    setBusy(false);
+  }
+}
+
+async function submitSprint() {
+  const title = $('#sprint-title').value.trim();
+  const why = $('#sprint-why').value.trim();
+  const action = $('#sprint-action').value.trim();
+  if (!title || !why || !action) return toast('三格都填上，才算种下种子。', true);
+  try {
+    setBusy(true);
+    const text = `${why}\n\n第一步：${action}`;
+    await api('/api/capture', { method: 'POST', body: JSON.stringify({ title, text }) });
+    closeModal('sprint-modal');
+    $('#sprint-title').value = '';
+    $('#sprint-why').value = '';
+    $('#sprint-action').value = '';
+    await load();
+    toast('第一颗种子已经种下');
   } catch (error) {
     toast(error.message, true);
   } finally {

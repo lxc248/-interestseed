@@ -1506,6 +1506,33 @@ async function dismissDiscovery(vaultPath, id) {
 	await saveDiscoveries(vaultPath, file);
 	return { ok: true };
 }
+async function feedbackDiscovery(vaultPath, id, action, correction) {
+	const file = await loadDiscoveries(vaultPath);
+	const discovery = file.discoveries.find((item) => item.id === id);
+	if (!discovery) return {
+		ok: false,
+		message: "Discovery not found."
+	};
+	const now = (/* @__PURE__ */ new Date()).toISOString();
+	const previousStatus = discovery.feedbackStatus;
+	discovery.feedbackStatus = action;
+	discovery.updatedAt = now;
+	discovery.feedbackHistory = [...discovery.feedbackHistory ?? [], {
+		id: `feedback_${Date.now()}`,
+		action,
+		at: now,
+		previousStatus
+	}];
+	if (action === "rejected") discovery.status = "dismissed";
+	else discovery.status = "active";
+	if (action === "corrected" && correction?.trim()) discovery.correction = {
+		title: discovery.title,
+		description: correction.trim(),
+		createdAt: now
+	};
+	await saveDiscoveries(vaultPath, file);
+	return { ok: true };
+}
 function discoveryView(discovery) {
 	return {
 		id: discovery.id,
@@ -1517,7 +1544,9 @@ function discoveryView(discovery) {
 		evidence: discovery.evidence,
 		strength: discovery.strength,
 		feedbackStatus: discovery.feedbackStatus,
+		status: discovery.status,
 		application: discovery.application ?? { state: "none" },
+		...discovery.correction ? { correction: discovery.correction } : {},
 		updatedAt: discovery.updatedAt
 	};
 }
@@ -3128,6 +3157,14 @@ async function route(request, response, options) {
 	if (url.pathname === "/api/discoveries/dismiss" && request.method === "POST") {
 		const body = await readJson(request);
 		return sendJson(response, 200, await dismissDiscovery(options.vaultPath, typeof body.id === "string" ? body.id : ""));
+	}
+	if (url.pathname === "/api/discoveries/feedback" && request.method === "POST") {
+		const body = await readJson(request);
+		const action = body.action;
+		return sendJson(response, 200, {
+			...await feedbackDiscovery(options.vaultPath, typeof body.id === "string" ? body.id : "", action, typeof body.correction === "string" ? body.correction : void 0),
+			...await statePayload(options.vaultPath)
+		});
 	}
 	if (url.pathname === "/api/inbox" && request.method === "GET") return sendJson(response, 200, { items: await listInbox(options.vaultPath) });
 	if (url.pathname === "/api/inbox" && request.method === "POST") {

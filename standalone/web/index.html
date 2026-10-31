@@ -17,8 +17,10 @@
         </div>
       </div>
       <div class="top-actions">
+        <span id="header-status" class="pill">检查中</span>
         <span id="model-badge" class="pill">本地模型</span>
         <button id="capture-button" class="button ghost">保存一条</button>
+        <button id="sprint-button" class="button ghost" hidden>冷启动</button>
         <button id="settings-button" class="button ghost">设置</button>
         <button id="scan-button" class="button ghost">重新扫描</button>
       </div>
@@ -169,6 +171,61 @@
           <option value="7">7 天完整实验</option>
         </select>
         <button id="experiment-submit" class="button primary">开始</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="correction-modal" class="modal-backdrop" hidden>
+    <div class="modal-card">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">DISCOVERY</p>
+          <h2>改一下这条发现</h2>
+        </div>
+        <button class="modal-close button ghost" data-close="correction-modal">关闭</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="correction-id" />
+        <label>你觉得它应该怎么说？</label>
+        <textarea id="correction-text" placeholder="例如：它们共享的是“如何让人愿意开始”，而不是单纯标签相同"></textarea>
+        <button id="correction-submit" class="button primary">保存修改</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="share-card-modal" class="modal-backdrop" hidden>
+    <div class="modal-card wide">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">SHARE CARD</p>
+          <h2>分享卡</h2>
+        </div>
+        <button class="modal-close button ghost" data-close="share-card-modal">关闭</button>
+      </div>
+      <div class="modal-body">
+        <canvas id="share-card-canvas" width="1200" height="630"></canvas>
+        <button id="share-card-download" class="button primary">下载成图</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="sprint-modal" class="modal-backdrop" hidden>
+    <div class="modal-card">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">SEED SPRINT</p>
+          <h2>3 分钟冷启动</h2>
+        </div>
+        <button class="modal-close button ghost" data-close="sprint-modal">关闭</button>
+      </div>
+      <div class="modal-body">
+        <label>最近想试的一个兴趣</label>
+        <input id="sprint-title" placeholder="例如：AI 工具" />
+        <label>为什么想保存它？</label>
+        <textarea id="sprint-why" placeholder="一句话说清楚它为什么吸引你"></textarea>
+        <label>3 天里想做的第一件事</label>
+        <input id="sprint-action" placeholder="例如：用它整理三篇旧笔记" />
+        <button id="sprint-submit" class="button primary">种下第一颗种子</button>
       </div>
     </div>
   </div>

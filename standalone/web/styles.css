@@ -295,3 +295,10 @@ button, input { font: inherit; }
 .edge.references { stroke: rgba(56, 189, 248, .38); }
 .edge.experiment-link { stroke: rgba(52, 211, 153, .55); stroke-width: 1.6; }
 .edge.about { stroke: rgba(251, 191, 36, .45); }
+.audit-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line); background: rgba(255,255,255,.03); color: var(--muted); font-size: 10.5px; }
+.audit-chips span { display: inline-flex; align-items: center; }
+.feedback-badge { display: inline-block; padding: 1px 7px; border-radius: 999px; background: rgba(167,139,250,.12); color: #c4b5fd; font-size: 10px; font-weight: 600; }
+.discovery-card p.next { color: #c4b5fd; margin-top: 6px; }
+.modal-card.wide { width: min(820px, calc(100vw - 40px)); }
+#share-card-canvas { width: 100%; height: auto; border-radius: 14px; border: 1px solid var(--line); }
+

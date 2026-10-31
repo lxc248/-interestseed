@@ -37,11 +37,11 @@ export function discoveryPriorityLabel(item: Discovery): string {
   if (item.supersededBy) return '自动收敛';
   const priority = discoveryPriority(item);
   if (priority === 0) return '已接受，待处理';
-  if (priority === 1) return item.feedbackStatus === 'corrected' ? '已修正' : '待验证';
+  if (priority === 1) return item.feedbackStatus === 'corrected' ? '已改过' : '想再看看';
   if (priority === 2) return '新发现';
   if (priority === 4) return '已应用/已存在关系';
   if (priority === 5) {
-    return item.feedbackStatus === 'low-value' ? '已标记低价值' : '已拒绝/已抑制';
+    return item.feedbackStatus === 'low-value' ? '先放着' : '已拒绝/已抑制';
   }
   return '未分类';
 }

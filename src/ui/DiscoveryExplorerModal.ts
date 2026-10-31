@@ -24,10 +24,10 @@ export interface DiscoveryExplorerModalDeps {
 
 const FEEDBACK_LABELS: Record<string, string> = {
   accepted: '已接受',
-  corrected: '已修正',
-  'low-value': '低价值',
+  corrected: '已改过',
+  'low-value': '先放着',
   rejected: '已拒绝',
-  'needs-verification': '待验证',
+  'needs-verification': '想再看看',
 };
 
 const INSIGHT_LABELS: Record<LocalInsightKind, string> = {
