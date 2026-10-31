@@ -1,0 +1,173 @@
+{
+  "started": 1793413936683,
+  "finished": 1793413999620,
+  "summary": {
+    "nodes": 23,
+    "edges": 29,
+    "pending": 1,
+    "logs": 1,
+    "discoveries": 9
+  },
+  "results": [
+    {
+      "name": "01 graph overview",
+      "ok": true,
+      "detail": {
+        "nodes": 18,
+        "edges": 23,
+        "pending": 0,
+        "logs": 0,
+        "discoveries": 9
+      }
+    },
+    {
+      "name": "02 search and filter",
+      "ok": false,
+      "error": "locator.fill: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.interestseed-search').first()\u001b[22m\n\u001b[2m    - locator resolved to <input type=\"search\" aria-label=\"搜索节点\" class=\"interestseed-search\" placeholder=\"搜索标题、标签、来源、观察…\"/>\u001b[22m\n\u001b[2m    - fill(\"theme\")\u001b[22m\n\u001b[2m  - attempting fill action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and editable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying fill action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and editable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying fill action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    59 × waiting for element to be visible, enabled and editable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying fill action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
+    },
+    {
+      "name": "03 node detail and observation timeline",
+      "ok": true,
+      "detail": {
+        "id": "node_1y729f618ppc8g",
+        "detailVisible": true
+      }
+    },
+    {
+      "name": "04 share card five presets",
+      "ok": true,
+      "detail": {
+        "presets": 5
+      }
+    },
+    {
+      "name": "05 inbox list and focus",
+      "ok": true,
+      "detail": {
+        "nodes": 18,
+        "edges": 23,
+        "pending": 3,
+        "logs": 0,
+        "discoveries": 9
+      }
+    },
+    {
+      "name": "06 inbox pass and keep",
+      "ok": true,
+      "detail": {
+        "afterPass": {
+          "nodes": 18,
+          "edges": 23,
+          "pending": 2,
+          "logs": 0,
+          "discoveries": 9
+        },
+        "afterKeep": {
+          "nodes": 19,
+          "edges": 23,
+          "pending": 1,
+          "logs": 0,
+          "discoveries": 9
+        }
+      }
+    },
+    {
+      "name": "07 standalone spark capture",
+      "ok": true,
+      "detail": {
+        "nodes": 20,
+        "edges": 23,
+        "pending": 1,
+        "logs": 0,
+        "discoveries": 9
+      }
+    },
+    {
+      "name": "08 experiment modal and quick check-in",
+      "ok": true,
+      "detail": {
+        "startedExperiment": true,
+        "recorded": true,
+        "state": {
+          "nodes": 20,
+          "edges": 23,
+          "pending": 1,
+          "logs": 1,
+          "discoveries": 9
+        }
+      }
+    },
+    {
+      "name": "09 discovery overview, explorer, audit",
+      "ok": true,
+      "detail": {
+        "nodes": 20,
+        "edges": 23,
+        "pending": 1,
+        "logs": 1,
+        "discoveries": 9
+      }
+    },
+    {
+      "name": "10 new node, relation, undo/redo",
+      "ok": true,
+      "detail": {
+        "created": {
+          "node": "node_mvvsds1n43cg5hx",
+          "edge": null
+        },
+        "afterUndo": {
+          "node": {
+            "id": "node_mvvsds1n43cg5hx",
+            "type": "topic",
+            "title": "实验临时节点",
+            "tags": [],
+            "createdAt": "2026-10-31T02:33:06.107Z",
+            "updatedAt": "2026-10-31T02:33:06.107Z",
+            "metadata": {}
+          },
+          "edge": null
+        }
+      }
+    },
+    {
+      "name": "11 interest route and canvas export",
+      "ok": true,
+      "detail": {
+        "files": [
+          "InterestSeed/兴趣图谱-2026-10-31.canvas"
+        ]
+      }
+    },
+    {
+      "name": "12 backup, retry, rebuild, suggestions",
+      "ok": true,
+      "detail": {
+        "rebuilt": {
+          "nodes": 23,
+          "suggested": 14
+        }
+      }
+    },
+    {
+      "name": "13 settings and agent view",
+      "ok": true,
+      "detail": {
+        "nodes": 23,
+        "edges": 29,
+        "pending": 1,
+        "logs": 1,
+        "discoveries": 9
+      }
+    },
+    {
+      "name": "14 narrow and dark layout",
+      "ok": true,
+      "detail": {
+        "width": 420,
+        "scrollWidth": 420,
+        "overflow": false
+      }
+    }
+  ]
+}

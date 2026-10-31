@@ -1,0 +1,74 @@
+{
+  "results": [
+    {
+      "name": "02 search and filters",
+      "ok": true,
+      "detail": {
+        "summary": "6/23 节点"
+      }
+    },
+    {
+      "name": "15 relation create and undo/redo",
+      "ok": true,
+      "detail": {
+        "source": "node_mvvsds1n43cg5hx",
+        "target": "node_0djj6am115gquf",
+        "edge": "edge_0c8ojuy1qurxez",
+        "afterUndo": true,
+        "afterRedo": true
+      }
+    },
+    {
+      "name": "16 suggested edge confirm / reject / restore",
+      "ok": true,
+      "detail": {
+        "edgeId": "edge_1u40641070p0t7",
+        "statuses": [
+          true,
+          true,
+          true
+        ],
+        "final": "confirmed"
+      }
+    },
+    {
+      "name": "17 discovery feedback and undo",
+      "ok": true,
+      "detail": {
+        "id": "discovery_1wq1pez17119s7",
+        "accepted": "accepted",
+        "restored": "none"
+      }
+    },
+    {
+      "name": "18 route and canvas content",
+      "ok": true,
+      "detail": {
+        "route": "InterestSeed/兴趣路线 - 全部兴趣 - 2026-10-31 2.md",
+        "routeHasNext": true,
+        "routeLength": 1387,
+        "canvas": "InterestSeed/兴趣图谱-2026-10-31-3.canvas",
+        "canvasNodes": 23,
+        "canvasEdges": 30,
+        "canvasUniqueIds": 23
+      }
+    },
+    {
+      "name": "19 backup and retry",
+      "ok": true,
+      "detail": {}
+    },
+    {
+      "name": "20 destructive command confirmations only",
+      "ok": false,
+      "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText('取消', { exact: true }).first()\u001b[22m\n"
+    },
+    {
+      "name": "21 disabled AI and save retry",
+      "ok": true,
+      "detail": {
+        "notice": "AI 关系建议尚未启用。启用前会先展示将发送的字段（节点 id、标题、标签）与服务商，并征得你的明确授权；不会发送笔记正文、完整 Vault 或个人记录。"
+      }
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "results": [
+    {
+      "name": "seed sprint full flow",
+      "ok": false,
+      "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText('把这些种子种进图谱', { exact: true }).first()\u001b[22m\n"
+    },
+    {
+      "name": "share card download and caption",
+      "ok": true,
+      "detail": {
+        "download": "interestseed-star-map-xiaohongshu-1080x1440.png",
+        "clipboard": "我最近有 23 个兴趣，先挑一个试三天。\n它们连成了一张星图：23 个节点，31 条关系。\n最近在认真看：theme8、创造、工具、观察。\n#InterestSeed #兴趣验证 #自我探索"
+      }
+    },
+    {
+      "name": "note inbox and node from file",
+      "ok": true,
+      "detail": {
+        "before": 1,
+        "afterNote": 2,
+        "nodes": 1
+      }
+    },
+    {
+      "name": "clipboard share",
+      "ok": true,
+      "detail": {
+        "pending": 3
+      }
+    },
+    {
+      "name": "relation modal and cluster rail",
+      "ok": false,
+      "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.interestseed-cluster-rail button').nth(1)\u001b[22m\n\u001b[2m    - locator resolved to <button type=\"button\" class=\"interestseed-cluster-chip\">其他轨道 19</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <div class=\"modal-bg\"></div> from <div class=\"modal-container mod-dim\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <div class=\"modal-bg\"></div> from <div class=\"modal-container mod-dim\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    57 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - <div class=\"modal-bg\"></div> from <div class=\"modal-container mod-dim\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
+    },
+    {
+      "name": "export graph json",
+      "ok": true,
+      "detail": []
+    }
+  ]
+}

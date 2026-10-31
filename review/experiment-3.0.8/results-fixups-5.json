@@ -1,0 +1,47 @@
+{
+  "results": [
+    {
+      "name": "gap coach",
+      "ok": true,
+      "detail": {
+        "opened": true
+      }
+    },
+    {
+      "name": "reconcile discoveries",
+      "ok": true,
+      "detail": {
+        "notice": "InterestSeed：发现应用状态已按当前图谱核对。"
+      }
+    },
+    {
+      "name": "quick check-in limits",
+      "ok": true,
+      "detail": {
+        "thought": false,
+        "missed": false,
+        "extend": false,
+        "logs": 1
+      }
+    },
+    {
+      "name": "edit relation and delete edge undo",
+      "ok": true,
+      "detail": {
+        "edge": "edge_03q6ja31e4qxji",
+        "relation": "可编辑关系-1793414871504",
+        "renamed": "编辑后的关系",
+        "afterDelete": false,
+        "afterUndo": true
+      }
+    },
+    {
+      "name": "delete node confirmation only",
+      "ok": true,
+      "detail": {
+        "nodeId": "node_mvvsds1n43cg5hx",
+        "exists": true
+      }
+    }
+  ]
+}

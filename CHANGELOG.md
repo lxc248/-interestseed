@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.9 — Clear graph confirmation
+
+- Added explicit confirmation before clearing the graph.
+- Added a 47-path full-feature simulation report and screenshots.
+- 513 tests passing, including the new clear-confirmation regression.
+
 ## 3.0.8 — Code structure optimization
 
 - Consolidated duplicate compareText, clamp, hash, palette, and share-topic logic.

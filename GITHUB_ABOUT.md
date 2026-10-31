@@ -60,7 +60,7 @@ Set via: GitHub → Settings → Social preview
 ## Release title
 
 ```text
-InterestSeed 3.0.8 — 把一条收藏变成 3 天真实行动
+InterestSeed 3.0.9 — 把一条收藏变成 3 天真实行动
 ```
 
 ## Release body — English
@@ -74,14 +74,15 @@ save a 3-day test, then lets the evidence decide.
 
 ![InterestSeed demo](https://raw.githubusercontent.com/lxc248/-interestseed/main/assets/interestseed-demo.gif)
 
-### What 3.0.8 actually changes
+### What 3.0.9 actually changes
 
-No new surface area. Mostly paying down structure debt:
+This release closes one real safety gap found by the full-feature simulation:
 
-- duplicate helpers moved into `utils/text`, `utils/math`, and `ui/nodeStyle`;
-- spark text logic moved out of `main.ts` into `services/shareAnalysis`;
-- the 3.0.7 fixes are included: 64-bit Canvas IDs, BOM handling, inbox dedupe;
-- 511 tests passing, 74.74% line coverage, CI and Release green.
+- clearing the graph now asks for confirmation first;
+- cancel leaves every node and edge untouched;
+- 47 feature paths were exercised in a real Obsidian vault;
+- screenshots and the report live in `review/experiment-3.0.8/`;
+- 513 tests passing, CI and Release green.
 
 ### The loop
 
@@ -89,7 +90,7 @@ No new surface area. Mostly paying down structure debt:
 
 ### Install
 
-1. Download `interestseed-v3.0.8.zip`.
+1. Download `interestseed-v3.0.9.zip`.
 2. Extract into `<vault>/.obsidian/plugins/interestseed/`.
 3. Enable InterestSeed in Community plugins.
 4. Run the cold-start questionnaire, then process the Share Inbox.
@@ -108,14 +109,15 @@ InterestSeed 是 Obsidian 里的一个小插件，专门处理那个很具体的
 
 ![InterestSeed demo](https://raw.githubusercontent.com/lxc248/-interestseed/main/assets/interestseed-demo.gif)
 
-### 这次 3.0.8，主要是在还结构债
+### 这次 3.0.9，把误触风险补上
 
-没有堆新功能，更多是把之前欠的账收干净：
+全功能模拟实验抓到一个真实问题：
 
-- 重复的工具函数收进 `utils/text`、`utils/math`、`ui/nodeStyle`；
-- 火花文本逻辑从 `main.ts` 移到 `services/shareAnalysis`；
-- 带上了 3.0.7 的几个修复：Canvas 64 位 ID、BOM 处理、收件箱重复 id；
-- 511 个测试通过，总行覆盖 74.74%，CI 和 Release 都是绿的。
+- 清空图谱现在会先确认；
+- 取消后节点和关系一条不少；
+- 真实 Obsidian 里跑了 47 条功能路径；
+- 截图和报告在 `review/experiment-3.0.8/`；
+- 513 个测试通过，CI 和 Release 都是绿的。
 
 ### 它怎么跑
 
@@ -123,7 +125,7 @@ InterestSeed 是 Obsidian 里的一个小插件，专门处理那个很具体的
 
 ### 装起来
 
-1. 下载 `interestseed-v3.0.8.zip`；
+1. 下载 `interestseed-v3.0.9.zip`；
 2. 解压到 `<vault>/.obsidian/plugins/interestseed/`；
 3. 在第三方插件里启用 InterestSeed；
 4. 跑一遍冷启动，然后处理分享收件箱。

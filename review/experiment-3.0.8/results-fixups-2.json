@@ -1,0 +1,33 @@
+{
+  "results": [
+    {
+      "name": "relation unique undo/redo",
+      "ok": true,
+      "detail": {
+        "edge": "edge_101eq9218wp2um",
+        "relation": "实验连接-1793414470268",
+        "nodes": 23,
+        "afterUndo": false,
+        "afterRedo": true
+      }
+    },
+    {
+      "name": "clear graph requires confirmation",
+      "ok": true,
+      "detail": {
+        "before": 23,
+        "afterCancel": 23,
+        "modalText": "请确认清空当前图谱里的所有节点和关系？这一步会进入撤销历史，但仍建议先创建备份。取消清空"
+      }
+    },
+    {
+      "name": "repair storage safe state",
+      "ok": true,
+      "detail": {
+        "modals": 1,
+        "notice": "当前没有需要修复的存储状态。",
+        "nodes": 23
+      }
+    }
+  ]
+}

@@ -23,6 +23,7 @@ import { createId, edgeIdFor, nodeIdForUri } from '../utils/ids';
 import { extensionOf, noteTitleFromPath, pathFromUri } from '../utils/paths';
 import { downloadGraphJson } from '../utils/exportGraph';
 import { confirmAction } from '../ui/ConfirmModal';
+import { confirmClearGraph } from './destructiveConfirm';
 import type { PersistenceService } from './PersistenceService';
 import { writeConfirmedAiSuggestion } from '../services/AiSuggestionConfirmation';
 
@@ -551,6 +552,9 @@ export class GraphController {
     }
     if (this.deps.store.isEmpty()) {
       new Notice('图谱已经是空的。');
+      return;
+    }
+    if (!(await confirmClearGraph(this.deps.app))) {
       return;
     }
 

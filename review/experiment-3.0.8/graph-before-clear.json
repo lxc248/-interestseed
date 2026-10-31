@@ -1,0 +1,956 @@
+{
+  "schemaVersion": 2,
+  "updatedAt": "2026-10-31T02:45:34.055Z",
+  "nodes": [
+    {
+      "id": "node_09ah6nw1b8xcpx",
+      "type": "document",
+      "title": "Theme B Three",
+      "tags": [
+        "theme8"
+      ],
+      "createdAt": "2026-10-22T02:13:26.758Z",
+      "updatedAt": "2026-10-22T02:13:26.758Z",
+      "metadata": {
+        "path": "P2/theme-b-three.md",
+        "extension": "md",
+        "links": [
+          "theme-b-four"
+        ],
+        "summary": "---"
+      },
+      "sourceUri": "vault:P2/theme-b-three.md"
+    },
+    {
+      "id": "node_0br3dq501ngtb3",
+      "type": "document",
+      "title": "兴趣路线 · 兴趣实验",
+      "tags": [],
+      "createdAt": "2026-10-31T02:33:08.528Z",
+      "updatedAt": "2026-10-31T02:38:53.758Z",
+      "metadata": {
+        "path": "InterestSeed/兴趣路线 - 兴趣实验 - 2026-10-31.md",
+        "extension": "md",
+        "links": [],
+        "summary": "由 InterestSeed 生成于 2026-10-31。这是一份只读快照，不会自动修改你的笔记。",
+        "position": {
+          "x": 459.39025457477635,
+          "y": 644.5149439909385
+        }
+      },
+      "sourceUri": "vault:InterestSeed/兴趣路线 - 兴趣实验 - 2026-10-31.md"
+    },
+    {
+      "id": "node_0djj6am115gquf",
+      "type": "activity",
+      "title": "3 天兴趣试跑",
+      "tags": [
+        "兴趣实验",
+        "下一步"
+      ],
+      "createdAt": "2026-10-28T16:57:03.298Z",
+      "updatedAt": "2026-10-31T02:38:30.674Z",
+      "metadata": {
+        "seedSprint": true,
+        "evidence": "从你的兴趣磁场生成的可执行下一步，不是自动任务；你可以随时修改或删除。",
+        "confidence": 0.76,
+        "nextStep": true,
+        "position": {
+          "x": 1166.946819478444,
+          "y": 452.6179247358467
+        },
+        "taskState": "experimenting",
+        "taskStateUpdatedAt": "2026-10-31T02:33:00.621Z",
+        "observations": [
+          {
+            "id": "observation_mvvsdnt93sdimsx",
+            "at": "2026-10-31T02:33:00.621Z",
+            "source": "experiment",
+            "evidence": "今天实际做了一件和这个兴趣有关的事。",
+            "belief": "stronger"
+          },
+          {
+            "id": "observation_mvv6809y17irgis",
+            "at": "2026-10-30T16:12:45.286Z",
+            "source": "experiment",
+            "evidence": "今天实际做了一件和这个兴趣有关的事。",
+            "belief": "stronger"
+          }
+        ],
+        "experimentState": {
+          "title": "3 天兴趣试跑",
+          "hypothesis": "这个兴趣值得我投入三天的真实注意力。",
+          "metric": "先做 3 天：每天记录一次兴趣强度、精力值和一个具体证据；3 条有效记录即完成。",
+          "startedAt": "",
+          "targetDays": 3,
+          "status": "active",
+          "logs": [
+            {
+              "day": 1,
+              "date": "2026-10-31",
+              "recordedAt": "2026-10-31T02:33:00.621Z",
+              "interest": 4,
+              "energy": 4,
+              "evidence": "今天实际做了一件和这个兴趣有关的事。"
+            }
+          ]
+        },
+        "experimentStatus": "active",
+        "experimentDay": 1,
+        "experimentLastCheckInAt": "2026-10-31T02:33:00.621Z"
+      }
+    },
+    {
+      "id": "node_0enu4vc1wezgox",
+      "type": "activity",
+      "title": "动手创造",
+      "tags": [
+        "创造",
+        "行动",
+        "兴趣起跑"
+      ],
+      "createdAt": "2026-10-28T16:57:03.298Z",
+      "updatedAt": "2026-10-29T04:22:45.108Z",
+      "metadata": {
+        "seedSprint": true,
+        "evidence": "来自你的选择：做出一个东西",
+        "confidence": 0.9,
+        "nextStep": false,
+        "position": {
+          "x": 1354.7169417775053,
+          "y": 837.3591876855025
+        }
+      }
+    },
+    {
+      "id": "node_0f2fsn60mroqbt",
+      "type": "topic",
+      "title": "一个让我停下来的观察：我对“让人愿意开始”这件事，似乎比工具本身更感兴趣。",
+      "tags": [
+        "火花",
+        "文本",
+        "AI 与工具"
+      ],
+      "createdAt": "2026-10-31T02:32:58.513Z",
+      "updatedAt": "2026-10-31T02:32:58.513Z",
+      "metadata": {
+        "spark": true,
+        "raw": "一个让我停下来的观察：我对“让人愿意开始”这件事，似乎比工具本身更感兴趣。",
+        "capturedAt": "2026-10-31T02:32:58.513Z",
+        "platform": "text",
+        "topics": [
+          "AI 与工具"
+        ],
+        "taskState": "captured",
+        "taskStateUpdatedAt": "2026-10-31T02:32:58.513Z",
+        "contextSource": "share",
+        "observations": [
+          {
+            "id": "observation_mvvsdm6q27gpovx",
+            "at": "2026-10-31T02:32:58.514Z",
+            "source": "share",
+            "evidence": "一个让我停下来的观察：我对“让人愿意开始”这件事，似乎比工具本身更感兴趣。",
+            "belief": "changed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "node_0g2drj91crvc5b",
+      "type": "project",
+      "title": "正在做的项目",
+      "tags": [
+        "项目",
+        "进行中",
+        "兴趣起跑"
+      ],
+      "createdAt": "2026-10-28T16:57:03.298Z",
+      "updatedAt": "2026-10-29T04:22:44.127Z",
+      "metadata": {
+        "seedSprint": true,
+        "evidence": "来自你的选择：正在做一个东西",
+        "confidence": 0.9,
+        "nextStep": false,
+        "position": {
+          "x": 1084.6449956663528,
+          "y": 838.6643020564095
+        }
+      }
+    },
+    {
+      "id": "node_0s4feji1ckn58c",
+      "type": "document",
+      "title": "Discovery Audit",
+      "tags": [],
+      "createdAt": "2026-10-22T03:54:11.252Z",
+      "updatedAt": "2026-10-22T03:54:11.255Z",
+      "metadata": {
+        "path": "InterestSeed-audit-2026-10-22T03-54-10-252Z.md",
+        "extension": "md",
+        "links": [],
+        "summary": "scope declared: true"
+      },
+      "sourceUri": "vault:InterestSeed-audit-2026-10-22T03-54-10-252Z.md"
+    },
+    {
+      "id": "node_0t3q6n81iho9ly",
+      "type": "topic",
+      "title": "我想验证：把复杂想法讲清楚，是否真的有人愿意听。",
+      "tags": [
+        "火花",
+        "文本"
+      ],
+      "createdAt": "2026-10-31T02:32:56.419Z",
+      "updatedAt": "2026-10-31T02:32:56.419Z",
+      "metadata": {
+        "spark": true,
+        "raw": "我想验证：把复杂想法讲清楚，是否真的有人愿意听。",
+        "capturedAt": "2026-10-31T02:32:56.419Z",
+        "platform": "text",
+        "topics": [],
+        "taskState": "captured",
+        "taskStateUpdatedAt": "2026-10-31T02:32:56.419Z",
+        "contextSource": "share",
+        "observations": [
+          {
+            "id": "observation_mvvsdkkk11xvfnv",
+            "at": "2026-10-31T02:32:56.420Z",
+            "source": "share",
+            "evidence": "我想验证：把复杂想法讲清楚，是否真的有人愿意听。",
+            "belief": "changed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "node_0wq5s2c11o68tm",
+      "type": "document",
+      "title": "Discovery Audit",
+      "tags": [],
+      "createdAt": "2026-10-22T08:02:07.257Z",
+      "updatedAt": "2026-10-22T08:02:07.259Z",
+      "metadata": {
+        "path": "InterestSeed-audit-2026-10-22T08-02-06-251Z.md",
+        "extension": "md",
+        "links": [],
+        "summary": "scope declared: true"
+      },
+      "sourceUri": "vault:InterestSeed-audit-2026-10-22T08-02-06-251Z.md"
+    },
+    {
+      "id": "node_0wvf1py077ktkh",
+      "type": "document",
+      "title": "Theme B Two",
+      "tags": [
+        "theme8"
+      ],
+      "createdAt": "2026-10-22T02:13:26.756Z",
+      "updatedAt": "2026-10-22T02:13:26.756Z",
+      "metadata": {
+        "path": "P2/theme-b-two.md",
+        "extension": "md",
+        "links": [
+          "theme-b-one"
+        ],
+        "summary": "---"
+      },
+      "sourceUri": "vault:P2/theme-b-two.md"
+    },
+    {
+      "id": "node_0ztw5ss1ha3u6m",
+      "type": "document",
+      "title": "Discovery Audit",
+      "tags": [],
+      "createdAt": "2026-10-22T08:20:56.158Z",
+      "updatedAt": "2026-10-22T08:22:19.575Z",
+      "metadata": {
+        "path": "InterestSeed-audit-2026-10-22T08-20-55-901Z.md",
+        "extension": "md",
+        "links": [],
+        "summary": "scope declared: true"
+      },
+      "sourceUri": "vault:InterestSeed-audit-2026-10-22T08-20-55-901Z.md"
+    },
+    {
+      "id": "node_11oqll519fik7t",
+      "type": "document",
+      "title": "兴趣路线 · AI",
+      "tags": [],
+      "createdAt": "2026-10-30T16:47:41.228Z",
+      "updatedAt": "2026-10-31T02:38:56.102Z",
+      "metadata": {
+        "path": "InterestSeed/兴趣路线 - AI - 2026-10-30.md",
+        "extension": "md",
+        "links": [],
+        "summary": "由 InterestSeed 生成于 2026-10-30。这是一份只读快照，不会自动修改你的笔记。",
+        "position": {
+          "x": 293.73799833519763,
+          "y": 424.895189896129
+        }
+      },
+      "sourceUri": "vault:InterestSeed/兴趣路线 - AI - 2026-10-30.md"
+    },
+    {
+      "id": "node_11otceg0wxa6wz",
+      "type": "document",
+      "title": "experiment note 1793414537041",
+      "tags": [],
+      "createdAt": "2026-10-31T02:42:17.131Z",
+      "updatedAt": "2026-10-31T02:42:17.131Z",
+      "metadata": {
+        "path": "InterestSeed/experiment-note-1793414537041.md",
+        "extension": "md"
+      },
+      "sourceUri": "vault:InterestSeed/experiment-note-1793414537041.md"
+    },
+    {
+      "id": "node_16qg45y0xoft6w",
+      "type": "document",
+      "title": "Discovery Audit",
+      "tags": [],
+      "createdAt": "2026-10-22T03:32:22.656Z",
+      "updatedAt": "2026-10-22T03:32:22.656Z",
+      "metadata": {
+        "path": "InterestSeed-audit-2026-10-22T03-32-14-256Z.md",
+        "extension": "md",
+        "links": [],
+        "summary": "scope declared: true"
+      },
+      "sourceUri": "vault:InterestSeed-audit-2026-10-22T03-32-14-256Z.md"
+    },
+    {
+      "id": "node_189hgws1hzsrdb",
+      "type": "document",
+      "title": "Theme B One",
+      "tags": [
+        "theme8"
+      ],
+      "createdAt": "2026-10-22T02:13:26.754Z",
+      "updatedAt": "2026-10-22T02:13:26.754Z",
+      "metadata": {
+        "path": "P2/theme-b-one.md",
+        "extension": "md",
+        "links": [
+          "theme-b-two"
+        ],
+        "summary": "---"
+      },
+      "sourceUri": "vault:P2/theme-b-one.md"
+    },
+    {
+      "id": "node_1c7v4if0hv2k0r",
+      "type": "document",
+      "title": "Discovery Audit",
+      "tags": [],
+      "createdAt": "2026-10-22T03:43:58.261Z",
+      "updatedAt": "2026-10-22T03:43:58.266Z",
+      "metadata": {
+        "path": "InterestSeed-audit-2026-10-22T03-43-57-263Z.md",
+        "extension": "md",
+        "links": [],
+        "summary": "scope declared: true"
+      },
+      "sourceUri": "vault:InterestSeed-audit-2026-10-22T03-43-57-263Z.md"
+    },
+    {
+      "id": "node_1cnuz8612dl07x",
+      "type": "project",
+      "title": "项目地图",
+      "tags": [
+        "项目",
+        "结构",
+        "兴趣起跑"
+      ],
+      "createdAt": "2026-10-28T16:57:03.298Z",
+      "updatedAt": "2026-10-30T16:12:38.518Z",
+      "metadata": {
+        "seedSprint": true,
+        "evidence": "来自你的选择：一张项目地图",
+        "confidence": 0.9,
+        "nextStep": false,
+        "position": {
+          "x": 1124.618935877414,
+          "y": 682.0504813410924
+        }
+      }
+    },
+    {
+      "id": "node_1eao0rr1jxfmor",
+      "type": "document",
+      "title": "Discovery Audit",
+      "tags": [],
+      "createdAt": "2026-10-22T07:18:16.251Z",
+      "updatedAt": "2026-10-22T07:18:16.259Z",
+      "metadata": {
+        "path": "InterestSeed-audit-2026-10-22T07-18-15-250Z.md",
+        "extension": "md",
+        "links": [],
+        "summary": "scope declared: true"
+      },
+      "sourceUri": "vault:InterestSeed-audit-2026-10-22T07-18-15-250Z.md"
+    },
+    {
+      "id": "node_1ewcc10007zd7d",
+      "type": "document",
+      "title": "Long Project A",
+      "tags": [
+        "theme8"
+      ],
+      "createdAt": "2026-10-22T02:13:26.751Z",
+      "updatedAt": "2026-10-22T02:13:26.751Z",
+      "metadata": {
+        "path": "P1/theme-a-very-long-project-name-with-many-words-for-layout-testing.md",
+        "extension": "md",
+        "links": [
+          "theme-a-support"
+        ],
+        "summary": "---"
+      },
+      "sourceUri": "vault:P1/theme-a-very-long-project-name-with-many-words-for-layout-testing.md"
+    },
+    {
+      "id": "node_1koz3o61n3olzi",
+      "type": "topic",
+      "title": "AI 与工具",
+      "tags": [
+        "AI",
+        "工具",
+        "兴趣起跑"
+      ],
+      "createdAt": "2026-10-28T16:57:03.298Z",
+      "updatedAt": "2026-10-30T16:12:39.705Z",
+      "metadata": {
+        "seedSprint": true,
+        "evidence": "来自你的选择：AI、工具、效率",
+        "confidence": 0.9,
+        "nextStep": false,
+        "position": {
+          "x": 1390.2579969425954,
+          "y": 677.4411426869132
+        }
+      }
+    },
+    {
+      "id": "node_1ojrs6l0b08dky",
+      "type": "topic",
+      "title": "我在三个项目里都遇到如何让人开始的问题",
+      "tags": [
+        "缺口",
+        "观察"
+      ],
+      "createdAt": "2026-10-28T17:43:52.752Z",
+      "updatedAt": "2026-10-31T02:38:43.452Z",
+      "metadata": {
+        "gapCoach": true,
+        "insightId": "bridge:node_0wvf1py077ktkh",
+        "insightTitle": "桥接节点：Theme B Two",
+        "evidence": "移除后图谱会裂成 11 个部分，它是不同项目之间的枢纽。",
+        "position": {
+          "x": 618.4800051975211,
+          "y": 464.2263714623502
+        }
+      }
+    },
+    {
+      "id": "node_1t90n8t04cdvyk",
+      "type": "document",
+      "title": "Support A",
+      "tags": [
+        "theme8"
+      ],
+      "createdAt": "2026-10-22T02:13:26.752Z",
+      "updatedAt": "2026-10-31T02:38:47.733Z",
+      "metadata": {
+        "path": "P1/theme-a-support.md",
+        "extension": "md",
+        "links": [
+          "theme-a-very-long-project-name-with-many-words-for-layout-testing"
+        ],
+        "summary": "---",
+        "position": {
+          "x": 678.249092984997,
+          "y": 504.8879462033156
+        }
+      },
+      "sourceUri": "vault:P1/theme-a-support.md"
+    },
+    {
+      "id": "node_1y729f618ppc8g",
+      "type": "document",
+      "title": "Theme B Four",
+      "tags": [
+        "theme8"
+      ],
+      "createdAt": "2026-10-22T02:13:26.760Z",
+      "updatedAt": "2026-10-31T02:38:51.445Z",
+      "metadata": {
+        "path": "P2/theme-b-four.md",
+        "extension": "md",
+        "links": [
+          "theme-b-three"
+        ],
+        "summary": "---",
+        "position": {
+          "x": 634.8850942018339,
+          "y": 561.1942941768517
+        }
+      },
+      "sourceUri": "vault:P2/theme-b-four.md"
+    },
+    {
+      "id": "node_mvvsds1n43cg5hx",
+      "type": "topic",
+      "title": "实验临时节点",
+      "tags": [],
+      "createdAt": "2026-10-31T02:33:06.107Z",
+      "updatedAt": "2026-10-31T02:38:45.315Z",
+      "metadata": {
+        "position": {
+          "x": 606.8040968919512,
+          "y": 602.9141955442639
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge_02pjqpc1mzzzko",
+      "source": "node_1t90n8t04cdvyk",
+      "target": "node_0wvf1py077ktkh",
+      "relation": "related-to",
+      "origin": "rule",
+      "status": "confirmed",
+      "createdAt": "2026-10-22T02:21:34.826Z",
+      "updatedAt": "2026-10-22T15:12:06.450Z",
+      "confidence": 0.55,
+      "evidence": [
+        "两个笔记具有相同标签：theme8"
+      ]
+    },
+    {
+      "id": "edge_09pt9sr1vfwsvh",
+      "source": "node_0wvf1py077ktkh",
+      "target": "node_189hgws1hzsrdb",
+      "relation": "references",
+      "origin": "user",
+      "status": "confirmed",
+      "createdAt": "2026-10-22T02:21:34.826Z",
+      "updatedAt": "2026-10-22T02:22:36.350Z",
+      "confidence": 1,
+      "evidence": [
+        "笔记《Theme B Two》中存在链接：[[theme-b-one]]"
+      ]
+    },
+    {
+      "id": "edge_0b9fprw0gidqo0",
+      "source": "node_189hgws1hzsrdb",
+      "target": "node_09ah6nw1b8xcpx",
+      "relation": "related-to",
+      "origin": "rule",
+      "status": "suggested",
+      "createdAt": "2026-10-22T02:21:34.826Z",
+      "updatedAt": "2026-10-22T02:21:34.826Z",
+      "confidence": 0.55,
+      "evidence": [
+        "两个笔记具有相同标签：theme8"
+      ]
+    },
+    {
+      "id": "edge_0c8ojuy1qurxez",
+      "source": "node_mvvsds1n43cg5hx",
+      "target": "node_0djj6am115gquf",
+      "relation": "实验连接",
+      "origin": "user",
+      "status": "confirmed",
+      "createdAt": "2026-10-31T02:35:55.082Z",
+      "updatedAt": "2026-10-31T02:35:55.082Z",
+      "confidence": 1,
+      "evidence": [
+        "用户手动创建"
+      ]
+    },
+    {
+      "id": "edge_0f8g0ja1e5igu2",
+      "source": "node_1t90n8t04cdvyk",
+      "target": "node_1y729f618ppc8g",
+      "relation": "related-to",
+      "origin": "rule",
+      "status": "suggested",
+      "createdAt": "2026-10-22T02:21:34.826Z",
+      "updatedAt": "2026-10-22T02:21:34.826Z",
+      "confidence": 0.55,
+      "evidence": [
+        "两个笔记具有相同标签：theme8"
+      ]
+    },
+    {
+      "id": "edge_0fnzxql0csfqhz",
+      "source": "node_1ewcc10007zd7d",
+      "target": "node_0wvf1py077ktkh",
+      "relation": "related-to",
+      "origin": "rule",
+      "status": "confirmed",
+      "createdAt": "2026-10-22T02:21:34.826Z",
+      "updatedAt": "2026-10-22T15:12:05.104Z",
+      "confidence": 0.55,
+      "evidence": [
+        "两个笔记具有相同标签：theme8"
+      ]
+    },
+    {
+      "id": "edge_0i7xz9u0o5ad12",
+      "source": "node_1ewcc10007zd7d",
+      "target": "node_1t90n8t04cdvyk",
+      "relation": "references",
+      "origin": "user",
+      "status": "confirmed",
+      "createdAt": "2026-10-22T02:21:34.826Z",
+      "updatedAt": "2026-10-22T02:22:36.350Z",
+      "confidence": 1,
+      "evidence": [
+        "笔记《Long Project A》中存在链接：[[theme-a-support]]"
+      ]
+    },
+    {
+      "id": "edge_0li2e8x0lwafzv",
+      "source": "node_1ewcc10007zd7d",
+      "target": "node_189hgws1hzsrdb",
+      "relation": "related-to",
+      "origin": "rule",
+      "status": "suggested",
+      "createdAt": "2026-10-22T02:21:34.826Z",
+      "updatedAt": "2026-10-22T02:21:34.826Z",
+      "confidence": 0.55,
+      "evidence": [
+        "两个笔记具有相同标签：theme8"
+      ]
+    },
+    {
+      "id": "edge_0pvbpj11pdkpk3",
+      "source": "node_0g2drj91crvc5b",
+      "target": "node_1cnuz8612dl07x",
+      "relation": "related-to",
+      "origin": "rule",
+      "status": "suggested",
+      "createdAt": "2026-10-31T02:33:13.817Z",
+      "updatedAt": "2026-10-31T02:33:13.817Z",
+      "confidence": 0.65,
+      "evidence": [
+        "两个笔记具有相同标签：兴趣起跑、项目"
+      ]
+    },
+    {
+      "id": "edge_0v49aaj0ozekz9",
+      "source": "node_189hgws1hzsrdb",
+      "target": "node_0wvf1py077ktkh",
+      "relation": "references",
+      "origin": "user",
+      "status": "confirmed",
+      "createdAt": "2026-10-22T02:21:34.826Z",
+      "updatedAt": "2026-10-22T02:22:36.350Z",
+      "confidence": 1,
+      "evidence": [
+        "笔记《Theme B One》中存在链接：[[theme-b-two]]"
+      ]
+    },
+    {
+      "id": "edge_0vk3z3h1c3ctdu",
+      "source": "node_0enu4vc1wezgox",
+      "target": "node_1koz3o61n3olzi",
+      "relation": "about",
+      "origin": "rule",
+      "status": "suggested",
+      "createdAt": "2026-10-31T02:33:13.817Z",
+      "updatedAt": "2026-10-31T02:33:13.817Z",
+      "confidence": 0.65,
+      "evidence": [
+        "匹配用户定义主题《AI 与工具》：共享标签 #兴趣起跑"
+      ]
+    },
+    {
+      "id": "edge_0wsrglu1kzeoja",
+      "source": "node_0enu4vc1wezgox",
+      "target": "node_0g2drj91crvc5b",
+      "relation": "related-to",
+      "origin": "rule",
+      "status": "confirmed",
+      "createdAt": "2026-10-31T02:33:13.817Z",
+      "updatedAt": "2026-10-31T02:35:56.850Z",
+      "confidence": 0.55,
+      "evidence": [
+        "两个笔记具有相同标签：兴趣起跑"
+      ]
+    },
+    {
+      "id": "edge_101eq9218wp2um",
+      "source": "node_0djj6am115gquf",
+      "target": "node_1koz3o61n3olzi",
+      "relation": "实验连接-1793414470268",
+      "origin": "user",
+      "status": "confirmed",
+      "createdAt": "2026-10-31T02:41:10.268Z",
+      "updatedAt": "2026-10-31T02:41:10.268Z",
+      "confidence": 1,
+      "evidence": [
+        "用户手动创建"
+      ]
+    },
+    {
+      "id": "edge_11cja9w0m64xts",
+      "source": "node_1y729f618ppc8g",
+      "target": "node_189hgws1hzsrdb",
+      "relation": "related-to",
+      "origin": "rule",
+      "status": "suggested",
+      "createdAt": "2026-10-22T02:21:34.826Z",
+      "updatedAt": "2026-10-22T02:21:34.826Z",
+      "confidence": 0.55,
+      "evidence": [
+        "两个笔记具有相同标签：theme8"
+      ]
+    },
+    {
+      "id": "edge_11km7gz0l99ei3",
+      "source": "node_0enu4vc1wezgox",
+      "target": "node_1cnuz8612dl07x",
+      "relation": "适合通过",
+      "origin": "ai",
+      "status": "confirmed",
+      "createdAt": "2026-10-28T16:57:03.298Z",
+      "updatedAt": "2026-10-28T16:57:03.298Z",
+      "confidence": 0.84,
+      "evidence": [
+        "你的心流来自「做出一个东西」，它会决定这张图更像项目、路径还是作品。"
+      ]
+    },
+    {
+      "id": "edge_12295371kizf23",
+      "source": "node_0g2drj91crvc5b",
+      "target": "node_1cnuz8612dl07x",
+      "relation": "正在形成",
+      "origin": "ai",
+      "status": "confirmed",
+      "createdAt": "2026-10-28T16:57:03.298Z",
+      "updatedAt": "2026-10-28T16:57:03.298Z",
+      "confidence": 0.92,
+      "evidence": [
+        "你把“现在的状态”和“想长成的样子”放在了一起；这张图先从这里长出方向。"
+      ]
+    },
+    {
+      "id": "edge_12qaprq02bfjjm",
+      "source": "node_1t90n8t04cdvyk",
+      "target": "node_09ah6nw1b8xcpx",
+      "relation": "related-to",
+      "origin": "rule",
+      "status": "suggested",
+      "createdAt": "2026-10-22T02:21:34.826Z",
+      "updatedAt": "2026-10-22T02:21:34.826Z",
+      "confidence": 0.55,
+      "evidence": [
+        "两个笔记具有相同标签：theme8"
+      ]
+    },
+    {
+      "id": "edge_18wtn7z05y87vd",
+      "source": "node_1ewcc10007zd7d",
+      "target": "node_1y729f618ppc8g",
+      "relation": "related-to",
+      "origin": "rule",
+      "status": "suggested",
+      "createdAt": "2026-10-22T02:21:34.826Z",
+      "updatedAt": "2026-10-22T02:21:34.826Z",
+      "confidence": 0.55,
+      "evidence": [
+        "两个笔记具有相同标签：theme8"
+      ]
+    },
+    {
+      "id": "edge_19bh82v00rgzt5",
+      "source": "node_09ah6nw1b8xcpx",
+      "target": "node_1y729f618ppc8g",
+      "relation": "references",
+      "origin": "user",
+      "status": "confirmed",
+      "createdAt": "2026-10-22T02:21:34.826Z",
+      "updatedAt": "2026-10-22T02:22:36.349Z",
+      "confidence": 1,
+      "evidence": [
+        "笔记《Theme B Three》中存在链接：[[theme-b-four]]"
+      ]
+    },
+    {
+      "id": "edge_1b3m79z108ohih",
+      "source": "node_1y729f618ppc8g",
+      "target": "node_09ah6nw1b8xcpx",
+      "relation": "references",
+      "origin": "user",
+      "status": "confirmed",
+      "createdAt": "2026-10-27T14:41:33.762Z",
+      "updatedAt": "2026-10-27T14:41:33.762Z",
+      "confidence": 1,
+      "evidence": [
+        "用户手动创建"
+      ]
+    },
+    {
+      "id": "edge_1b40fkc1ng1d5k",
+      "source": "node_09ah6nw1b8xcpx",
+      "target": "node_0wvf1py077ktkh",
+      "relation": "related-to",
+      "origin": "rule",
+      "status": "confirmed",
+      "createdAt": "2026-10-22T02:21:34.826Z",
+      "updatedAt": "2026-10-22T15:12:07.831Z",
+      "confidence": 0.55,
+      "evidence": [
+        "两个笔记具有相同标签：theme8"
+      ]
+    },
+    {
+      "id": "edge_1dm3ext0vt0sse",
+      "source": "node_0g2drj91crvc5b",
+      "target": "node_1koz3o61n3olzi",
+      "relation": "about",
+      "origin": "rule",
+      "status": "suggested",
+      "createdAt": "2026-10-31T02:33:13.817Z",
+      "updatedAt": "2026-10-31T02:33:13.817Z",
+      "confidence": 0.65,
+      "evidence": [
+        "匹配用户定义主题《AI 与工具》：共享标签 #兴趣起跑"
+      ]
+    },
+    {
+      "id": "edge_1gs762e1r0pqgc",
+      "source": "node_1koz3o61n3olzi",
+      "target": "node_0enu4vc1wezgox",
+      "relation": "意外连接",
+      "origin": "ai",
+      "status": "confirmed",
+      "createdAt": "2026-10-28T16:57:03.298Z",
+      "updatedAt": "2026-10-28T16:57:03.298Z",
+      "confidence": 0.64,
+      "evidence": [
+        "一个吸引你的主题，和一个让你进入心流的动作之间，可能藏着一条你还没走过的桥。"
+      ]
+    },
+    {
+      "id": "edge_1hlcf780w46eao",
+      "source": "node_1y729f618ppc8g",
+      "target": "node_0wvf1py077ktkh",
+      "relation": "related-to",
+      "origin": "rule",
+      "status": "confirmed",
+      "createdAt": "2026-10-22T02:21:34.826Z",
+      "updatedAt": "2026-10-22T15:12:07.237Z",
+      "confidence": 0.55,
+      "evidence": [
+        "两个笔记具有相同标签：theme8"
+      ]
+    },
+    {
+      "id": "edge_1nectsf0e6a1av",
+      "source": "node_mvvsds1n43cg5hx",
+      "target": "node_0djj6am115gquf",
+      "relation": "experiment-link",
+      "origin": "user",
+      "status": "confirmed",
+      "createdAt": "2026-10-31T02:33:06.638Z",
+      "updatedAt": "2026-10-31T02:33:06.638Z",
+      "confidence": 1,
+      "evidence": [
+        "用户手动创建"
+      ]
+    },
+    {
+      "id": "edge_1p6ipeq1d26cnq",
+      "source": "node_1t90n8t04cdvyk",
+      "target": "node_1ewcc10007zd7d",
+      "relation": "references",
+      "origin": "user",
+      "status": "confirmed",
+      "createdAt": "2026-10-22T02:21:34.826Z",
+      "updatedAt": "2026-10-22T02:22:36.350Z",
+      "confidence": 1,
+      "evidence": [
+        "笔记《Support A》中存在链接：[[theme-a-very-long-project-name-with-many-words-for-layout-testing]]"
+      ]
+    },
+    {
+      "id": "edge_1pbimzs0hou9nc",
+      "source": "node_1t90n8t04cdvyk",
+      "target": "node_189hgws1hzsrdb",
+      "relation": "related-to",
+      "origin": "rule",
+      "status": "suggested",
+      "createdAt": "2026-10-22T02:21:34.826Z",
+      "updatedAt": "2026-10-22T02:21:34.826Z",
+      "confidence": 0.55,
+      "evidence": [
+        "两个笔记具有相同标签：theme8"
+      ]
+    },
+    {
+      "id": "edge_1qugy161qze2cj",
+      "source": "node_1cnuz8612dl07x",
+      "target": "node_1koz3o61n3olzi",
+      "relation": "about",
+      "origin": "rule",
+      "status": "suggested",
+      "createdAt": "2026-10-31T02:33:13.817Z",
+      "updatedAt": "2026-10-31T02:33:13.817Z",
+      "confidence": 0.65,
+      "evidence": [
+        "匹配用户定义主题《AI 与工具》：共享标签 #兴趣起跑"
+      ]
+    },
+    {
+      "id": "edge_1u40641070p0t7",
+      "source": "node_0enu4vc1wezgox",
+      "target": "node_1cnuz8612dl07x",
+      "relation": "related-to",
+      "origin": "rule",
+      "status": "confirmed",
+      "createdAt": "2026-10-31T02:33:13.817Z",
+      "updatedAt": "2026-10-31T02:39:31.745Z",
+      "confidence": 0.55,
+      "evidence": [
+        "两个笔记具有相同标签：兴趣起跑"
+      ]
+    },
+    {
+      "id": "edge_1wai2mr09uuc9p",
+      "source": "node_1ewcc10007zd7d",
+      "target": "node_09ah6nw1b8xcpx",
+      "relation": "related-to",
+      "origin": "rule",
+      "status": "suggested",
+      "createdAt": "2026-10-22T02:21:34.826Z",
+      "updatedAt": "2026-10-22T02:21:34.826Z",
+      "confidence": 0.55,
+      "evidence": [
+        "两个笔记具有相同标签：theme8"
+      ]
+    },
+    {
+      "id": "edge_1x5f82b1ho2yin",
+      "source": "node_1koz3o61n3olzi",
+      "target": "node_0g2drj91crvc5b",
+      "relation": "持续吸引",
+      "origin": "ai",
+      "status": "confirmed",
+      "createdAt": "2026-10-28T16:57:03.298Z",
+      "updatedAt": "2026-10-28T16:57:03.298Z",
+      "confidence": 0.78,
+      "evidence": [
+        "「AI、工具、效率」在你的注意力里反复出现，先把它放到当前状态旁边。"
+      ]
+    }
+  ],
+  "viewport": {
+    "zoom": 0.3,
+    "panX": -240.775287016012,
+    "panY": -179.76698101109335
+  }
+}

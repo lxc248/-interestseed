@@ -1,4 +1,4 @@
-<div align="center">
+﻿<div align="center">
 
 <a href="assets/interestseed-launch.mp4"><img src="assets/interestseed-demo.gif" alt="InterestSeed 40 秒演示" width="360" /></a>
 
@@ -12,7 +12,7 @@
   <a href="assets/interestseed-launch.mp4"><img alt="Demo" src="https://img.shields.io/badge/%E2%96%B6%2040%20%E7%A7%92%E6%BC%94%E7%A4%BA-111827?style=for-the-badge" /></a>
   <img alt="CI" src="https://github.com/lxc248/-interestseed/actions/workflows/ci.yml/badge.svg?branch=main" />
   <img alt="Release" src="https://img.shields.io/github/v/release/lxc248/-interestseed?style=for-the-badge" />
-  <img alt="Tests" src="https://img.shields.io/badge/tests-511%20passing-22c55e?style=for-the-badge" />
+  <img alt="Tests" src="https://img.shields.io/badge/tests-513%20passing-22c55e?style=for-the-badge" />
   <img alt="Coverage" src="https://img.shields.io/badge/coverage-74.7%25-14b8a6?style=for-the-badge" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b?style=for-the-badge" />
 </p>
@@ -114,7 +114,7 @@ Capture → Decide → Connect → Verify → Review → Next action
 
 三分钟能跑起来。
 
-1. 从 [Releases](https://github.com/lxc248/-interestseed/releases) 下载 `interestseed-v3.0.8.zip`。
+1. 从 [Releases](https://github.com/lxc248/-interestseed/releases) 下载 `interestseed-v3.0.9.zip`。
 2. 解压到：
 
 ```text
@@ -147,7 +147,7 @@ MCP 是只读的。核心功能不需要账号、API key 或模型凭据。
 这些数字不是装饰。每次改完，我都会重新跑一遍。
 
 ```text
-511 tests passing
+513 tests passing
 74.74% line coverage
 92.25% core coverage
 43.81% UI coverage
@@ -199,3 +199,4 @@ AGPL-3.0-only. Author: [aicoder](https://github.com/lxc248).
 
 如果你也有过“收藏了就等于学了”的错觉，欢迎试试它。  
 觉得有用就 star；发现问题就提 issue；想一起改，先读 [CONTRIBUTING.md](CONTRIBUTING.md) 和 [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)。
+
