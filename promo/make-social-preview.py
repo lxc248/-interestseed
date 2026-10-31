@@ -34,20 +34,20 @@ loop_font = ImageFont.truetype(str(bold_path), 22)
 d.rounded_rectangle((64, 84, 74, 168), radius=5, fill='#e18061')
 
 # Eyebrow pill.
-d.rounded_rectangle((96, 82, 300, 122), radius=20, fill=(232, 200, 132, 28), outline=(232, 200, 132, 120), width=1)
-d.text((116, 92), 'OBSIDIAN PLUGIN', font=pill_font, fill='#f0d6a0')
+d.rounded_rectangle((96, 82, 430, 122), radius=20, fill=(232, 200, 132, 28), outline=(232, 200, 132, 120), width=1)
+d.text((116, 92), 'LOCAL AI · OBSIDIAN PLUGIN', font=pill_font, fill='#f0d6a0')
 
 d.text((96, 148), 'InterestSeed', font=title_font, fill='#f4f6fb')
-d.text((100, 262), '把一条收藏，变成 3 天真实行动。', font=sub_font, fill='#d7dcea')
-d.text((100, 304), '再用证据决定：继续，还是放下。', font=sub_font, fill='#9aa6ba')
-d.text((100, 346), 'AI 关系建议：可接自己的本地模型。', font=small_font, fill='#b9a7ff')
+d.text((100, 262), '本地 AI，给你一条能验证的连接。', font=sub_font, fill='#d7dcea')
+d.text((100, 304), '连上，或换一个；再用 3 天实验决定。', font=sub_font, fill='#9aa6ba')
+d.text((100, 346), '只发节点 id、标题、标签；Key 存本机。', font=small_font, fill='#b9a7ff')
 
 # Loop line.
-loop = 'Capture  →  Decide  →  Connect  →  Verify'
+loop = 'One suggestion  →  Decide  →  3-day test'
 d.text((100, 384), loop, font=loop_font, fill='#b9a7ff')
 
 # Bottom badges.
-badges = ['LOCAL-FIRST', 'AI-READY', 'MCP-READY']
+badges = ['LOCAL MODEL', 'ONE SUGGESTION', 'UNDOABLE']
 x = 100
 for label in badges:
     w = d.textlength(label, font=pill_font) + 26
@@ -56,7 +56,7 @@ for label in badges:
     x += w + 12
 
 # Screenshot card on the right.
-shot = Image.open(root / 'assets' / 'plugin-cosmic.png').convert('RGB')
+shot = Image.open(root / 'assets' / 'ai-suggestions-live.png').convert('RGB')
 target_w, target_h = 560, 350
 shot = shot.resize((target_w, target_h), Image.LANCZOS)
 mask = Image.new('L', (target_w, target_h), 0)

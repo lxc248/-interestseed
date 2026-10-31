@@ -1,15 +1,19 @@
 ﻿<div align="center">
 
-<a href="assets/interestseed-launch.mp4"><img src="assets/interestseed-demo.gif" alt="InterestSeed 40-second demo" width="360" /></a>
-
 <h1>InterestSeed</h1>
 
 <p><strong>An interest validator for Obsidian</strong></p>
 
 <p>Turn one saved post into a real 3-day action.<br/>Then let evidence decide: keep it, or let it go.</p>
 
+<p><strong>Local AI, one testable connection at a time.</strong></p>
+
+<img src="assets/ai-suggestions-live.png" alt="One AI suggestion at a time" width="820" />
+
 <p>
   <a href="assets/interestseed-launch.mp4"><img alt="Demo" src="https://img.shields.io/badge/%E2%96%B6%2040s%20demo-111827?style=for-the-badge" /></a>
+  <img alt="AI" src="https://img.shields.io/badge/AI-READY-8b5cf6?style=for-the-badge" />
+  <img alt="Local model" src="https://img.shields.io/badge/LOCAL-MODEL-22c55e?style=for-the-badge" />
   <img alt="CI" src="https://github.com/lxc248/-interestseed/actions/workflows/ci.yml/badge.svg?branch=main" />
   <img alt="Release" src="https://img.shields.io/github/v/release/lxc248/-interestseed?style=for-the-badge" />
   <img alt="Tests" src="https://img.shields.io/badge/tests-522%20passing-22c55e?style=for-the-badge" />
@@ -20,6 +24,7 @@
 <p>
   <a href="README.md">简体中文</a> ·
   <a href="assets/interestseed-launch.mp4">40s demo</a> ·
+  <a href="docs/ai.en.md">AI suggestions</a> ·
   <a href="docs/tutorial.md">Tutorial</a> ·
   <a href="docs/positioning.md">Positioning</a> ·
   <a href="https://github.com/lxc248/-interestseed/releases">Download</a>
@@ -33,6 +38,22 @@
 > InterestSeed helps you **test it**.
 
 We don't lack bookmarks. We lack the part after saving: actually trying it once, then saying honestly, "worth keeping" or "let it go."
+
+## AI is the core, not an add-on
+
+Most AI features hand you a chat box. InterestSeed's AI does one thing: it picks the one connection in your graph that is most worth testing.
+
+```text
+One saved item → one AI suggestion → connect / next / not now → 3-day test
+```
+
+- one suggestion at a time, not a pending-confirmation wall
+- a reason attached; the relation name is editable
+- written only after you connect; undo is available
+- sends only node id, title, and tags
+- uses your own local model and key
+
+[How the AI works →](docs/ai.en.md)
 
 ## Where it differs from a bookmark pile
 
@@ -68,7 +89,7 @@ The graph is not the product. It is the evidence layer that makes each decision 
 
 ## What it looks like
 
-Six screenshots, and you basically know what it does.
+AI first, then the whole picture.
 
 <table>
   <tr>
@@ -89,16 +110,6 @@ Six screenshots, and you basically know what it does.
     <td width="50%">
       <img src="assets/share-card-xiaohongshu.png" alt="Xiaohongshu share card" /><br/>
       <sub><b>Local share cards</b>: five platform presets, rendered on Canvas.</sub>
-    </td>
-  </tr>
-  <tr>
-    <td width="50%">
-      <img src="assets/ai-suggestions-live.png" alt="AI relation suggestions" /><br/>
-      <sub><b>AI suggestion</b>: one at a time; connect / next / not now.</sub>
-    </td>
-    <td width="50%">
-      <img src="assets/ai-model-panel.png" alt="Local model panel" /><br/>
-      <sub><b>Local model</b>: model, endpoint, and key state at a glance.</sub>
     </td>
   </tr>
 </table>

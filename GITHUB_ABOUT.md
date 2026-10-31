@@ -12,16 +12,16 @@ interestseed
 ## About — English
 
 ```text
-A small Obsidian plugin that turns one saved post into a real 3-day test, then
-lets evidence decide whether to keep it. Local-first, human-in-the-loop,
-AI suggestions on by default, MCP-ready.
+A small Obsidian plugin where your own local AI suggests one testable connection,
+then a 3-day experiment decides whether to keep it. Local-first,
+human-in-the-loop, MCP-ready.
 ```
 
 ## About — 简体中文
 
 ```text
-一个 Obsidian 小插件：把一条收藏变成 3 天真实行动，再用证据决定继续还是放下。
-本地优先，人做决定，AI 建议默认开启，MCP 可连接。
+一个 Obsidian 小插件：你自己的本地 AI 一次给一条能验证的连接，
+再用 3 天实验决定继续还是放下。本地优先，人做决定，MCP 可连接。
 ```
 
 ## Topics
@@ -60,7 +60,7 @@ Set via: GitHub → Settings → Social preview
 ## Release title
 
 ```text
-InterestSeed 3.6.0 — 只使用用户自己的本地模型
+InterestSeed 3.6.0 — 本地 AI，一次一条
 ```
 
 ## Release body — English
@@ -76,14 +76,15 @@ save a 3-day test, then lets the evidence decide.
 
 ### What 3.6.0 actually changes
 
-AI now runs only against the user's local model:
+AI is the headline, not a feature row:
 
-- Claudian provider, detection, settings option, and tests are gone;
-- one endpoint: local OpenAI-compatible service at `localhost:7863/v1`;
-- one key: the user's own key in Obsidian SecretStorage;
-- model ID is configurable; default `cn:deepseek-v4.1-flash`;
-- a local model status panel shows model, endpoint, and key state;
-- AI still gives one suggestion at a time: connect / next / not now;
+- one local suggestion at a time: connect / next / not now;
+- a reason attached; relation name editable; undo after writing;
+- no batch pending-confirmation wall, no auto-write;
+- only your local OpenAI-compatible endpoint at `localhost:7863/v1`;
+- your own key in Obsidian SecretStorage; model ID configurable;
+- default `cn:deepseek-v4.1-flash`;
+- Claudian provider, detection, settings, and tests are gone;
 - 522 tests passing, CI and Release green.
 
 ### The loop
@@ -111,14 +112,15 @@ InterestSeed 是 Obsidian 里的一个小插件，专门处理那个很具体的
 
 ![InterestSeed demo](https://raw.githubusercontent.com/lxc248/-interestseed/main/assets/interestseed-demo.gif)
 
-### 这次 3.6.0，只使用用户自己的本地模型
+### 这次 3.6.0，AI 是主角
 
+- 一次只给一条本地 AI 建议：连上 / 换一个 / 先不用
+- 带理由，关系名可改，写入后可撤销
+- 没有批量“待确认”，不会自动写图谱
+- 只连你自己的本地 OpenAI-compatible 服务 `localhost:7863/v1`
+- Key 存在 Obsidian SecretStorage，模型 ID 可配置
+- 默认模型 `cn:deepseek-v4.1-flash`
 - Claudian 提供方、检测、设置项和测试都已移除
-- 只保留一个入口：本地 OpenAI-compatible 服务 `localhost:7863/v1`
-- 只使用用户自己的 API Key，存在 Obsidian SecretStorage
-- 模型 ID 可配置，默认 `cn:deepseek-v4.1-flash`
-- 设置页新增本地模型状态面板：模型、地址、Key 状态
-- AI 仍然一次只给一条：连上 / 换一个 / 先不用
 - 522 个测试通过，CI 和 Release 都是绿的。
 
 ### 它怎么跑

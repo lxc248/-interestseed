@@ -1,15 +1,19 @@
 ﻿<div align="center">
 
-<a href="assets/interestseed-launch.mp4"><img src="assets/interestseed-demo.gif" alt="InterestSeed 40 秒演示" width="360" /></a>
-
 <h1>InterestSeed</h1>
 
 <p><strong>Obsidian 里的兴趣验证器</strong></p>
 
 <p>把一条收藏，变成 3 天真实行动；<br/>再用证据决定：继续，还是放下。</p>
 
+<p><strong>本地 AI，一次只给一条能验证的连接。</strong></p>
+
+<img src="assets/ai-suggestions-live.png" alt="AI 一次只给一条建议" width="820" />
+
 <p>
   <a href="assets/interestseed-launch.mp4"><img alt="Demo" src="https://img.shields.io/badge/%E2%96%B6%2040%20%E7%A7%92%E6%BC%94%E7%A4%BA-111827?style=for-the-badge" /></a>
+  <img alt="AI" src="https://img.shields.io/badge/AI-READY-8b5cf6?style=for-the-badge" />
+  <img alt="Local model" src="https://img.shields.io/badge/LOCAL-MODEL-22c55e?style=for-the-badge" />
   <img alt="CI" src="https://github.com/lxc248/-interestseed/actions/workflows/ci.yml/badge.svg?branch=main" />
   <img alt="Release" src="https://img.shields.io/github/v/release/lxc248/-interestseed?style=for-the-badge" />
   <img alt="Tests" src="https://img.shields.io/badge/tests-522%20passing-22c55e?style=for-the-badge" />
@@ -20,6 +24,7 @@
 <p>
   <a href="README.en.md">English</a> ·
   <a href="assets/interestseed-launch.mp4">40 秒演示</a> ·
+  <a href="docs/ai.md">AI 建议</a> ·
   <a href="docs/tutorial.md">完整教程</a> ·
   <a href="docs/positioning.md">产品定位</a> ·
   <a href="https://github.com/lxc248/-interestseed/releases">下载</a>
@@ -33,6 +38,22 @@
 > InterestSeed 帮你**验一下**。
 
 我们并不缺收藏。缺的是收藏之后，真的做一次，然后诚实地说一句：还行，或者算了。
+
+## AI 是核心，不是附加功能
+
+大多数 AI 功能给你一个聊天框。InterestSeed 的 AI 只做一件事：从你的图谱里挑一条最值得验证的连接。
+
+```text
+一条收藏 → AI 给一条建议 → 连上 / 换一个 / 先不用 → 3 天实验
+```
+
+- 只给一条，不给你一屏“待确认”
+- 带一句理由，关系名可以改
+- 连上后才写入，写入后可撤销
+- 只发节点 id、标题、标签
+- 使用你自己的本地模型和 Key
+
+[AI 建议是怎么工作的 →](docs/ai.md)
 
 ## 它和收藏夹到底差在哪
 
@@ -68,7 +89,7 @@ Capture → Decide → Connect → Verify → Review → Next action
 
 ## 它长这样
 
-先看六张图，基本就知道它在干什么。
+先看 AI，再看全貌。
 
 <table>
   <tr>
@@ -89,16 +110,6 @@ Capture → Decide → Connect → Verify → Review → Next action
     <td width="50%">
       <img src="assets/share-card-xiaohongshu.png" alt="小红书分享卡" /><br/>
       <sub><b>本地分享卡</b>：五种平台规格，Canvas 本地渲染。</sub>
-    </td>
-  </tr>
-  <tr>
-    <td width="50%">
-      <img src="assets/ai-suggestions-live.png" alt="AI 关系建议" /><br/>
-      <sub><b>AI 建议</b>：一次只给一条，连上 / 换一个 / 先不用。</sub>
-    </td>
-    <td width="50%">
-      <img src="assets/ai-model-panel.png" alt="本地模型面板" /><br/>
-      <sub><b>本地模型</b>：模型、地址、Key 状态一眼可见。</sub>
     </td>
   </tr>
 </table>
