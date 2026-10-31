@@ -136,6 +136,63 @@ describe('AiSuggestionModal', () => {
       confidence: 0.82,
     });
   });
+
+  it('lets the user rename the relation before confirming', async () => {
+    const confirm = vi.fn(async () => ({ ok: true }));
+    const modal = new AiSuggestionModal(
+      {} as never,
+      [{ source: 'a', target: 'b', relation: '相关', reason: '共享主题' }],
+      {
+        getNodeTitle: (id) => (id === 'a' ? '节点 A' : '节点 B'),
+        confirm,
+      },
+    );
+    modal.open();
+    const input = modal.contentEl.querySelector(
+      '.interestseed-ai-suggestion-relation-input',
+    ) as HTMLInputElement;
+    input.value = '同一个实验';
+    input.dispatchEvent(new Event('change'));
+    const button = [...modal.contentEl.querySelectorAll('button')].find(
+      (item) => item.textContent === '确认',
+    ) as HTMLButtonElement;
+    button.click();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(confirm).toHaveBeenCalledWith(
+      expect.objectContaining({ relation: '同一个实验' }),
+    );
+  });
+
+  it('shows a write banner and can undo the accepted edge', async () => {
+    const onUndo = vi.fn(() => true);
+    const modal = new AiSuggestionModal(
+      {} as never,
+      [{ source: 'a', target: 'b', relation: '共享方法', reason: '共享标签' }],
+      {
+        getNodeTitle: (id) => (id === 'a' ? '节点 A' : '节点 B'),
+        confirm: vi.fn(async () => ({ ok: true })),
+        onUndo,
+      },
+    );
+    modal.open();
+    expect(modal.contentEl.textContent).not.toContain('未评分');
+    expect(modal.contentEl.textContent).toContain('模型没有返回置信度');
+
+    const confirmButton = [...modal.contentEl.querySelectorAll('button')].find(
+      (item) => item.textContent === '确认',
+    ) as HTMLButtonElement;
+    confirmButton.click();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(modal.contentEl.textContent).toContain('已写入 1 条 AI 关系');
+
+    const undoButton = [...modal.contentEl.querySelectorAll('button')].find(
+      (item) => item.textContent === '撤销这次写入',
+    ) as HTMLButtonElement;
+    undoButton.click();
+    expect(onUndo).toHaveBeenCalled();
+    expect(modal.contentEl.textContent).toContain('已撤销');
+    expect(modal.contentEl.textContent).not.toContain('已写入 1 条 AI 关系');
+  });
 });
 
 describe('AiSetupModal', () => {
@@ -165,6 +222,25 @@ describe('AiSetupModal', () => {
     save.click();
     await new Promise((resolve) => setTimeout(resolve, 0));
     expect(onSaveKey).toHaveBeenCalledWith('sk-local-test');
+  });
+
+  it('makes a saved key explicit instead of showing an empty input', () => {
+    const modal = new AiSetupModal({} as never, {
+      endpoint: 'http://localhost:7863/v1',
+      providerLabel: '本地模型 · cn:deepseek-v4.1-flash',
+      enabled: true,
+      consentGranted: true,
+      hasKey: true,
+      onSaveKey: vi.fn(async () => {}),
+      onOpenSettings: vi.fn(),
+    });
+    modal.open();
+    const input = modal.contentEl.querySelector(
+      '.interestseed-ai-setup-input',
+    ) as HTMLInputElement;
+    expect(input.placeholder).toContain('已保存 Key');
+    expect(modal.contentEl.textContent).toContain('出于安全不回显');
+    expect(modal.contentEl.textContent).toContain('清除已保存 Key');
   });
 });
 

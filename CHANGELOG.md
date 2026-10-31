@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.4.2 — AI confirmation flow rework
+
+- Confirmed AI edges now show a write banner with an undo button.
+- Undone suggestions show an explicit "undone" state instead of stale "accepted".
+- Relation names are editable before confirmation.
+- Missing confidence no longer renders "unrated"; a single note explains it.
+- Saved keys show a clear placeholder and a clear-key action.
+- 525 tests passing.
+
 ## 3.4.1 — Live AI run and confirmation fix
 
 - Confirmed AI suggestions now carry the reason into edge evidence.

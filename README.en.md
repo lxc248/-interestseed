@@ -12,7 +12,7 @@
   <a href="assets/interestseed-launch.mp4"><img alt="Demo" src="https://img.shields.io/badge/%E2%96%B6%2040s%20demo-111827?style=for-the-badge" /></a>
   <img alt="CI" src="https://github.com/lxc248/-interestseed/actions/workflows/ci.yml/badge.svg?branch=main" />
   <img alt="Release" src="https://img.shields.io/github/v/release/lxc248/-interestseed?style=for-the-badge" />
-  <img alt="Tests" src="https://img.shields.io/badge/tests-522%20passing-22c55e?style=for-the-badge" />
+  <img alt="Tests" src="https://img.shields.io/badge/tests-525%20passing-22c55e?style=for-the-badge" />
   <img alt="Coverage" src="https://img.shields.io/badge/coverage-75.2%25-14b8a6?style=for-the-badge" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b?style=for-the-badge" />
 </p>
@@ -125,7 +125,7 @@ These aren't a feature checklist. They're the moves I actually make every day.
 
 It takes about three minutes.
 
-1. Download `interestseed-v3.4.1.zip` from [Releases](https://github.com/lxc248/-interestseed/releases).
+1. Download `interestseed-v3.4.2.zip` from [Releases](https://github.com/lxc248/-interestseed/releases).
 2. Extract it into:
 
 ```text
@@ -153,17 +153,18 @@ prompts:    review-interest / plan-next-experiment
 
 The MCP surface is read-only. Core functionality needs no account or model credentials.  
 AI relation suggestions are on by default and only call the selected model when you ask. A setup window lets you connect your own local service key, and the model ID can be changed in settings; it lives in Obsidian SecretStorage, never in data.json. If unavailable, local rule discovery stays intact.  
-Live run: cn:deepseek-v4.1-flash returned 5 focused candidates; a confirmed relation carried its reason into edge evidence.
+Live run: cn:deepseek-v4.1-flash returned 5 focused candidates; a confirmed relation carried its reason into edge evidence.  
+Rename a relation before confirming; after writing, the dialog offers an undo button instead of leaving a stale accepted state.
 
 ## How stable it is
 
 These numbers are not decoration. I rerun them after every change.
 
 ```text
-522 tests passing
-75.16% line coverage
+525 tests passing
+75.17% line coverage
 92.25% core coverage
-43.97% UI coverage
+46.43% UI coverage
 axe: graph / inbox / share-card 0 violations
 semgrep: 0 findings
 gitleaks: no leaks

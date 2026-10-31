@@ -45,21 +45,31 @@ v4.1 Flash 返回了 `source`、`target`、`reason`，但省略了 `relation` �
 
 ```text
 缺 relation → 从共享标签推导；没有共享标签时回退“相关”
-缺 confidence → 显示“未评分”，不伪造分数
+缺 confidence → 不显示百分比，顶部说明模型未给分
 单条坏数据 → 跳过，不让整批失败
+```
+
+## 3.4.2 确认流程
+
+```text
+关系名可在确认前编辑
+确认后显示“已写入 1 条 AI 关系”
+可直接“撤销这次写入”
+撤销后卡片显示“已撤销”，图谱恢复 32 条关系
 ```
 
 ## 截图
 
 ```text
-review/experiment-3.0.8/55-ai-focus-live.png
-review/experiment-3.0.8/56-ai-confirmed-edge.png
+review/experiment-3.0.8/58-ai-rename-before-confirm.png
+review/experiment-3.0.8/59-ai-write-banner.png
+review/experiment-3.0.8/60-ai-undone.png
 ```
 
 ## 验证
 
 ```text
-71 test files / 522 tests passing
+71 test files / 525 tests passing
 MCP smoke 4/4
 npm run verify 通过
 ```

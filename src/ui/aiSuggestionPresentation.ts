@@ -4,6 +4,7 @@ export type AiSuggestionStatus =
   | 'pending'
   | 'confirming'
   | 'accepted'
+  | 'undone'
   | 'ignored'
   | 'failed'
   | 'invalid';
@@ -18,6 +19,7 @@ export const AI_SUGGESTION_STATUS_LABELS: Record<AiSuggestionStatus, string> = {
   pending: '待确认',
   confirming: '确认中',
   accepted: '已接受',
+  undone: '已撤销',
   ignored: '已忽略',
   failed: '失败',
   invalid: '已失效',

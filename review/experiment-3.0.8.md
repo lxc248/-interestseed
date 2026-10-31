@@ -93,8 +93,11 @@ review/experiment-3.0.8/results-onboarding.json
 | 48 | 探索页 AI 入口 | ✅ AI 可选、入口可见 | 49-explorer-ai-enabled.png |
 | 49 | AI 推荐卡理由与置信度 | ✅ 按可信度排序、显示理由 | 51-ai-suggestion-card.png |
 | 50 | AI 接入引导窗口 | ✅ 说明边界、保存 Key、打开设置 | 52-ai-setup-modal.png |
-| 51 | 真实 v4.1 Flash 建议 | ✅ 5 条候选、理由显示、未评分诚实标注 | 54-ai-live-v41-flash.png |
-| 52 | MCP smoke | ✅ 4/4 | 命令行输出 |
+| 51 | 真实 v4.1 Flash 建议 | ✅ 5 条候选、理由显示 | 54-ai-live-v41-flash.png |
+| 52 | 确认前改关系名 | ✅ 输入框可编辑 | 58-ai-rename-before-confirm.png |
+| 53 | 写入后撤销横幅 | ✅ 已写入 1 条、可撤销 | 59-ai-write-banner.png |
+| 54 | 撤销后状态 | ✅ 已撤销、图谱 32 | 60-ai-undone.png |
+| 55 | MCP smoke | ✅ 4/4 | 命令行输出 |
 
 ## 4. 关键流程
 
@@ -225,7 +228,7 @@ review/experiment-3.0.8/
 ## 7. 验证
 
 ```text
-71 test files / 522 tests passing
+71 test files / 525 tests passing
 MCP smoke 4/4
 npm run verify 通过
 ```
@@ -241,12 +244,13 @@ npm run verify 通过
 ## 9. 结论
 
 ```text
-52 项功能路径覆盖
+55 项功能路径覆盖
 1 个真实高优 UX bug 被发现并修复
 收件箱、实验、分享卡、发现、导出、冷启动、撤销/重做全部通过
 窄屏与暗色无布局回归
 实验后图谱已恢复
 ```
+
 
 
 

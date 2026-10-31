@@ -12,7 +12,7 @@
   <a href="assets/interestseed-launch.mp4"><img alt="Demo" src="https://img.shields.io/badge/%E2%96%B6%2040%20%E7%A7%92%E6%BC%94%E7%A4%BA-111827?style=for-the-badge" /></a>
   <img alt="CI" src="https://github.com/lxc248/-interestseed/actions/workflows/ci.yml/badge.svg?branch=main" />
   <img alt="Release" src="https://img.shields.io/github/v/release/lxc248/-interestseed?style=for-the-badge" />
-  <img alt="Tests" src="https://img.shields.io/badge/tests-522%20passing-22c55e?style=for-the-badge" />
+  <img alt="Tests" src="https://img.shields.io/badge/tests-525%20passing-22c55e?style=for-the-badge" />
   <img alt="Coverage" src="https://img.shields.io/badge/coverage-75.2%25-14b8a6?style=for-the-badge" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b?style=for-the-badge" />
 </p>
@@ -125,7 +125,7 @@ Capture → Decide → Connect → Verify → Review → Next action
 
 三分钟能跑起来。
 
-1. 从 [Releases](https://github.com/lxc248/-interestseed/releases) 下载 `interestseed-v3.4.1.zip`。
+1. 从 [Releases](https://github.com/lxc248/-interestseed/releases) 下载 `interestseed-v3.4.2.zip`。
 2. 解压到：
 
 ```text
@@ -153,17 +153,18 @@ prompts:    review-interest / plan-next-experiment
 
 MCP 是只读的。核心功能不需要账号或模型凭据。  
 AI 关系建议默认开启，只在你点击 AI 时请求所选模型；接入引导窗口可以填写自己的本地服务 Key，模型 ID 可在设置里改成服务实际暴露的 ID；密钥存进 Obsidian 安全存储，不进入 data.json。不可用时会自动保留本地规则发现。  
-本地实测：`cn:deepseek-v4.1-flash` 返回 5 条聚焦候选，确认后写入图谱，理由进入关系证据。
+本地实测：`cn:deepseek-v4.1-flash` 返回 5 条聚焦候选，确认后写入图谱，理由进入关系证据。  
+候选确认前可以改关系名；写入后弹窗会给出撤销按钮，不会留下无法解释的“已接受”。
 
 ## 我把它做得多稳
 
 这些数字不是装饰。每次改完，我都会重新跑一遍。
 
 ```text
-522 tests passing
-75.16% line coverage
+525 tests passing
+75.17% line coverage
 92.25% core coverage
-43.97% UI coverage
+46.43% UI coverage
 axe: graph / inbox / share-card 0 violations
 semgrep: 0 findings
 gitleaks: no leaks

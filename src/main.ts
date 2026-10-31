@@ -1564,6 +1564,7 @@ export default class InterestSeedPlugin extends Plugin {
     new AiSuggestionModal(this.app, suggestions, {
       getNodeTitle: (id) => this.store.getNode(id)?.title ?? null,
       confirm: (suggestion) => this.controller.confirmAiSuggestion(suggestion),
+      onUndo: () => this.undo.undo(),
     }).open();
   }
 

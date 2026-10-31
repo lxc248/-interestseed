@@ -77,7 +77,9 @@ export class AiSetupModal extends Modal {
       attr: {
         id: 'interestseed-ai-key-input',
         type: 'password',
-        placeholder: '粘贴你的本地服务 Key',
+        placeholder: this.options.hasKey
+          ? '已保存 Key，留空保持不变；输入新 Key 可替换'
+          : '粘贴你的本地服务 Key',
         autocomplete: 'off',
         spellcheck: 'false',
       },
@@ -94,8 +96,22 @@ export class AiSetupModal extends Modal {
     save.addEventListener('click', () => {
       void this.save();
     });
+    if (this.options.hasKey) {
+      keyRow.createEl('p', {
+        cls: 'interestseed-ai-setup-key-saved',
+        text: '已保存 Key，出于安全不回显。留空保存不会覆盖原 Key。',
+      });
+    }
 
     const actions = this.contentEl.createDiv({ cls: 'interestseed-ai-setup-actions' });
+    if (this.options.hasKey) {
+      actions.createEl('button', {
+        text: '清除已保存 Key',
+        attr: { type: 'button' },
+      }).addEventListener('click', () => {
+        void this.clearKey();
+      });
+    }
     actions.createEl('button', {
       text: '打开设置',
       attr: { type: 'button' },
@@ -133,11 +149,21 @@ export class AiSetupModal extends Modal {
   private async save(): Promise<void> {
     const value = this.keyDraft.trim();
     if (!value) {
+      if (this.options.hasKey) {
+        this.close();
+        return;
+      }
       new Notice('先填入本地服务 API Key。');
       return;
     }
     await this.options.onSaveKey(value);
     new Notice('AI API Key 已保存到 Obsidian 安全存储。');
+    this.close();
+  }
+
+  private async clearKey(): Promise<void> {
+    await this.options.onSaveKey('');
+    new Notice('AI API Key 已清除。');
     this.close();
   }
 
