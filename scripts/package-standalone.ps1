@@ -19,7 +19,7 @@ Copy-Item (Join-Path $standalone "web") (Join-Path $pkg "web") -Recurse
 Copy-Item (Join-Path $standalone "skill") (Join-Path $pkg "skill") -Recurse
 New-Item -ItemType Directory -Path (Join-Path $pkg "mcp") -Force | Out-Null
 Copy-Item (Join-Path $root "mcp\server.mjs") (Join-Path $pkg "mcp\server.mjs")
-Copy-Item (Join-Path $standalone "README.md") (Join-Path $pkg "README.md")
+Copy-Item (Join-Path $standalone "PACKAGED_README.md") (Join-Path $pkg "README.md")
 Copy-Item (Join-Path $root "LICENSE") (Join-Path $pkg "LICENSE")
 
 $zip = Join-Path $out "$name.zip"

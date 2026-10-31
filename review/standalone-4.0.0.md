@@ -50,7 +50,7 @@ second log on the same day → rejected: 今天已经记录过了，明天再来
 
 ```text
 release/interestseed-standalone-v4.0.0.zip
-sha256: 8228ddac20a9932b0469ffe811199eb7c81b99586cbbd1c53da591fb0dc0e71b
+sha256: 32734edbe689246555b72c64d85c6c0ecba145163b5a63d56162b3d72fa0cca3
 packaged cli.js status → 8 nodes / 10 edges
 packaged web / → 200
 ```
