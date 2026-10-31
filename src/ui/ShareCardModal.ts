@@ -52,10 +52,10 @@ export class ShareCardModal extends Modal {
     setIcon(mark, 'share-2');
     const copy = header.createDiv();
     copy.createDiv({ cls: 'interestseed-share-kicker', text: 'MAKE A PROOF CARD' });
-    copy.createEl('h2', { cls: 'interestseed-share-title', text: '把你的兴趣，做成一张会被看完的卡。' });
+    copy.createEl('h2', { cls: 'interestseed-share-title', text: '做一张你自己也愿意发的卡。' });
     copy.createEl('p', {
       cls: 'interestseed-share-lede',
-      text: '不是 UI 截图，是给短视频平台重新排版的证据卡：一个钩子、一组数字、一张星图。',
+      text: '不是截屏。它会重新排一版：一句你想说的话，几个真实数字，一张你的星图。',
     });
 
     const platforms = root.createDiv({ cls: 'interestseed-share-platforms' });
@@ -78,7 +78,7 @@ export class ShareCardModal extends Modal {
 
     const settings = root.createEl('details', { cls: 'interestseed-share-settings' });
     settings.createEl('summary', {
-      text: '分享设置 · 隐藏不想公开的节点',
+      text: '分享前，先把不想公开的藏起来',
     });
     const nodeList = settings.createDiv({ cls: 'interestseed-share-node-list' });
     for (const node of [...this.plugin.store.listNodes()]
@@ -223,7 +223,7 @@ export class ShareCardModal extends Modal {
         new Notice('当前设备不支持系统分享，请使用「下载 PNG」。');
         return;
       }
-      await navigator.share({ files: [file], title: '我的兴趣星图' });
+      await navigator.share({ files: [file], title: '我的兴趣，先试一个' });
       this.setStatus('已打开系统分享');
     } catch (error) {
       if (error instanceof DOMException && error.name === 'AbortError') return;

@@ -80,10 +80,10 @@ function shareTopics(graph: InterestSeedGraph, limit = 3): string[] {
 
 export function buildShareCaption(graph: InterestSeedGraph, preset: SharePreset): string {
   const topics = shareTopics(graph, 4);
-  const topicLine = topics.length > 0 ? `最近在关注：${topics.join('、')}。` : '';
+  const topicLine = topics.length > 0 ? `最近在认真看：${topics.join('、')}。` : '';
   return [
-    `我把 ${graph.nodes.length} 个兴趣，先验证 1 个。`,
-    `星图：${graph.nodes.length} 个节点，${graph.edges.length} 条关系。`,
+    `我最近有 ${graph.nodes.length} 个兴趣，先挑一个试三天。`,
+    `它们连成了一张星图：${graph.nodes.length} 个节点，${graph.edges.length} 条关系。`,
     topicLine,
     `#InterestSeed #兴趣验证 #${preset.id === 'x' ? '个人成长' : '自我探索'}`,
   ]
@@ -406,7 +406,7 @@ function drawGraphPanel(
 
   text(
     ctx,
-    '证据不是更多内容，是真实做过。',
+    '每条线，都有做过的事撑着。',
     rect.x + 20,
     rect.y + rect.h - 22,
     11,
@@ -424,8 +424,8 @@ function drawSteps(
   const gap = 10;
   const cardWidth = (width - gap * 2) / 3;
   const steps = [
-    { number: '01', title: '收藏', detail: '先留下一条', color: '#e8c884' },
-    { number: '02', title: '验证', detail: '做 3 天看看', color: '#7dd9ad' },
+    { number: '01', title: '收藏', detail: '先留一条', color: '#e8c884' },
+    { number: '02', title: '验证', detail: '做三天看看', color: '#7dd9ad' },
     { number: '03', title: '决定', detail: '继续或放下', color: '#b69cff' },
   ];
   steps.forEach((step, index) => {
@@ -477,14 +477,14 @@ function drawPortraitCard(
   );
 
   text(ctx, `${graph.nodes.length} 个兴趣`, margin, titleTop, titleSize, '#f3f0e8', 720);
-  text(ctx, '我先验证 1 个', margin, titleTop + Math.round(titleSize * 1.02), titleSize, '#f3f0e8', 720);
-  text(ctx, '不是收藏更多，是知道哪个值得做。', margin, subTop, 25, '#aeb8c8', 500);
+  text(ctx, '先挑一个试试', margin, titleTop + Math.round(titleSize * 1.02), titleSize, '#f3f0e8', 720);
+  text(ctx, '收藏夹已经够满了，缺的是试过之后的答案。', margin, subTop, 25, '#aeb8c8', 500);
 
   const confirmed = graph.edges.filter((edge) => edge.status === 'confirmed').length;
   const statW = (graphRect.w - 20) / 3;
   const stats = [
     { value: `${graph.nodes.length}`, label: '个兴趣', sub: '在星图里' },
-    { value: `${confirmed}`, label: '条确认关系', sub: '不是 AI 猜测' },
+    { value: `${confirmed}`, label: '条确认关系', sub: '有来源，能回看' },
     { value: '3', label: '天真实行动', sub: '决定继续或放下' },
   ];
   stats.forEach((stat, index) => {
@@ -501,10 +501,10 @@ function drawPortraitCard(
   drawGraphPanel(ctx, graph, graphRect, true);
 
   const quoteY = graphRect.y + graphRect.h + 52;
-  text(ctx, '别收藏更多，验证一个。', width / 2, quoteY, 31, '#f3e5c0', 680, 'center');
+  text(ctx, '挑一个，做三天，再决定。', width / 2, quoteY, 31, '#f3e5c0', 680, 'center');
   text(
     ctx,
-    'InterestSeed  ·  把刷到的内容，变成 3 天真实行动',
+    'InterestSeed  ·  把一条收藏，做成三天实验',
     width / 2,
     quoteY + 30,
     15,
@@ -555,13 +555,13 @@ function drawLandscapeCard(
 
   text(ctx, 'INTERESTSEED  ·  3-DAY PROOF', margin, margin + 8, 12, '#b98f3c', 750);
   text(ctx, `${graph.nodes.length} 个兴趣`, margin, margin + 112, titleSize, '#f3f0e8', 720);
-  text(ctx, '我先验证 1 个', margin, margin + 112 + 66, titleSize, '#f3f0e8', 720);
-  text(ctx, '不是收藏更多，是知道哪个值得做。', margin, margin + 230, 22, '#aeb8c8', 500);
+  text(ctx, '先挑一个试试', margin, margin + 112 + 66, titleSize, '#f3f0e8', 720);
+  text(ctx, '收藏夹已经够满了，缺的是试过之后的答案。', margin, margin + 230, 22, '#aeb8c8', 500);
 
   const confirmed = graph.edges.filter((edge) => edge.status === 'confirmed').length;
   const stats = [
     { value: `${graph.nodes.length}`, label: '个兴趣', sub: '在星图里' },
-    { value: `${confirmed}`, label: '条确认关系', sub: '不是 AI 猜测' },
+    { value: `${confirmed}`, label: '条确认关系', sub: '有来源，能回看' },
     { value: '3', label: '天真实行动', sub: '继续或放下' },
   ];
   stats.forEach((stat, index) => {
@@ -582,8 +582,8 @@ function drawLandscapeCard(
   if (topics.length > 0) {
     text(ctx, `最近在关注 · ${topics.join(' · ')}`, margin, height - 112, 12, '#b98f3c', 600);
   }
-  text(ctx, '别收藏更多，验证一个。', margin, height - 74, 24, '#f3e5c0', 680);
-  text(ctx, 'InterestSeed  ·  把刷到的内容，变成 3 天真实行动', margin, height - 44, 13, '#8995a9', 500);
+  text(ctx, '挑一个，做三天，再决定。', margin, height - 74, 24, '#f3e5c0', 680);
+  text(ctx, 'InterestSeed  ·  把一条收藏，做成三天实验', margin, height - 44, 13, '#8995a9', 500);
   text(ctx, preset.shortLabel, width - margin, height - 30, 11, '#b98f3c', 650, 'right');
 }
 
