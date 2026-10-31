@@ -3,6 +3,7 @@ import { existsSync } from 'node:fs';
 import { readFile, rm, writeFile } from 'node:fs/promises';
 import { extname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { InsightEngine } from '../../src/core/InsightEngine';
 import type { AiRelationSuggestion } from '../../src/services/ModelProvider';
 import { connectSuggestion, resolveApiKey } from './ai';
 import { captureToVault } from './capture';
@@ -263,7 +264,19 @@ async function statePayload(vaultPath: string) {
     .slice(0, 6)
     .map(([tag, count]) => ({ tag, count }));
   const orphans = state.graph.nodes.filter((node) => (degree.get(node.id) ?? 0) === 0).length;
-  const insights = { top, themes, orphans };
+  let advice = '';
+  try {
+    const deep = new InsightEngine().analyze(state.graph).insights;
+    if (deep[0]) {
+      advice = deep[0].kind === 'orphan'
+        ? `有 ${deep[0].nodeIds.length} 个节点还没确认关系，先从当前节点开始连一条。`
+        : `${deep[0].title}：${deep[0].detail}`;
+    }
+  } catch {
+    advice = '';
+  }
+  if (!advice && orphans > 0) advice = `有 ${orphans} 个孤岛，先从它们开始连一条。`;
+  const insights = { top, themes, orphans, advice };
   return {
     vaultPath,
     model: config.model,

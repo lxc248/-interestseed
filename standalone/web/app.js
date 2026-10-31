@@ -70,8 +70,9 @@ function renderStats() {
 }
 
 function renderInsights() {
-  const insights = state.data.insights ?? { top: [], themes: [], orphans: 0 };
+  const insights = state.data.insights ?? { top: [], themes: [], orphans: 0, advice: '' };
   const chips = [];
+  if (insights.advice) chips.push(`<span class="insight-chip advice"><strong>建议</strong> ${escapeHtml(insights.advice)}</span>`);
   if (insights.orphans) chips.push(`<span class="insight-chip">孤岛 <strong>${insights.orphans}</strong></span>`);
   for (const node of insights.top ?? []) {
     chips.push(`<span class="insight-chip">星核 <strong>${escapeHtml(node.title)}</strong> · ${node.degree}</span>`);

@@ -60,8 +60,9 @@ nothing important was dropped in that move.
 5. **Experiments were 3-day only.** Added a start-experiment modal with 3-day and
    7-day options, and a next-step input on the daily log.
 
-6. **No insights strip.** Added top nodes, themes, and orphan counts to
-   `/api/state` and rendered them as chips below the stat cards.
+6. **No insights strip.** Added top nodes, themes, orphan counts, and a friendly
+   advice line backed by `src/core/InsightEngine.ts` to `/api/state` and rendered
+   them as chips below the stat cards.
 
 7. **Discovery feedback was shallow.** Added feedback actions (accepted /
    needs-verification / low-value / corrected / rejected) with a health summary,

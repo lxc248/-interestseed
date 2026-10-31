@@ -315,3 +315,6 @@ button, input { font: inherit; }
 .audit-row strong { font-size: 12px; }
 .audit-row p { margin: 4px 0 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
 
+.insight-chip.advice { border-color: rgba(52,211,153,.35); background: rgba(52,211,153,.08); color: #d1fae5; }
+.insight-chip.advice strong { color: #a7f3d0; }
+

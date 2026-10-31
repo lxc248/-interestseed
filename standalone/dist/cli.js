@@ -3076,6 +3076,211 @@ async function scanAndBuild(vaultPath) {
 	};
 }
 //#endregion
+//#region src/core/InsightEngine.ts
+var TYPE_LABELS = {
+	project: "项目",
+	document: "文档",
+	topic: "主题",
+	image: "图片",
+	audio: "音频",
+	video: "视频",
+	activity: "活动"
+};
+var MAX_INSIGHTS = 12;
+var MAX_BRIDGE_CANDIDATES = 60;
+var CONFIRMED_STATUSES = /* @__PURE__ */ new Set(["confirmed"]);
+function buildAdjacency(graph, statuses = CONFIRMED_STATUSES) {
+	const adjacency = /* @__PURE__ */ new Map();
+	for (const node of graph.nodes) adjacency.set(node.id, /* @__PURE__ */ new Set());
+	for (const edge of graph.edges) {
+		if (!statuses.has(edge.status)) continue;
+		if (!adjacency.has(edge.source) || !adjacency.has(edge.target)) continue;
+		adjacency.get(edge.source)?.add(edge.target);
+		adjacency.get(edge.target)?.add(edge.source);
+	}
+	return adjacency;
+}
+function connectedComponents(adjacency) {
+	const visited = /* @__PURE__ */ new Set();
+	const components = [];
+	for (const start of [...adjacency.keys()].sort(compareText)) {
+		if (visited.has(start)) continue;
+		const queue = [start];
+		const component = [];
+		visited.add(start);
+		while (queue.length > 0) {
+			const current = queue.pop();
+			if (!current) continue;
+			component.push(current);
+			for (const next of adjacency.get(current) ?? []) {
+				if (visited.has(next)) continue;
+				visited.add(next);
+				queue.push(next);
+			}
+		}
+		component.sort(compareText);
+		components.push(component);
+	}
+	return components;
+}
+function countComponents(ids, adjacency, excluded) {
+	const visited = new Set(excluded);
+	let count = 0;
+	for (const id of ids) {
+		if (visited.has(id)) continue;
+		count += 1;
+		const queue = [id];
+		visited.add(id);
+		while (queue.length > 0) {
+			const current = queue.pop();
+			if (!current) continue;
+			for (const next of adjacency.get(current) ?? []) {
+				if (visited.has(next)) continue;
+				visited.add(next);
+				queue.push(next);
+			}
+		}
+	}
+	return count;
+}
+function topTags(graph, nodeIds, limit) {
+	const counts = /* @__PURE__ */ new Map();
+	const byId = new Map(graph.nodes.map((node) => [node.id, node]));
+	for (const id of nodeIds) {
+		const node = byId.get(id);
+		if (!node) continue;
+		for (const tag of node.tags) {
+			const key = tag.toLowerCase();
+			counts.set(key, (counts.get(key) ?? 0) + 1);
+		}
+	}
+	return [...counts.entries()].sort((left, right) => right[1] - left[1] || compareText(left[0], right[0])).slice(0, limit).map(([tag]) => tag);
+}
+/**
+* 洞察引擎：把图谱翻译成可执行的下一步。
+*
+* 输出主题簇、桥接节点、待确认建议、孤立节点与类型覆盖情况。
+*/
+var InsightEngine = class {
+	analyze(graph, options = {}) {
+		const now = options.now ?? (() => (/* @__PURE__ */ new Date()).toISOString());
+		const adjacency = buildAdjacency(graph, CONFIRMED_STATUSES);
+		const components = connectedComponents(adjacency);
+		const bridges = this.bridges(graph, 5, adjacency);
+		const stats = InterestSeedGraphStore.fromJSON(graph).stats();
+		return {
+			stats,
+			clusters: components.filter((component) => component.length >= 2).slice(0, 6).map((nodeIds) => {
+				const tags = topTags(graph, nodeIds, 3);
+				return {
+					nodeIds,
+					tags,
+					label: tags.length > 0 ? tags.map((tag) => `#${tag}`).join(" ") : `${nodeIds.length} 个节点`
+				};
+			}),
+			bridges,
+			insights: this.buildInsights(graph, stats, components, bridges, adjacency),
+			generatedAt: now()
+		};
+	}
+	stats(graph) {
+		return InterestSeedGraphStore.fromJSON(graph).stats();
+	}
+	clusters(graph) {
+		return connectedComponents(buildAdjacency(graph, CONFIRMED_STATUSES)).filter((component) => component.length >= 2).map((nodeIds) => {
+			const tags = topTags(graph, nodeIds, 3);
+			return {
+				nodeIds,
+				tags,
+				label: tags.length > 0 ? tags.map((tag) => `#${tag}`).join(" ") : `${nodeIds.length} 个节点`
+			};
+		});
+	}
+	/** 近似桥接节点：移除后连通块数量增加的枢纽。 */
+	bridges(graph, limit = 5, adjacency = buildAdjacency(graph, CONFIRMED_STATUSES)) {
+		const ids = graph.nodes.map((node) => node.id);
+		const base = countComponents(ids, adjacency, /* @__PURE__ */ new Set());
+		const candidates = ids.map((id) => ({
+			id,
+			degree: adjacency.get(id)?.size ?? 0
+		})).filter((candidate) => candidate.degree >= 3).sort((left, right) => right.degree - left.degree || compareText(left.id, right.id)).slice(0, MAX_BRIDGE_CANDIDATES);
+		const result = [];
+		for (const candidate of candidates) {
+			const after = countComponents(ids, adjacency, /* @__PURE__ */ new Set([candidate.id]));
+			if (after <= base) continue;
+			result.push({
+				nodeId: candidate.id,
+				title: graph.nodes.find((node) => node.id === candidate.id)?.title ?? candidate.id,
+				componentsAfterRemoval: after,
+				degree: candidate.degree
+			});
+		}
+		result.sort((left, right) => right.componentsAfterRemoval - left.componentsAfterRemoval || right.degree - left.degree || compareText(left.nodeId, right.nodeId));
+		return result.slice(0, limit);
+	}
+	buildInsights(graph, stats, components, bridges, adjacency) {
+		const insights = [];
+		const nodes = graph.nodes;
+		const largest = [...components].sort((left, right) => right.length - left.length);
+		for (const component of largest.slice(0, 3)) {
+			if (component.length < 3) continue;
+			const tags = topTags(graph, component, 3);
+			insights.push({
+				id: `cluster:${component[0] ?? "root"}`,
+				kind: "cluster",
+				title: tags.length > 0 ? `主题簇：${tags.map((tag) => `#${tag}`).join(" ")}` : "主题簇",
+				detail: `${component.length} 个节点彼此相连，可以顺着这条线继续整理。`,
+				nodeIds: component.slice(0, 12),
+				score: component.length * 2
+			});
+		}
+		for (const bridge of bridges.slice(0, 3)) insights.push({
+			id: `bridge:${bridge.nodeId}`,
+			kind: "bridge",
+			title: `桥接节点：${bridge.title}`,
+			detail: `移除后图谱会裂成 ${bridge.componentsAfterRemoval} 个部分，它是不同项目之间的枢纽。`,
+			nodeIds: [bridge.nodeId],
+			score: 10 + bridge.componentsAfterRemoval
+		});
+		const suggested = graph.edges.filter((edge) => edge.status === "suggested").sort((left, right) => (right.confidence ?? 0) - (left.confidence ?? 0)).slice(0, 3);
+		if (suggested.length > 0) {
+			const byId = new Map(nodes.map((node) => [node.id, node]));
+			const lines = suggested.map((edge) => {
+				return `「${byId.get(edge.source)?.title ?? edge.source}」—「${byId.get(edge.target)?.title ?? edge.target}」（${Math.round((edge.confidence ?? 0) * 100)}%，${edge.relation}）`;
+			});
+			insights.push({
+				id: "suggestion",
+				kind: "suggestion",
+				title: `待确认的关系（${stats.suggested}）`,
+				detail: lines.join("\n"),
+				nodeIds: suggested.flatMap((edge) => [edge.source, edge.target]),
+				score: 8 + stats.suggested / 10
+			});
+		}
+		const orphans = nodes.filter((node) => (adjacency.get(node.id)?.size ?? 0) === 0 && !node.metadata?.nextStep).sort((left, right) => compareText(left.title, right.title));
+		if (orphans.length > 0) insights.push({
+			id: "orphan",
+			kind: "orphan",
+			title: "孤立节点",
+			detail: `${orphans.length} 个节点还没有已确认关系：${orphans.slice(0, 4).map((node) => node.title).join("、")}`,
+			nodeIds: orphans.slice(0, 6).map((node) => node.id),
+			score: 4 + Math.min(orphans.length, 6)
+		});
+		if (nodes.length > 0) {
+			const important = Object.keys(TYPE_LABELS).filter((type) => stats.byType[type] === 0).filter((type) => type === "project" || type === "topic" || type === "activity");
+			if (important.length > 0) insights.push({
+				id: "coverage",
+				kind: "coverage",
+				title: "类型覆盖不完整",
+				detail: `图谱里还没有${important.map((type) => TYPE_LABELS[type]).join(" / ")}节点。用 frontmatter 的 type 字段可以把笔记标记成项目或活动。`,
+				nodeIds: [],
+				score: 1.5
+			});
+		}
+		return insights.sort((left, right) => right.score - left.score || compareText(left.id, right.id)).slice(0, MAX_INSIGHTS);
+	}
+};
+//#endregion
 //#region standalone/src/server.ts
 var webRoot = [resolve(fileURLToPath(new URL("../web", import.meta.url))), resolve(fileURLToPath(new URL("./web", import.meta.url)))].find((path) => existsSync(join(path, "index.html"))) ?? resolve(fileURLToPath(new URL("../web", import.meta.url)));
 function startServer(options) {
@@ -3278,13 +3483,24 @@ async function statePayload(vaultPath) {
 	}));
 	const themeCounts = /* @__PURE__ */ new Map();
 	for (const node of state.graph.nodes) for (const tag of node.tags ?? []) themeCounts.set(tag, (themeCounts.get(tag) ?? 0) + 1);
+	const themes = [...themeCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6).map(([tag, count]) => ({
+		tag,
+		count
+	}));
+	const orphans = state.graph.nodes.filter((node) => (degree.get(node.id) ?? 0) === 0).length;
+	let advice = "";
+	try {
+		const deep = new InsightEngine().analyze(state.graph).insights;
+		if (deep[0]) advice = deep[0].kind === "orphan" ? `有 ${deep[0].nodeIds.length} 个节点还没确认关系，先从当前节点开始连一条。` : `${deep[0].title}：${deep[0].detail}`;
+	} catch {
+		advice = "";
+	}
+	if (!advice && orphans > 0) advice = `有 ${orphans} 个孤岛，先从它们开始连一条。`;
 	const insights = {
 		top,
-		themes: [...themeCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6).map(([tag, count]) => ({
-			tag,
-			count
-		})),
-		orphans: state.graph.nodes.filter((node) => (degree.get(node.id) ?? 0) === 0).length
+		themes,
+		orphans,
+		advice
 	};
 	return {
 		vaultPath,
