@@ -1,4 +1,4 @@
-from PIL import Image, ImageDraw, ImageFont
+﻿from PIL import Image, ImageDraw, ImageFont
 from pathlib import Path
 
 root = Path(r'C:\Users\30735\Desktop\interestseed')
@@ -40,13 +40,14 @@ d.text((116, 92), 'OBSIDIAN PLUGIN', font=pill_font, fill='#f0d6a0')
 d.text((96, 148), 'InterestSeed', font=title_font, fill='#f4f6fb')
 d.text((100, 262), '把一条收藏，变成 3 天真实行动。', font=sub_font, fill='#d7dcea')
 d.text((100, 304), '再用证据决定：继续，还是放下。', font=sub_font, fill='#9aa6ba')
+d.text((100, 346), 'AI 关系建议：可接自己的本地模型。', font=small_font, fill='#b9a7ff')
 
 # Loop line.
 loop = 'Capture  →  Decide  →  Connect  →  Verify'
 d.text((100, 384), loop, font=loop_font, fill='#b9a7ff')
 
 # Bottom badges.
-badges = ['LOCAL-FIRST', 'HUMAN-IN-THE-LOOP', 'MCP-READY']
+badges = ['LOCAL-FIRST', 'AI-READY', 'MCP-READY']
 x = 100
 for label in badges:
     w = d.textlength(label, font=pill_font) + 26
@@ -75,3 +76,4 @@ d.text((100, 568), 'github.com/lxc248/-interestseed', font=small_font, fill='#6f
 
 img.save(root / 'assets' / 'github-social-preview.png', optimize=True)
 print('social preview written')
+

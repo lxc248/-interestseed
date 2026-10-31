@@ -225,7 +225,7 @@ review/experiment-3.0.8/
 ## 7. 验证
 
 ```text
-71 test files / 521 tests passing
+71 test files / 522 tests passing
 MCP smoke 4/4
 npm run verify 通过
 ```

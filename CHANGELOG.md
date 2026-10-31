@@ -1,12 +1,19 @@
 # Changelog
 
+## 3.4.1 — Live AI run and confirmation fix
+
+- Confirmed AI suggestions now carry the reason into edge evidence.
+- Confidence is stored only when the model actually returned it.
+- Added live-run screenshots and README AI showcase.
+- 522 tests passing.
+
 ## 3.4.0 — Configurable model, v4.1 Flash default
 
 - Default local model is now `cn:deepseek-v4.1-flash`.
 - Added a model ID setting and passed it through relation and exploration calls.
 - Tolerant response parsing: aliases, skipped malformed items, derived relation fallback.
 - Missing confidence now shows "unrated" instead of a fake 50%.
-- 521 tests passing.
+- 522 tests passing.
 
 ## 3.3.0 — AI setup window
 

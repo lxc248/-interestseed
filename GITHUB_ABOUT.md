@@ -60,7 +60,7 @@ Set via: GitHub → Settings → Social preview
 ## Release title
 
 ```text
-InterestSeed 3.4.0 — 模型可配置，默认 v4.1 Flash
+InterestSeed 3.4.1 — 本地 AI 实测跑通
 ```
 
 ## Release body — English
@@ -74,20 +74,18 @@ save a 3-day test, then lets the evidence decide.
 
 ![InterestSeed demo](https://raw.githubusercontent.com/lxc248/-interestseed/main/assets/interestseed-demo.gif)
 
-### What 3.4.0 actually changes
+### What 3.4.1 actually changes
 
-The local model is now configurable, and the parser survives real model output:
+The local AI path has now been run end to end:
 
-- default model: `cn:deepseek-v4.1-flash`;
-- model ID can be changed in settings;
+- model: `cn:deepseek-v4.1-flash` against `localhost:7863`;
+- selected "AI 与工具", got 5 focused candidates;
+- confirmed one relation: 32 → 33 edges, then undid it back to 32;
+- the reason now lands in edge evidence; missing confidence is not faked;
 - a guided window connects your own local key and stores it in SecretStorage;
-- focus nodes and shared tags drive candidate selection;
-- existing edge pairs are sent so the model avoids duplicates;
-- missing relation falls back to a shared tag or "related";
-- missing confidence shows "unrated" instead of a fake 50%;
-- malformed items are skipped without failing the whole batch;
-- only node id, title, and tags are sent;
-- 521 tests passing, CI and Release green.
+- model ID, focus selection, duplicate avoidance, and tolerant parsing are all in place;
+- README now shows the live AI suggestion and setup screens;
+- 522 tests passing, CI and Release green.
 
 ### The loop
 
@@ -95,7 +93,7 @@ The local model is now configurable, and the parser survives real model output:
 
 ### Install
 
-1. Download `interestseed-v3.4.0.zip`.
+1. Download `interestseed-v3.4.1.zip`.
 2. Extract into `<vault>/.obsidian/plugins/interestseed/`.
 3. Enable InterestSeed in Community plugins.
 4. Run the cold-start questionnaire, then process the Share Inbox.
@@ -114,18 +112,16 @@ InterestSeed 是 Obsidian 里的一个小插件，专门处理那个很具体的
 
 ![InterestSeed demo](https://raw.githubusercontent.com/lxc248/-interestseed/main/assets/interestseed-demo.gif)
 
-### 这次 3.4.0，模型可配置，默认 v4.1 Flash
+### 这次 3.4.1，本地 AI 真跑了一遍
 
-- 默认本地模型：`cn:deepseek-v4.1-flash`
-- 模型 ID 可在设置里改成服务实际暴露的 ID
+- 模型：`cn:deepseek-v4.1-flash`，服务：`localhost:7863`
+- 选中「AI 与工具」，返回 5 条聚焦候选
+- 确认 1 条：关系 32 → 33，再撤销回 32
+- 理由现在会进入关系证据；没有置信度就不伪造
 - 接入引导窗口填写自己的 Key，存进 Obsidian SecretStorage
-- 选中节点会成为焦点，优先找共享标签的候选
-- 请求里带已有关系的节点 id 对，避免重复建议
-- 模型缺 relation 时，用共享标签推导，例如“共享 火花”
-- 模型缺 confidence 时显示“未评分”，不假装 50%
-- 单条坏数据跳过，不让整批建议失败
-- 只发送节点 id、标题、标签
-- 521 个测试通过，CI 和 Release 都是绿的。
+- 模型 ID、焦点选择、去重、容错解析都已接上
+- README 新增 AI 候选和接入窗口截图
+- 522 个测试通过，CI 和 Release 都是绿的。
 
 ### 它怎么跑
 
@@ -133,7 +129,7 @@ InterestSeed 是 Obsidian 里的一个小插件，专门处理那个很具体的
 
 ### 装起来
 
-1. 下载 `interestseed-v3.4.0.zip`；
+1. 下载 `interestseed-v3.4.1.zip`；
 2. 解压到 `<vault>/.obsidian/plugins/interestseed/`；
 3. 在第三方插件里启用 InterestSeed；
 4. 跑一遍冷启动，然后处理分享收件箱。

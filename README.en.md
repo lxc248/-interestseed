@@ -12,8 +12,8 @@
   <a href="assets/interestseed-launch.mp4"><img alt="Demo" src="https://img.shields.io/badge/%E2%96%B6%2040s%20demo-111827?style=for-the-badge" /></a>
   <img alt="CI" src="https://github.com/lxc248/-interestseed/actions/workflows/ci.yml/badge.svg?branch=main" />
   <img alt="Release" src="https://img.shields.io/github/v/release/lxc248/-interestseed?style=for-the-badge" />
-  <img alt="Tests" src="https://img.shields.io/badge/tests-521%20passing-22c55e?style=for-the-badge" />
-  <img alt="Coverage" src="https://img.shields.io/badge/coverage-74.7%25-14b8a6?style=for-the-badge" />
+  <img alt="Tests" src="https://img.shields.io/badge/tests-522%20passing-22c55e?style=for-the-badge" />
+  <img alt="Coverage" src="https://img.shields.io/badge/coverage-75.2%25-14b8a6?style=for-the-badge" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b?style=for-the-badge" />
 </p>
 
@@ -68,7 +68,7 @@ The graph is not the product. It is the evidence layer that makes each decision 
 
 ## What it looks like
 
-Four screenshots, and you basically know what it does.
+Six screenshots, and you basically know what it does.
 
 <table>
   <tr>
@@ -89,6 +89,16 @@ Four screenshots, and you basically know what it does.
     <td width="50%">
       <img src="assets/share-card-xiaohongshu.png" alt="Xiaohongshu share card" /><br/>
       <sub><b>Local share cards</b>: five platform presets, rendered on Canvas.</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <img src="assets/ai-suggestions-live.png" alt="AI relation suggestions" /><br/>
+      <sub><b>AI relation suggestions</b>: candidates with reasons, written only after confirmation.</sub>
+    </td>
+    <td width="50%">
+      <img src="assets/ai-setup.png" alt="Connect your own AI" /><br/>
+      <sub><b>Connect your own AI</b>: keys in local secret storage, model configurable.</sub>
     </td>
   </tr>
 </table>
@@ -115,7 +125,7 @@ These aren't a feature checklist. They're the moves I actually make every day.
 
 It takes about three minutes.
 
-1. Download `interestseed-v3.4.0.zip` from [Releases](https://github.com/lxc248/-interestseed/releases).
+1. Download `interestseed-v3.4.1.zip` from [Releases](https://github.com/lxc248/-interestseed/releases).
 2. Extract it into:
 
 ```text
@@ -142,17 +152,18 @@ prompts:    review-interest / plan-next-experiment
 ```
 
 The MCP surface is read-only. Core functionality needs no account or model credentials.  
-AI relation suggestions are on by default and only call the selected model when you ask. A setup window lets you connect your own local service key, and the model ID can be changed in settings; it lives in Obsidian SecretStorage, never in data.json. If unavailable, local rule discovery stays intact.
+AI relation suggestions are on by default and only call the selected model when you ask. A setup window lets you connect your own local service key, and the model ID can be changed in settings; it lives in Obsidian SecretStorage, never in data.json. If unavailable, local rule discovery stays intact.  
+Live run: cn:deepseek-v4.1-flash returned 5 focused candidates; a confirmed relation carried its reason into edge evidence.
 
 ## How stable it is
 
 These numbers are not decoration. I rerun them after every change.
 
 ```text
-521 tests passing
-74.74% line coverage
+522 tests passing
+75.16% line coverage
 92.25% core coverage
-43.81% UI coverage
+43.97% UI coverage
 axe: graph / inbox / share-card 0 violations
 semgrep: 0 findings
 gitleaks: no leaks
@@ -201,5 +212,6 @@ AGPL-3.0-only. Author: [aicoder](https://github.com/lxc248).
 
 If you have ever saved something and quietly known you would never try it, this is for you.  
 Star it if it helps. Open an issue if it doesn't. If you want to improve it, start with [CONTRIBUTING.md](CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+
 
 

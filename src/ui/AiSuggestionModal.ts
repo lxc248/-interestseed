@@ -120,7 +120,13 @@ export class AiSuggestionModal extends Modal {
       row.message = undefined;
       this.render();
       void this.actions
-        .confirm({ source: row.source, target: row.target, relation: row.relation })
+        .confirm({
+          source: row.source,
+          target: row.target,
+          relation: row.relation,
+          ...(row.reason ? { reason: row.reason } : {}),
+          ...(typeof row.confidence === 'number' ? { confidence: row.confidence } : {}),
+        })
         .then((result) => {
           if (row.status !== 'confirming') return;
           row.status = result.ok ? 'accepted' : 'failed';

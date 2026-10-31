@@ -40,7 +40,9 @@ export async function writeConfirmedAiSuggestion(
     relation: name,
     origin: 'ai',
     status: 'confirmed',
-    confidence: suggestion.confidence ?? 0.5,
+    ...(typeof suggestion.confidence === 'number'
+      ? { confidence: suggestion.confidence }
+      : {}),
     evidence: reason ? [`AI 建议：${reason}`, '用户确认'] : ['AI 建议，用户确认'],
     createdAt: now,
     updatedAt: now,

@@ -1,4 +1,4 @@
-﻿// @vitest-environment jsdom
+// @vitest-environment jsdom
 import { describe, expect, it, vi } from 'vitest';
 import { installDomShims } from './ui-test-shim';
 import { NodeCreateModal } from '../src/ui/NodeCreateModal';
@@ -110,6 +110,31 @@ describe('AiSuggestionModal', () => {
     const ignore = [...modal.contentEl.querySelectorAll('button')].find((b) => b.textContent === '忽略') as HTMLButtonElement;
     ignore.click();
     expect(modal.contentEl.textContent).toContain('已忽略');
+  });
+
+  it('passes reason and confidence through confirmation', async () => {
+    const confirm = vi.fn(async () => ({ ok: true }));
+    const modal = new AiSuggestionModal(
+      {} as never,
+      [{ source: 'a', target: 'b', relation: '共享方法', reason: '共享标签：focus', confidence: 0.82 }],
+      {
+        getNodeTitle: (id) => (id === 'a' ? '节点 A' : '节点 B'),
+        confirm,
+      },
+    );
+    modal.open();
+    const button = [...modal.contentEl.querySelectorAll('button')].find(
+      (item) => item.textContent === '确认',
+    ) as HTMLButtonElement;
+    button.click();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(confirm).toHaveBeenCalledWith({
+      source: 'a',
+      target: 'b',
+      relation: '共享方法',
+      reason: '共享标签：focus',
+      confidence: 0.82,
+    });
   });
 });
 
