@@ -37,6 +37,7 @@ function render() {
   keyStatus.className = `pill ${state.data.keyReady ? 'ready' : 'missing'}`;
   renderStats();
   renderInsights();
+  renderChainStrip();
   renderGraph();
   renderExperiment();
   renderDiscoveries();
@@ -361,6 +362,48 @@ function svgEl(name, attrs = {}) {
   return element;
 }
 
+function chainStateOf(nodeId) {
+  const graph = state.data?.graph;
+  if (!graph) return 'captured';
+  const experiments = state.data.experiments ?? [];
+  if (experiments.some((item) => item.nodeId === nodeId && item.status === 'active')) return 'experimenting';
+  if (experiments.some((item) => item.nodeId === nodeId && item.status === 'complete')) return 'reviewed';
+  const connected = graph.edges.some((edge) => edge.status === 'confirmed'
+    && (edge.source === nodeId || edge.target === nodeId));
+  return connected ? 'connected' : 'captured';
+}
+
+function chainMeta(stage) {
+  return {
+    captured: { label: '收藏', next: '先用 AI 找一条连接', gradient: 'planet-captured' },
+    connected: { label: '已连接', next: '开始 3 天实验', gradient: 'planet-connected' },
+    experimenting: { label: '实验中', next: '今天记一条真实证据', gradient: 'planet-experimenting' },
+    reviewed: { label: '已复盘', next: '决定继续，还是放下', gradient: 'planet-reviewed' },
+  }[stage] ?? { label: '收藏', next: '先用 AI 找一条连接', gradient: 'planet-captured' };
+}
+
+function renderChainStrip() {
+  const strip = document.getElementById('chain-strip');
+  if (!strip) return;
+  const nodeId = state.selectedId ?? state.data?.graph?.nodes?.[0]?.id;
+  const stage = nodeId ? chainStateOf(nodeId) : 'captured';
+  const meta = chainMeta(stage);
+  const steps = [
+    ['captured', '收藏'],
+    ['connected', '连接'],
+    ['experimenting', '实验'],
+    ['reviewed', '复盘'],
+  ];
+  const stepHtml = steps
+    .map(([key, label], index) => {
+      const active = key === stage ? ' active' : '';
+      const arrow = index < steps.length - 1 ? '<span class="chain-arrow">→</span>' : '';
+      return `<span class="chain-step${active}"><strong>${label}</strong>${key === stage ? ` · ${escapeHtml(nodeTitle(nodeId))}` : ''}</span>${arrow}`;
+    })
+    .join('');
+  strip.innerHTML = `<div class="chain-steps">${stepHtml}</div><div class="chain-action">下一步：${escapeHtml(meta.next)}</div>`;
+}
+
 function renderGraph() {
   const graph = state.data.graph;
   const svg = document.getElementById('graph');
@@ -449,6 +492,30 @@ function renderGraph() {
       <stop offset="82%" stop-color="#047857"/>
       <stop offset="100%" stop-color="#022c22"/>
     </radialGradient>
+    <radialGradient id="planet-captured" cx="32%" cy="28%" r="72%">
+      <stop offset="0%" stop-color="#f1f5f9"/>
+      <stop offset="34%" stop-color="#94a3b8"/>
+      <stop offset="82%" stop-color="#475569"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </radialGradient>
+    <radialGradient id="planet-connected" cx="32%" cy="28%" r="72%">
+      <stop offset="0%" stop-color="#e0f2fe"/>
+      <stop offset="34%" stop-color="#38bdf8"/>
+      <stop offset="82%" stop-color="#0369a1"/>
+      <stop offset="100%" stop-color="#082f49"/>
+    </radialGradient>
+    <radialGradient id="planet-experimenting" cx="32%" cy="28%" r="72%">
+      <stop offset="0%" stop-color="#ecfdf5"/>
+      <stop offset="34%" stop-color="#34d399"/>
+      <stop offset="82%" stop-color="#047857"/>
+      <stop offset="100%" stop-color="#022c22"/>
+    </radialGradient>
+    <radialGradient id="planet-reviewed" cx="32%" cy="28%" r="72%">
+      <stop offset="0%" stop-color="#f5f3ff"/>
+      <stop offset="34%" stop-color="#a78bfa"/>
+      <stop offset="82%" stop-color="#6d28d9"/>
+      <stop offset="100%" stop-color="#2e1065"/>
+    </radialGradient>
     <filter id="soft-glow" x="-80%" y="-80%" width="260%" height="260%">
       <feGaussianBlur stdDeviation="4" result="blur"/>
       <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
@@ -513,20 +580,21 @@ function renderGraph() {
     const controlY = my + (dx / distance) * bend;
     svg.appendChild(svgEl('path', {
       d: `M ${from.x} ${from.y} Q ${controlX} ${controlY} ${to.x} ${to.y}`,
-      class: `edge ${edge.status === 'confirmed' ? 'confirmed' : ''} ${touchesFocus ? 'focus-edge' : ''}`,
+      class: `edge ${edge.status === 'confirmed' ? 'confirmed' : ''} ${String(edge.relation ?? '').toLowerCase().replace(/[^a-z0-9]+/g, '-')} ${touchesFocus ? 'focus-edge' : ''}`,
       'fill': 'none',
     }));
   }
 
-  const colors = { project: 'planet-project', topic: 'planet-topic', document: 'planet-document' };
   for (const node of nodes) {
     const pos = positions.get(node.id);
     if (!pos) continue;
     const isSelected = node.id === selected.id;
     const isNeighbor = neighborIds.has(node.id);
+    const stage = chainStateOf(node.id);
+    const stageMeta = chainMeta(stage);
     const r = isSelected ? 24 : Math.min(16, 8 + (degree.get(node.id) ?? 0) * 1.3);
     const group = svgEl('g', {
-      class: `node ${isSelected ? 'selected' : ''} ${!isSelected && !isNeighbor ? 'dimmed' : ''}`,
+      class: `node ${isSelected ? 'selected' : ''} ${!isSelected && !isNeighbor ? 'dimmed' : ''} chain-${stage}`,
       transform: `translate(${pos.x}, ${pos.y})`,
       tabindex: 0,
     });
@@ -537,13 +605,13 @@ function renderGraph() {
       state.lastConnected = null;
       render();
     });
-    group.appendChild(svgEl('title', {})).textContent = node.title;
+    group.appendChild(svgEl('title', {})).textContent = `${node.title} · ${stageMeta.label}`;
     if (isSelected) {
       group.appendChild(svgEl('circle', { r: r + 17, fill: 'url(#star-halo)', class: 'sun-halo' }));
       group.appendChild(svgEl('circle', { r: r + 8, fill: 'none', class: 'selected-ring' }));
     }
     group.appendChild(svgEl('circle', {
-      r, fill: `url(#${colors[node.type] ?? 'planet-document'})`,
+      r, fill: `url(#${stageMeta.gradient})`,
       class: 'planet', filter: 'url(#node-glow)',
     }));
     group.appendChild(svgEl('ellipse', {
@@ -568,8 +636,10 @@ function renderGraph() {
     svg.appendChild(group);
   }
 
+  const focusStage = chainStateOf(state.selectedId);
+  const focusMeta = chainMeta(focusStage);
   document.getElementById('graph-subtitle').textContent = state.selectedId
-    ? `当前恒星：${nodeTitle(state.selectedId)}`
+    ? `当前恒星：${nodeTitle(state.selectedId)} · ${focusMeta.label} · 下一步：${focusMeta.next}`
     : '选择一个节点，让 AI 找一条最值得验证的连接。';
 }
 

@@ -28,20 +28,23 @@
     <section class="insights-strip" id="insights-strip"></section>
     <section class="experiment-strip" id="experiment-strip"></section>
 
+    <section class="chain-strip" id="chain-strip"></section>
+
     <main class="workspace">
       <section class="graph-pane">
         <div class="pane-head">
           <div>
-            <h2>你的兴趣图谱</h2>
+            <h2>兴趣链路星图</h2>
             <p id="graph-subtitle">选择一个节点，让 AI 找一条最值得验证的连接。</p>
           </div>
           <div class="legend">
-            <span><i class="dot project"></i>项目</span>
-            <span><i class="dot document"></i>笔记</span>
-            <span><i class="dot topic"></i>主题</span>
+            <span><i class="dot chain-captured"></i>收藏</span>
+            <span><i class="dot chain-connected"></i>已连接</span>
+            <span><i class="dot chain-experimenting"></i>实验中</span>
+            <span><i class="dot chain-reviewed"></i>已复盘</span>
           </div>
         </div>
-        <svg id="graph" viewBox="0 0 820 560" role="img" aria-label="兴趣图谱"></svg>
+        <svg id="graph" viewBox="0 0 820 560" role="img" aria-label="兴趣链路星图"></svg>
       </section>
 
       <aside class="ai-pane">

@@ -37,6 +37,7 @@ connect → 200
 undo → 200
 experiment strip: DAY 2 / 3
 lower panels: discoveries / share inbox / experiment history
+chain strip: 收藏 → 连接 → 实验 → 复盘
 ```
 
 ## Discovery
@@ -67,7 +68,7 @@ second log on the same day → rejected: 今天已经记录过了，明天再来
 
 ```text
 release/interestseed-standalone-v4.0.0.zip
-sha256: d049ef162ceacf0b2e7c33abb8423e88d17bb8f1a78ffc2d5e4407c7c1217985
+sha256: 24d7291f392e73a20bb6126dd9e97bef41be14d6064c7bf318dc5de3a4872c87
 packaged cli.js status → 8 nodes / 10 edges
 packaged web / → 200
 ```
