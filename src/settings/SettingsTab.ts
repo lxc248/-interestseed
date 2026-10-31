@@ -4,91 +4,10 @@ import type InterestSeedPlugin from '../main';
 import type { InterestSeedSettings } from '../types/graph';
 import { DEEPSEEK_V4_PRO_CONFIG } from '../services/ModelProvider';
 import { confirmAction } from '../ui/ConfirmModal';
-import { isRecord, sanitizeTags } from '../utils/validation';
+import { sanitizeTags } from '../utils/validation';
+import { sanitizeFolders } from './defaults';
 
-export const DEFAULT_SETTINGS: InterestSeedSettings = {
-  autoBuildOnOpen: true,
-  includeFolders: [],
-  excludeFolders: ['.obsidian', '.trash'],
-  includeTags: [],
-  enableRuleSuggestions: true,
-  enableAI: false,
-  aiProvider: 'offline',
-  aiConsentGranted: false,
-  seedSprintCompletedAt: null,
-  enableDshAgent: false,
-  dshCommand: 'dsh',
-  dshProfile: 'acp',
-  dshModel: 'wodebody/cn:deepseek-v4.1-flash',
-};
-
-export function normalizeSettings(raw: unknown): InterestSeedSettings {
-  const source = isRecord(raw) ? raw : {};
-  return {
-    autoBuildOnOpen:
-      typeof source.autoBuildOnOpen === 'boolean'
-        ? source.autoBuildOnOpen
-        : DEFAULT_SETTINGS.autoBuildOnOpen,
-    includeFolders: sanitizeFolders(source.includeFolders),
-    excludeFolders:
-      source.excludeFolders === undefined
-        ? [...DEFAULT_SETTINGS.excludeFolders]
-        : sanitizeFolders(source.excludeFolders),
-    includeTags: sanitizeTags(source.includeTags),
-    enableRuleSuggestions:
-      typeof source.enableRuleSuggestions === 'boolean'
-        ? source.enableRuleSuggestions
-        : DEFAULT_SETTINGS.enableRuleSuggestions,
-    enableAI:
-      typeof source.enableAI === 'boolean' ? source.enableAI : DEFAULT_SETTINGS.enableAI,
-    aiProvider:
-      source.aiProvider === 'claudian'
-        ? 'claudian'
-        : DEEPSEEK_V4_PRO_CONFIG.model,
-    aiConsentGranted:
-      typeof source.aiConsentGranted === 'boolean'
-        ? source.aiConsentGranted
-        : DEFAULT_SETTINGS.aiConsentGranted,
-    seedSprintCompletedAt:
-      typeof source.seedSprintCompletedAt === 'string'
-        ? source.seedSprintCompletedAt
-        : null,
-      enableDshAgent:
-      typeof source.enableDshAgent === 'boolean'
-        ? source.enableDshAgent
-        : DEFAULT_SETTINGS.enableDshAgent,
-    dshCommand:
-      typeof source.dshCommand === 'string' && source.dshCommand.trim()
-        ? source.dshCommand.trim()
-        : DEFAULT_SETTINGS.dshCommand,
-    dshProfile:
-      typeof source.dshProfile === 'string' && source.dshProfile.trim()
-        ? source.dshProfile.trim()
-        : DEFAULT_SETTINGS.dshProfile,
-    dshModel:
-      typeof source.dshModel === 'string' && source.dshModel.trim()
-        ? source.dshModel.trim()
-        : DEFAULT_SETTINGS.dshModel,
-  };
-}
-
-function sanitizeFolders(input: unknown): string[] {
-  const source = Array.isArray(input)
-    ? input
-    : typeof input === 'string'
-      ? input.split(/[\n,，]+/)
-      : [];
-  const seen = new Set<string>();
-  const folders: string[] = [];
-  for (const entry of source) {
-    if (typeof entry !== 'string') continue;
-    const folder = entry.replace(/\\/g, '/').replace(/^\/+|\/+$/g, '').trim();
-    if (!folder || seen.has(folder)) continue;
-    seen.add(folder);
-    folders.push(folder);
-  }
-  return folders;
-}
+export { DEFAULT_SETTINGS, normalizeSettings } from './defaults';
 
 function foldersToText(folders: string[]): string {
   return folders.join('\n');
@@ -122,6 +41,7 @@ export class InterestSeedSettingsTab extends PluginSettingTab {
 
     this.renderBuildSettings(containerEl);
     this.renderRuleSettings(containerEl);
+    this.renderAiSettings(containerEl);
     this.renderDshAgentSettings(containerEl);
   }
 
@@ -222,6 +142,61 @@ export class InterestSeedSettingsTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           }),
       );
+  }
+
+  private renderAiSettings(containerEl: HTMLElement): void {
+    containerEl.createEl('h3', { text: 'AI 关系建议' });
+    containerEl.createEl('p', {
+      cls: 'setting-item-description',
+      text: '默认开启。只把节点 id、标题、标签发送给所选模型；不会发送笔记正文、完整 Vault 或个人记录。AI 只生成候选关系，你确认后才会写入图谱。',
+    });
+
+    new Setting(containerEl)
+      .setName('启用 AI 关系建议')
+      .setDesc('关闭后只使用本地规则建议，不发起任何模型请求。')
+      .addToggle((toggle) =>
+        toggle.setValue(this.plugin.settings.enableAI).onChange(async (value) => {
+          this.plugin.settings.enableAI = value;
+          await this.plugin.saveSettings();
+          this.display();
+        }),
+      );
+
+    new Setting(containerEl)
+      .setName('模型提供方')
+      .setDesc('本地 DeepSeek 走 localhost:7863；Claudian 使用已安装的 Claudian 插件。')
+      .addDropdown((dropdown) =>
+        dropdown
+          .addOption(DEEPSEEK_V4_PRO_CONFIG.model, '本地 DeepSeek V4 Pro')
+          .addOption('claudian', 'Claudian')
+          .setValue(this.plugin.settings.aiProvider)
+          .onChange(async (value) => {
+            this.plugin.settings.aiProvider =
+              value === 'claudian' ? 'claudian' : DEEPSEEK_V4_PRO_CONFIG.model;
+            await this.plugin.saveSettings();
+            this.display();
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName('允许发送关系请求字段')
+      .setDesc('仅节点 id、标题、标签；不包含笔记正文、来源路径、观察全文或个人信息。')
+      .addToggle((toggle) =>
+        toggle.setValue(this.plugin.settings.aiConsentGranted).onChange(async (value) => {
+          this.plugin.settings.aiConsentGranted = value;
+          await this.plugin.saveSettings();
+          this.display();
+        }),
+      );
+
+    const provider =
+      this.plugin.settings.aiProvider === 'claudian'
+        ? 'Claudian（使用其现有模型配置）'
+        : `本地 DeepSeek V4 Pro · ${DEEPSEEK_V4_PRO_CONFIG.baseUrl}`;
+    containerEl.createEl('p', {
+      cls: 'setting-item-description',
+      text: `当前模型：${provider}。本地服务需要先在电脑上启动；AI 不可用时会自动保留本地规则发现。`,
+    });
   }
 
   private renderDshAgentSettings(containerEl: HTMLElement): void {

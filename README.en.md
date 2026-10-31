@@ -12,7 +12,7 @@
   <a href="assets/interestseed-launch.mp4"><img alt="Demo" src="https://img.shields.io/badge/%E2%96%B6%2040s%20demo-111827?style=for-the-badge" /></a>
   <img alt="CI" src="https://github.com/lxc248/-interestseed/actions/workflows/ci.yml/badge.svg?branch=main" />
   <img alt="Release" src="https://img.shields.io/github/v/release/lxc248/-interestseed?style=for-the-badge" />
-  <img alt="Tests" src="https://img.shields.io/badge/tests-513%20passing-22c55e?style=for-the-badge" />
+  <img alt="Tests" src="https://img.shields.io/badge/tests-516%20passing-22c55e?style=for-the-badge" />
   <img alt="Coverage" src="https://img.shields.io/badge/coverage-74.7%25-14b8a6?style=for-the-badge" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b?style=for-the-badge" />
 </p>
@@ -107,6 +107,7 @@ These aren't a feature checklist. They're the moves I actually make every day.
 | **Context Search** | Deterministic multi-field search across title, tags, summary, why, raw text, source, and evidence. No embeddings. |
 | **Interest Route** | An explicit Markdown MOC generated on command. It never writes notes automatically. |
 | **Five share cards** | Xiaohongshu, Instagram, X, WeChat, and Story, rendered locally on Canvas. |
+| **AI relation suggestions** | On by default; sends only node id, title, and tags to local DeepSeek or Claudian. Candidates are written only after you confirm. |
 | **MCP interface** | Zero-dependency read-only MCP server, protocol `2026-07-28`. |
 | **Adaptive layout** | Desktop, narrow, and very narrow panes with icon-first actions and no horizontal overflow. |
 
@@ -114,7 +115,7 @@ These aren't a feature checklist. They're the moves I actually make every day.
 
 It takes about three minutes.
 
-1. Download `interestseed-v3.0.9.zip` from [Releases](https://github.com/lxc248/-interestseed/releases).
+1. Download `interestseed-v3.1.0.zip` from [Releases](https://github.com/lxc248/-interestseed/releases).
 2. Extract it into:
 
 ```text
@@ -140,14 +141,15 @@ resources:  interestseed://graph / experiment / next / context
 prompts:    review-interest / plan-next-experiment
 ```
 
-The MCP surface is read-only. Core functionality needs no account, API key, or model credentials.
+The MCP surface is read-only. Core functionality needs no account or model credentials.  
+AI relation suggestions are on by default and only call the selected model when you ask. If unavailable, local rule discovery stays intact.
 
 ## How stable it is
 
 These numbers are not decoration. I rerun them after every change.
 
 ```text
-513 tests passing
+516 tests passing
 74.74% line coverage
 92.25% core coverage
 43.81% UI coverage
@@ -199,4 +201,5 @@ AGPL-3.0-only. Author: [aicoder](https://github.com/lxc248).
 
 If you have ever saved something and quietly known you would never try it, this is for you.  
 Star it if it helps. Open an issue if it doesn't. If you want to improve it, start with [CONTRIBUTING.md](CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+
 

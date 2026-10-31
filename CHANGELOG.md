@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.1.0 — AI relation suggestions on by default
+
+- Enabled AI relation suggestions and consent by default for new installs.
+- Added AI settings: provider, consent, and field disclosure.
+- Added an AI suggestion entry to the graph relation menu.
+- 516 tests passing, including AI defaults and clear-confirmation regressions.
+
 ## 3.0.9 — Clear graph confirmation
 
 - Added explicit confirmation before clearing the graph.

@@ -212,7 +212,7 @@ export function registerCommands(plugin: Plugin, host: CommandHost): void {
 
   plugin.addCommand({
     id: 'interestseed-ai-expand',
-    name: 'AI 关系建议（未启用）',
+    name: 'AI 关系建议',
     callback: () => {
       void host.expandWithAI();
     },

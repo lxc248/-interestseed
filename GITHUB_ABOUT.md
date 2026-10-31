@@ -14,14 +14,14 @@ interestseed
 ```text
 A small Obsidian plugin that turns one saved post into a real 3-day test, then
 lets evidence decide whether to keep it. Local-first, human-in-the-loop,
-MCP-ready.
+AI suggestions on by default, MCP-ready.
 ```
 
 ## About — 简体中文
 
 ```text
 一个 Obsidian 小插件：把一条收藏变成 3 天真实行动，再用证据决定继续还是放下。
-本地优先，人做决定，MCP 可连接。
+本地优先，人做决定，AI 建议默认开启，MCP 可连接。
 ```
 
 ## Topics
@@ -60,7 +60,7 @@ Set via: GitHub → Settings → Social preview
 ## Release title
 
 ```text
-InterestSeed 3.0.9 — 把误触风险补上
+InterestSeed 3.1.0 — AI 关系建议默认开启
 ```
 
 ## Release body — English
@@ -74,15 +74,16 @@ save a 3-day test, then lets the evidence decide.
 
 ![InterestSeed demo](https://raw.githubusercontent.com/lxc248/-interestseed/main/assets/interestseed-demo.gif)
 
-### What 3.0.9 actually changes
+### What 3.1.0 actually changes
 
-This release closes one real safety gap found by the full-feature simulation:
+AI relation suggestions are now on by default, with a local-first boundary:
 
-- clearing the graph now asks for confirmation first;
-- cancel leaves every node and edge untouched;
-- 47 feature paths were exercised in a real Obsidian vault;
-- screenshots and the report live in `review/experiment-3.0.8/`;
-- 513 tests passing, CI and Release green.
+- settings show the enable switch, provider, and consent;
+- only node id, title, and tags are sent;
+- candidates are never written without confirmation;
+- unavailable models fall back to local rule discovery;
+- the 3.0.9 clear-graph confirmation is included;
+- 516 tests passing, CI and Release green.
 
 ### The loop
 
@@ -90,7 +91,7 @@ This release closes one real safety gap found by the full-feature simulation:
 
 ### Install
 
-1. Download `interestseed-v3.0.9.zip`.
+1. Download `interestseed-v3.1.0.zip`.
 2. Extract into `<vault>/.obsidian/plugins/interestseed/`.
 3. Enable InterestSeed in Community plugins.
 4. Run the cold-start questionnaire, then process the Share Inbox.
@@ -109,15 +110,14 @@ InterestSeed 是 Obsidian 里的一个小插件，专门处理那个很具体的
 
 ![InterestSeed demo](https://raw.githubusercontent.com/lxc248/-interestseed/main/assets/interestseed-demo.gif)
 
-### 这次 3.0.9，把误触风险补上
+### 这次 3.1.0，AI 关系建议默认开启
 
-全功能模拟实验抓到一个真实问题：
-
-- 清空图谱现在会先确认；
-- 取消后节点和关系一条不少；
-- 真实 Obsidian 里跑了 47 条功能路径；
-- 截图和报告在 `review/experiment-3.0.8/`；
-- 513 个测试通过，CI 和 Release 都是绿的。
+- 设置页可以直接开关 AI、选择提供方、查看发送字段；
+- 只发送节点 id、标题、标签；
+- AI 只出候选关系，确认后才写入；
+- 模型不可用时保留本地规则发现；
+- 同时包含 3.0.9 的清空图谱确认；
+- 516 个测试通过，CI 和 Release 都是绿的。
 
 ### 它怎么跑
 
@@ -125,7 +125,7 @@ InterestSeed 是 Obsidian 里的一个小插件，专门处理那个很具体的
 
 ### 装起来
 
-1. 下载 `interestseed-v3.0.9.zip`；
+1. 下载 `interestseed-v3.1.0.zip`；
 2. 解压到 `<vault>/.obsidian/plugins/interestseed/`；
 3. 在第三方插件里启用 InterestSeed；
 4. 跑一遍冷启动，然后处理分享收件箱。

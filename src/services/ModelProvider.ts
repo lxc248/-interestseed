@@ -102,7 +102,7 @@ export const DEEPSEEK_V4_PRO_CONFIG: ExperimentalModelConfig = {
 export const RELATION_REQUEST_FIELDS = ['节点 id', '标题', '标签'] as const;
 
 export const AI_ENABLEMENT_NOTICE =
-  'AI 关系建议尚未启用。启用前会先展示将发送的字段（节点 id、标题、标签）与服务商，并征得你的明确授权；不会发送笔记正文、完整 Vault 或个人记录。';
+  'AI 关系建议当前不可用。请在设置中检查模型服务、启用状态与明确授权；只会发送节点 id、标题、标签，不会发送笔记正文、完整 Vault 或个人记录。';
 
 export interface ModelProviderSettings {
   enableAI: boolean;

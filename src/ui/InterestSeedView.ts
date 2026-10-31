@@ -293,6 +293,9 @@ export class InterestSeedView extends ItemView {
     this.createQuickAction(relationGroup, 'git-fork', '刷新建议', () =>
       this.plugin.refreshSuggestions(),
     );
+    this.createQuickAction(relationGroup, 'sparkles', 'AI 建议', () =>
+      void this.plugin.expandWithAI(),
+    );
     this.quickInboxButton = this.createQuickAction(relationGroup, 'inbox', '待确认关系', () =>
       this.toggleInbox(),
     );

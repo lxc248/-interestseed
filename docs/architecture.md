@@ -46,6 +46,20 @@ Graph snapshot
   → GraphStore edge
 ```
 
+## AI boundary
+
+```text
+default: on
+providers: local DeepSeek V4 Pro (localhost:7863) or Claudian
+sent: node id, title, tags
+never sent: note body, source paths, full observations, vault contents
+output: candidate relations only; user confirmation writes them
+failure: local rule discovery remains available
+```
+
+AI is a suggestion layer, not a writer. `enableAI` and `aiConsentGranted` are
+both required; disabling either falls back to the disabled provider.
+
 ## Invariants
 
 ```text
