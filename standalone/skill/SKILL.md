@@ -44,6 +44,19 @@ Capture a saved item into the vault inbox:
 ```bash
 node standalone/dist/cli.js capture --vault "<vault-path>" \
   --title "一条收藏" --url "https://example.com" --text "为什么我想保存它"
+
+node standalone/dist/cli.js inbox add --vault "<vault-path>" --text "一条想验证的收藏"
+node standalone/dist/cli.js inbox list --vault "<vault-path>"
+node standalone/dist/cli.js inbox keep --vault "<vault-path>" --id "<inbox-id>"
+```
+
+Cross-folder discovery:
+
+```bash
+node standalone/dist/cli.js discoveries list --vault "<vault-path>"
+node standalone/dist/cli.js discoveries refresh --vault "<vault-path>"
+node standalone/dist/cli.js discoveries apply --vault "<vault-path>" --id "<discovery-id>"
+node standalone/dist/cli.js discoveries dismiss --vault "<vault-path>" --id "<discovery-id>"
 ```
 
 AI suggestion:

@@ -41,6 +41,14 @@ node standalone/dist/cli.js scan --vault "<vault>"
 node standalone/dist/cli.js capture --vault "<vault>" \
   --title "一条收藏" --url "https://example.com" --text "为什么想保存它"
 
+# 收件箱：先排队，再决定留下还是放回
+node standalone/dist/cli.js inbox add --vault "<vault>" --text "一条想验证的收藏"
+node standalone/dist/cli.js inbox keep --vault "<vault>" --id "<inbox-id>"
+
+# 跨目录发现
+node standalone/dist/cli.js discoveries refresh --vault "<vault>"
+node standalone/dist/cli.js discoveries apply --vault "<vault>" --id "<discovery-id>"
+
 # 查看状态
 node standalone/dist/cli.js status --vault "<vault>"
 

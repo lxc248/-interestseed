@@ -78,7 +78,7 @@ capture → scan → one AI connection → 3-day experiment → evidence
 Three shapes:
 
 - CLI: capture / scan / suggest / connect / experiment / serve
-- Local Web: graph, one suggestion, undo, experiment strip
+- Local Web: graph, one suggestion, undo, experiment strip, discovery, inbox, history
 - Skill: standalone/skill/SKILL.md
 
 The model only receives node id, title, tags, and existing edge pairs.
@@ -104,7 +104,7 @@ capture → scan → 一条 AI 连接 → 3 天实验 → 证据
 三种形态：
 
 - CLI：capture / scan / suggest / connect / experiment / serve
-- 本地 Web：图谱、单条建议、撤销、实验条
+- 本地 Web：图谱、单条建议、撤销、实验条、发现、收件箱、历史
 - Skill：standalone/skill/SKILL.md
 
 只发送节点 id、标题、标签、已有关系 id 对。

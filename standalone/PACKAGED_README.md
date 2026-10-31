@@ -14,6 +14,10 @@ Open `http://127.0.0.1:4173`.
 
 ```bash
 node cli.js capture --vault "<vault>" --title "Saved item" --text "Why I saved it"
+node cli.js inbox add --vault "<vault>" --text "A saved item"
+node cli.js inbox keep --vault "<vault>" --id "<inbox-id>"
+node cli.js discoveries refresh --vault "<vault>"
+node cli.js discoveries apply --vault "<vault>" --id "<discovery-id>"
 node cli.js suggest --vault "<vault>" --node "<node-id>"
 node cli.js connect --vault "<vault>" --source "<id>" --target "<id>" --relation "shared method"
 node cli.js experiment start --vault "<vault>" --title "AI tools × habits"

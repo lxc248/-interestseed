@@ -27,6 +27,10 @@ node standalone/dist/cli.js serve --vault "<vault>" --port 4173
 node standalone/dist/cli.js status --vault "<vault>"
 node standalone/dist/cli.js capture --vault "<vault>" \
   --title "Saved item" --url "https://example.com" --text "Why I saved it"
+node standalone/dist/cli.js inbox add --vault "<vault>" --text "A saved item"
+node standalone/dist/cli.js inbox keep --vault "<vault>" --id "<inbox-id>"
+node standalone/dist/cli.js discoveries refresh --vault "<vault>"
+node standalone/dist/cli.js discoveries apply --vault "<vault>" --id "<discovery-id>"
 node standalone/dist/cli.js suggest --vault "<vault>" --node "<node-id>"
 node standalone/dist/cli.js connect --vault "<vault>" \
   --source "<id>" --target "<id>" --relation "shared method" \
