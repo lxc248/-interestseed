@@ -60,7 +60,7 @@ Set via: GitHub → Settings → Social preview
 ## Release title
 
 ```text
-InterestSeed 3.0.9 — 把一条收藏变成 3 天真实行动
+InterestSeed 3.0.9 — 把误触风险补上
 ```
 
 ## Release body — English
