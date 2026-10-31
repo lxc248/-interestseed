@@ -53,6 +53,15 @@ One saved item → one AI suggestion → connect / next / not now → 3-day test
 - sends only node id, title, and tags
 - uses your own local model and key
 
+### How the AI meets Obsidian
+
+- right-click the active note → "Find a connection for this note"
+- command palette → "Find AI connection from current note"
+- graph selection → "Find connection from selected node"
+- file explorer right-click uses the same action
+- the AI panel stays in the right sidebar, without interrupting editing
+- connect / next / not now; undo after connecting
+
 [How the AI works →](docs/ai.en.md)
 
 ## Where it differs from a bookmark pile
@@ -136,7 +145,7 @@ These aren't a feature checklist. They're the moves I actually make every day.
 
 It takes about three minutes.
 
-1. Download `interestseed-v3.6.0.zip` from [Releases](https://github.com/lxc248/-interestseed/releases).
+1. Download `interestseed-v3.7.0.zip` from [Releases](https://github.com/lxc248/-interestseed/releases).
 2. Extract it into:
 
 ```text
@@ -173,9 +182,9 @@ These numbers are not decoration. I rerun them after every change.
 
 ```text
 522 tests passing
-74.83% line coverage
+74.82% line coverage
 92.25% core coverage
-46.42% UI coverage
+46.53% UI coverage
 axe: graph / inbox / share-card 0 violations
 semgrep: 0 findings
 gitleaks: no leaks

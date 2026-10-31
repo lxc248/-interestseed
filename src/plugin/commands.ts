@@ -28,6 +28,8 @@ export interface CommandHost {
   reconcileDiscoveries(): Promise<void>;
   readonly undo: UndoHistory;
   expandWithAI(nodeId?: string): Promise<void>;
+  openAiPanel(): Promise<void> | void;
+  suggestForActiveNote(): Promise<void> | void;
   openAiSetup(): void;
   clearGraph(): Promise<void>;
   retrySave(): Promise<void>;
@@ -216,6 +218,22 @@ export function registerCommands(plugin: Plugin, host: CommandHost): void {
     name: 'AI 关系建议',
     callback: () => {
       void host.expandWithAI();
+    },
+  });
+
+  plugin.addCommand({
+    id: 'interestseed-ai-panel',
+    name: '打开 AI 建议面板',
+    callback: () => {
+      void host.openAiPanel();
+    },
+  });
+
+  plugin.addCommand({
+    id: 'interestseed-ai-from-note',
+    name: '从当前笔记找 AI 连接',
+    callback: () => {
+      void host.suggestForActiveNote();
     },
   });
 

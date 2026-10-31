@@ -68,6 +68,14 @@ Claudian 已移除
 设置页新增 MODEL 面板：模型 / 地址 / Key 状态
 ```
 
+## 3.7.0 Obsidian 原生侧边栏
+
+```text
+AI 建议变成右侧 ItemView
+当前笔记右键 / 命令面板 / 文件树右键 / 图谱选中节点都能发起
+面板常驻，不打断笔记
+```
+
 ## 截图
 
 ```text
@@ -75,12 +83,15 @@ review/experiment-3.0.8/61-ai-single-suggestion.png
 review/experiment-3.0.8/62-ai-single-connected.png
 review/experiment-3.0.8/63-ai-single-undone.png
 review/experiment-3.0.8/64-ai-local-model-panel.png
+review/experiment-3.0.8/65-ai-panel-empty.png
+review/experiment-3.0.8/66-ai-panel-suggestion.png
+review/experiment-3.0.8/67-ai-from-note.png
 ```
 
 ## 验证
 
 ```text
-71 test files / 525 tests passing
+70 test files / 522 tests passing
 MCP smoke 4/4
 npm run verify 通过
 ```

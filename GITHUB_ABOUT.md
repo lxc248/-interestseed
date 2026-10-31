@@ -60,7 +60,7 @@ Set via: GitHub → Settings → Social preview
 ## Release title
 
 ```text
-InterestSeed 3.6.0 — 本地 AI，一次一条
+InterestSeed 3.7.0 — AI 变成 Obsidian 侧边栏
 ```
 
 ## Release body — English
@@ -74,17 +74,18 @@ save a 3-day test, then lets the evidence decide.
 
 ![InterestSeed demo](https://raw.githubusercontent.com/lxc248/-interestseed/main/assets/interestseed-demo.gif)
 
-### What 3.6.0 actually changes
+### What 3.7.0 actually changes
 
-AI is the headline, not a feature row:
+AI is now an Obsidian-native side panel, not a modal:
 
-- one local suggestion at a time: connect / next / not now;
-- a reason attached; relation name editable; undo after writing;
-- no batch pending-confirmation wall, no auto-write;
-- only your local OpenAI-compatible endpoint at `localhost:7863/v1`;
-- your own key in Obsidian SecretStorage; model ID configurable;
-- default `cn:deepseek-v4.1-flash`;
-- Claudian provider, detection, settings, and tests are gone;
+- right-click the active note → find a connection for this note;
+- command palette → find AI connection from current note;
+- graph selection → find connection from the selected node;
+- file explorer right-click → same note entry;
+- the panel stays in the right sidebar: connect / next / not now;
+- one local suggestion at a time, reason attached, relation editable;
+- undo after writing; no auto-write;
+- local model only, key in Obsidian SecretStorage;
 - 522 tests passing, CI and Release green.
 
 ### The loop
@@ -93,7 +94,7 @@ AI is the headline, not a feature row:
 
 ### Install
 
-1. Download `interestseed-v3.6.0.zip`.
+1. Download `interestseed-v3.7.0.zip`.
 2. Extract into `<vault>/.obsidian/plugins/interestseed/`.
 3. Enable InterestSeed in Community plugins.
 4. Run the cold-start questionnaire, then process the Share Inbox.
@@ -112,15 +113,16 @@ InterestSeed 是 Obsidian 里的一个小插件，专门处理那个很具体的
 
 ![InterestSeed demo](https://raw.githubusercontent.com/lxc248/-interestseed/main/assets/interestseed-demo.gif)
 
-### 这次 3.6.0，AI 是主角
+### 这次 3.7.0，AI 变成 Obsidian 原生侧边栏
 
-- 一次只给一条本地 AI 建议：连上 / 换一个 / 先不用
-- 带理由，关系名可改，写入后可撤销
-- 没有批量“待确认”，不会自动写图谱
-- 只连你自己的本地 OpenAI-compatible 服务 `localhost:7863/v1`
-- Key 存在 Obsidian SecretStorage，模型 ID 可配置
-- 默认模型 `cn:deepseek-v4.1-flash`
-- Claudian 提供方、检测、设置项和测试都已移除
+- 当前笔记右键 → 用 AI 找这条笔记的连接
+- 命令面板 → 从当前笔记找 AI 连接
+- 图谱选中节点 → 从选中节点找连接
+- 文件树右键 → 同一条笔记入口
+- 面板常驻右侧：连上 / 换一个 / 先不用
+- 一次只给一条，带理由，关系名可改
+- 连上后可撤销，不会自动写图谱
+- 只使用本地模型，Key 存在 Obsidian SecretStorage
 - 522 个测试通过，CI 和 Release 都是绿的。
 
 ### 它怎么跑
@@ -129,7 +131,7 @@ InterestSeed 是 Obsidian 里的一个小插件，专门处理那个很具体的
 
 ### 装起来
 
-1. 下载 `interestseed-v3.6.0.zip`；
+1. 下载 `interestseed-v3.7.0.zip`；
 2. 解压到 `<vault>/.obsidian/plugins/interestseed/`；
 3. 在第三方插件里启用 InterestSeed；
 4. 跑一遍冷启动，然后处理分享收件箱。

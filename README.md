@@ -53,6 +53,15 @@
 - 只发节点 id、标题、标签
 - 使用你自己的本地模型和 Key
 
+### AI 和 Obsidian 怎么接
+
+- 当前笔记右键 →「用 AI 找这条笔记的连接」
+- 命令面板 →「从当前笔记找 AI 连接」
+- 图谱选中节点 →「从选中节点找连接」
+- 左侧文件树右键同样可以发起
+- AI 侧边栏常驻右侧，不打断编辑
+- 连上 / 换一个 / 先不用，连上后可撤销
+
 [AI 建议是怎么工作的 →](docs/ai.md)
 
 ## 它和收藏夹到底差在哪
@@ -136,7 +145,7 @@ Capture → Decide → Connect → Verify → Review → Next action
 
 三分钟能跑起来。
 
-1. 从 [Releases](https://github.com/lxc248/-interestseed/releases) 下载 `interestseed-v3.6.0.zip`。
+1. 从 [Releases](https://github.com/lxc248/-interestseed/releases) 下载 `interestseed-v3.7.0.zip`。
 2. 解压到：
 
 ```text
@@ -173,9 +182,9 @@ AI 关系建议默认开启，只在你点击 AI 时请求所选模型；接入�
 
 ```text
 522 tests passing
-74.83% line coverage
+74.82% line coverage
 92.25% core coverage
-46.42% UI coverage
+46.53% UI coverage
 axe: graph / inbox / share-card 0 violations
 semgrep: 0 findings
 gitleaks: no leaks

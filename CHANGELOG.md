@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.7.0 — AI as an Obsidian side panel
+
+- Moved AI suggestions from a modal to a native right-side ItemView.
+- Added current-note, file-menu, graph-selection, command-palette, and ribbon entries.
+- Added an empty state with "from current note" / "from selected node" / settings.
+- Kept one suggestion at a time, editable relation, and undo.
+- 522 tests passing.
+
 ## 3.6.0 — Local model only
 
 - Removed the Claudian provider, detection, settings option, and tests.

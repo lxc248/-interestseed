@@ -98,7 +98,10 @@ review/experiment-3.0.8/results-onboarding.json
 | 53 | 连上后状态 | ✅ 33 条关系、可撤销 | 62-ai-single-connected.png |
 | 54 | 撤销后状态 | ✅ 32 条关系、回到下一条 | 63-ai-single-undone.png |
 | 55 | 本地模型状态面板 | ✅ MODEL / 模型 ID / 地址 / Key 状态 | 64-ai-local-model-panel.png |
-| 56 | MCP smoke | ✅ 4/4 | 命令行输出 |
+| 56 | AI 侧边栏空态 | ✅ 当前笔记 / 选中节点 / 接入设置 | 65-ai-panel-empty.png |
+| 57 | AI 侧边栏建议 | ✅ 常驻右侧、单条建议 | 66-ai-panel-suggestion.png |
+| 58 | 从当前笔记发起 | ✅ 命令入口可用 | 67-ai-from-note.png |
+| 59 | MCP smoke | ✅ 4/4 | 命令行输出 |
 
 ## 4. 关键流程
 
@@ -245,12 +248,13 @@ npm run verify 通过
 ## 9. 结论
 
 ```text
-56 项功能路径覆盖
+59 项功能路径覆盖
 1 个真实高优 UX bug 被发现并修复
 收件箱、实验、分享卡、发现、导出、冷启动、撤销/重做全部通过
 窄屏与暗色无布局回归
 实验后图谱已恢复
 ```
+
 
 
 

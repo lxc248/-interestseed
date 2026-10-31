@@ -25,6 +25,24 @@ written only after you connect
 undoable after writing
 ```
 
+## How it meets Obsidian
+
+```text
+right-click active note → find a connection for this note
+command palette → find AI connection from current note
+graph selection → find connection from selected node
+file explorer right-click → same note entry
+AI side panel → stays in the right sidebar
+```
+
+One suggestion in the panel:
+
+```text
+connect / next / not now
+```
+
+After connecting, undo is available and the next suggestion appears.
+
 ## How it chooses
 
 ```text
@@ -86,7 +104,7 @@ undo: 33 → 32 edges
 ## Screenshots
 
 ```text
-assets/ai-suggestions-live.png
-assets/ai-model-panel.png
-assets/ai-setup.png
+review/experiment-3.0.8/65-ai-panel-empty.png
+review/experiment-3.0.8/66-ai-panel-suggestion.png
+review/experiment-3.0.8/67-ai-from-note.png
 ```

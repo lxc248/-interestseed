@@ -26,6 +26,24 @@ InterestSeed 的 AI 只做一件事：
 写入后可以撤销
 ```
 
+## 和 Obsidian 的接法
+
+```text
+当前笔记右键 → 用 AI 找这条笔记的连接
+命令面板 → 从当前笔记找 AI 连接
+图谱选中节点 → 从选中节点找连接
+文件树右键 → 同一条笔记入口
+AI 侧边栏 → 常驻右侧，不打断编辑
+```
+
+侧边栏里只有一条建议：
+
+```text
+连上 / 换一个 / 先不用
+```
+
+连上后可以撤销，然后自动看下一条。
+
 ## 它怎么选
 
 ```text
@@ -87,7 +105,7 @@ Vault 内容
 ## 截图
 
 ```text
-assets/ai-suggestions-live.png
-assets/ai-model-panel.png
-assets/ai-setup.png
+review/experiment-3.0.8/65-ai-panel-empty.png
+review/experiment-3.0.8/66-ai-panel-suggestion.png
+review/experiment-3.0.8/67-ai-from-note.png
 ```

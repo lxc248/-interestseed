@@ -1,4 +1,4 @@
-import { Notice, Plugin } from 'obsidian';
+import { Notice, Plugin, TFile } from 'obsidian';
 import type { WorkspaceLeaf } from 'obsidian';
 
 import { ObsidianVaultAdapterImpl } from './adapters/ObsidianVaultAdapter';
@@ -45,7 +45,6 @@ import type {
 import { GraphController } from './plugin/GraphController';
 import { PersistenceService, type PersistenceState } from './plugin/PersistenceService';
 import { registerCommands } from './plugin/commands';
-import { AiSuggestionModal } from './ui/AiSuggestionModal';
 import type { AiRelationSuggestion } from './services/ModelProvider';
 import { InterestSeedSettingsTab, normalizeSettings } from './settings/SettingsTab';
 import { VaultGraphRepository, type LoadResult } from './storage/GraphRepository';
@@ -57,6 +56,7 @@ import {
 import type { GraphViewport, InterestSeedNode, InterestSeedSettings } from './types/graph';
 import { INTERESTSEED_VIEW_TYPE, InterestSeedView } from './ui/InterestSeedView';
 import { AgentView, INTERESTSEED_AGENT_VIEW_TYPE } from './ui/AgentView';
+import { AiSuggestionView, INTERESTSEED_AI_VIEW_TYPE } from './ui/AiSuggestionView';
 import { NodeCreateModal } from './ui/NodeCreateModal';
 import { SeedSprintModal } from './ui/SeedSprintModal';
 import { SparkCaptureModal } from './ui/SparkCaptureModal';
@@ -83,7 +83,7 @@ import {
 } from './experiment/experiment';
 import type { SeedSprintDraft } from './onboarding/seedSprint';
 import { edgeIdFor, hashString, nodeIdForUri } from './utils/ids';
-import { slugifyFileName } from './utils/paths';
+import { pathFromUri, slugifyFileName, vaultUri } from './utils/paths';
 import { RelationCreateModal } from './ui/RelationCreateModal';
 import { RelationEditModal } from './ui/RelationEditModal';
 import { ScanConfirmModal } from './ui/ScanConfirmModal';
@@ -296,13 +296,33 @@ export default class InterestSeedPlugin extends Plugin {
 
     this.registerView(INTERESTSEED_VIEW_TYPE, (leaf) => new InterestSeedView(leaf, this));
     this.registerView(INTERESTSEED_AGENT_VIEW_TYPE, (leaf) => new AgentView(leaf, this));
+    this.registerView(INTERESTSEED_AI_VIEW_TYPE, (leaf) => new AiSuggestionView(leaf, this));
     this.addRibbonIcon('sprout', '打开兴趣图谱', () => {
       void this.activateView();
+    });
+    this.addRibbonIcon('sparkles', '打开 InterestSeed AI 建议', () => {
+      void this.activateAiView();
+    });
+    this.addRibbonIcon('bot', '打开 InterestSeed Agent', () => {
+      void this.activateAgentView();
     });
     this.addRibbonIcon('sparkles', '打开 InterestSeed Agent', () => {
       void this.activateAgentView();
     });
     registerCommands(this, this);
+    this.registerEvent(
+      this.app.workspace.on('file-menu', (menu, file) => {
+        if (!(file instanceof TFile) || file.extension.toLowerCase() !== 'md') return;
+        menu.addItem((item) =>
+          item
+            .setTitle('用 AI 找这条笔记的连接')
+            .setIcon('sparkles')
+            .onClick(() => {
+              void this.suggestForFile(file);
+            }),
+        );
+      }),
+    );
     this.registerObsidianProtocolHandler('interestseed-share', (params) => {
       const text = typeof params.text === 'string' ? params.text : '';
       const result = this.enqueueShare(text, 'clipboard');
@@ -375,6 +395,7 @@ export default class InterestSeedPlugin extends Plugin {
     // 先 detach，让 view.onClose 的 saveViewport 在 flush 前提交。
     this.app.workspace.detachLeavesOfType(INTERESTSEED_VIEW_TYPE);
     this.app.workspace.detachLeavesOfType(INTERESTSEED_AGENT_VIEW_TYPE);
+    this.app.workspace.detachLeavesOfType(INTERESTSEED_AI_VIEW_TYPE);
     this.discoveryQueue?.close();
     void this.discoveryQueue?.flush();
     void this.persistence?.flush();
@@ -936,6 +957,63 @@ export default class InterestSeedPlugin extends Plugin {
     }
     await leaf.setViewState({ type: INTERESTSEED_AGENT_VIEW_TYPE, active: true });
     await workspace.revealLeaf(leaf);
+  }
+
+  async activateAiView(): Promise<AiSuggestionView | null> {
+    const { workspace } = this.app;
+    const existing = workspace.getLeavesOfType(INTERESTSEED_AI_VIEW_TYPE);
+    let leaf: WorkspaceLeaf | null = existing[0] ?? null;
+    if (!leaf) leaf = workspace.getRightLeaf(false);
+    if (!leaf) leaf = workspace.getLeaf('tab');
+    await leaf.setViewState({ type: INTERESTSEED_AI_VIEW_TYPE, active: true });
+    await workspace.revealLeaf(leaf);
+    return leaf.view instanceof AiSuggestionView ? leaf.view : null;
+  }
+
+  async openAiPanel(): Promise<void> {
+    await this.activateAiView();
+  }
+
+  async suggestForFile(file: TFile): Promise<void> {
+    const node =
+      this.store.findNodeByUri(vaultUri(file.path)) ??
+      this.store.listNodes().find((item) => {
+        if (!item.sourceUri) return false;
+        return pathFromUri(item.sourceUri).toLowerCase() === file.path.toLowerCase();
+      });
+    if (!node) {
+      new Notice('这篇笔记还没进入图谱；先运行一次“重新扫描”。');
+      return;
+    }
+    await this.expandWithAI(node.id);
+  }
+
+  async suggestForActiveNote(): Promise<void> {
+    const file = this.app.workspace.getActiveFile();
+    if (!file) {
+      new Notice('先打开一篇 Markdown 笔记。');
+      return;
+    }
+    await this.suggestForFile(file);
+  }
+
+  async suggestForSelectedNode(): Promise<void> {
+    const nodeId = this.getSelectedNodeId();
+    if (!nodeId) {
+      new Notice('先在图谱里选中一个节点。');
+      return;
+    }
+    await this.expandWithAI(nodeId);
+  }
+
+  confirmAiSuggestion(
+    suggestion: AiRelationSuggestion,
+  ): Promise<{ ok: boolean; message?: string }> {
+    return this.controller.confirmAiSuggestion(suggestion);
+  }
+
+  undoAiSuggestion(): boolean {
+    return this.undo.undo();
   }
 
   setSelectedNode(nodeId: string | null): void {
@@ -1544,11 +1622,12 @@ export default class InterestSeedPlugin extends Plugin {
   }
 
   private openAiSuggestions(suggestions: AiRelationSuggestion[]): void {
-    new AiSuggestionModal(this.app, suggestions, {
-      getNodeTitle: (id) => this.store.getNode(id)?.title ?? null,
-      confirm: (suggestion) => this.controller.confirmAiSuggestion(suggestion),
-      onUndo: () => this.undo.undo(),
-    }).open();
+    void this.showAiSuggestions(suggestions);
+  }
+
+  private async showAiSuggestions(suggestions: AiRelationSuggestion[]): Promise<void> {
+    const view = await this.activateAiView();
+    view?.setSuggestions(suggestions);
   }
 
   private reportError(message: string | null): void {
