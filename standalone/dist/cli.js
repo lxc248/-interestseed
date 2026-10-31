@@ -548,7 +548,9 @@ var DEFAULT_CONFIG = {
 	includeTags: [],
 	model: "cn:deepseek-v4.1-flash",
 	baseUrl: "http://localhost:7863/v1",
-	keyEnv: "INTERESTSEED_AI_API_KEY"
+	keyEnv: "INTERESTSEED_AI_API_KEY",
+	enableAI: true,
+	aiConsentGranted: true
 };
 function stateDir(vaultPath) {
 	return join(vaultPath, STATE_DIR);
@@ -572,7 +574,9 @@ async function loadConfig(vaultPath) {
 		...parsed,
 		includeFolders: Array.isArray(parsed.includeFolders) ? parsed.includeFolders : DEFAULT_CONFIG.includeFolders,
 		excludeFolders: Array.isArray(parsed.excludeFolders) ? parsed.excludeFolders : DEFAULT_CONFIG.excludeFolders,
-		includeTags: Array.isArray(parsed.includeTags) ? parsed.includeTags : DEFAULT_CONFIG.includeTags
+		includeTags: Array.isArray(parsed.includeTags) ? parsed.includeTags : DEFAULT_CONFIG.includeTags,
+		enableAI: typeof parsed.enableAI === "boolean" ? parsed.enableAI : DEFAULT_CONFIG.enableAI,
+		aiConsentGranted: typeof parsed.aiConsentGranted === "boolean" ? parsed.aiConsentGranted : DEFAULT_CONFIG.aiConsentGranted
 	};
 }
 async function saveConfig(vaultPath, config) {
@@ -650,6 +654,8 @@ async function suggestRelations(vaultPath, focusNodeId) {
 	const state = await loadState(vaultPath);
 	const key = await resolveApiKey(vaultPath, config);
 	if (!key) throw new Error(`Missing API key. Set ${config.keyEnv} or write .interestseed/key.`);
+	if (!config.enableAI) throw new Error("AI 已关闭，请先在设置里启用。");
+	if (!config.aiConsentGranted) throw new Error("还没有确认 AI 请求边界，请先在设置里同意。");
 	const request = buildRelationRequest(state.graph.nodes, {
 		focusNodeId,
 		existingEdges: state.graph.edges.map((edge) => ({
@@ -659,8 +665,8 @@ async function suggestRelations(vaultPath, focusNodeId) {
 		maxSuggestions: 5
 	});
 	const provider = createModelProvider({
-		enableAI: true,
-		aiConsentGranted: true,
+		enableAI: config.enableAI,
+		aiConsentGranted: config.aiConsentGranted,
 		model: config.model,
 		baseUrl: config.baseUrl
 	}, void 0, key);
@@ -3024,7 +3030,6 @@ async function scanAndBuild(vaultPath) {
 //#endregion
 //#region standalone/src/server.ts
 var webRoot = [resolve(fileURLToPath(new URL("../web", import.meta.url))), resolve(fileURLToPath(new URL("./web", import.meta.url)))].find((path) => existsSync(join(path, "index.html"))) ?? resolve(fileURLToPath(new URL("../web", import.meta.url)));
-var previousGraph = null;
 function startServer(options) {
 	createServer(async (request, response) => {
 		try {
@@ -3042,7 +3047,6 @@ async function route(request, response, options) {
 	if (url.pathname === "/api/state") return sendJson(response, 200, await statePayload(options.vaultPath));
 	if (url.pathname === "/api/scan" && request.method === "POST") {
 		const result = await scanAndBuild(options.vaultPath);
-		previousGraph = null;
 		return sendJson(response, 200, {
 			...await statePayload(options.vaultPath),
 			files: result.files,
@@ -3072,18 +3076,13 @@ async function route(request, response, options) {
 	if (url.pathname === "/api/connect" && request.method === "POST") {
 		const suggestion = (await readJson(request)).suggestion;
 		if (!suggestion) return sendJson(response, 400, { error: "suggestion required" });
-		const before = await loadState(options.vaultPath);
-		const result = await connectSuggestion(options.vaultPath, suggestion);
-		if (result.ok) previousGraph = before.graph;
-		return sendJson(response, 200, result);
+		return sendJson(response, 200, await connectSuggestion(options.vaultPath, suggestion));
 	}
 	if (url.pathname === "/api/undo" && request.method === "POST") {
-		if (!previousGraph) return sendJson(response, 200, {
+		if (!await undoGraph(options.vaultPath)) return sendJson(response, 200, {
 			ok: false,
 			message: "Nothing to undo."
 		});
-		await saveGraph(options.vaultPath, previousGraph);
-		previousGraph = null;
 		return sendJson(response, 200, {
 			ok: true,
 			...await statePayload(options.vaultPath)
@@ -3163,6 +3162,8 @@ async function route(request, response, options) {
 		if (typeof body.model === "string" && body.model.trim()) config.model = body.model.trim();
 		if (typeof body.baseUrl === "string" && body.baseUrl.trim()) config.baseUrl = body.baseUrl.trim();
 		if (typeof body.keyEnv === "string" && body.keyEnv.trim()) config.keyEnv = body.keyEnv.trim();
+		if (typeof body.enableAI === "boolean") config.enableAI = body.enableAI;
+		if (typeof body.aiConsentGranted === "boolean") config.aiConsentGranted = body.aiConsentGranted;
 		if (Array.isArray(body.includeFolders)) config.includeFolders = body.includeFolders.map(String);
 		if (Array.isArray(body.excludeFolders)) config.excludeFolders = body.excludeFolders.map(String);
 		if (Array.isArray(body.includeTags)) config.includeTags = body.includeTags.map(String);
@@ -3200,12 +3201,35 @@ async function statePayload(vaultPath) {
 	const experiments = (await listExperiments(vaultPath)).map(experimentView);
 	const discoveries = (await listDiscoveries(vaultPath)).map(discoveryView);
 	const inbox = await listInbox(vaultPath);
+	const degree = /* @__PURE__ */ new Map();
+	for (const node of state.graph.nodes) degree.set(node.id, 0);
+	for (const edge of state.graph.edges) {
+		if (edge.status === "rejected") continue;
+		degree.set(edge.source, (degree.get(edge.source) ?? 0) + 1);
+		degree.set(edge.target, (degree.get(edge.target) ?? 0) + 1);
+	}
+	const top = [...state.graph.nodes].sort((a, b) => (degree.get(b.id) ?? 0) - (degree.get(a.id) ?? 0)).slice(0, 3).map((node) => ({
+		id: node.id,
+		title: node.title,
+		degree: degree.get(node.id) ?? 0
+	}));
+	const themeCounts = /* @__PURE__ */ new Map();
+	for (const node of state.graph.nodes) for (const tag of node.tags ?? []) themeCounts.set(tag, (themeCounts.get(tag) ?? 0) + 1);
+	const insights = {
+		top,
+		themes: [...themeCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6).map(([tag, count]) => ({
+			tag,
+			count
+		})),
+		orphans: state.graph.nodes.filter((node) => (degree.get(node.id) ?? 0) === 0).length
+	};
 	return {
 		vaultPath,
 		model: config.model,
 		baseUrl: config.baseUrl,
 		keyReady: Boolean(key),
 		graph: state.graph,
+		insights,
 		activeExperiment: active ? experimentView(active) : null,
 		experiments,
 		discoveries,

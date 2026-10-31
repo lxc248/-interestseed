@@ -36,6 +36,12 @@ export async function suggestRelations(
       `Missing API key. Set ${config.keyEnv} or write .interestseed/key.`,
     );
   }
+  if (!config.enableAI) {
+    throw new Error('AI 已关闭，请先在设置里启用。');
+  }
+  if (!config.aiConsentGranted) {
+    throw new Error('还没有确认 AI 请求边界，请先在设置里同意。');
+  }
 
   const request = buildRelationRequest(state.graph.nodes, {
     focusNodeId,
@@ -47,8 +53,8 @@ export async function suggestRelations(
   });
   const provider = createModelProvider(
     {
-      enableAI: true,
-      aiConsentGranted: true,
+      enableAI: config.enableAI,
+      aiConsentGranted: config.aiConsentGranted,
       model: config.model,
       baseUrl: config.baseUrl,
     },

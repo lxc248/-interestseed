@@ -50,6 +50,19 @@ nothing important was dropped in that move.
 2. **Tag filtering was not exposed in the web settings.** `includeTags` existed in
    the scanner config but had no UI. Added a textarea for include tags.
 
+3. **Web undo used in-memory state.** `/api/undo` now calls `undoGraph` from
+   `history.json`, the same path the CLI uses, so undo survives a server restart.
+
+4. **No AI consent / enable switch.** Added `enableAI` and `aiConsentGranted` to
+   standalone config, settings checkboxes, and pre-flight checks in
+   `suggestRelations`.
+
+5. **Experiments were 3-day only.** Added a start-experiment modal with 3-day and
+   7-day options, and a next-step input on the daily log.
+
+6. **No insights strip.** Added top nodes, themes, and orphan counts to
+   `/api/state` and rendered them as chips below the stat cards.
+
 ## Remaining differences that are intentional
 
 - Obsidian-only entry points (file menu, command palette, SecretStorage) do not

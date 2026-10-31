@@ -4,7 +4,6 @@ import { readFile, rm, writeFile } from 'node:fs/promises';
 import { extname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { AiRelationSuggestion } from '../../src/services/ModelProvider';
-import type { InterestSeedGraph } from '../../src/types/graph';
 import { connectSuggestion, resolveApiKey } from './ai';
 import { captureToVault } from './capture';
 import { suggestRelations } from './ai';
@@ -24,7 +23,7 @@ import {
 } from './discoveries';
 import { enqueueInbox, listInbox, resolveInbox } from './inbox';
 import { scanAndBuild } from './graph';
-import { ensureStateDir, loadConfig, loadState, saveConfig, saveGraph, stateDir } from './state';
+import { ensureStateDir, loadConfig, loadState, saveConfig, stateDir, undoGraph } from './state';
 
 export interface ServerOptions {
   vaultPath: string;
@@ -35,7 +34,6 @@ const webRoot = [
   resolve(fileURLToPath(new URL('../web', import.meta.url))),
   resolve(fileURLToPath(new URL('./web', import.meta.url))),
 ].find((path) => existsSync(join(path, 'index.html'))) ?? resolve(fileURLToPath(new URL('../web', import.meta.url)));
-let previousGraph: InterestSeedGraph | null = null;
 
 export function startServer(options: ServerOptions): void {
   const server = createServer(async (request, response) => {
@@ -60,7 +58,6 @@ async function route(
   if (url.pathname === '/api/state') return sendJson(response, 200, await statePayload(options.vaultPath));
   if (url.pathname === '/api/scan' && request.method === 'POST') {
     const result = await scanAndBuild(options.vaultPath);
-    previousGraph = null;
     return sendJson(response, 200, {
       ...(await statePayload(options.vaultPath)),
       files: result.files,
@@ -90,15 +87,12 @@ async function route(
     const body = await readJson(request);
     const suggestion = body.suggestion as AiRelationSuggestion | undefined;
     if (!suggestion) return sendJson(response, 400, { error: 'suggestion required' });
-    const before = await loadState(options.vaultPath);
     const result = await connectSuggestion(options.vaultPath, suggestion);
-    if (result.ok) previousGraph = before.graph;
     return sendJson(response, 200, result);
   }
   if (url.pathname === '/api/undo' && request.method === 'POST') {
-    if (!previousGraph) return sendJson(response, 200, { ok: false, message: 'Nothing to undo.' });
-    await saveGraph(options.vaultPath, previousGraph);
-    previousGraph = null;
+    const previous = await undoGraph(options.vaultPath);
+    if (!previous) return sendJson(response, 200, { ok: false, message: 'Nothing to undo.' });
     return sendJson(response, 200, { ok: true, ...(await statePayload(options.vaultPath)) });
   }
   if (url.pathname === '/api/experiments' && request.method === 'GET') {
@@ -188,6 +182,8 @@ async function route(
     if (typeof body.model === 'string' && body.model.trim()) config.model = body.model.trim();
     if (typeof body.baseUrl === 'string' && body.baseUrl.trim()) config.baseUrl = body.baseUrl.trim();
     if (typeof body.keyEnv === 'string' && body.keyEnv.trim()) config.keyEnv = body.keyEnv.trim();
+    if (typeof body.enableAI === 'boolean') config.enableAI = body.enableAI;
+    if (typeof body.aiConsentGranted === 'boolean') config.aiConsentGranted = body.aiConsentGranted;
     if (Array.isArray(body.includeFolders)) config.includeFolders = body.includeFolders.map(String);
     if (Array.isArray(body.excludeFolders)) config.excludeFolders = body.excludeFolders.map(String);
     if (Array.isArray(body.includeTags)) config.includeTags = body.includeTags.map(String);
@@ -225,12 +221,34 @@ async function statePayload(vaultPath: string) {
   const experiments = (await listExperiments(vaultPath)).map(experimentView);
   const discoveries = (await listDiscoveries(vaultPath)).map(discoveryView);
   const inbox = await listInbox(vaultPath);
+  const degree = new Map<string, number>();
+  for (const node of state.graph.nodes) degree.set(node.id, 0);
+  for (const edge of state.graph.edges) {
+    if (edge.status === 'rejected') continue;
+    degree.set(edge.source, (degree.get(edge.source) ?? 0) + 1);
+    degree.set(edge.target, (degree.get(edge.target) ?? 0) + 1);
+  }
+  const top = [...state.graph.nodes]
+    .sort((a, b) => (degree.get(b.id) ?? 0) - (degree.get(a.id) ?? 0))
+    .slice(0, 3)
+    .map((node) => ({ id: node.id, title: node.title, degree: degree.get(node.id) ?? 0 }));
+  const themeCounts = new Map<string, number>();
+  for (const node of state.graph.nodes) {
+    for (const tag of node.tags ?? []) themeCounts.set(tag, (themeCounts.get(tag) ?? 0) + 1);
+  }
+  const themes = [...themeCounts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 6)
+    .map(([tag, count]) => ({ tag, count }));
+  const orphans = state.graph.nodes.filter((node) => (degree.get(node.id) ?? 0) === 0).length;
+  const insights = { top, themes, orphans };
   return {
     vaultPath,
     model: config.model,
     baseUrl: config.baseUrl,
     keyReady: Boolean(key),
     graph: state.graph,
+    insights,
     activeExperiment: active ? experimentView(active) : null,
     experiments,
     discoveries,

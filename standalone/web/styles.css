@@ -245,3 +245,24 @@ button, input { font: inherit; }
 
 #model-badge { cursor: pointer; }
 
+.insights-strip {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  padding: 10px 14px; margin-bottom: 14px;
+  border-radius: 14px; border: 1px solid var(--line);
+  background: rgba(15,20,32,.6);
+}
+.insight-chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 6px 10px; border-radius: 999px;
+  background: rgba(255,255,255,.035); border: 1px solid var(--line);
+  color: var(--muted); font-size: 11px;
+}
+.insight-chip strong { color: #c7d2fe; font-weight: 600; }
+.insight-chip .tag { padding: 1px 6px; }
+.history-card .log .next { color: #c4b5fd; margin-top: 4px; }
+
+.modal-body label.check { display: flex; align-items: center; gap: 8px; color: var(--text); font-size: 12px; }
+.modal-body label.check input { width: auto; }
+
+.modal-body select { padding: 8px 10px; border-radius: 9px; border: 1px solid var(--line); background: rgba(0,0,0,.25); color: var(--text); }
+

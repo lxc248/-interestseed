@@ -36,6 +36,7 @@ function render() {
   keyStatus.textContent = state.data.keyReady ? 'Key 已保存' : '未配置 Key';
   keyStatus.className = `pill ${state.data.keyReady ? 'ready' : 'missing'}`;
   renderStats();
+  renderInsights();
   renderGraph();
   renderExperiment();
   renderDiscoveries();
@@ -57,6 +58,21 @@ function renderStats() {
     .join('');
 }
 
+function renderInsights() {
+  const insights = state.data.insights ?? { top: [], themes: [], orphans: 0 };
+  const chips = [];
+  if (insights.orphans) chips.push(`<span class="insight-chip">孤岛 <strong>${insights.orphans}</strong></span>`);
+  for (const node of insights.top ?? []) {
+    chips.push(`<span class="insight-chip">星核 <strong>${escapeHtml(node.title)}</strong> · ${node.degree}</span>`);
+  }
+  for (const theme of insights.themes ?? []) {
+    chips.push(`<span class="insight-chip"><span class="tag">#${escapeHtml(theme.tag)}</span> × ${theme.count}</span>`);
+  }
+  $('#insights-strip').innerHTML = chips.length
+    ? chips.join('')
+    : '<span class="insight-chip">扫描后这里会显示最连接节点、孤岛和主题。</span>';
+}
+
 function renderExperiment() {
   const strip = $('#experiment-strip');
   strip.innerHTML = '';
@@ -71,7 +87,7 @@ function renderExperiment() {
     const start = document.createElement('button');
     start.className = 'button primary';
     start.textContent = '开始 3 天实验';
-    start.addEventListener('click', () => startExperiment());
+    start.addEventListener('click', () => openExperimentModal());
     actions.appendChild(start);
     strip.appendChild(actions);
     return;
@@ -104,13 +120,16 @@ function renderExperiment() {
   const evidence = document.createElement('input');
   evidence.placeholder = '今天实际做了什么？';
   evidence.maxLength = 160;
+  const next = document.createElement('input');
+  next.placeholder = '下一步想做什么？（可选）';
+  next.maxLength = 120;
   const record = document.createElement('button');
   record.className = 'button primary';
   record.textContent = '记录';
   record.addEventListener('click', () => {
     const value = evidence.value.trim();
     if (value.length < 4) return toast('至少写 4 个字的真实观察。', true);
-    logExperiment({ evidence: value, interest: 4, energy: 4 });
+    logExperiment({ evidence: value, interest: 4, energy: 4, ...(next.value.trim() ? { next: next.value.trim() } : {}) });
   });
   const did = document.createElement('button');
   did.className = 'button ghost';
@@ -124,22 +143,38 @@ function renderExperiment() {
   missed.className = 'button ghost';
   missed.textContent = '没做';
   missed.addEventListener('click', () => logExperiment({ evidence: '今天没有做，也没有特别想起这个兴趣。', interest: 2, energy: 1 }));
-  actions.append(evidence, record, did, thought, missed);
+  actions.append(evidence, next, record, did, thought, missed);
   strip.appendChild(actions);
 }
 
-async function startExperiment(title) {
+function openExperimentModal(title) {
   const selected = state.data.graph.nodes.find((node) => node.id === state.selectedId);
-  const targetTitle = title || selected?.title;
+  const targetTitle = title || selected?.title || '';
   if (!targetTitle) return toast('先选择一个节点。', true);
+  $('#experiment-title').value = targetTitle;
+  $('#experiment-hypothesis').value = `我愿意连续 3 天为「${targetTitle}」做一次真实行动。`;
+  $('#experiment-days').value = '3';
+  openModal('experiment-modal');
+}
+
+async function submitExperimentStart() {
+  const selected = state.data.graph.nodes.find((node) => node.id === state.selectedId);
+  const title = $('#experiment-title').value.trim();
+  if (!title) return toast('实验需要一个标题。', true);
   try {
     setBusy(true);
     await api('/api/experiments', {
       method: 'POST',
-      body: JSON.stringify({ title: targetTitle, nodeId: selected?.id }),
+      body: JSON.stringify({
+        title,
+        hypothesis: $('#experiment-hypothesis').value.trim(),
+        targetDays: Number($('#experiment-days').value),
+        nodeId: selected?.id,
+      }),
     });
+    closeModal('experiment-modal');
     await load();
-    toast('3 天实验已开始');
+    toast('实验已开始');
   } catch (error) {
     toast(error.message, true);
   } finally {
@@ -255,7 +290,7 @@ function renderHistory() {
     for (const log of (experiment.logs ?? []).slice(-3)) {
       const entry = document.createElement('div');
       entry.className = 'log';
-      entry.innerHTML = `<span>DAY ${log.day} · ${log.date} · 兴趣 ${log.interest} / 精力 ${log.energy}</span><p>${escapeHtml(log.evidence)}</p>`;
+      entry.innerHTML = `<span>DAY ${log.day} · ${log.date} · 兴趣 ${log.interest} / 精力 ${log.energy}</span><p>${escapeHtml(log.evidence)}</p>${log.next ? `<p class="next">下一步：${escapeHtml(log.next)}</p>` : ''}`;
       card.appendChild(entry);
     }
     list.appendChild(card);
@@ -563,7 +598,7 @@ function renderAI() {
       const start = document.createElement('button');
       start.className = 'button green';
       start.textContent = '开始 3 天实验';
-      start.addEventListener('click', () => startExperiment(nodeTitle(state.lastConnected.target)));
+      start.addEventListener('click', () => openExperimentModal(nodeTitle(state.lastConnected.target)));
       actions.append(start);
     }
     actions.append(done);
@@ -752,6 +787,7 @@ $('#settings-button').addEventListener('click', openSettings);
 $('#model-badge').addEventListener('click', openSettings);
 $('#capture-submit').addEventListener('click', submitCapture);
 $('#settings-submit').addEventListener('click', saveSettings);
+$('#experiment-submit').addEventListener('click', submitExperimentStart);
 $('#settings-clear-key').addEventListener('click', clearKey);
 for (const button of document.querySelectorAll('.modal-close')) {
   button.addEventListener('click', () => {
@@ -777,6 +813,8 @@ async function openSettings() {
     const result = await api('/api/config');
     $('#settings-model').value = result.config.model ?? '';
     $('#settings-base-url').value = result.config.baseUrl ?? '';
+    $('#settings-enable-ai').checked = result.config.enableAI !== false;
+    $('#settings-ai-consent').checked = result.config.aiConsentGranted !== false;
     $('#settings-key').value = '';
     $('#settings-key').placeholder = result.keyReady
       ? '已保存 Key，留空保持不变；输入新 Key 可替换'
@@ -796,6 +834,8 @@ async function saveSettings() {
     const body = {
       model: $('#settings-model').value.trim(),
       baseUrl: $('#settings-base-url').value.trim(),
+      enableAI: $('#settings-enable-ai').checked,
+      aiConsentGranted: $('#settings-ai-consent').checked,
       includeFolders: $('#settings-include').value.split(/\r?\n/).map((value) => value.trim()).filter(Boolean),
       excludeFolders: $('#settings-exclude').value.split(/\r?\n/).map((value) => value.trim()).filter(Boolean),
       includeTags: $('#settings-include-tags').value.split(/\r?\n/).map((value) => value.trim()).filter(Boolean),

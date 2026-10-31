@@ -25,6 +25,7 @@
     </header>
 
     <section class="stats" id="stats"></section>
+    <section class="insights-strip" id="insights-strip"></section>
     <section class="experiment-strip" id="experiment-strip"></section>
 
     <main class="workspace">
@@ -126,6 +127,8 @@
         <input id="settings-model" placeholder="cn:deepseek-v4.1-flash" />
         <label>API 地址</label>
         <input id="settings-base-url" placeholder="http://localhost:7863/v1" />
+        <label class="check"><input type="checkbox" id="settings-enable-ai" /> 启用 AI 建议</label>
+        <label class="check"><input type="checkbox" id="settings-ai-consent" /> 我同意只发送节点 id、标题、标签</label>
         <label>Key</label>
         <input id="settings-key" type="password" placeholder="留空保持不变；输入新 Key 可替换" />
         <p class="hint">Key 只写入本机 <code>.interestseed/key</code>，不会进 Web。</p>
@@ -139,6 +142,30 @@
           <button id="settings-submit" class="button primary">保存</button>
           <button id="settings-clear-key" class="button danger">清除 Key</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="experiment-modal" class="modal-backdrop" hidden>
+    <div class="modal-card">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">EXPERIMENT</p>
+          <h2>开始实验</h2>
+        </div>
+        <button class="modal-close button ghost" data-close="experiment-modal">关闭</button>
+      </div>
+      <div class="modal-body">
+        <label>标题</label>
+        <input id="experiment-title" />
+        <label>假设</label>
+        <input id="experiment-hypothesis" />
+        <label>天数</label>
+        <select id="experiment-days">
+          <option value="3">3 天试跑</option>
+          <option value="7">7 天完整实验</option>
+        </select>
+        <button id="experiment-submit" class="button primary">开始</button>
       </div>
     </div>
   </div>

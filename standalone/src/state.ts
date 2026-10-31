@@ -15,6 +15,8 @@ export interface StandaloneConfig {
   model: string;
   baseUrl: string;
   keyEnv: string;
+  enableAI: boolean;
+  aiConsentGranted: boolean;
 }
 
 export const DEFAULT_CONFIG: StandaloneConfig = {
@@ -24,6 +26,8 @@ export const DEFAULT_CONFIG: StandaloneConfig = {
   model: 'cn:deepseek-v4.1-flash',
   baseUrl: 'http://localhost:7863/v1',
   keyEnv: 'INTERESTSEED_AI_API_KEY',
+  enableAI: true,
+  aiConsentGranted: true,
 };
 
 export interface StateFile {
@@ -65,6 +69,11 @@ export async function loadConfig(vaultPath: string): Promise<StandaloneConfig> {
     includeTags: Array.isArray(parsed.includeTags)
       ? parsed.includeTags
       : DEFAULT_CONFIG.includeTags,
+    enableAI: typeof parsed.enableAI === 'boolean' ? parsed.enableAI : DEFAULT_CONFIG.enableAI,
+    aiConsentGranted:
+      typeof parsed.aiConsentGranted === 'boolean'
+        ? parsed.aiConsentGranted
+        : DEFAULT_CONFIG.aiConsentGranted,
   };
 }
 
