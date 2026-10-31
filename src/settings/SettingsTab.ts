@@ -189,6 +189,32 @@ export class InterestSeedSettingsTab extends PluginSettingTab {
         }),
       );
 
+    let apiKeyDraft = '';
+    new Setting(containerEl)
+      .setName('本地服务 API Key（可选）')
+      .setDesc('写入 Obsidian 安全存储，不进入 data.json；留空则使用 INTERESTSEED_AI_API_KEY 环境变量。')
+      .addText((text) =>
+        text
+          .setPlaceholder('仅本地服务需要时填写')
+          .onChange((value) => {
+            apiKeyDraft = value;
+          }),
+      )
+      .addButton((button) =>
+        button.setButtonText('保存').onClick(async () => {
+          await this.plugin.saveAiApiKey(apiKeyDraft);
+          new Notice('AI API Key 已保存到安全存储。');
+          this.display();
+        }),
+      )
+      .addButton((button) =>
+        button.setButtonText('清除').onClick(async () => {
+          await this.plugin.saveAiApiKey('');
+          new Notice('AI API Key 已清除。');
+          this.display();
+        }),
+      );
+
     const provider =
       this.plugin.settings.aiProvider === 'claudian'
         ? 'Claudian（使用其现有模型配置）'

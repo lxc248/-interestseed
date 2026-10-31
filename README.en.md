@@ -115,7 +115,7 @@ These aren't a feature checklist. They're the moves I actually make every day.
 
 It takes about three minutes.
 
-1. Download `interestseed-v3.1.0.zip` from [Releases](https://github.com/lxc248/-interestseed/releases).
+1. Download `interestseed-v3.1.1.zip` from [Releases](https://github.com/lxc248/-interestseed/releases).
 2. Extract it into:
 
 ```text
@@ -142,7 +142,7 @@ prompts:    review-interest / plan-next-experiment
 ```
 
 The MCP surface is read-only. Core functionality needs no account or model credentials.  
-AI relation suggestions are on by default and only call the selected model when you ask. If unavailable, local rule discovery stays intact.
+AI relation suggestions are on by default and only call the selected model when you ask. A local service key can live in Obsidian SecretStorage, never in data.json. If unavailable, local rule discovery stays intact.
 
 ## How stable it is
 

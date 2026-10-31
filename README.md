@@ -115,7 +115,7 @@ Capture → Decide → Connect → Verify → Review → Next action
 
 三分钟能跑起来。
 
-1. 从 [Releases](https://github.com/lxc248/-interestseed/releases) 下载 `interestseed-v3.1.0.zip`。
+1. 从 [Releases](https://github.com/lxc248/-interestseed/releases) 下载 `interestseed-v3.1.1.zip`。
 2. 解压到：
 
 ```text
@@ -142,7 +142,7 @@ prompts:    review-interest / plan-next-experiment
 ```
 
 MCP 是只读的。核心功能不需要账号或模型凭据。  
-AI 关系建议默认开启，只在你点击 AI 时请求所选模型；不可用时会自动保留本地规则发现。
+AI 关系建议默认开启，只在你点击 AI 时请求所选模型；本地服务密钥可以存进 Obsidian 安全存储，不进入 data.json。不可用时会自动保留本地规则发现。
 
 ## 我把它做得多稳
 

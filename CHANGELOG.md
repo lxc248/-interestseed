@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.1.1 — Local AI key in SecretStorage
+
+- Added optional local AI API key storage via Obsidian SecretStorage.
+- Kept environment variable fallback and actionable 401/403 messages.
+- 516 tests passing.
+
 ## 3.1.0 — AI relation suggestions on by default
 
 - Enabled AI relation suggestions and consent by default for new installs.

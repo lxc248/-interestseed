@@ -281,6 +281,7 @@ export default class InterestSeedPlugin extends Plugin {
       settings: this.settings,
       getSelectedNodeId: () => this.selectedId,
       setSelectedNodeId: (nodeId) => this.setSelectedNode(nodeId),
+      getAiApiKey: () => this.getAiApiKey(),
       activateView: () => this.activateView(),
       markRebuilt: async (at) => {
         this.settingsLastRebuiltAt = at;
@@ -1045,10 +1046,15 @@ export default class InterestSeedPlugin extends Plugin {
     if (this.settings.aiProvider === 'claudian') {
       return exploreWithClaudian(this.app, request);
     }
-    const provider = createModelProvider({
-      enableAI: this.settings.enableAI,
-      aiConsentGranted: this.settings.aiConsentGranted,
-    });
+    const apiKey = await this.getAiApiKey();
+    const provider = createModelProvider(
+      {
+        enableAI: this.settings.enableAI,
+        aiConsentGranted: this.settings.aiConsentGranted,
+      },
+      undefined,
+      apiKey,
+    );
     try {
       if (!provider.explore) {
         throw new Error('AI 尚未启用或未授权；请在设置中启用 AI 并确认隐私授权。');
@@ -1307,6 +1313,39 @@ export default class InterestSeedPlugin extends Plugin {
   }
 
   // ------------------------------------------------------------ 设置与持久化
+
+  async getAiApiKey(): Promise<string | undefined> {
+    const storage = (
+      this.app as unknown as {
+        secretStorage?: { getSecret(id: string): Promise<string | null> };
+      }
+    ).secretStorage;
+    if (!storage) return undefined;
+    try {
+      const value = await storage.getSecret('interestseed-ai-key');
+      return value?.trim() || undefined;
+    } catch {
+      return undefined;
+    }
+  }
+
+  async saveAiApiKey(value: string): Promise<void> {
+    const storage = (
+      this.app as unknown as {
+        secretStorage?: {
+          setSecret(id: string, secret: string): Promise<void>;
+          deleteSecret(id: string): Promise<void>;
+        };
+      }
+    ).secretStorage;
+    if (!storage) {
+      new Notice('当前 Obsidian 不支持安全存储，无法保存 API Key。');
+      return;
+    }
+    const trimmed = value.trim();
+    if (trimmed) await storage.setSecret('interestseed-ai-key', trimmed);
+    else await storage.deleteSecret('interestseed-ai-key');
+  }
 
   async saveSettings(): Promise<void> {
     await this.persist();

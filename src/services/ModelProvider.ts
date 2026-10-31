@@ -586,12 +586,13 @@ export function parseExplorationInsight(
 }
 
 /**
- * v1 默认禁用；只有 enableAI 与 aiConsentGranted 同时为 true 才创建实验适配器。
- * 关闭或不满足授权时始终使用禁用实现。
+ * 低层默认禁用；应用设置默认启用并向这里传入 enableAI/consent。
+ * 只有 enableAI 与 aiConsentGranted 同时为 true 才创建适配器。
  */
 export function createModelProvider(
   settings: ModelProviderSettings = { enableAI: false, aiConsentGranted: false },
   requestImpl?: typeof fetch,
+  apiKey: string | undefined = resolveLocalApiKey(),
 ): ModelProvider {
   if (!settings.enableAI || !settings.aiConsentGranted) {
     return new DisabledModelProvider();
@@ -599,6 +600,6 @@ export function createModelProvider(
   return new OpenAICompatibleModelProvider(
     DEEPSEEK_V4_PRO_CONFIG,
     requestImpl ?? ((input, init) => fetch(input, init)),
-    resolveLocalApiKey(),
+    apiKey,
   );
 }

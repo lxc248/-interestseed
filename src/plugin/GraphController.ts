@@ -124,6 +124,7 @@ export interface GraphControllerDeps {
   settings: InterestSeedSettings;
   getSelectedNodeId(): string | null;
   setSelectedNodeId(id: string | null): void;
+  getAiApiKey(): Promise<string | undefined>;
   activateView(): Promise<void>;
   markRebuilt(at: string): Promise<void>;
   setScanning(scanning: boolean): void;
@@ -465,12 +466,14 @@ export class GraphController {
   }
 
   async expandWithAI(_nodeId?: string): Promise<void> {
+    const apiKey = await this.deps.getAiApiKey();
     const provider = createModelProvider(
       {
         enableAI: this.deps.settings.enableAI,
         aiConsentGranted: this.deps.settings.aiConsentGranted,
       },
       aiRequestFetch,
+      apiKey,
     );
     try {
       const available = await provider.isAvailable();
@@ -490,7 +493,10 @@ export class GraphController {
       this.deps.openAiSuggestions(suggestions);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      new Notice(`AI 建议不可用：${message}。已保留本地规则发现。`, 10_000);
+      const authHint = /\b401\b|\b403\b/.test(message)
+        ? '，请检查设置中的本地服务 API Key'
+        : '';
+      new Notice(`AI 建议不可用：${message}${authHint}。已保留本地规则发现。`, 10_000);
     } finally {
       provider.dispose();
     }
