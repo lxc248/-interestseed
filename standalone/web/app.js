@@ -62,7 +62,7 @@ function renderStats() {
     ['节点', stats.nodes, '笔记、项目、主题'],
     ['关系', stats.edges, '图谱里的连接'],
     ['已确认', stats.confirmed, '你确认过的证据'],
-    ['待整理', stats.suggested, '规则建议'],
+    ['待确认', stats.suggested, '规则建议'],
   ];
   $('#stats').innerHTML = cards
     .map(([label, value, hint]) => `<div class="stat"><strong>${value}</strong><span>${label} · ${hint}</span></div>`)
@@ -552,6 +552,7 @@ function renderGraph() {
   }
   const selected = nodes.find((node) => node.id === state.selectedId)
     ?? [...nodes].sort((a, b) => (degree.get(b.id) ?? 0) - (degree.get(a.id) ?? 0))[0];
+  if (state.selectedId !== selected.id) state.selectedId = selected.id;
   const others = nodes
     .filter((node) => node.id !== selected.id)
     .sort((a, b) => (degree.get(b.id) ?? 0) - (degree.get(a.id) ?? 0));
@@ -815,20 +816,43 @@ function renderAI() {
       body.appendChild(waiting);
       return;
     }
+    const stage = chainStateOf(selected.id);
+    const stageMeta = chainMeta(stage);
     const card = document.createElement('div');
     card.className = 'ai-empty';
-    card.innerHTML = `<h3>从「${escapeHtml(selected.title)}」开始</h3><p>AI 会先看这个节点，再从图谱里挑一条最值得验证的连接。一次只给一条。</p>`;
+    card.innerHTML = `<h3>「${escapeHtml(selected.title)}」 · ${escapeHtml(stageMeta.label)}</h3><p>下一步：${escapeHtml(stageMeta.next)}</p>`;
     const stack = document.createElement('div');
     stack.className = 'stack';
-    const suggest = document.createElement('button');
-    suggest.className = 'button primary';
-    suggest.textContent = '用 AI 找一条连接';
-    suggest.addEventListener('click', () => suggestFor(selected.id));
+    if (stage === 'captured') {
+      const suggest = document.createElement('button');
+      suggest.className = 'button primary';
+      suggest.textContent = '用 AI 找一条连接';
+      suggest.addEventListener('click', () => suggestFor(selected.id));
+      stack.append(suggest);
+    } else if (stage === 'connected') {
+      const start = document.createElement('button');
+      start.className = 'button primary';
+      start.textContent = '开始 3 天实验';
+      start.addEventListener('click', () => openExperimentModal(selected.title));
+      stack.append(start);
+    } else if (stage === 'experimenting') {
+      const log = document.createElement('button');
+      log.className = 'button primary';
+      log.textContent = '记录今天的证据';
+      log.addEventListener('click', () => document.getElementById('experiment-strip')?.scrollIntoView({ behavior: 'smooth', block: 'center' }));
+      stack.append(log);
+    } else {
+      const audit = document.createElement('button');
+      audit.className = 'button primary';
+      audit.textContent = '打开发现体检';
+      audit.addEventListener('click', openDiscoveryAudit);
+      stack.append(audit);
+    }
     const scan = document.createElement('button');
     scan.className = 'button ghost';
     scan.textContent = '重新扫描 vault';
     scan.addEventListener('click', scanVault);
-    stack.append(suggest, scan);
+    stack.append(scan);
     card.appendChild(stack);
     body.appendChild(card);
     return;
