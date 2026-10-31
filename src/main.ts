@@ -1054,6 +1054,7 @@ export default class InterestSeedPlugin extends Plugin {
       {
         enableAI: this.settings.enableAI,
         aiConsentGranted: this.settings.aiConsentGranted,
+        model: this.settings.aiModel,
       },
       undefined,
       apiKey,
@@ -1357,7 +1358,7 @@ export default class InterestSeedPlugin extends Plugin {
         providerLabel:
           this.settings.aiProvider === 'claudian'
             ? 'Claudian'
-            : '本地 DeepSeek V4 Pro',
+            : `本地模型 · ${this.settings.aiModel}`,
         enabled: this.settings.enableAI,
         consentGranted: this.settings.aiConsentGranted,
         hasKey: Boolean(key),

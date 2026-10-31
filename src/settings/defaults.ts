@@ -1,4 +1,4 @@
-import { DEEPSEEK_V4_PRO_CONFIG } from '../services/ModelProvider';
+import { DEFAULT_AI_MODEL } from '../services/ModelProvider';
 import type { InterestSeedSettings } from '../types/graph';
 import { isRecord, sanitizeTags } from '../utils/validation';
 
@@ -9,7 +9,8 @@ export const DEFAULT_SETTINGS: InterestSeedSettings = {
   includeTags: [],
   enableRuleSuggestions: true,
   enableAI: true,
-  aiProvider: DEEPSEEK_V4_PRO_CONFIG.model,
+  aiProvider: 'local',
+  aiModel: DEFAULT_AI_MODEL,
   aiConsentGranted: true,
   seedSprintCompletedAt: null,
   enableDshAgent: false,
@@ -38,9 +39,11 @@ export function normalizeSettings(raw: unknown): InterestSeedSettings {
     enableAI:
       typeof source.enableAI === 'boolean' ? source.enableAI : DEFAULT_SETTINGS.enableAI,
     aiProvider:
-      source.aiProvider === 'claudian'
-        ? 'claudian'
-        : DEEPSEEK_V4_PRO_CONFIG.model,
+      source.aiProvider === 'claudian' ? 'claudian' : 'local',
+    aiModel:
+      typeof source.aiModel === 'string' && source.aiModel.trim()
+        ? source.aiModel.trim()
+        : DEFAULT_SETTINGS.aiModel,
     aiConsentGranted:
       typeof source.aiConsentGranted === 'boolean'
         ? source.aiConsentGranted

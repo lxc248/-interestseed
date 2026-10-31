@@ -83,7 +83,10 @@ export class AiSuggestionModal extends Modal {
     });
     head.createEl('span', {
       cls: 'interestseed-ai-suggestion-confidence',
-      text: `${Math.round((row.confidence ?? 0) * 100)}%`,
+      text:
+        typeof row.confidence === 'number'
+          ? `${Math.round(row.confidence * 100)}%`
+          : '未评分',
     });
     card.createEl('p', {
       cls: 'interestseed-ai-suggestion-relation',

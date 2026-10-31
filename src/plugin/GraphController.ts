@@ -481,6 +481,7 @@ export class GraphController {
       {
         enableAI: this.deps.settings.enableAI,
         aiConsentGranted: this.deps.settings.aiConsentGranted,
+        model: this.deps.settings.aiModel,
       },
       aiRequestFetch,
       apiKey,

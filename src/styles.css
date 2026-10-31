@@ -6916,3 +6916,11 @@ body.theme-light .interestseed-sprint-option.is-selected {
   font-size: 11px;
   line-height: 1.5;
 }
+.interestseed-ai-suggestion-head strong {
+  min-width: 0;
+  line-height: 1.4;
+}
+.interestseed-ai-suggestion-confidence {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}

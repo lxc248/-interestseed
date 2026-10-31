@@ -99,11 +99,21 @@ export interface ExperimentalModelConfig {
 }
 
 export const DEEPSEEK_V4_PRO_CONFIG: ExperimentalModelConfig = {
-  displayName: 'DeepSeek V4 Pro',
+  displayName: 'Local model',
   model: 'cn:deepseek-v4-pro',
   baseUrl: 'http://localhost:7863/v1',
   protocol: 'openai-chat-completions',
 };
+
+/** 本地服务的默认模型；可在设置里改成服务实际暴露的任意 ID。 */
+export const DEFAULT_AI_MODEL = 'cn:deepseek-v4.1-flash';
+
+export function localModelConfig(model?: string): ExperimentalModelConfig {
+  return {
+    ...DEEPSEEK_V4_PRO_CONFIG,
+    model: model?.trim() || DEFAULT_AI_MODEL,
+  };
+}
 
 /** 未来启用 AI 时需要向用户展示的字段清单与服务商信息。 */
 export const RELATION_REQUEST_FIELDS = ['节点 id', '标题', '标签'] as const;
@@ -114,6 +124,7 @@ export const AI_ENABLEMENT_NOTICE =
 export interface ModelProviderSettings {
   enableAI: boolean;
   aiConsentGranted: boolean;
+  model?: string;
 }
 
 /**
@@ -242,6 +253,7 @@ export class OpenAICompatibleModelProvider implements ModelProvider {
     return parseSuggestionPayload(
       content,
       new Set(safeRequest.nodes.map((node) => node.id)),
+      safeRequest.nodes,
     );
   }
 
@@ -355,6 +367,7 @@ export const MAX_AI_SUGGESTIONS = 8;
 function parseSuggestionPayload(
   content: string,
   allowedNodeIds: ReadonlySet<string>,
+  nodes: RelationRequest['nodes'] = [],
 ): AiSuggestionPayload {
   let text = content.trim();
   const fence = /^```(?:json)?\s*([\s\S]*?)\s*```$/i.exec(text);
@@ -375,52 +388,29 @@ function parseSuggestionPayload(
     throw new ModelProviderError('invalid-response', 'AI 返回缺少 suggestions 数组');
   }
 
-  const normalized = suggestions.map((item) => {
-    if (
-      typeof item !== 'object' ||
-      item === null ||
-      typeof (item as { source?: unknown }).source !== 'string' ||
-      !(item as { source: string }).source.trim() ||
-      typeof (item as { target?: unknown }).target !== 'string' ||
-      !(item as { target: string }).target.trim() ||
-      typeof (item as { relation?: unknown }).relation !== 'string' ||
-      !(item as { relation: string }).relation.trim()
-    ) {
-      throw new ModelProviderError(
-        'invalid-response',
-        'AI 建议缺少 source/target/relation 字符串',
-      );
-    }
-    const source = (item as { source: string }).source.trim();
-    const target = (item as { target: string }).target.trim();
-    const relation = (item as { relation: string }).relation.trim();
-    if (relation.length > MAX_AI_RELATION_LENGTH) {
-      throw new ModelProviderError('invalid-response', 'AI 建议关系名过长');
-    }
-    if (source === target) {
-      throw new ModelProviderError('invalid-response', 'AI 建议不能是自环');
-    }
-    if (!allowedNodeIds.has(source) || !allowedNodeIds.has(target)) {
-      throw new ModelProviderError('invalid-response', 'AI 建议引用了未提交的节点');
-    }
-    const reasonRaw = (item as { reason?: unknown }).reason;
-    const reason =
-      typeof reasonRaw === 'string'
-        ? reasonRaw.trim().slice(0, MAX_AI_REASON_LENGTH)
-        : '';
-    const confidenceRaw = (item as { confidence?: unknown }).confidence;
-    const confidence =
-      typeof confidenceRaw === 'number' && Number.isFinite(confidenceRaw)
-        ? Math.max(0, Math.min(1, confidenceRaw))
-        : 0.5;
-    return {
+  const byId = new Map(nodes.map((node) => [node.id, node]));
+  const normalized: AiRelationSuggestion[] = [];
+  for (const item of suggestions) {
+    if (typeof item !== 'object' || item === null) continue;
+    const record = item as Record<string, unknown>;
+    const source = readStringField(record, ['source', 'sourceId', 'from', 'fromId']);
+    const target = readStringField(record, ['target', 'targetId', 'to', 'toId']);
+    if (!source || !target) continue;
+    if (source === target) continue;
+    if (!allowedNodeIds.has(source) || !allowedNodeIds.has(target)) continue;
+    const relation =
+      readStringField(record, ['relation', 'label', 'type', 'name']) ??
+      deriveRelation(source, target, byId);
+    const reason = readStringField(record, ['reason', 'why', 'explanation']);
+    const confidence = readNumberField(record, ['confidence', 'score']);
+    normalized.push({
       source,
       target,
-      relation,
-      ...(reason ? { reason } : {}),
-      confidence,
-    };
-  });
+      relation: relation.slice(0, MAX_AI_RELATION_LENGTH),
+      ...(reason ? { reason: reason.slice(0, MAX_AI_REASON_LENGTH) } : {}),
+      ...(confidence === null ? {} : { confidence: Math.max(0, Math.min(1, confidence)) }),
+    });
+  }
 
   const seenPairs = new Set<string>();
   const deduped: AiRelationSuggestion[] = [];
@@ -432,6 +422,39 @@ function parseSuggestionPayload(
     if (deduped.length >= MAX_AI_SUGGESTIONS) break;
   }
   return { suggestions: deduped };
+}
+
+function readStringField(record: Record<string, unknown>, keys: string[]): string | null {
+  for (const key of keys) {
+    const value = record[key];
+    if (typeof value === 'string' && value.trim()) return value.trim();
+  }
+  return null;
+}
+
+function readNumberField(record: Record<string, unknown>, keys: string[]): number | null {
+  for (const key of keys) {
+    const value = record[key];
+    if (typeof value === 'number' && Number.isFinite(value)) return value;
+    if (typeof value === 'string' && value.trim() && Number.isFinite(Number(value))) {
+      return Number(value);
+    }
+  }
+  return null;
+}
+
+function deriveRelation(
+  source: string,
+  target: string,
+  byId: ReadonlyMap<string, RelationRequest['nodes'][number]>,
+): string {
+  const sourceTags = new Set(
+    (byId.get(source)?.tags ?? []).map((tag) => tag.toLowerCase()),
+  );
+  const shared = (byId.get(target)?.tags ?? []).find((tag) =>
+    sourceTags.has(tag.toLowerCase()),
+  );
+  return shared ? `共享 ${shared}` : '相关';
 }
 
 /**
@@ -735,8 +758,9 @@ export function createModelProvider(
     return new DisabledModelProvider();
   }
   return new OpenAICompatibleModelProvider(
-    DEEPSEEK_V4_PRO_CONFIG,
+    localModelConfig(settings.model),
     requestImpl ?? ((input, init) => fetch(input, init)),
     apiKey,
   );
 }
+

@@ -2,7 +2,7 @@ import { Notice, PluginSettingTab, Setting } from 'obsidian';
 import type { App } from 'obsidian';
 import type InterestSeedPlugin from '../main';
 import type { InterestSeedSettings } from '../types/graph';
-import { DEEPSEEK_V4_PRO_CONFIG } from '../services/ModelProvider';
+import { DEFAULT_AI_MODEL, DEEPSEEK_V4_PRO_CONFIG } from '../services/ModelProvider';
 import { confirmAction } from '../ui/ConfirmModal';
 import { sanitizeTags } from '../utils/validation';
 import { sanitizeFolders } from './defaults';
@@ -164,17 +164,29 @@ export class InterestSeedSettingsTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName('模型提供方')
-      .setDesc('本地 DeepSeek 走 localhost:7863；Claudian 使用已安装的 Claudian 插件。')
+      .setDesc('本地模型走 localhost:7863；Claudian 使用已安装的 Claudian 插件。')
       .addDropdown((dropdown) =>
         dropdown
-          .addOption(DEEPSEEK_V4_PRO_CONFIG.model, '本地 DeepSeek V4 Pro')
+          .addOption('local', '本地模型（localhost:7863）')
           .addOption('claudian', 'Claudian')
           .setValue(this.plugin.settings.aiProvider)
           .onChange(async (value) => {
-            this.plugin.settings.aiProvider =
-              value === 'claudian' ? 'claudian' : DEEPSEEK_V4_PRO_CONFIG.model;
+            this.plugin.settings.aiProvider = value === 'claudian' ? 'claudian' : 'local';
             await this.plugin.saveSettings();
             this.display();
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName('模型 ID')
+      .setDesc('填本地服务实际暴露的 ID，例如 cn:deepseek-v4.1-flash；留空使用默认值。')
+      .addText((text) =>
+        text
+          .setPlaceholder(DEFAULT_AI_MODEL)
+          .setValue(this.plugin.settings.aiModel)
+          .onChange(async (value) => {
+            this.plugin.settings.aiModel = value.trim() || DEFAULT_AI_MODEL;
+            await this.plugin.saveSettings();
           }),
       );
 
@@ -225,7 +237,7 @@ export class InterestSeedSettingsTab extends PluginSettingTab {
     const provider =
       this.plugin.settings.aiProvider === 'claudian'
         ? 'Claudian（使用其现有模型配置）'
-        : `本地 DeepSeek V4 Pro · ${DEEPSEEK_V4_PRO_CONFIG.baseUrl}`;
+        : `本地模型 · ${this.plugin.settings.aiModel} · ${DEEPSEEK_V4_PRO_CONFIG.baseUrl}`;
     containerEl.createEl('p', {
       cls: 'setting-item-description',
       text: `当前模型：${provider}。本地服务需要先在电脑上启动；AI 不可用时会自动保留本地规则发现。`,

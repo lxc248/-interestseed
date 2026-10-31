@@ -224,12 +224,10 @@ describe('OpenAI-compatible experimental provider', () => {
     }
   });
 
-  it('rejects prose, mixed prose+JSON, malformed fields and empty content', async () => {
+  it('rejects prose, mixed prose+JSON and empty content', async () => {
     const cases = [
       'These 6 nodes are all tagged theme8.',
       'Here is the JSON:\n{"suggestions":[]}',
-      '{"suggestions":[{"source":"node-1"}]}',
-      '{"suggestions":[{"source":1,"target":"b","relation":"r"}]}',
       '   ',
     ];
     for (const content of cases) {
@@ -249,7 +247,33 @@ describe('OpenAI-compatible experimental provider', () => {
     }
   });
 
-  it('rejects unknown node ids and self-loop suggestions', async () => {
+  it('drops malformed items and keeps valid suggestions', async () => {
+    const content =
+      '{"suggestions":[{"source":"node-1"},{"source":"node-1","target":"node-2","reason":"shared tag"}]}';
+    const provider = new OpenAICompatibleModelProvider(
+      DEEPSEEK_V4_PRO_CONFIG,
+      (async () =>
+        ({
+          ok: true,
+          status: 200,
+          json: async () => ({ choices: [{ message: { content } }] }),
+        }) as Response) as typeof fetch,
+    );
+    const result = (await provider.suggestRelations(
+      buildRelationRequest([node(), node({ id: 'node-2' })]),
+    )) as { suggestions: Array<Record<string, unknown>> };
+    expect(result.suggestions).toHaveLength(1);
+    expect(result.suggestions[0]).toMatchObject({
+      source: 'node-1',
+      target: 'node-2',
+      relation: '共享 focus',
+      reason: 'shared tag',
+    });
+    expect(result.suggestions[0]?.confidence).toBeUndefined();
+    provider.dispose();
+  });
+
+  it('drops unknown node ids and self-loop suggestions', async () => {
     for (const content of [
       '{"suggestions":[{"source":"node-1","target":"unknown","relation":"r"}]}',
       '{"suggestions":[{"source":"node-1","target":"node-1","relation":"r"}]}',
@@ -265,7 +289,7 @@ describe('OpenAI-compatible experimental provider', () => {
       );
       await expect(
         provider.suggestRelations(buildRelationRequest([node()])),
-      ).rejects.toMatchObject({ code: 'invalid-response' });
+      ).resolves.toEqual({ suggestions: [] });
       provider.dispose();
     }
   });

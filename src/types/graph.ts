@@ -80,6 +80,7 @@ export interface InterestSeedSettings {
   enableRuleSuggestions: boolean;
   enableAI: boolean;
   aiProvider: string;
+  aiModel: string;
   aiConsentGranted: boolean;
   seedSprintCompletedAt: string | null;
   enableDshAgent: boolean;

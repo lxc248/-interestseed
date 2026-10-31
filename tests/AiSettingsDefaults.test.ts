@@ -4,7 +4,7 @@ import {
   normalizeSettings,
 } from '../src/settings/defaults';
 import {
-  DEEPSEEK_V4_PRO_CONFIG,
+  DEFAULT_AI_MODEL,
   createModelProvider,
 } from '../src/services/ModelProvider';
 
@@ -12,11 +12,13 @@ describe('AI defaults', () => {
   it('enables AI and consent by default for new installs', () => {
     expect(DEFAULT_SETTINGS.enableAI).toBe(true);
     expect(DEFAULT_SETTINGS.aiConsentGranted).toBe(true);
-    expect(DEFAULT_SETTINGS.aiProvider).toBe(DEEPSEEK_V4_PRO_CONFIG.model);
+    expect(DEFAULT_SETTINGS.aiProvider).toBe('local');
+    expect(DEFAULT_SETTINGS.aiModel).toBe(DEFAULT_AI_MODEL);
 
     const normalized = normalizeSettings(undefined);
     expect(normalized.enableAI).toBe(true);
     expect(normalized.aiConsentGranted).toBe(true);
+    expect(normalized.aiModel).toBe(DEFAULT_AI_MODEL);
   });
 
   it('keeps an explicit opt-out', () => {
