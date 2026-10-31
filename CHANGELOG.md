@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.5.0 — One AI suggestion at a time
+
+- Replaced the batch pending list with a single suggestion card.
+- Actions: connect / next / not now; relation name editable.
+- Connecting shows success and undo, then advances to the next suggestion.
+- Removed pending/accepted status chrome from the AI surface.
+- 525 tests passing.
+
 ## 3.4.2 — AI confirmation flow rework
 
 - Confirmed AI edges now show a write banner with an undo button.

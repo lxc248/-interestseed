@@ -9,7 +9,7 @@ on:
       tag:
         description: 'Tag to build and release'
         required: true
-        default: 'v3.4.2'
+        default: 'v3.5.0'
 
 permissions:
   contents: write

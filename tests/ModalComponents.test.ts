@@ -93,7 +93,7 @@ describe('RelationEditModal', () => {
 });
 
 describe('AiSuggestionModal', () => {
-  it('renders a suggestion and can ignore it', () => {
+  it('shows one suggestion at a time and can skip it', () => {
     const modal = new AiSuggestionModal(
       {} as never,
       [{ source: 'a', target: 'b', relation: 'related-to', reason: '共享标签：focus', confidence: 0.82 }],
@@ -103,16 +103,19 @@ describe('AiSuggestionModal', () => {
       },
     );
     modal.open();
-    expect(modal.contentEl.textContent).toContain('共 1 条候选');
+    expect(modal.contentEl.textContent).toContain('AI 建议 · 1 / 1');
     expect(modal.contentEl.textContent).toContain('节点 A → 节点 B');
-    expect(modal.contentEl.textContent).toContain('82%');
+    expect(modal.contentEl.textContent).toContain('可信度 82%');
     expect(modal.contentEl.textContent).toContain('共享标签：focus');
-    const ignore = [...modal.contentEl.querySelectorAll('button')].find((b) => b.textContent === '忽略') as HTMLButtonElement;
-    ignore.click();
-    expect(modal.contentEl.textContent).toContain('已忽略');
+    expect(modal.contentEl.textContent).not.toContain('待确认');
+    const skip = [...modal.contentEl.querySelectorAll('button')].find(
+      (button) => button.textContent === '先不用',
+    ) as HTMLButtonElement;
+    skip.click();
+    expect(modal.contentEl.textContent).toContain('没有更多建议了');
   });
 
-  it('passes reason and confidence through confirmation', async () => {
+  it('passes reason and confidence through connection', async () => {
     const confirm = vi.fn(async () => ({ ok: true }));
     const modal = new AiSuggestionModal(
       {} as never,
@@ -124,7 +127,7 @@ describe('AiSuggestionModal', () => {
     );
     modal.open();
     const button = [...modal.contentEl.querySelectorAll('button')].find(
-      (item) => item.textContent === '确认',
+      (item) => item.textContent === '连上',
     ) as HTMLButtonElement;
     button.click();
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -137,7 +140,7 @@ describe('AiSuggestionModal', () => {
     });
   });
 
-  it('lets the user rename the relation before confirming', async () => {
+  it('lets the user rename the relation before connecting', async () => {
     const confirm = vi.fn(async () => ({ ok: true }));
     const modal = new AiSuggestionModal(
       {} as never,
@@ -154,7 +157,7 @@ describe('AiSuggestionModal', () => {
     input.value = '同一个实验';
     input.dispatchEvent(new Event('change'));
     const button = [...modal.contentEl.querySelectorAll('button')].find(
-      (item) => item.textContent === '确认',
+      (item) => item.textContent === '连上',
     ) as HTMLButtonElement;
     button.click();
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -163,7 +166,7 @@ describe('AiSuggestionModal', () => {
     );
   });
 
-  it('shows a write banner and can undo the accepted edge', async () => {
+  it('shows a success bar and can undo the accepted edge', async () => {
     const onUndo = vi.fn(() => true);
     const modal = new AiSuggestionModal(
       {} as never,
@@ -176,22 +179,22 @@ describe('AiSuggestionModal', () => {
     );
     modal.open();
     expect(modal.contentEl.textContent).not.toContain('未评分');
-    expect(modal.contentEl.textContent).toContain('模型没有返回置信度');
+    expect(modal.contentEl.textContent).not.toContain('待确认');
 
-    const confirmButton = [...modal.contentEl.querySelectorAll('button')].find(
-      (item) => item.textContent === '确认',
+    const connectButton = [...modal.contentEl.querySelectorAll('button')].find(
+      (item) => item.textContent === '连上',
     ) as HTMLButtonElement;
-    confirmButton.click();
+    connectButton.click();
     await new Promise((resolve) => setTimeout(resolve, 0));
-    expect(modal.contentEl.textContent).toContain('已写入 1 条 AI 关系');
+    expect(modal.contentEl.textContent).toContain('已连上这条关系');
 
     const undoButton = [...modal.contentEl.querySelectorAll('button')].find(
-      (item) => item.textContent === '撤销这次写入',
+      (item) => item.textContent === '撤销',
     ) as HTMLButtonElement;
     undoButton.click();
     expect(onUndo).toHaveBeenCalled();
-    expect(modal.contentEl.textContent).toContain('已撤销');
-    expect(modal.contentEl.textContent).not.toContain('已写入 1 条 AI 关系');
+    expect(modal.contentEl.textContent).toContain('没有更多建议了');
+    expect(modal.contentEl.textContent).not.toContain('已连上这条关系');
   });
 });
 

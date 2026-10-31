@@ -94,7 +94,7 @@ Capture → Decide → Connect → Verify → Review → Next action
   <tr>
     <td width="50%">
       <img src="assets/ai-suggestions-live.png" alt="AI 关系建议" /><br/>
-      <sub><b>AI 关系建议</b>：带理由的候选关系，确认后才写入。</sub>
+      <sub><b>AI 建议</b>：一次只给一条，连上 / 换一个 / 先不用。</sub>
     </td>
     <td width="50%">
       <img src="assets/ai-setup.png" alt="接入自己的 AI" /><br/>
@@ -117,7 +117,7 @@ Capture → Decide → Connect → Verify → Review → Next action
 | **上下文搜索** | 标题、标签、摘要、为什么、原文、来源路径、观察证据，多字段确定性搜索，无需 embedding |
 | **兴趣路线** | 显式命令生成 Markdown MOC，从不自动写笔记 |
 | **五种分享卡** | 小红书、Instagram、X、微信、Story，全部本地 Canvas 渲染 |
-| **AI 关系建议** | 默认开启；引导窗口接入自己的 Key；默认模型 `cn:deepseek-v4.1-flash`，可改模型 ID；只发节点 id、标题、标签，返回理由与置信度 |
+| **AI 建议** | 默认开启；一次只给一条；可改关系名；连上后可撤销；默认模型 `cn:deepseek-v4.1-flash` |
 | **MCP 接口** | 零依赖只读 MCP server，协议 `2026-07-28` |
 | **自适应布局** | 桌面、窄栏、极窄栏三档，图标优先，不横向溢出 |
 
@@ -125,7 +125,7 @@ Capture → Decide → Connect → Verify → Review → Next action
 
 三分钟能跑起来。
 
-1. 从 [Releases](https://github.com/lxc248/-interestseed/releases) 下载 `interestseed-v3.4.2.zip`。
+1. 从 [Releases](https://github.com/lxc248/-interestseed/releases) 下载 `interestseed-v3.5.0.zip`。
 2. 解压到：
 
 ```text

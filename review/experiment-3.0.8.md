@@ -1,4 +1,4 @@
-﻿# InterestSeed 3.0.8 全功能模拟实验报告
+# InterestSeed 3.0.8 全功能模拟实验报告
 
 ## 1. 实验信息
 
@@ -94,9 +94,9 @@ review/experiment-3.0.8/results-onboarding.json
 | 49 | AI 推荐卡理由与置信度 | ✅ 按可信度排序、显示理由 | 51-ai-suggestion-card.png |
 | 50 | AI 接入引导窗口 | ✅ 说明边界、保存 Key、打开设置 | 52-ai-setup-modal.png |
 | 51 | 真实 v4.1 Flash 建议 | ✅ 5 条候选、理由显示 | 54-ai-live-v41-flash.png |
-| 52 | 确认前改关系名 | ✅ 输入框可编辑 | 58-ai-rename-before-confirm.png |
-| 53 | 写入后撤销横幅 | ✅ 已写入 1 条、可撤销 | 59-ai-write-banner.png |
-| 54 | 撤销后状态 | ✅ 已撤销、图谱 32 | 60-ai-undone.png |
+| 52 | AI 单条建议界面 | ✅ 1/5、无“待确认”列表 | 61-ai-single-suggestion.png |
+| 53 | 连上后状态 | ✅ 33 条关系、可撤销 | 62-ai-single-connected.png |
+| 54 | 撤销后状态 | ✅ 32 条关系、回到下一条 | 63-ai-single-undone.png |
 | 55 | MCP smoke | ✅ 4/4 | 命令行输出 |
 
 ## 4. 关键流程

@@ -60,7 +60,7 @@ Set via: GitHub → Settings → Social preview
 ## Release title
 
 ```text
-InterestSeed 3.4.2 — AI 确认流程重做
+InterestSeed 3.5.0 — AI 一次只给一条建议
 ```
 
 ## Release body — English
@@ -74,18 +74,17 @@ save a 3-day test, then lets the evidence decide.
 
 ![InterestSeed demo](https://raw.githubusercontent.com/lxc248/-interestseed/main/assets/interestseed-demo.gif)
 
-### What 3.4.2 actually changes
+### What 3.5.0 actually changes
 
-The AI confirmation flow now explains itself:
+AI now gives one suggestion at a time:
 
-- after writing, a banner says how many relations were written;
-- the banner offers "undo this write" and "done";
-- undone rows show "undone" instead of a stale "accepted";
-- relation names are editable before confirmation;
-- missing confidence no longer renders "unrated"; one note explains it;
-- saved keys show "saved, keep blank to keep it" and a clear-key action;
-- live run on `cn:deepseek-v4.1-flash`: 5 focused candidates, 32 → 33 → 32 edges;
-- README shows the redesigned AI screens;
+- one card, `1 / 5`, no batch pending list;
+- actions: connect / next / not now;
+- relation name editable before connecting;
+- connecting shows a success bar with undo, then moves to the next suggestion;
+- live run: 5 focused candidates, 32 → 33 → 32 edges;
+- no "pending confirmation" wall, no accepted/undone status chrome;
+- README shows the single-suggestion flow;
 - 525 tests passing, CI and Release green.
 
 ### The loop
@@ -94,7 +93,7 @@ The AI confirmation flow now explains itself:
 
 ### Install
 
-1. Download `interestseed-v3.4.2.zip`.
+1. Download `interestseed-v3.5.0.zip`.
 2. Extract into `<vault>/.obsidian/plugins/interestseed/`.
 3. Enable InterestSeed in Community plugins.
 4. Run the cold-start questionnaire, then process the Share Inbox.
@@ -113,15 +112,14 @@ InterestSeed 是 Obsidian 里的一个小插件，专门处理那个很具体的
 
 ![InterestSeed demo](https://raw.githubusercontent.com/lxc248/-interestseed/main/assets/interestseed-demo.gif)
 
-### 这次 3.4.2，AI 确认流程重做
+### 这次 3.5.0，AI 一次只给一条建议
 
-- 写入后弹窗顶部显示“已写入 1 条 AI 关系”
-- 提供“撤销这次写入”和“完成”
-- 撤销后卡片显示“已撤销”，图谱恢复原状
-- 关系名可以在确认前直接改
-- 模型没给置信度时，不再显示“未评分”
-- Key 已保存时提示“留空保持不变”，并提供清除按钮
+- 一张卡，`1 / 5`，没有批量“待确认”列表
+- 三个动作：连上 / 换一个 / 先不用
+- 关系名可以在连上之前直接改
+- 连上后显示“已连上这条关系”，可撤销，然后自动看下一条
 - 本地实测：5 条聚焦候选，关系 32 → 33 → 32
+- 不再有“待确认”状态墙
 - 525 个测试通过，CI 和 Release 都是绿的。
 
 ### 它怎么跑
@@ -130,7 +128,7 @@ InterestSeed 是 Obsidian 里的一个小插件，专门处理那个很具体的
 
 ### 装起来
 
-1. 下载 `interestseed-v3.4.2.zip`；
+1. 下载 `interestseed-v3.5.0.zip`；
 2. 解压到 `<vault>/.obsidian/plugins/interestseed/`；
 3. 在第三方插件里启用 InterestSeed；
 4. 跑一遍冷启动，然后处理分享收件箱。

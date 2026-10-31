@@ -49,21 +49,22 @@ v4.1 Flash 返回了 `source`、`target`、`reason`，但省略了 `relation` �
 单条坏数据 → 跳过，不让整批失败
 ```
 
-## 3.4.2 确认流程
+## 3.5.0 单条建议
 
 ```text
-关系名可在确认前编辑
-确认后显示“已写入 1 条 AI 关系”
-可直接“撤销这次写入”
-撤销后卡片显示“已撤销”，图谱恢复 32 条关系
+一次只显示一条：AI 建议 · 1 / 5
+动作：连上 / 换一个 / 先不用
+关系名可在连上之前编辑
+连上后显示“已连上这条关系”，可撤销
+撤销后回到下一条，图谱恢复 32 条关系
 ```
 
 ## 截图
 
 ```text
-review/experiment-3.0.8/58-ai-rename-before-confirm.png
-review/experiment-3.0.8/59-ai-write-banner.png
-review/experiment-3.0.8/60-ai-undone.png
+review/experiment-3.0.8/61-ai-single-suggestion.png
+review/experiment-3.0.8/62-ai-single-connected.png
+review/experiment-3.0.8/63-ai-single-undone.png
 ```
 
 ## 验证

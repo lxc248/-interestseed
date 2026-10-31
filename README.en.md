@@ -94,7 +94,7 @@ Six screenshots, and you basically know what it does.
   <tr>
     <td width="50%">
       <img src="assets/ai-suggestions-live.png" alt="AI relation suggestions" /><br/>
-      <sub><b>AI relation suggestions</b>: candidates with reasons, written only after confirmation.</sub>
+      <sub><b>AI suggestion</b>: one at a time; connect / next / not now.</sub>
     </td>
     <td width="50%">
       <img src="assets/ai-setup.png" alt="Connect your own AI" /><br/>
@@ -117,7 +117,7 @@ These aren't a feature checklist. They're the moves I actually make every day.
 | **Context Search** | Deterministic multi-field search across title, tags, summary, why, raw text, source, and evidence. No embeddings. |
 | **Interest Route** | An explicit Markdown MOC generated on command. It never writes notes automatically. |
 | **Five share cards** | Xiaohongshu, Instagram, X, WeChat, and Story, rendered locally on Canvas. |
-| **AI relation suggestions** | On by default; a setup window connects your own key; default model `cn:deepseek-v4.1-flash`, model ID is configurable; sends only node id, title, and tags |
+| **AI suggestion** | On by default; one at a time; editable relation; undo after connecting; default model `cn:deepseek-v4.1-flash` |
 | **MCP interface** | Zero-dependency read-only MCP server, protocol `2026-07-28`. |
 | **Adaptive layout** | Desktop, narrow, and very narrow panes with icon-first actions and no horizontal overflow. |
 
@@ -125,7 +125,7 @@ These aren't a feature checklist. They're the moves I actually make every day.
 
 It takes about three minutes.
 
-1. Download `interestseed-v3.4.2.zip` from [Releases](https://github.com/lxc248/-interestseed/releases).
+1. Download `interestseed-v3.5.0.zip` from [Releases](https://github.com/lxc248/-interestseed/releases).
 2. Extract it into:
 
 ```text
