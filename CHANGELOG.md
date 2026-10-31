@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.2.0 — Focused AI relation suggestions
+
+- Focus-aware candidate selection: shared tags first, low-degree nodes when unfocused.
+- Sends existing edge pairs so the model avoids duplicate suggestions.
+- Suggestions now carry a reason and confidence; cards are sorted by confidence.
+- Confirmed AI edges keep the reason as evidence and the confidence on the edge.
+- 519 tests passing.
+
 ## 3.1.1 — Local AI key in SecretStorage
 
 - Added optional local AI API key storage via Obsidian SecretStorage.

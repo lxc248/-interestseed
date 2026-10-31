@@ -6795,3 +6795,38 @@ body.theme-light .interestseed-sprint-option.is-selected {
    unstyled descendants when Obsidian is in a light host theme. */
 .interestseed-experiment-modal .modal-content,
 .interestseed-experiment { color: var(--exp-ink, #f2efe9); }
+/* AI relation suggestions */
+.interestseed-ai-suggestion-card {
+  display: grid;
+  gap: 7px;
+  margin: 10px 0;
+  padding: 12px 14px;
+  border: 1px solid rgba(156, 140, 255, 0.28);
+  border-radius: 12px;
+  background: var(--background-secondary, rgba(156, 140, 255, 0.06));
+}
+.interestseed-ai-suggestion-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.interestseed-ai-suggestion-confidence {
+  color: var(--color-green, #22c55e);
+  font-size: 11px;
+  font-weight: 700;
+}
+.interestseed-ai-suggestion-relation {
+  margin: 0;
+  color: var(--text-normal);
+}
+.interestseed-ai-suggestion-reason {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.interestseed-ai-suggestion-actions {
+  display: flex;
+  gap: 8px;
+}

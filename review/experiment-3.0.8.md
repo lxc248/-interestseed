@@ -1,4 +1,4 @@
-# InterestSeed 3.0.8 全功能模拟实验报告
+﻿# InterestSeed 3.0.8 全功能模拟实验报告
 
 ## 1. 实验信息
 
@@ -91,7 +91,8 @@ review/experiment-3.0.8/results-onboarding.json
 | 46 | AI 默认启用设置 | ✅ 开关默认开、只发 id/标题/标签 | 47-ai-settings-default.png |
 | 47 | AI 命令不可用时降级 | ✅ HTTP 401 → 保留本地规则发现 | 48-ai-command-fallback.png |
 | 48 | 探索页 AI 入口 | ✅ AI 可选、入口可见 | 49-explorer-ai-enabled.png |
-| 49 | MCP smoke | ✅ 4/4 | 命令行输出 |
+| 49 | AI 推荐卡理由与置信度 | ✅ 按可信度排序、显示理由 | 51-ai-suggestion-card.png |
+| 50 | MCP smoke | ✅ 4/4 | 命令行输出 |
 
 ## 4. 关键流程
 
@@ -158,6 +159,9 @@ Canvas：InterestSeed/兴趣图谱-2026-10-31-3.canvas
 默认授权：aiConsentGranted = true
 默认提供方：本地 DeepSeek V4 Pro · localhost:7863
 发送字段：节点 id、标题、标签
+已有关系：只发送节点 id 对，避免重复建议
+请求规模：最多 32 个节点、5 条建议
+返回：关系名 + 理由 + 置信度
 不发送：笔记正文、来源路径、完整观察、Vault 内容
 ```
 
@@ -166,6 +170,7 @@ Canvas：InterestSeed/兴趣图谱-2026-10-31-3.canvas
 ```text
 设置页 AI 开关默认开启
 AI 命令在本地服务 401 时给出明确提示
+候选卡按置信度排序，显示理由
 本地规则发现保持不变
 探索页 AI 入口可见
 ```
@@ -217,7 +222,7 @@ review/experiment-3.0.8/
 ## 7. 验证
 
 ```text
-70 test files / 516 tests passing
+71 test files / 519 tests passing
 MCP smoke 4/4
 npm run verify 通过
 ```
@@ -233,10 +238,12 @@ npm run verify 通过
 ## 9. 结论
 
 ```text
-49 项功能路径覆盖
+50 项功能路径覆盖
 1 个真实高优 UX bug 被发现并修复
 收件箱、实验、分享卡、发现、导出、冷启动、撤销/重做全部通过
 窄屏与暗色无布局回归
 实验后图谱已恢复
 ```
+
+
 

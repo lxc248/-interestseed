@@ -25,7 +25,10 @@ export class AiSuggestionModal extends Modal {
     private readonly actions: AiSuggestionModalActions,
   ) {
     super(app);
-    this.rows = createAiSuggestionRows(suggestions, (id) => actions.getNodeTitle(id));
+    this.rows = createAiSuggestionRows(
+      [...suggestions].sort((left, right) => (right.confidence ?? 0) - (left.confidence ?? 0)),
+      (id) => actions.getNodeTitle(id),
+    );
   }
 
   override onOpen(): void {
@@ -61,11 +64,11 @@ export class AiSuggestionModal extends Modal {
   private summary(): string {
     const count = (status: AiSuggestionStatus): number =>
       this.rows.filter((row) => row.status === status).length;
-    return `共 ${this.rows.length} 条 · 待确认 ${count('pending')} · 已接受 ${count(
-      'accepted',
-    )} · 已忽略 ${count('ignored')} · 失败 ${count('failed')} · 已失效 ${count(
-      'invalid',
-    )}`;
+    return `共 ${this.rows.length} 条候选 · 按可信度排序 · 确认后才写入图谱。待确认 ${count(
+      'pending',
+    )} · 已接受 ${count('accepted')} · 已忽略 ${count('ignored')} · 失败 ${count(
+      'failed',
+    )} · 已失效 ${count('invalid')}`;
   }
 
   private renderRow(parent: HTMLElement, row: AiSuggestionRow): void {
@@ -74,14 +77,25 @@ export class AiSuggestionModal extends Modal {
 
     const source = this.actions.getNodeTitle(row.source);
     const target = this.actions.getNodeTitle(row.target);
-    card.createEl('strong', {
+    const head = card.createDiv({ cls: 'interestseed-ai-suggestion-head' });
+    head.createEl('strong', {
       text: `${source ?? '已删除节点'} → ${target ?? '已删除节点'}`,
+    });
+    head.createEl('span', {
+      cls: 'interestseed-ai-suggestion-confidence',
+      text: `${Math.round((row.confidence ?? 0) * 100)}%`,
     });
     card.createEl('p', {
       cls: 'interestseed-ai-suggestion-relation',
       // 模型输出是不可信内容，只作为文本显示；长度在 provider 已限制。
-      text: row.relation.slice(0, 120),
+      text: `关系：${row.relation.slice(0, 120)}`,
     });
+    if (row.reason) {
+      card.createEl('p', {
+        cls: 'interestseed-ai-suggestion-reason',
+        text: `理由：${row.reason.slice(0, 160)}`,
+      });
+    }
     card.createEl('span', {
       cls: `interestseed-ai-suggestion-status ${row.status}`,
       text: AI_SUGGESTION_STATUS_LABELS[row.status],

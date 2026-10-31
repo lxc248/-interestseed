@@ -60,7 +60,7 @@ Set via: GitHub → Settings → Social preview
 ## Release title
 
 ```text
-InterestSeed 3.1.1 — AI 关系建议默认开启
+InterestSeed 3.2.0 — 更聚焦的 AI 关系建议
 ```
 
 ## Release body — English
@@ -74,18 +74,19 @@ save a 3-day test, then lets the evidence decide.
 
 ![InterestSeed demo](https://raw.githubusercontent.com/lxc248/-interestseed/main/assets/interestseed-demo.gif)
 
-### What 3.1.1 actually changes
+### What 3.2.0 actually changes
 
-AI relation suggestions are now on by default, with a local-first boundary:
+AI relation suggestions are now focused instead of dumping every node into the prompt:
 
-- settings show the enable switch, provider, and consent;
-- an optional local service key is stored in Obsidian SecretStorage, never in data.json;
-- `INTERESTSEED_AI_API_KEY` remains the environment fallback;
-- only node id, title, and tags are sent;
-- candidates are never written without confirmation;
-- unavailable models fall back to local rule discovery;
-- 401/403 responses point to the API key setting;
-- 516 tests passing, CI and Release green.
+- a selected node becomes the focus; shared tags win;
+- without a focus, low-degree and orphan nodes go first;
+- existing edge pairs are sent so the model avoids duplicates;
+- at most 32 nodes and 5 suggestions;
+- every suggestion carries a reason and confidence;
+- cards are sorted by confidence and show the reason;
+- confirmed edges keep the reason as evidence and the confidence on the edge;
+- only node id, title, and tags are sent; local keys live in SecretStorage;
+- 519 tests passing, CI and Release green.
 
 ### The loop
 
@@ -93,7 +94,7 @@ AI relation suggestions are now on by default, with a local-first boundary:
 
 ### Install
 
-1. Download `interestseed-v3.1.1.zip`.
+1. Download `interestseed-v3.2.0.zip`.
 2. Extract into `<vault>/.obsidian/plugins/interestseed/`.
 3. Enable InterestSeed in Community plugins.
 4. Run the cold-start questionnaire, then process the Share Inbox.
@@ -112,16 +113,17 @@ InterestSeed 是 Obsidian 里的一个小插件，专门处理那个很具体的
 
 ![InterestSeed demo](https://raw.githubusercontent.com/lxc248/-interestseed/main/assets/interestseed-demo.gif)
 
-### 这次 3.1.1，AI 关系建议默认开启
+### 这次 3.2.0，AI 关系建议更聚焦
 
-- 设置页可以直接开关 AI、选择提供方、查看发送字段；
-- 本地服务 API Key 可保存到 Obsidian SecretStorage，不写入 data.json；
-- 仍支持 `INTERESTSEED_AI_API_KEY` 环境变量；
-- 只发送节点 id、标题、标签；
-- AI 只出候选关系，确认后才写入；
-- 模型不可用时保留本地规则发现；
-- 401/403 会提示检查 API Key；
-- 516 个测试通过，CI 和 Release 都是绿的。
+- 选中节点会成为焦点，优先找共享标签的候选；
+- 没有焦点时，先看孤立 / 低度数节点，避免只围着中心打转；
+- 请求里带已有关系的节点 id 对，避免重复建议；
+- 最多 32 个节点、5 条建议；
+- 每条建议带一句理由和置信度；
+- 候选卡按置信度排序，确认前能看到理由；
+- 确认后，理由进入关系证据，置信度进入边数据；
+- 只发送节点 id、标题、标签；本地密钥存在 Obsidian SecretStorage；
+- 519 个测试通过，CI 和 Release 都是绿的。
 
 ### 它怎么跑
 
@@ -129,7 +131,7 @@ InterestSeed 是 Obsidian 里的一个小插件，专门处理那个很具体的
 
 ### 装起来
 
-1. 下载 `interestseed-v3.1.1.zip`；
+1. 下载 `interestseed-v3.2.0.zip`；
 2. 解压到 `<vault>/.obsidian/plugins/interestseed/`；
 3. 在第三方插件里启用 InterestSeed；
 4. 跑一遍冷启动，然后处理分享收件箱。

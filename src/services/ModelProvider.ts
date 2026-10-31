@@ -1,19 +1,26 @@
 import type { InterestSeedNode } from '../types/graph';
+import { compareText } from '../utils/text';
 
 /** 发送给模型的最小数据：只有 id、标题、标签，不含正文或路径。 */
 export interface RelationRequest {
+  focusNodeId?: string;
   nodes: Array<{
     id: string;
     title: string;
     tags: string[];
   }>;
+  /** 只发送已存在关系的节点 id 对，帮助模型避免重复建议。 */
+  existingEdges?: Array<{ source: string; target: string }>;
+  maxSuggestions?: number;
 }
 
-/** AI 建议只使用节点 ID 和一个简短关系名；不是图谱 Schema。 */
+/** AI 建议只使用节点 ID、简短关系名、理由和置信度；不是图谱 Schema。 */
 export interface AiRelationSuggestion {
   source: string;
   target: string;
   relation: string;
+  reason?: string;
+  confidence?: number;
 }
 
 export interface AiSuggestionPayload {
@@ -178,6 +185,7 @@ export class OpenAICompatibleModelProvider implements ModelProvider {
     };
     if (this.apiKey) headers.Authorization = `Bearer ${this.apiKey}`;
 
+    const maxSuggestions = safeRequest.maxSuggestions ?? 5;
     let response: Response;
     try {
       response = await this.fetchImpl(url, {
@@ -189,18 +197,22 @@ export class OpenAICompatibleModelProvider implements ModelProvider {
             {
               role: 'system',
               content:
+                'You are a careful interest cartographer. ' +
+                `Suggest at most ${maxSuggestions} connections that are non-obvious but defensible from shared tags or complementary titles. ` +
+                'Avoid every pair listed in existingEdges. Prefer one bridge, orphan, or cross-project link over many weak links. ' +
+                'If focusNodeId is set, every suggestion must include that node. No self-loops, no duplicate pairs. ' +
                 'Return exactly one JSON object. No prose, no Markdown, no code fences. ' +
-                'The only allowed shape is {"suggestions":[{"source":"<node id>","target":"<node id>","relation":"<short relation>"}]}. ' +
-                'Use only node ids supplied by the user. Return {"suggestions":[]} if there is nothing supported. ' +
+                'Shape: {"suggestions":[{"source":"<node id>","target":"<node id>","relation":"<short relation>","reason":"<one concrete sentence citing a shared tag or title>","confidence":0.0}]}. ' +
+                'confidence must be between 0 and 1. reason must be at most 120 characters. ' +
+                'Use only node ids supplied by the user. Return {"suggestions":[]} if nothing is supported. ' +
                 'Do not invent evidence or facts.',
             },
             {
               role: 'user',
               content:
-                'Return exactly one JSON object. No prose, no Markdown, no code fences. ' +
-                'Shape: {"suggestions":[{"source":"<node id>","target":"<node id>","relation":"<short relation>"}]}. ' +
-                'Use only node ids from this input; return {"suggestions":[]} if none:\n' +
-                JSON.stringify(safeRequest),
+                'Input JSON:\n' +
+                JSON.stringify(safeRequest) +
+                '\nReturn only the JSON object described in the system message.',
             },
           ],
           temperature: 0,
@@ -337,6 +349,8 @@ function extractContent(payload: unknown): string | null {
  * 不从前缀/后缀说明文本中提取 JSON，避免把混合内容误判为有效建议。
  */
 export const MAX_AI_RELATION_LENGTH = 120;
+export const MAX_AI_REASON_LENGTH = 160;
+export const MAX_AI_SUGGESTIONS = 8;
 
 function parseSuggestionPayload(
   content: string,
@@ -362,57 +376,144 @@ function parseSuggestionPayload(
   }
 
   const normalized = suggestions.map((item) => {
-      if (
-        typeof item !== 'object' ||
-        item === null ||
-        typeof (item as { source?: unknown }).source !== 'string' ||
-        !(item as { source: string }).source.trim() ||
-        typeof (item as { target?: unknown }).target !== 'string' ||
-        !(item as { target: string }).target.trim() ||
-        typeof (item as { relation?: unknown }).relation !== 'string' ||
-        !(item as { relation: string }).relation.trim()
-      ) {
-        throw new ModelProviderError(
-          'invalid-response',
-          'AI 建议缺少 source/target/relation 字符串',
-        );
-      }
-      const source = (item as { source: string }).source.trim();
-      const target = (item as { target: string }).target.trim();
-      const relation = (item as { relation: string }).relation.trim();
-      if (relation.length > MAX_AI_RELATION_LENGTH) {
-        throw new ModelProviderError('invalid-response', 'AI 建议关系名过长');
-      }
-      if (source === target) {
-        throw new ModelProviderError('invalid-response', 'AI 建议不能是自环');
-      }
-      if (!allowedNodeIds.has(source) || !allowedNodeIds.has(target)) {
-        throw new ModelProviderError('invalid-response', 'AI 建议引用了未提交的节点');
-      }
-      return { source, target, relation };
-    });
-
-  const seen = new Set<string>();
-  for (const item of normalized) {
-    const key = `${item.source}\u0000${item.target}\u0000${item.relation}`;
-    if (seen.has(key)) {
-      throw new ModelProviderError('invalid-response', 'AI 建议包含重复项');
+    if (
+      typeof item !== 'object' ||
+      item === null ||
+      typeof (item as { source?: unknown }).source !== 'string' ||
+      !(item as { source: string }).source.trim() ||
+      typeof (item as { target?: unknown }).target !== 'string' ||
+      !(item as { target: string }).target.trim() ||
+      typeof (item as { relation?: unknown }).relation !== 'string' ||
+      !(item as { relation: string }).relation.trim()
+    ) {
+      throw new ModelProviderError(
+        'invalid-response',
+        'AI 建议缺少 source/target/relation 字符串',
+      );
     }
-    seen.add(key);
+    const source = (item as { source: string }).source.trim();
+    const target = (item as { target: string }).target.trim();
+    const relation = (item as { relation: string }).relation.trim();
+    if (relation.length > MAX_AI_RELATION_LENGTH) {
+      throw new ModelProviderError('invalid-response', 'AI 建议关系名过长');
+    }
+    if (source === target) {
+      throw new ModelProviderError('invalid-response', 'AI 建议不能是自环');
+    }
+    if (!allowedNodeIds.has(source) || !allowedNodeIds.has(target)) {
+      throw new ModelProviderError('invalid-response', 'AI 建议引用了未提交的节点');
+    }
+    const reasonRaw = (item as { reason?: unknown }).reason;
+    const reason =
+      typeof reasonRaw === 'string'
+        ? reasonRaw.trim().slice(0, MAX_AI_REASON_LENGTH)
+        : '';
+    const confidenceRaw = (item as { confidence?: unknown }).confidence;
+    const confidence =
+      typeof confidenceRaw === 'number' && Number.isFinite(confidenceRaw)
+        ? Math.max(0, Math.min(1, confidenceRaw))
+        : 0.5;
+    return {
+      source,
+      target,
+      relation,
+      ...(reason ? { reason } : {}),
+      confidence,
+    };
+  });
+
+  const seenPairs = new Set<string>();
+  const deduped: AiRelationSuggestion[] = [];
+  for (const item of normalized) {
+    const pair = [item.source, item.target].sort().join('\u0000');
+    if (seenPairs.has(pair)) continue;
+    seenPairs.add(pair);
+    deduped.push(item);
+    if (deduped.length >= MAX_AI_SUGGESTIONS) break;
   }
-  return { suggestions: normalized };
+  return { suggestions: deduped };
 }
 
 /**
  * 构造最小请求：显式挑选字段，避免把 metadata（摘要、路径等）带出去。
  */
-export function buildRelationRequest(nodes: InterestSeedNode[]): RelationRequest {
+export interface RelationRequestOptions {
+  focusNodeId?: string;
+  existingEdges?: ReadonlyArray<{ source: string; target: string }>;
+  maxNodes?: number;
+  maxSuggestions?: number;
+}
+
+/**
+ * 构造最小但有用的请求：
+ * - 有焦点节点时，优先发送共享标签的候选；
+ * - 无焦点时，优先发送孤立 / 低度数节点，避免只围绕中心节点打转；
+ * - 只发送已有关系的 id 对，帮助模型避开重复建议。
+ */
+export function buildRelationRequest(
+  nodes: InterestSeedNode[],
+  options: RelationRequestOptions = {},
+): RelationRequest {
+  const maxNodes = Math.max(8, Math.min(48, options.maxNodes ?? 32));
+  const byId = new Map(nodes.map((node) => [node.id, node]));
+  const focus = options.focusNodeId ? byId.get(options.focusNodeId) : undefined;
+  const degree = new Map<string, number>();
+  for (const edge of options.existingEdges ?? []) {
+    degree.set(edge.source, (degree.get(edge.source) ?? 0) + 1);
+    degree.set(edge.target, (degree.get(edge.target) ?? 0) + 1);
+  }
+
+  let selected: InterestSeedNode[];
+  if (focus) {
+    const focusTags = new Set(focus.tags.map((tag) => tag.toLowerCase()));
+    selected = [
+      focus,
+      ...nodes
+        .filter((node) => node.id !== focus.id)
+        .sort((left, right) => {
+          const leftShared = left.tags.filter((tag) => focusTags.has(tag.toLowerCase())).length;
+          const rightShared = right.tags.filter((tag) => focusTags.has(tag.toLowerCase())).length;
+          return (
+            rightShared - leftShared ||
+            (degree.get(left.id) ?? 0) - (degree.get(right.id) ?? 0) ||
+            compareText(left.title, right.title)
+          );
+        }),
+    ];
+  } else {
+    selected = [...nodes].sort(
+      (left, right) =>
+        (degree.get(left.id) ?? 0) - (degree.get(right.id) ?? 0) ||
+        right.tags.length - left.tags.length ||
+        compareText(left.title, right.title),
+    );
+  }
+  selected = selected.slice(0, maxNodes);
+  const selectedIds = new Set(selected.map((node) => node.id));
+
+  const seenPairs = new Set<string>();
+  const existingEdges: Array<{ source: string; target: string }> = [];
+  for (const edge of options.existingEdges ?? []) {
+    if (!selectedIds.has(edge.source) || !selectedIds.has(edge.target)) continue;
+    const pair = [edge.source, edge.target].sort().join('\u0000');
+    if (seenPairs.has(pair)) continue;
+    seenPairs.add(pair);
+    existingEdges.push({ source: edge.source, target: edge.target });
+    if (existingEdges.length >= 160) break;
+  }
+
   return {
-    nodes: nodes.map((node) => ({
+    ...(focus ? { focusNodeId: focus.id } : {}),
+    nodes: selected.map((node) => ({
       id: node.id,
       title: node.title,
       tags: [...node.tags],
     })),
+    ...(existingEdges.length > 0 ? { existingEdges } : {}),
+    maxSuggestions: Math.max(
+      1,
+      Math.min(MAX_AI_SUGGESTIONS, options.maxSuggestions ?? 5),
+    ),
   };
 }
 
@@ -440,7 +541,43 @@ function sanitizeRelationRequest(input: RelationRequest): RelationRequest {
     };
   });
 
-  return { nodes };
+  const nodeIds = new Set(nodes.map((node) => node.id));
+  const focusNodeId =
+    typeof input.focusNodeId === 'string' && nodeIds.has(input.focusNodeId)
+      ? input.focusNodeId
+      : undefined;
+
+  const seenPairs = new Set<string>();
+  const existingEdges: Array<{ source: string; target: string }> = [];
+  for (const edge of Array.isArray(input.existingEdges) ? input.existingEdges : []) {
+    if (
+      typeof edge?.source !== 'string' ||
+      typeof edge?.target !== 'string' ||
+      !nodeIds.has(edge.source) ||
+      !nodeIds.has(edge.target) ||
+      edge.source === edge.target
+    ) {
+      continue;
+    }
+    const pair = [edge.source, edge.target].sort().join('\u0000');
+    if (seenPairs.has(pair)) continue;
+    seenPairs.add(pair);
+    existingEdges.push({ source: edge.source, target: edge.target });
+    if (existingEdges.length >= 160) break;
+  }
+
+  const rawMax =
+    typeof input.maxSuggestions === 'number' && Number.isFinite(input.maxSuggestions)
+      ? Math.floor(input.maxSuggestions)
+      : 5;
+  const maxSuggestions = Math.max(1, Math.min(MAX_AI_SUGGESTIONS, rawMax));
+
+  return {
+    ...(focusNodeId ? { focusNodeId } : {}),
+    nodes,
+    ...(existingEdges.length > 0 ? { existingEdges } : {}),
+    maxSuggestions,
+  };
 }
 
 function clampNumber(value: number): number {

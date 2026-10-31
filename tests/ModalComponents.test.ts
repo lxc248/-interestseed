@@ -95,15 +95,17 @@ describe('AiSuggestionModal', () => {
   it('renders a suggestion and can ignore it', () => {
     const modal = new AiSuggestionModal(
       {} as never,
-      [{ source: 'a', target: 'b', relation: 'related-to' }],
+      [{ source: 'a', target: 'b', relation: 'related-to', reason: '共享标签：focus', confidence: 0.82 }],
       {
         getNodeTitle: (id) => (id === 'a' ? '节点 A' : '节点 B'),
         confirm: vi.fn(async () => ({ ok: true })),
       },
     );
     modal.open();
-    expect(modal.contentEl.textContent).toContain('共 1 条');
+    expect(modal.contentEl.textContent).toContain('共 1 条候选');
     expect(modal.contentEl.textContent).toContain('节点 A → 节点 B');
+    expect(modal.contentEl.textContent).toContain('82%');
+    expect(modal.contentEl.textContent).toContain('共享标签：focus');
     const ignore = [...modal.contentEl.querySelectorAll('button')].find((b) => b.textContent === '忽略') as HTMLButtonElement;
     ignore.click();
     expect(modal.contentEl.textContent).toContain('已忽略');

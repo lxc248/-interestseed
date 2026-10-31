@@ -465,7 +465,17 @@ export class GraphController {
     }
   }
 
-  async expandWithAI(_nodeId?: string): Promise<void> {
+  async expandWithAI(nodeId?: string): Promise<void> {
+    const graph = this.deps.store.getGraph();
+    const focusNodeId = nodeId ?? this.deps.getSelectedNodeId() ?? undefined;
+    const request = buildRelationRequest(graph.nodes, {
+      focusNodeId,
+      existingEdges: graph.edges.map((edge) => ({
+        source: edge.source,
+        target: edge.target,
+      })),
+      maxSuggestions: 5,
+    });
     const apiKey = await this.deps.getAiApiKey();
     const provider = createModelProvider(
       {
@@ -482,9 +492,7 @@ export class GraphController {
         return;
       }
 
-      const result = await provider.suggestRelations(
-        buildRelationRequest(this.deps.store.listNodes()),
-      );
+      const result = await provider.suggestRelations(request);
       const suggestions = (result as { suggestions?: AiRelationSuggestion[] }).suggestions;
       if (!Array.isArray(suggestions) || suggestions.length === 0) {
         new Notice('AI 没有返回候选关系；本地规则发现保持不变。', 8000);

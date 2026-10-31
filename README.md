@@ -12,7 +12,7 @@
   <a href="assets/interestseed-launch.mp4"><img alt="Demo" src="https://img.shields.io/badge/%E2%96%B6%2040%20%E7%A7%92%E6%BC%94%E7%A4%BA-111827?style=for-the-badge" /></a>
   <img alt="CI" src="https://github.com/lxc248/-interestseed/actions/workflows/ci.yml/badge.svg?branch=main" />
   <img alt="Release" src="https://img.shields.io/github/v/release/lxc248/-interestseed?style=for-the-badge" />
-  <img alt="Tests" src="https://img.shields.io/badge/tests-516%20passing-22c55e?style=for-the-badge" />
+  <img alt="Tests" src="https://img.shields.io/badge/tests-519%20passing-22c55e?style=for-the-badge" />
   <img alt="Coverage" src="https://img.shields.io/badge/coverage-74.7%25-14b8a6?style=for-the-badge" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b?style=for-the-badge" />
 </p>
@@ -107,7 +107,7 @@ Capture → Decide → Connect → Verify → Review → Next action
 | **上下文搜索** | 标题、标签、摘要、为什么、原文、来源路径、观察证据，多字段确定性搜索，无需 embedding |
 | **兴趣路线** | 显式命令生成 Markdown MOC，从不自动写笔记 |
 | **五种分享卡** | 小红书、Instagram、X、微信、Story，全部本地 Canvas 渲染 |
-| **AI 关系建议** | 默认开启；只把节点 id、标题、标签发送给本地 DeepSeek 或 Claudian，候选关系确认后才写入 |
+| **AI 关系建议** | 默认开启；只发节点 id、标题、标签，返回理由与置信度；候选关系确认后才写入 |
 | **MCP 接口** | 零依赖只读 MCP server，协议 `2026-07-28` |
 | **自适应布局** | 桌面、窄栏、极窄栏三档，图标优先，不横向溢出 |
 
@@ -115,7 +115,7 @@ Capture → Decide → Connect → Verify → Review → Next action
 
 三分钟能跑起来。
 
-1. 从 [Releases](https://github.com/lxc248/-interestseed/releases) 下载 `interestseed-v3.1.1.zip`。
+1. 从 [Releases](https://github.com/lxc248/-interestseed/releases) 下载 `interestseed-v3.2.0.zip`。
 2. 解压到：
 
 ```text
@@ -149,7 +149,7 @@ AI 关系建议默认开启，只在你点击 AI 时请求所选模型；本地�
 这些数字不是装饰。每次改完，我都会重新跑一遍。
 
 ```text
-516 tests passing
+519 tests passing
 74.74% line coverage
 92.25% core coverage
 43.81% UI coverage

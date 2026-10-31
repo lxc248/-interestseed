@@ -334,6 +334,6 @@ describe('buildRelationRequest', () => {
   });
 
   it('空节点列表返回空请求', () => {
-    expect(buildRelationRequest([])).toEqual({ nodes: [] });
+    expect(buildRelationRequest([])).toEqual({ nodes: [], maxSuggestions: 5 });
   });
 });

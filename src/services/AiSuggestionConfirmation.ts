@@ -32,6 +32,7 @@ export async function writeConfirmedAiSuggestion(
 
   const name = suggestion.relation.trim();
   const now = new Date().toISOString();
+  const reason = suggestion.reason?.trim().slice(0, 160);
   const edge: InterestSeedEdge = {
     id: edgeIdFor(suggestion.source, suggestion.target, name),
     source: suggestion.source,
@@ -39,7 +40,8 @@ export async function writeConfirmedAiSuggestion(
     relation: name,
     origin: 'ai',
     status: 'confirmed',
-    evidence: ['AI 建议，用户确认'],
+    confidence: suggestion.confidence ?? 0.5,
+    evidence: reason ? [`AI 建议：${reason}`, '用户确认'] : ['AI 建议，用户确认'],
     createdAt: now,
     updatedAt: now,
   };
