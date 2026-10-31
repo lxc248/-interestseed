@@ -99,6 +99,27 @@ export async function logExperiment(
   return experiment;
 }
 
+export async function extendExperiment(
+  vaultPath: string,
+  id: string,
+  targetDays: number,
+): Promise<StoredExperiment> {
+  const file = await loadFile(vaultPath);
+  const index = file.experiments.findIndex((item) => item.id === id);
+  if (index < 0) throw new Error('Experiment not found.');
+  const current = file.experiments[index]!;
+  if (current.state.status === 'complete') throw new Error('这个实验已经完成。');
+  const days = Math.min(30, Math.max(3, Math.round(targetDays)));
+  const state: ExperimentState = {
+    ...current.state,
+    targetDays: Math.max(current.state.targetDays, days),
+  };
+  const experiment: StoredExperiment = { ...current, state };
+  file.experiments[index] = experiment;
+  await saveFile(vaultPath, file);
+  return experiment;
+}
+
 export function experimentView(experiment: StoredExperiment): Record<string, unknown> {
   return {
     id: experiment.id,

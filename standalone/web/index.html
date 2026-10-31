@@ -46,6 +46,13 @@
             <span><i class="dot chain-reviewed"></i>已复盘</span>
           </div>
         </div>
+        <div class="graph-filter" id="graph-filter">
+          <button class="filter-chip active" data-stage="all">全部</button>
+          <button class="filter-chip" data-stage="captured">收藏</button>
+          <button class="filter-chip" data-stage="connected">已连接</button>
+          <button class="filter-chip" data-stage="experimenting">实验中</button>
+          <button class="filter-chip" data-stage="reviewed">已复盘</button>
+        </div>
         <svg id="graph" viewBox="0 0 820 560" role="img" aria-label="兴趣链路星图"></svg>
       </section>
 
@@ -68,7 +75,10 @@
             <p class="eyebrow">CROSS-PROJECT</p>
             <h2>跨目录发现</h2>
           </div>
-          <button id="discoveries-refresh" class="button ghost">刷新</button>
+          <div class="panel-actions">
+            <button id="discoveries-audit" class="button ghost">体检</button>
+            <button id="discoveries-refresh" class="button ghost">刷新</button>
+          </div>
         </div>
         <div id="discoveries-list" class="panel-body"></div>
       </section>
@@ -227,6 +237,19 @@
         <input id="sprint-action" placeholder="例如：用它整理三篇旧笔记" />
         <button id="sprint-submit" class="button primary">种下第一颗种子</button>
       </div>
+    </div>
+  </div>
+
+  <div id="discovery-audit-modal" class="modal-backdrop" hidden>
+    <div class="modal-card">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">HEALTH CHECK</p>
+          <h2>发现体检</h2>
+        </div>
+        <button class="modal-close button ghost" data-close="discovery-audit-modal">关闭</button>
+      </div>
+      <div class="modal-body" id="discovery-audit-body"></div>
     </div>
   </div>
 

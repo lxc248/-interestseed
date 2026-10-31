@@ -79,6 +79,13 @@ nothing important was dropped in that move.
 11. **No persistent header status.** Added a header pill showing key state,
     discovery count, and pending inbox count.
 
+12. **No stage filter.** Added graph filter chips: all / captured / connected /
+    experimenting / reviewed.
+
+13. **Experiments could not be extended.** Added extend-to-7-days from the strip.
+
+14. **No discovery audit view.** Added a 体检 modal with per-feedback summaries.
+
 ## Remaining differences that are intentional
 
 - Obsidian-only entry points (file menu, command palette, SecretStorage) do not

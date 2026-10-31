@@ -302,3 +302,16 @@ button, input { font: inherit; }
 .modal-card.wide { width: min(820px, calc(100vw - 40px)); }
 #share-card-canvas { width: 100%; height: auto; border-radius: 14px; border: 1px solid var(--line); }
 
+.graph-filter { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 20px 10px; }
+.filter-chip {
+  border: 1px solid var(--line); background: rgba(255,255,255,.035);
+  color: var(--muted); border-radius: 999px; padding: 5px 11px;
+  font-size: 11px; cursor: pointer;
+}
+.filter-chip.active { border-color: rgba(167,139,250,.55); background: rgba(167,139,250,.14); color: #ddd6fe; }
+.panel-actions { display: flex; gap: 6px; }
+
+.audit-row { padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: rgba(255,255,255,.03); }
+.audit-row strong { font-size: 12px; }
+.audit-row p { margin: 4px 0 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+

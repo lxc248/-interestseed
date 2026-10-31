@@ -5,6 +5,7 @@ const state = {
   index: 0,
   lastConnected: null,
   busy: false,
+  filterStage: 'all',
 };
 
 const $ = (selector) => document.querySelector(selector);
@@ -154,6 +155,13 @@ function renderExperiment() {
   missed.textContent = '没做';
   missed.addEventListener('click', () => logExperiment({ evidence: '今天没有做，也没有特别想起这个兴趣。', interest: 2, energy: 1 }));
   actions.append(evidence, next, record, did, thought, missed);
+  if (experiment.targetDays === 3 && experiment.status === 'active') {
+    const extend = document.createElement('button');
+    extend.className = 'button ghost';
+    extend.textContent = '延长到 7 天';
+    extend.addEventListener('click', () => extendExperiment(experiment.id));
+    actions.append(extend);
+  }
   strip.appendChild(actions);
 }
 
@@ -203,6 +211,19 @@ async function logExperiment(input) {
     });
     await load();
     toast('今天已经记下');
+  } catch (error) {
+    toast(error.message, true);
+  } finally {
+    setBusy(false);
+  }
+}
+
+async function extendExperiment(id) {
+  try {
+    setBusy(true);
+    await api('/api/experiments/extend', { method: 'POST', body: JSON.stringify({ id, targetDays: 7 }) });
+    await load();
+    toast('实验已延长到 7 天');
   } catch (error) {
     toast(error.message, true);
   } finally {
@@ -501,8 +522,8 @@ function renderGraph() {
   const height = 560;
   const cx = width / 2;
   const cy = height / 2;
-  const nodes = graph.nodes;
-  if (!nodes.length) {
+  const allNodes = graph.nodes;
+  if (!allNodes.length) {
     svg.appendChild(svgEl('text', {
       x: cx, y: cy, fill: '#8b96ad', 'text-anchor': 'middle', 'font-size': 13,
       text: '扫描一个 Markdown vault，星系会出现在这里。',
@@ -510,9 +531,21 @@ function renderGraph() {
     return;
   }
 
+  const nodes = state.filterStage === 'all'
+    ? allNodes
+    : allNodes.filter((node) => chainStateOf(node.id) === state.filterStage);
+  if (!nodes.length) {
+    svg.appendChild(svgEl('text', {
+      x: cx, y: cy, fill: '#8b96ad', 'text-anchor': 'middle', 'font-size': 13,
+      text: '这个阶段还没有节点。',
+    }));
+    return;
+  }
+
   const degree = new Map(nodes.map((node) => [node.id, 0]));
   for (const edge of graph.edges) {
     if (edge.status === 'rejected') continue;
+    if (!degree.has(edge.source) || !degree.has(edge.target)) continue;
     degree.set(edge.source, (degree.get(edge.source) ?? 0) + 1);
     degree.set(edge.target, (degree.get(edge.target) ?? 0) + 1);
   }
@@ -655,6 +688,7 @@ function renderGraph() {
     if (edge.target === selected.id) neighborIds.add(edge.source);
   }
   for (const edge of graph.edges) {
+    if (!positions.has(edge.source) || !positions.has(edge.target)) continue;
     const from = positions.get(edge.source);
     const to = positions.get(edge.target);
     if (!from || !to) continue;
@@ -1007,6 +1041,15 @@ function downloadShareCard() {
 
 $('#share-card-download').addEventListener('click', downloadShareCard);
 $('#scan-button').addEventListener('click', scanVault);
+for (const chip of document.querySelectorAll('.filter-chip')) {
+  chip.addEventListener('click', () => {
+    state.filterStage = chip.getAttribute('data-stage') ?? 'all';
+    for (const item of document.querySelectorAll('.filter-chip')) {
+      item.classList.toggle('active', item === chip);
+    }
+    render();
+  });
+}
 $('#capture-button').addEventListener('click', () => openModal('capture-modal'));
 $('#sprint-button').addEventListener('click', () => openModal('sprint-modal'));
 $('#sprint-submit').addEventListener('click', submitSprint);
@@ -1140,6 +1183,38 @@ async function submitCapture() {
     setBusy(false);
   }
 }
+function openDiscoveryAudit() {
+  const discoveries = state.data.discoveries ?? [];
+  const counts = { accepted: 0, 'needs-verification': 0, 'low-value': 0, rejected: 0, none: 0 };
+  const byStatus = {};
+  for (const item of discoveries) {
+    const key = item.feedbackStatus ?? 'none';
+    counts[key] = (counts[key] ?? 0) + 1;
+    (byStatus[key] ??= []).push(item.title);
+  }
+  const applied = discoveries.filter((item) => item.application?.state === 'applied' || item.application?.state === 'existing').length;
+  const rows = [
+    ['已留下', counts.accepted, 'accepted'],
+    ['想再看看', counts['needs-verification'], 'needs-verification'],
+    ['先放着', counts['low-value'], 'low-value'],
+    ['先不看', counts.rejected, 'rejected'],
+    ['还没处理', counts.none, 'none'],
+  ];
+  const body = document.getElementById('discovery-audit-body');
+  body.innerHTML = `<p class="empty-copy">${discoveries.length} 条发现 · 已连上 ${applied} 条</p>`;
+  for (const [label, count, key] of rows) {
+    const block = document.createElement('div');
+    block.className = 'audit-row';
+    block.innerHTML = `<strong>${label} · ${count ?? 0}</strong>`;
+    if (byStatus[key]?.length) {
+      block.innerHTML += `<p>${byStatus[key].map(escapeHtml).join('、')}</p>`;
+    }
+    body.appendChild(block);
+  }
+  openModal('discovery-audit-modal');
+}
+
+$('#discoveries-audit').addEventListener('click', openDiscoveryAudit);
 $('#discoveries-refresh').addEventListener('click', async () => {
   try {
     setBusy(true);

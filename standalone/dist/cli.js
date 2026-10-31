@@ -1811,6 +1811,25 @@ async function logExperiment(vaultPath, id, input, now = /* @__PURE__ */ new Dat
 	await saveFile(vaultPath, file);
 	return experiment;
 }
+async function extendExperiment(vaultPath, id, targetDays) {
+	const file = await loadFile(vaultPath);
+	const index = file.experiments.findIndex((item) => item.id === id);
+	if (index < 0) throw new Error("Experiment not found.");
+	const current = file.experiments[index];
+	if (current.state.status === "complete") throw new Error("这个实验已经完成。");
+	const days = Math.min(30, Math.max(3, Math.round(targetDays)));
+	const state = {
+		...current.state,
+		targetDays: Math.max(current.state.targetDays, days)
+	};
+	const experiment = {
+		...current,
+		state
+	};
+	file.experiments[index] = experiment;
+	await saveFile(vaultPath, file);
+	return experiment;
+}
 function experimentView(experiment) {
 	return {
 		id: experiment.id,
@@ -3140,6 +3159,13 @@ async function route(request, response, options) {
 				evidence: typeof body.evidence === "string" ? body.evidence : "",
 				...typeof body.next === "string" ? { next: body.next } : {}
 			}))
+		});
+	}
+	if (url.pathname === "/api/experiments/extend" && request.method === "POST") {
+		const body = await readJson(request);
+		return sendJson(response, 200, {
+			ok: true,
+			experiment: experimentView(await extendExperiment(options.vaultPath, typeof body.id === "string" ? body.id : "", Number(body.targetDays ?? 7)))
 		});
 	}
 	if (url.pathname === "/api/discoveries" && request.method === "GET") return sendJson(response, 200, { discoveries: (await listDiscoveries(options.vaultPath)).map(discoveryView) });

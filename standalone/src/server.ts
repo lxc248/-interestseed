@@ -10,6 +10,7 @@ import { suggestRelations } from './ai';
 import {
   activeExperiment,
   experimentView,
+  extendExperiment,
   listExperiments,
   logExperiment,
   startExperiment,
@@ -121,6 +122,15 @@ async function route(
         evidence: typeof body.evidence === 'string' ? body.evidence : '',
         ...(typeof body.next === 'string' ? { next: body.next } : {}),
       },
+    );
+    return sendJson(response, 200, { ok: true, experiment: experimentView(experiment) });
+  }
+  if (url.pathname === '/api/experiments/extend' && request.method === 'POST') {
+    const body = await readJson(request);
+    const experiment = await extendExperiment(
+      options.vaultPath,
+      typeof body.id === 'string' ? body.id : '',
+      Number(body.targetDays ?? 7),
     );
     return sendJson(response, 200, { ok: true, experiment: experimentView(experiment) });
   }
