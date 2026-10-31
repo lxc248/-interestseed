@@ -32,7 +32,9 @@
 > 大多数工具帮你**存下来**。  
 > InterestSeed 帮你**验一下**。
 
-## 为什么不是另一个收藏夹
+我们并不缺收藏。缺的是收藏之后，真的做一次，然后诚实地说一句：还行，或者算了。
+
+## 它和收藏夹到底差在哪
 
 | | 收藏夹 | 双向链接笔记 | **InterestSeed** |
 | --- | --- | --- | --- |
@@ -41,9 +43,13 @@
 | 结束状态 | 待读 | 一张网 | **继续 / 放下 + 下一步** |
 | 默认动作 | 保存 | 链接 | **做一个小实验** |
 
-InterestSeed 不优化“节点数”，它优化**决策完成率**。
+收藏夹解决“别丢”，InterestSeed 想解决“别假装自己会做”。
 
-## 产品闭环
+它不优化“节点数”，它优化**决策完成率**。
+
+## 它是怎么跑起来的
+
+一条内容进来，只走一条路。
 
 ```text
 Capture → Decide → Connect → Verify → Review → Next action
@@ -60,7 +66,9 @@ Capture → Decide → Connect → Verify → Review → Next action
 
 图谱不是产品，它是让每个决定可复查的**证据层**。
 
-## 看一眼
+## 它长这样
+
+先看四张图，基本就知道它在干什么。
 
 <table>
   <tr>
@@ -85,7 +93,9 @@ Capture → Decide → Connect → Verify → Review → Next action
   </tr>
 </table>
 
-## 核心能力
+## 你实际会用到什么
+
+下面不是功能清单，是我每天真的会碰到的几个动作。
 
 | 能力 | 说明 |
 | --- | --- |
@@ -100,7 +110,9 @@ Capture → Decide → Connect → Verify → Review → Next action
 | **MCP 接口** | 零依赖只读 MCP server，协议 `2026-07-28` |
 | **自适应布局** | 桌面、窄栏、极窄栏三档，图标优先，不横向溢出 |
 
-## 安装
+## 装起来
+
+三分钟能跑起来。
 
 1. 从 [Releases](https://github.com/lxc248/-interestseed/releases) 下载 `interestseed-v3.0.8.zip`。
 2. 解压到：
@@ -130,7 +142,9 @@ prompts:    review-interest / plan-next-experiment
 
 MCP 是只读的。核心功能不需要账号、API key 或模型凭据。
 
-## 工程状态
+## 我把它做得多稳
+
+这些数字不是装饰。每次改完，我都会重新跑一遍。
 
 ```text
 511 tests passing
@@ -152,7 +166,7 @@ node --test mcp/smoke.test.mjs
 
 要求 Node.js 22+。
 
-## 设计原则
+## 几条不肯让步的原则
 
 ```text
 Human-in-the-loop
@@ -183,5 +197,5 @@ InterestSeed 不抓取平台、不保存 cookie、不自动发布、不自动写
 
 AGPL-3.0-only. Author: [aicoder](https://github.com/lxc248).
 
-如果这个项目让你重新思考“收藏之后该做什么”，欢迎 star、试用、提 issue。  
-参与贡献前请读 [CONTRIBUTING.md](CONTRIBUTING.md) 与 [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)。
+如果你也有过“收藏了就等于学了”的错觉，欢迎试试它。  
+觉得有用就 star；发现问题就提 issue；想一起改，先读 [CONTRIBUTING.md](CONTRIBUTING.md) 和 [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)。

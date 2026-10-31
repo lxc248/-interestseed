@@ -32,7 +32,9 @@
 > Most tools help you **save it**.  
 > InterestSeed helps you **test it**.
 
-## Not another bookmark pile
+We don't lack bookmarks. We lack the part after saving: actually trying it once, then saying honestly, "worth keeping" or "let it go."
+
+## Where it differs from a bookmark pile
 
 | | Bookmarks | Bidirectional notes | **InterestSeed** |
 | --- | --- | --- | --- |
@@ -41,9 +43,13 @@
 | End state | To read | A graph | **Keep / drop + next action** |
 | Default action | Save | Link | **Run a small experiment** |
 
-InterestSeed does not optimize node count. It optimizes **decision completion**.
+Bookmarks solve "don't lose it." InterestSeed tries to solve "don't pretend you'll do it."
 
-## The loop
+It does not optimize node count. It optimizes **decision completion**.
+
+## How it actually runs
+
+One piece of content comes in. It gets one path.
 
 ```text
 Capture → Decide → Connect → Verify → Review → Next action
@@ -60,7 +66,9 @@ Capture → Decide → Connect → Verify → Review → Next action
 
 The graph is not the product. It is the evidence layer that makes each decision inspectable.
 
-## See it
+## What it looks like
+
+Four screenshots, and you basically know what it does.
 
 <table>
   <tr>
@@ -85,7 +93,9 @@ The graph is not the product. It is the evidence layer that makes each decision 
   </tr>
 </table>
 
-## Core capabilities
+## What you will actually use
+
+These aren't a feature checklist. They're the moves I actually make every day.
 
 | Capability | What it does |
 | --- | --- |
@@ -100,7 +110,9 @@ The graph is not the product. It is the evidence layer that makes each decision 
 | **MCP interface** | Zero-dependency read-only MCP server, protocol `2026-07-28`. |
 | **Adaptive layout** | Desktop, narrow, and very narrow panes with icon-first actions and no horizontal overflow. |
 
-## Install
+## Install it
+
+It takes about three minutes.
 
 1. Download `interestseed-v3.0.8.zip` from [Releases](https://github.com/lxc248/-interestseed/releases).
 2. Extract it into:
@@ -130,7 +142,9 @@ prompts:    review-interest / plan-next-experiment
 
 The MCP surface is read-only. Core functionality needs no account, API key, or model credentials.
 
-## Engineering
+## How stable it is
+
+These numbers are not decoration. I rerun them after every change.
 
 ```text
 511 tests passing
@@ -152,7 +166,7 @@ node --test mcp/smoke.test.mjs
 
 Requires Node.js 22+.
 
-## Design principles
+## A few principles I won't trade away
 
 ```text
 Human-in-the-loop
@@ -183,5 +197,5 @@ The user keeps the decision rights.
 
 AGPL-3.0-only. Author: [aicoder](https://github.com/lxc248).
 
-If this project makes you rethink what should happen after “save”, star it, try it, or open an issue.  
-Before contributing, read [CONTRIBUTING.md](CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+If you have ever saved something and quietly known you would never try it, this is for you.  
+Star it if it helps. Open an issue if it doesn't. If you want to improve it, start with [CONTRIBUTING.md](CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
