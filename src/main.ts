@@ -94,9 +94,11 @@ import {
 } from './ui/DiscoveryAuditModal';
 import { DiscoveryOverviewModal } from './ui/DiscoveryOverviewModal';
 import { DiscoveryExplorerModal } from './ui/DiscoveryExplorerModal';
+import { AiSetupModal } from './ui/AiSetupModal';
 import { buildDiscoveryOverview } from './discovery/overview';
 import { buildExploration } from './discovery/exploration';
 import {
+  DEEPSEEK_V4_PRO_CONFIG,
   createModelProvider,
   type ExplorationInsight,
   type ExplorationRequest,
@@ -282,6 +284,7 @@ export default class InterestSeedPlugin extends Plugin {
       getSelectedNodeId: () => this.selectedId,
       setSelectedNodeId: (nodeId) => this.setSelectedNode(nodeId),
       getAiApiKey: () => this.getAiApiKey(),
+      openAiSetup: () => this.openAiSetup(),
       activateView: () => this.activateView(),
       markRebuilt: async (at) => {
         this.settingsLastRebuiltAt = at;
@@ -1345,6 +1348,36 @@ export default class InterestSeedPlugin extends Plugin {
     const trimmed = value.trim();
     if (trimmed) await storage.setSecret('interestseed-ai-key', trimmed);
     else await storage.deleteSecret('interestseed-ai-key');
+  }
+
+  openAiSetup(): void {
+    void this.getAiApiKey().then((key) => {
+      new AiSetupModal(this.app, {
+        endpoint: DEEPSEEK_V4_PRO_CONFIG.baseUrl,
+        providerLabel:
+          this.settings.aiProvider === 'claudian'
+            ? 'Claudian'
+            : '本地 DeepSeek V4 Pro',
+        enabled: this.settings.enableAI,
+        consentGranted: this.settings.aiConsentGranted,
+        hasKey: Boolean(key),
+        onSaveKey: (value) => this.saveAiApiKey(value),
+        onUseClaudian: async () => {
+          this.settings.aiProvider = 'claudian';
+          await this.saveSettings();
+          new Notice('已切换到 Claudian；请确认 Claudian 插件可用。');
+        },
+        onOpenSettings: () => {
+          const setting = (
+            this.app as unknown as {
+              setting?: { open(): void; openTabById(id: string): void };
+            }
+          ).setting;
+          setting?.open();
+          setting?.openTabById(this.manifest.id);
+        },
+      }).open();
+    });
   }
 
   async saveSettings(): Promise<void> {

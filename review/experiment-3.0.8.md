@@ -92,7 +92,8 @@ review/experiment-3.0.8/results-onboarding.json
 | 47 | AI 命令不可用时降级 | ✅ HTTP 401 → 保留本地规则发现 | 48-ai-command-fallback.png |
 | 48 | 探索页 AI 入口 | ✅ AI 可选、入口可见 | 49-explorer-ai-enabled.png |
 | 49 | AI 推荐卡理由与置信度 | ✅ 按可信度排序、显示理由 | 51-ai-suggestion-card.png |
-| 50 | MCP smoke | ✅ 4/4 | 命令行输出 |
+| 50 | AI 接入引导窗口 | ✅ 说明边界、保存 Key、打开设置 | 52-ai-setup-modal.png |
+| 51 | MCP smoke | ✅ 4/4 | 命令行输出 |
 
 ## 4. 关键流程
 
@@ -169,6 +170,7 @@ Canvas：InterestSeed/兴趣图谱-2026-10-31-3.canvas
 
 ```text
 设置页 AI 开关默认开启
+接入引导窗口可填写自己的 Key
 AI 命令在本地服务 401 时给出明确提示
 候选卡按置信度排序，显示理由
 本地规则发现保持不变
@@ -222,7 +224,7 @@ review/experiment-3.0.8/
 ## 7. 验证
 
 ```text
-71 test files / 519 tests passing
+71 test files / 520 tests passing
 MCP smoke 4/4
 npm run verify 通过
 ```
@@ -238,12 +240,14 @@ npm run verify 通过
 ## 9. 结论
 
 ```text
-50 项功能路径覆盖
+51 项功能路径覆盖
 1 个真实高优 UX bug 被发现并修复
 收件箱、实验、分享卡、发现、导出、冷启动、撤销/重做全部通过
 窄屏与暗色无布局回归
 实验后图谱已恢复
 ```
+
+
 
 
 

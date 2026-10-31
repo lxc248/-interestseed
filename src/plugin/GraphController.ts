@@ -6,7 +6,6 @@ import { detectNodeType, type BuildReport, type InterestSeedGraphBuilder } from 
 import type { InterestSeedGraphStore } from '../core/GraphStore';
 import type { GraphSession } from '../core/GraphSession';
 import {
-  AI_ENABLEMENT_NOTICE,
   buildRelationRequest,
   createModelProvider,
   type AiRelationSuggestion,
@@ -125,6 +124,7 @@ export interface GraphControllerDeps {
   getSelectedNodeId(): string | null;
   setSelectedNodeId(id: string | null): void;
   getAiApiKey(): Promise<string | undefined>;
+  openAiSetup(): void;
   activateView(): Promise<void>;
   markRebuilt(at: string): Promise<void>;
   setScanning(scanning: boolean): void;
@@ -488,7 +488,7 @@ export class GraphController {
     try {
       const available = await provider.isAvailable();
       if (!available) {
-        new Notice(AI_ENABLEMENT_NOTICE, 10_000);
+        this.deps.openAiSetup();
         return;
       }
 
@@ -501,10 +501,11 @@ export class GraphController {
       this.deps.openAiSuggestions(suggestions);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      const authHint = /\b401\b|\b403\b/.test(message)
-        ? '，请检查设置中的本地服务 API Key'
-        : '';
-      new Notice(`AI 建议不可用：${message}${authHint}。已保留本地规则发现。`, 10_000);
+      if (/\b401\b|\b403\b/.test(message)) {
+        this.deps.openAiSetup();
+        return;
+      }
+      new Notice(`AI 建议不可用：${message}。已保留本地规则发现。`, 10_000);
     } finally {
       provider.dispose();
     }

@@ -6830,3 +6830,89 @@ body.theme-light .interestseed-sprint-option.is-selected {
   display: flex;
   gap: 8px;
 }
+
+/* AI setup modal */
+.interestseed-ai-setup-lede {
+  margin: 0 0 14px;
+  color: var(--text-normal);
+  line-height: 1.6;
+}
+.interestseed-ai-setup-facts {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--background-secondary);
+}
+.interestseed-ai-setup-fact {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 12px;
+}
+.interestseed-ai-setup-fact span {
+  color: var(--text-muted);
+}
+.interestseed-ai-setup-fact strong {
+  color: var(--text-normal);
+  font-weight: 600;
+  text-align: right;
+  word-break: break-all;
+}
+.interestseed-ai-setup-note {
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  border-left: 2px solid var(--interactive-accent);
+  background: var(--background-primary-alt);
+  border-radius: 0 8px 8px 0;
+}
+.interestseed-ai-setup-note strong {
+  font-size: 12px;
+  color: var(--text-normal);
+}
+.interestseed-ai-setup-note p {
+  margin: 4px 0 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.interestseed-ai-setup-key {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: end;
+  margin-bottom: 14px;
+}
+.interestseed-ai-setup-key label {
+  grid-column: 1 / -1;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.interestseed-ai-setup-input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+}
+.interestseed-ai-setup-save {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--interactive-accent);
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  font-weight: 600;
+}
+.interestseed-ai-setup-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.interestseed-ai-setup-footnote {
+  margin: 14px 0 0;
+  color: var(--text-faint);
+  font-size: 11px;
+  line-height: 1.5;
+}

@@ -51,7 +51,7 @@ Graph snapshot
 ```text
 default: on
 providers: local DeepSeek V4 Pro (localhost:7863) or Claudian
-key: optional local service key in Obsidian SecretStorage; env fallback
+setup: guided modal; key saved in Obsidian SecretStorage, env fallback
 sent: node id, title, tags
 never sent: note body, source paths, full observations, vault contents
 output: candidate relations only; user confirmation writes them

@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.3.0 — AI setup window
+
+- Added a guided modal for connecting a user-provided local AI key.
+- Opens from the command palette, settings, or an AI 401/403.
+- Saves keys in Obsidian SecretStorage and states the data boundary.
+- 520 tests passing.
+
 ## 3.2.0 — Focused AI relation suggestions
 
 - Focus-aware candidate selection: shared tags first, low-degree nodes when unfocused.

@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+﻿// @vitest-environment jsdom
 import { describe, expect, it, vi } from 'vitest';
 import { installDomShims } from './ui-test-shim';
 import { NodeCreateModal } from '../src/ui/NodeCreateModal';
@@ -6,6 +6,7 @@ import { RelationCreateModal } from '../src/ui/RelationCreateModal';
 import { RelationEditModal } from '../src/ui/RelationEditModal';
 import { ScanConfirmModal } from '../src/ui/ScanConfirmModal';
 import { AiSuggestionModal } from '../src/ui/AiSuggestionModal';
+import { AiSetupModal } from '../src/ui/AiSetupModal';
 import { DiscoveryOverviewModal } from '../src/ui/DiscoveryOverviewModal';
 import { DiscoveryCorrectionModal } from '../src/ui/DiscoveryCorrectionModal';
 import { GapCoachModal } from '../src/ui/GapCoachModal';
@@ -109,6 +110,36 @@ describe('AiSuggestionModal', () => {
     const ignore = [...modal.contentEl.querySelectorAll('button')].find((b) => b.textContent === '忽略') as HTMLButtonElement;
     ignore.click();
     expect(modal.contentEl.textContent).toContain('已忽略');
+  });
+});
+
+describe('AiSetupModal', () => {
+  it('saves a user-provided key and explains the boundary', async () => {
+    const onSaveKey = vi.fn(async () => {});
+    const modal = new AiSetupModal({} as never, {
+      endpoint: 'http://localhost:7863/v1',
+      providerLabel: '本地 DeepSeek V4 Pro',
+      enabled: true,
+      consentGranted: true,
+      hasKey: false,
+      onSaveKey,
+      onOpenSettings: vi.fn(),
+    });
+    modal.open();
+    expect(modal.titleEl.textContent).toContain('把 AI 推荐接上');
+    expect(modal.contentEl.textContent).toContain('不会发送笔记正文');
+
+    const input = modal.contentEl.querySelector(
+      '.interestseed-ai-setup-input',
+    ) as HTMLInputElement;
+    input.value = 'sk-local-test';
+    input.dispatchEvent(new Event('input'));
+    const save = [...modal.contentEl.querySelectorAll('button')].find(
+      (button) => button.textContent === '保存 Key',
+    ) as HTMLButtonElement;
+    save.click();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(onSaveKey).toHaveBeenCalledWith('sk-local-test');
   });
 });
 
@@ -272,3 +303,4 @@ describe('DiscoveryApplyModal', () => {
     expect(apply).toHaveBeenCalled();
   });
 });
+

@@ -215,6 +215,13 @@ export class InterestSeedSettingsTab extends PluginSettingTab {
         }),
       );
 
+    new Setting(containerEl)
+      .setName('接入我的 API')
+      .setDesc('打开引导窗口，填写本地服务 Key，或切换到 Claudian。')
+      .addButton((button) =>
+        button.setButtonText('打开接入引导').onClick(() => this.plugin.openAiSetup()),
+      );
+
     const provider =
       this.plugin.settings.aiProvider === 'claudian'
         ? 'Claudian（使用其现有模型配置）'
