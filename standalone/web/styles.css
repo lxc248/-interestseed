@@ -212,3 +212,36 @@ button, input { font: inherit; }
 .node.selected .planet-label { fill: #fff7d6; font-size: 11px; }
 @keyframes sun-breathe { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
 @keyframes ring-pulse { 0%, 100% { opacity: .35; } 50% { opacity: .9; } }
+.modal-backdrop {
+  position: fixed; inset: 0; z-index: 60;
+  display: grid; place-items: center;
+  background: rgba(4, 6, 12, .72);
+  backdrop-filter: blur(8px);
+}
+.modal-backdrop[hidden] { display: none; }
+.modal-card {
+  width: min(520px, calc(100vw - 40px));
+  border: 1px solid var(--line); border-radius: 18px;
+  background: #0e1320; box-shadow: 0 30px 80px rgba(0,0,0,.5);
+  overflow: hidden;
+}
+.modal-body { display: grid; gap: 8px; padding: 16px 20px 20px; }
+.modal-body label { color: var(--muted); font-size: 11px; }
+.modal-body input, .modal-body textarea {
+  padding: 9px 11px; border-radius: 9px; border: 1px solid var(--line);
+  background: rgba(0,0,0,.25); color: var(--text); resize: vertical;
+}
+.modal-body .hint { margin: 2px 0 4px; color: var(--muted); font-size: 11px; line-height: 1.5; }
+.modal-body .hint code { color: #c4b5fd; }
+.edge.focus-edge { stroke: rgba(165, 180, 252, .5); stroke-width: 1.7; filter: drop-shadow(0 0 5px rgba(129,140,248,.55)); }
+.node.dimmed { opacity: .32; }
+.node.dimmed:hover { opacity: .85; }
+@media (prefers-reduced-motion: reduce) {
+  .star, .node .sun-halo, .node .selected-ring { animation: none; }
+}
+
+.modal-actions { display: flex; gap: 8px; margin-top: 10px; }
+
+
+#model-badge { cursor: pointer; }
+

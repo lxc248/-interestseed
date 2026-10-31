@@ -103,6 +103,34 @@ export async function saveGraph(vaultPath: string, graph: InterestSeedGraph): Pr
   await writeJson(statePath(vaultPath), state);
 }
 
+const HISTORY_FILE = 'history.json';
+
+export async function snapshotGraph(vaultPath: string): Promise<void> {
+  const state = await loadState(vaultPath);
+  const path = join(stateDir(vaultPath), HISTORY_FILE);
+  let history: InterestSeedGraph[] = [];
+  if (existsSync(path)) {
+    const raw = (await readFile(path, 'utf8')).replace(/^\uFEFF/, '');
+    const parsed = JSON.parse(raw) as unknown;
+    if (Array.isArray(parsed)) history = parsed as InterestSeedGraph[];
+  }
+  history = [...history, state.graph].slice(-30);
+  await writeJson(path, history);
+}
+
+export async function undoGraph(vaultPath: string): Promise<InterestSeedGraph | null> {
+  const path = join(stateDir(vaultPath), HISTORY_FILE);
+  if (!existsSync(path)) return null;
+  const raw = (await readFile(path, 'utf8')).replace(/^\uFEFF/, '');
+  const parsed = JSON.parse(raw) as unknown;
+  if (!Array.isArray(parsed) || parsed.length === 0) return null;
+  const history = parsed as InterestSeedGraph[];
+  const previous = history.pop()!;
+  await writeJson(path, history);
+  await saveGraph(vaultPath, previous);
+  return previous;
+}
+
 async function writeJson(path: string, value: unknown): Promise<void> {
   const temp = `${path}.tmp`;
   await writeFile(temp, `${JSON.stringify(value, null, 2)}\n`, 'utf8');

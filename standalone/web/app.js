@@ -458,10 +458,16 @@ function renderGraph() {
     cx, cy, r: 58, fill: 'url(#star-halo)', opacity: 0.9,
   }));
 
+  const neighborIds = new Set();
+  for (const edge of graph.edges) {
+    if (edge.source === selected.id) neighborIds.add(edge.target);
+    if (edge.target === selected.id) neighborIds.add(edge.source);
+  }
   for (const edge of graph.edges) {
     const from = positions.get(edge.source);
     const to = positions.get(edge.target);
     if (!from || !to) continue;
+    const touchesFocus = edge.source === selected.id || edge.target === selected.id;
     const mx = (from.x + to.x) / 2;
     const my = (from.y + to.y) / 2;
     const dx = to.x - from.x;
@@ -472,7 +478,7 @@ function renderGraph() {
     const controlY = my + (dx / distance) * bend;
     svg.appendChild(svgEl('path', {
       d: `M ${from.x} ${from.y} Q ${controlX} ${controlY} ${to.x} ${to.y}`,
-      class: `edge ${edge.status === 'confirmed' ? 'confirmed' : ''}`,
+      class: `edge ${edge.status === 'confirmed' ? 'confirmed' : ''} ${touchesFocus ? 'focus-edge' : ''}`,
       'fill': 'none',
     }));
   }
@@ -482,9 +488,10 @@ function renderGraph() {
     const pos = positions.get(node.id);
     if (!pos) continue;
     const isSelected = node.id === selected.id;
+    const isNeighbor = neighborIds.has(node.id);
     const r = isSelected ? 24 : Math.min(16, 8 + (degree.get(node.id) ?? 0) * 1.3);
     const group = svgEl('g', {
-      class: `node ${isSelected ? 'selected' : ''}`,
+      class: `node ${isSelected ? 'selected' : ''} ${!isSelected && !isNeighbor ? 'dimmed' : ''}`,
       transform: `translate(${pos.x}, ${pos.y})`,
       tabindex: 0,
     });
@@ -740,6 +747,109 @@ function toast(message, error = false) {
 }
 
 $('#scan-button').addEventListener('click', scanVault);
+$('#capture-button').addEventListener('click', () => openModal('capture-modal'));
+$('#settings-button').addEventListener('click', openSettings);
+$('#model-badge').addEventListener('click', openSettings);
+$('#capture-submit').addEventListener('click', submitCapture);
+$('#settings-submit').addEventListener('click', saveSettings);
+$('#settings-clear-key').addEventListener('click', clearKey);
+for (const button of document.querySelectorAll('.modal-close')) {
+  button.addEventListener('click', () => {
+    const id = button.getAttribute('data-close');
+    if (id) closeModal(id);
+  });
+}
+for (const backdrop of document.querySelectorAll('.modal-backdrop')) {
+  backdrop.addEventListener('click', (event) => {
+    if (event.target === backdrop) backdrop.hidden = true;
+  });
+}
+
+function openModal(id) {
+  document.getElementById(id).hidden = false;
+}
+function closeModal(id) {
+  document.getElementById(id).hidden = true;
+}
+
+async function openSettings() {
+  try {
+    const result = await api('/api/config');
+    $('#settings-model').value = result.config.model ?? '';
+    $('#settings-base-url').value = result.config.baseUrl ?? '';
+    $('#settings-key').value = '';
+    $('#settings-key').placeholder = result.keyReady
+      ? '已保存 Key，留空保持不变；输入新 Key 可替换'
+      : '未配置 Key，粘贴本地 API Key';
+    $('#settings-include').value = (result.config.includeFolders ?? []).join('\n');
+    $('#settings-exclude').value = (result.config.excludeFolders ?? []).join('\n');
+    $('#settings-include-tags').value = (result.config.includeTags ?? []).join('\n');
+    openModal('settings-modal');
+  } catch (error) {
+    toast(error.message, true);
+  }
+}
+
+async function saveSettings() {
+  try {
+    setBusy(true);
+    const body = {
+      model: $('#settings-model').value.trim(),
+      baseUrl: $('#settings-base-url').value.trim(),
+      includeFolders: $('#settings-include').value.split(/\r?\n/).map((value) => value.trim()).filter(Boolean),
+      excludeFolders: $('#settings-exclude').value.split(/\r?\n/).map((value) => value.trim()).filter(Boolean),
+      includeTags: $('#settings-include-tags').value.split(/\r?\n/).map((value) => value.trim()).filter(Boolean),
+    };
+    const key = $('#settings-key').value.trim();
+    if (key) body.key = key;
+    await api('/api/config', { method: 'PUT', body: JSON.stringify(body) });
+    closeModal('settings-modal');
+    await load();
+    toast('设置已保存');
+  } catch (error) {
+    toast(error.message, true);
+  } finally {
+    setBusy(false);
+  }
+}
+
+async function clearKey() {
+  try {
+    setBusy(true);
+    await api('/api/config', { method: 'PUT', body: JSON.stringify({ key: '' }) });
+    closeModal('settings-modal');
+    await load();
+    toast('Key 已清除');
+  } catch (error) {
+    toast(error.message, true);
+  } finally {
+    setBusy(false);
+  }
+}
+
+async function submitCapture() {
+  const text = $('#capture-text').value.trim();
+  if (!text) return toast('先写点内容。', true);
+  try {
+    setBusy(true);
+    const body = {
+      text,
+      title: $('#capture-title').value.trim(),
+      url: $('#capture-url').value.trim(),
+    };
+    await api('/api/capture', { method: 'POST', body: JSON.stringify(body) });
+    $('#capture-text').value = '';
+    $('#capture-title').value = '';
+    $('#capture-url').value = '';
+    closeModal('capture-modal');
+    await load();
+    toast('已保存并重新扫描');
+  } catch (error) {
+    toast(error.message, true);
+  } finally {
+    setBusy(false);
+  }
+}
 $('#discoveries-refresh').addEventListener('click', async () => {
   try {
     setBusy(true);

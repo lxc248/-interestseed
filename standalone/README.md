@@ -33,9 +33,21 @@ npm run build --prefix standalone
 node standalone/dist/cli.js init --vault "C:\path\to\vault"
 node standalone/dist/cli.js scan --vault "C:\path\to\vault"
 node standalone/dist/cli.js suggest --vault "C:\path\to\vault" --node "node_..."
+node standalone/dist/cli.js connect --vault "C:\path\to\vault" --source "node_..." --target "node_..." --relation "共享方法"
+node standalone/dist/cli.js undo --vault "C:\path\to\vault"
 node standalone/dist/cli.js experiment start --vault "C:\path\to\vault" --title "AI 工具 × 习惯"
 node standalone/dist/cli.js experiment log --vault "C:\path\to\vault" --id "exp_..." --evidence "今天做了什么"
 node standalone/dist/cli.js serve --vault "C:\path\to\vault" --port 4173
+```
+
+Web 里也有：
+
+```text
+保存一条       捕获弹窗
+设置           本地模型 / Key / 扫描目录
+AI 建议        一条建议
+实验条         快速记录
+发现 / 收件箱 / 实验历史
 ```
 
 ## Demo vault

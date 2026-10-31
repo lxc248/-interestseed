@@ -18,6 +18,8 @@
       </div>
       <div class="top-actions">
         <span id="model-badge" class="pill">本地模型</span>
+        <button id="capture-button" class="button ghost">保存一条</button>
+        <button id="settings-button" class="button ghost">设置</button>
         <button id="scan-button" class="button ghost">重新扫描</button>
       </div>
     </header>
@@ -91,6 +93,56 @@
       </section>
     </section>
   </div>
+
+  <div id="capture-modal" class="modal-backdrop" hidden>
+    <div class="modal-card">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">SPARK CAPTURE</p>
+          <h2>保存一条</h2>
+        </div>
+        <button class="modal-close button ghost" data-close="capture-modal">关闭</button>
+      </div>
+      <div class="modal-body">
+        <input id="capture-title" placeholder="标题（可选）" />
+        <input id="capture-url" placeholder="来源链接（可选）" />
+        <textarea id="capture-text" placeholder="把这条收藏粘进来：为什么想保存它？"></textarea>
+        <button id="capture-submit" class="button primary">保存并扫描</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="settings-modal" class="modal-backdrop" hidden>
+    <div class="modal-card">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">LOCAL MODEL</p>
+          <h2>接入你的本地模型</h2>
+        </div>
+        <button class="modal-close button ghost" data-close="settings-modal">关闭</button>
+      </div>
+      <div class="modal-body">
+        <label>模型 ID</label>
+        <input id="settings-model" placeholder="cn:deepseek-v4.1-flash" />
+        <label>API 地址</label>
+        <input id="settings-base-url" placeholder="http://localhost:7863/v1" />
+        <label>Key</label>
+        <input id="settings-key" type="password" placeholder="留空保持不变；输入新 Key 可替换" />
+        <p class="hint">Key 只写入本机 <code>.interestseed/key</code>，不会进 Web。</p>
+        <label>只扫描这些标签（每行一个，可选）</label>
+        <textarea id="settings-include-tags" placeholder="例如：focus"></textarea>
+        <label>扫描目录（每行一个）</label>
+        <textarea id="settings-include"></textarea>
+        <label>排除目录（每行一个）</label>
+        <textarea id="settings-exclude"></textarea>
+        <div class="modal-actions">
+          <button id="settings-submit" class="button primary">保存</button>
+          <button id="settings-clear-key" class="button danger">清除 Key</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="toast" class="toast" hidden></div>
   <script type="module" src="/app.js"></script>
 </body>

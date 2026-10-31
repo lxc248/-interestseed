@@ -10,7 +10,7 @@ import {
 } from '../../src/discovery/types';
 import type { InterestSeedEdge, InterestSeedGraph } from '../../src/types/graph';
 import { edgeIdFor } from '../../src/utils/ids';
-import { ensureStateDir, loadState, saveGraph, stateDir } from './state';
+import { ensureStateDir, loadState, saveGraph, snapshotGraph, stateDir } from './state';
 
 const FILE = 'discoveries.json';
 
@@ -94,6 +94,7 @@ export async function applyDiscovery(
         ],
         updatedAt: now,
       };
+      await snapshotGraph(vaultPath);
       await saveGraph(vaultPath, {
         ...state.graph,
         edges: state.graph.edges.map((edge) => (edge.id === existing.id ? confirmed : edge)),
@@ -150,6 +151,7 @@ export async function applyDiscovery(
     edges: [...state.graph.edges, edge],
     updatedAt: now,
   };
+  await snapshotGraph(vaultPath);
   await saveGraph(vaultPath, nextGraph);
   discovery.feedbackStatus = 'accepted';
   discovery.application = {

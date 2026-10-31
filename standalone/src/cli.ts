@@ -26,6 +26,7 @@ import {
   loadConfig,
   loadState,
   saveConfig,
+  undoGraph,
 } from './state';
 
 async function main(): Promise<void> {
@@ -97,6 +98,12 @@ async function main(): Promise<void> {
       discoveries: (await listDiscoveries(vaultPath)).length,
       inbox: (await listInbox(vaultPath)).filter((item) => item.status === 'pending').length,
     });
+  }
+
+  if (command === 'undo') {
+    const previous = await undoGraph(vaultPath);
+    if (!previous) return print({ ok: false, message: 'Nothing to undo.' });
+    return print({ ok: true, nodes: previous.nodes.length, edges: previous.edges.length });
   }
 
   if (command === 'suggest') {
@@ -241,6 +248,7 @@ Usage:
   interestseed inbox list | add --text <text> | keep --id <id> | pass --id <id>
   interestseed suggest [--vault <path>] [--node <id>]
   interestseed connect --source <id> --target <id> --relation <name> [--reason <text>]
+  interestseed undo
   interestseed experiment start --title <title> [--node <id>] [--days 3]
   interestseed experiment log --id <id> --evidence <text> [--interest 4] [--energy 4]
   interestseed experiment list

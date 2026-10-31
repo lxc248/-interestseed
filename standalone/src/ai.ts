@@ -8,7 +8,7 @@ import {
 } from '../../src/services/ModelProvider';
 import type { InterestSeedEdge, InterestSeedGraph } from '../../src/types/graph';
 import { edgeIdFor } from '../../src/utils/ids';
-import { loadConfig, loadState, saveGraph, type StandaloneConfig } from './state';
+import { loadConfig, loadState, saveGraph, snapshotGraph, type StandaloneConfig } from './state';
 
 export async function resolveApiKey(
   vaultPath: string,
@@ -110,6 +110,7 @@ export async function connectSuggestion(
     edges: [...graph.edges, edge],
     updatedAt: now,
   };
+  await snapshotGraph(vaultPath);
   await saveGraph(vaultPath, next);
   return { ok: true, edge };
 }

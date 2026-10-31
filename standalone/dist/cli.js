@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { existsSync } from "node:fs";
 import { extname, join, relative, resolve } from "node:path";
-import { mkdir, readFile, readdir, rename, stat, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, rename, rm, stat, writeFile } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
 import { createServer } from "node:http";
 import { fileURLToPath } from "node:url";
@@ -604,6 +604,31 @@ async function saveGraph(vaultPath, graph) {
 	};
 	await writeJson(statePath(vaultPath), state);
 }
+var HISTORY_FILE = "history.json";
+async function snapshotGraph(vaultPath) {
+	const state = await loadState(vaultPath);
+	const path = join(stateDir(vaultPath), HISTORY_FILE);
+	let history = [];
+	if (existsSync(path)) {
+		const raw = (await readFile(path, "utf8")).replace(/^\uFEFF/, "");
+		const parsed = JSON.parse(raw);
+		if (Array.isArray(parsed)) history = parsed;
+	}
+	history = [...history, state.graph].slice(-30);
+	await writeJson(path, history);
+}
+async function undoGraph(vaultPath) {
+	const path = join(stateDir(vaultPath), HISTORY_FILE);
+	if (!existsSync(path)) return null;
+	const raw = (await readFile(path, "utf8")).replace(/^\uFEFF/, "");
+	const parsed = JSON.parse(raw);
+	if (!Array.isArray(parsed) || parsed.length === 0) return null;
+	const history = parsed;
+	const previous = history.pop();
+	await writeJson(path, history);
+	await saveGraph(vaultPath, previous);
+	return previous;
+}
 async function writeJson(path, value) {
 	const temp = `${path}.tmp`;
 	await writeFile(temp, `${JSON.stringify(value, null, 2)}\n`, "utf8");
@@ -679,11 +704,13 @@ async function connectSuggestion(vaultPath, suggestion) {
 		createdAt: now,
 		updatedAt: now
 	};
-	await saveGraph(vaultPath, {
+	const next = {
 		...graph,
 		edges: [...graph.edges, edge],
 		updatedAt: now
-	});
+	};
+	await snapshotGraph(vaultPath);
+	await saveGraph(vaultPath, next);
 	return {
 		ok: true,
 		edge
@@ -1373,6 +1400,7 @@ async function applyDiscovery(vaultPath, id) {
 				],
 				updatedAt: now
 			};
+			await snapshotGraph(vaultPath);
 			await saveGraph(vaultPath, {
 				...state.graph,
 				edges: state.graph.edges.map((edge) => edge.id === existing.id ? confirmed : edge),
@@ -1428,11 +1456,13 @@ async function applyDiscovery(vaultPath, id) {
 		createdAt: now,
 		updatedAt: now
 	};
-	await saveGraph(vaultPath, {
+	const nextGraph = {
 		...state.graph,
 		edges: [...state.graph.edges, edge],
 		updatedAt: now
-	});
+	};
+	await snapshotGraph(vaultPath);
+	await saveGraph(vaultPath, nextGraph);
 	discovery.feedbackStatus = "accepted";
 	discovery.application = {
 		state: "applied",
@@ -3119,6 +3149,38 @@ async function route(request, response, options) {
 			...await statePayload(options.vaultPath)
 		});
 	}
+	if (url.pathname === "/api/config" && request.method === "GET") {
+		const config = await loadConfig(options.vaultPath);
+		const key = await resolveApiKey(options.vaultPath, config);
+		return sendJson(response, 200, {
+			config,
+			keyReady: Boolean(key)
+		});
+	}
+	if (url.pathname === "/api/config" && request.method === "PUT") {
+		const body = await readJson(request);
+		const config = await loadConfig(options.vaultPath);
+		if (typeof body.model === "string" && body.model.trim()) config.model = body.model.trim();
+		if (typeof body.baseUrl === "string" && body.baseUrl.trim()) config.baseUrl = body.baseUrl.trim();
+		if (typeof body.keyEnv === "string" && body.keyEnv.trim()) config.keyEnv = body.keyEnv.trim();
+		if (Array.isArray(body.includeFolders)) config.includeFolders = body.includeFolders.map(String);
+		if (Array.isArray(body.excludeFolders)) config.excludeFolders = body.excludeFolders.map(String);
+		if (Array.isArray(body.includeTags)) config.includeTags = body.includeTags.map(String);
+		if (typeof body.key === "string") {
+			await ensureStateDir(options.vaultPath);
+			const keyPath = join(stateDir(options.vaultPath), "key");
+			const value = body.key.trim();
+			if (value) await writeFile(keyPath, value, "utf8");
+			else if (existsSync(keyPath)) await rm(keyPath);
+		}
+		await saveConfig(options.vaultPath, config);
+		const key = await resolveApiKey(options.vaultPath, config);
+		return sendJson(response, 200, {
+			ok: true,
+			config,
+			keyReady: Boolean(key)
+		});
+	}
 	if (url.pathname === "/api/graph") return sendJson(response, 200, (await loadState(options.vaultPath)).graph);
 	const filePath = url.pathname === "/" ? join(webRoot, "index.html") : join(webRoot, url.pathname);
 	if (!filePath.startsWith(webRoot)) return sendText(response, 403, "Forbidden");
@@ -3251,6 +3313,18 @@ async function main() {
 			inbox: (await listInbox(vaultPath)).filter((item) => item.status === "pending").length
 		});
 	}
+	if (command === "undo") {
+		const previous = await undoGraph(vaultPath);
+		if (!previous) return print({
+			ok: false,
+			message: "Nothing to undo."
+		});
+		return print({
+			ok: true,
+			nodes: previous.nodes.length,
+			edges: previous.edges.length
+		});
+	}
 	if (command === "suggest") return print({ suggestions: await suggestRelations(vaultPath, typeof flags.node === "string" ? flags.node : void 0) });
 	if (command === "connect") {
 		const source = typeof flags.source === "string" ? flags.source : "";
@@ -3374,6 +3448,7 @@ Usage:
   interestseed inbox list | add --text <text> | keep --id <id> | pass --id <id>
   interestseed suggest [--vault <path>] [--node <id>]
   interestseed connect --source <id> --target <id> --relation <name> [--reason <text>]
+  interestseed undo
   interestseed experiment start --title <title> [--node <id>] [--days 3]
   interestseed experiment log --id <id> --evidence <text> [--interest 4] [--energy 4]
   interestseed experiment list

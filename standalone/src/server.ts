@@ -1,6 +1,6 @@
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { existsSync } from 'node:fs';
-import { readFile } from 'node:fs/promises';
+import { readFile, rm, writeFile } from 'node:fs/promises';
 import { extname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { AiRelationSuggestion } from '../../src/services/ModelProvider';
@@ -24,7 +24,7 @@ import {
 } from './discoveries';
 import { enqueueInbox, listInbox, resolveInbox } from './inbox';
 import { scanAndBuild } from './graph';
-import { loadConfig, loadState, saveGraph } from './state';
+import { ensureStateDir, loadConfig, loadState, saveConfig, saveGraph, stateDir } from './state';
 
 export interface ServerOptions {
   vaultPath: string;
@@ -176,6 +176,31 @@ async function route(
     );
     if (status === 'kept') await scanAndBuild(options.vaultPath);
     return sendJson(response, 200, { ok: true, ...result, ...(await statePayload(options.vaultPath)) });
+  }
+  if (url.pathname === '/api/config' && request.method === 'GET') {
+    const config = await loadConfig(options.vaultPath);
+    const key = await resolveApiKey(options.vaultPath, config);
+    return sendJson(response, 200, { config, keyReady: Boolean(key) });
+  }
+  if (url.pathname === '/api/config' && request.method === 'PUT') {
+    const body = await readJson(request);
+    const config = await loadConfig(options.vaultPath);
+    if (typeof body.model === 'string' && body.model.trim()) config.model = body.model.trim();
+    if (typeof body.baseUrl === 'string' && body.baseUrl.trim()) config.baseUrl = body.baseUrl.trim();
+    if (typeof body.keyEnv === 'string' && body.keyEnv.trim()) config.keyEnv = body.keyEnv.trim();
+    if (Array.isArray(body.includeFolders)) config.includeFolders = body.includeFolders.map(String);
+    if (Array.isArray(body.excludeFolders)) config.excludeFolders = body.excludeFolders.map(String);
+    if (Array.isArray(body.includeTags)) config.includeTags = body.includeTags.map(String);
+    if (typeof body.key === 'string') {
+      await ensureStateDir(options.vaultPath);
+      const keyPath = join(stateDir(options.vaultPath), 'key');
+      const value = body.key.trim();
+      if (value) await writeFile(keyPath, value, 'utf8');
+      else if (existsSync(keyPath)) await rm(keyPath);
+    }
+    await saveConfig(options.vaultPath, config);
+    const key = await resolveApiKey(options.vaultPath, config);
+    return sendJson(response, 200, { ok: true, config, keyReady: Boolean(key) });
   }
   if (url.pathname === '/api/graph') {
     return sendJson(response, 200, (await loadState(options.vaultPath)).graph);
