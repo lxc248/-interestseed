@@ -195,6 +195,10 @@ Full walkthrough: [docs/tutorial.md](docs/tutorial.md)
 ## MCP
 
 ```bash
+# standalone
+node mcp/server.mjs --graph "<vault>/.interestseed/state.json"
+
+# Obsidian plugin compatibility
 node mcp/server.mjs --graph "<vault>/.obsidian/plugins/interestseed/graphs/default.json"
 ```
 

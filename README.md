@@ -195,6 +195,10 @@ Web：`http://127.0.0.1:4173`
 ## MCP
 
 ```bash
+# 独立版
+node mcp/server.mjs --graph "<vault>/.interestseed/state.json"
+
+# Obsidian 插件兼容
 node mcp/server.mjs --graph "<vault>/.obsidian/plugins/interestseed/graphs/default.json"
 ```
 

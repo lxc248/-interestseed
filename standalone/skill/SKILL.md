@@ -95,6 +95,12 @@ Web panel:
 node standalone/dist/cli.js serve --vault "<vault-path>" --port 4173
 ```
 
+Read-only MCP:
+
+```bash
+node mcp/server.mjs --graph "<vault-path>/.interestseed/state.json"
+```
+
 ## Interaction contract
 
 1. Scan the vault.

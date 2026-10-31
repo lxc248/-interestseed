@@ -69,6 +69,14 @@ npm run build:standalone
 `skill/SKILL.md` is the agent-facing contract. It instructs the agent to show one
 suggestion, wait for connect / next / not now, and never write without confirmation.
 
+## MCP
+
+```bash
+node mcp/server.mjs --graph "<vault>/.interestseed/state.json"
+```
+
+Read-only. The same MCP server also accepts the plugin's graph snapshot.
+
 ## Relationship to the plugin
 
 The plugin remains a compatibility shell for people who want Obsidian-native

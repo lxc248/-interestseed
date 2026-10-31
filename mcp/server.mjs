@@ -7,6 +7,7 @@
  * to an MCP client (Claude Desktop, Cursor, DSH, etc.).
  *
  * Usage:
+ *   node mcp/server.mjs --graph "<vault>/.interestseed/state.json"
  *   node mcp/server.mjs --graph "<vault>/.obsidian/plugins/interestseed/graphs/default.json"
  *   INTERESTSEED_GRAPH=... node mcp/server.mjs
  */
@@ -16,10 +17,12 @@ import { resolve } from 'node:path';
 const PROTOCOL_VERSION = '2026-07-28';
 const args = process.argv.slice(2);
 const graphArgIndex = args.indexOf('--graph');
+const standaloneDefault = resolve(process.cwd(), '.interestseed/state.json');
+const pluginDefault = resolve(process.cwd(), '.obsidian/plugins/interestseed/graphs/default.json');
 const graphPath = resolve(
   process.env.INTERESTSEED_GRAPH ||
     (graphArgIndex >= 0 ? args[graphArgIndex + 1] : '') ||
-    resolve(process.cwd(), '.obsidian/plugins/interestseed/graphs/default.json'),
+    (existsSync(standaloneDefault) ? standaloneDefault : pluginDefault),
 );
 
 let graphCache = { mtimeMs: 0, graph: null };
@@ -28,7 +31,8 @@ function readGraph() {
   if (existsSync(graphPath)) mtimeMs = statSync(graphPath).mtimeMs;
   if (graphCache.graph && graphCache.mtimeMs === mtimeMs) return graphCache.graph;
   const raw = readFileSync(graphPath, 'utf8').replace(/^\uFEFF/, '');
-  const graph = JSON.parse(raw);
+  const parsed = JSON.parse(raw);
+  const graph = parsed?.graph && Array.isArray(parsed.graph.nodes) ? parsed.graph : parsed;
   if (!graph || !Array.isArray(graph.nodes) || !Array.isArray(graph.edges)) {
     throw new Error('图谱文件缺少 nodes / edges');
   }
@@ -412,7 +416,7 @@ function handle(message) {
         resources: { subscribe: false, listChanged: false },
         prompts: { listChanged: false },
       },
-      serverInfo: { name: 'interestseed', version: '3.7.0' },
+      serverInfo: { name: 'interestseed', version: '4.0.0' },
     });
   }
   if (method === 'notifications/initialized') return null;
