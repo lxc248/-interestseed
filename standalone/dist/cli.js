@@ -456,6 +456,15 @@ function createId(prefix = "id") {
 	const random = Math.random().toString(36).slice(2, 8).padEnd(6, "0");
 	return `${prefix}_${time}${sequence.toString(36)}${random}`;
 }
+/** FNV-1a 32 位哈希，输出 base36。 */
+function hashString(input) {
+	let hash = 2166136261;
+	for (let index = 0; index < input.length; index += 1) {
+		hash ^= input.charCodeAt(index);
+		hash = Math.imul(hash, 16777619) >>> 0;
+	}
+	return hash.toString(36);
+}
 /**
 * 64 位级哈希（两个独立 FNV 变体拼接）。
 *
@@ -792,6 +801,811 @@ async function captureToVault(vaultPath, input) {
 function firstLine(text) {
 	return text.split(/\r?\n/).map((line) => line.trim()).find((line) => line.length > 0)?.slice(0, 120) ?? "";
 }
+//#endregion
+//#region src/utils/validation.ts
+function isRecord(value) {
+	return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+function toFiniteNumber(value, fallback) {
+	const numeric = typeof value === "number" ? value : typeof value === "string" && value.trim() !== "" ? Number(value) : NaN;
+	return Number.isFinite(numeric) ? numeric : fallback;
+}
+function clamp01(value, fallback = 0) {
+	const numeric = toFiniteNumber(value, fallback);
+	if (numeric <= 0) return 0;
+	if (numeric >= 1) return 1;
+	return numeric;
+}
+/** 接受 `"a, b"`、`['a', '#b']` 等输入，去重并去掉前导 #。 */
+function sanitizeTags(input) {
+	const source = Array.isArray(input) ? input : typeof input === "string" ? input.split(/[,，;；\s]+/) : [];
+	const seen = /* @__PURE__ */ new Set();
+	const tags = [];
+	for (const entry of source) {
+		if (typeof entry !== "string") continue;
+		const tag = entry.replace(/^#+/, "").trim();
+		if (!tag) continue;
+		const key = tag.toLowerCase();
+		if (seen.has(key)) continue;
+		seen.add(key);
+		tags.push(tag);
+	}
+	return tags;
+}
+function tagKey(tag) {
+	return tag.replace(/^#+/, "").trim().toLowerCase();
+}
+var ISO_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?Z$/;
+function isIsoTimestamp(value) {
+	return typeof value === "string" && ISO_PATTERN.test(value) && !Number.isNaN(Date.parse(value));
+}
+/**
+* 严格的结构校验：用于保存前检查，不修正数据，只报告问题。
+* 与 validateGraph（读入时的宽松清洗）互补。
+*/
+function validateGraphStructure(graph) {
+	const errors = [];
+	if (!isRecord(graph)) return ["图谱根对象不是对象"];
+	if (!Number.isInteger(graph.schemaVersion) || graph.schemaVersion < 1) errors.push("schemaVersion 必须是正整数");
+	if (!isIsoTimestamp(graph.updatedAt)) errors.push("updatedAt 必须是 ISO 8601 字符串");
+	if (!Array.isArray(graph.nodes)) errors.push("nodes 必须是数组");
+	if (!Array.isArray(graph.edges)) errors.push("edges 必须是数组");
+	if (errors.length > 0) return errors;
+	const nodeIds = /* @__PURE__ */ new Set();
+	const sourceUris = /* @__PURE__ */ new Set();
+	for (const node of graph.nodes) {
+		if (!isRecord(node)) {
+			errors.push("nodes 中存在非对象项");
+			continue;
+		}
+		if (typeof node.id !== "string" || !node.id.trim()) {
+			errors.push("节点缺少 id");
+			continue;
+		}
+		if (nodeIds.has(node.id)) errors.push(`节点 id 重复：${node.id}`);
+		nodeIds.add(node.id);
+		if (typeof node.sourceUri === "string" && node.sourceUri.trim()) {
+			const key = node.sourceUri.toLowerCase();
+			if (sourceUris.has(key)) errors.push(`节点 sourceUri 重复：${node.sourceUri}`);
+			sourceUris.add(key);
+		}
+		if (!isNodeType(node.type)) errors.push(`节点 ${node.id} 的 type 无效`);
+		if (typeof node.title !== "string" || !node.title.trim()) errors.push(`节点 ${node.id} 缺少 title`);
+		if (!Array.isArray(node.tags) || !node.tags.every((tag) => typeof tag === "string")) errors.push(`节点 ${node.id} 的 tags 必须是字符串数组`);
+		if (!isRecord(node.metadata)) errors.push(`节点 ${node.id} 的 metadata 必须是对象`);
+		if (!isIsoTimestamp(node.createdAt)) errors.push(`节点 ${node.id} 的 createdAt 不是 ISO 时间`);
+		if (!isIsoTimestamp(node.updatedAt)) errors.push(`节点 ${node.id} 的 updatedAt 不是 ISO 时间`);
+		if (node.sourceUri !== void 0 && typeof node.sourceUri !== "string") errors.push(`节点 ${node.id} 的 sourceUri 必须是字符串`);
+	}
+	const edgeIds = /* @__PURE__ */ new Set();
+	const edgeKeys = /* @__PURE__ */ new Set();
+	for (const edge of graph.edges) {
+		if (!isRecord(edge)) {
+			errors.push("edges 中存在非对象项");
+			continue;
+		}
+		if (typeof edge.id !== "string" || !edge.id.trim()) {
+			errors.push("关系缺少 id");
+			continue;
+		}
+		if (edgeIds.has(edge.id)) errors.push(`关系 id 重复：${edge.id}`);
+		edgeIds.add(edge.id);
+		if (typeof edge.source === "string" && typeof edge.target === "string" && typeof edge.relation === "string") {
+			const key = `${edge.source}\u0000${edge.target}\u0000${edge.relation}`;
+			if (edgeKeys.has(key)) errors.push(`关系重复：${edge.source} → ${edge.target}（${edge.relation}）`);
+			edgeKeys.add(key);
+		}
+		if (typeof edge.source !== "string" || !nodeIds.has(edge.source)) errors.push(`关系 ${edge.id} 的 source 不存在`);
+		if (typeof edge.target !== "string" || !nodeIds.has(edge.target)) errors.push(`关系 ${edge.id} 的 target 不存在`);
+		if (edge.source === edge.target) errors.push(`关系 ${edge.id} 是自环`);
+		if (typeof edge.relation !== "string" || !edge.relation.trim()) errors.push(`关系 ${edge.id} 缺少 relation`);
+		if (!isRelationOrigin(edge.origin)) errors.push(`关系 ${edge.id} 的 origin 无效`);
+		if (!isRelationStatus(edge.status)) errors.push(`关系 ${edge.id} 的 status 无效`);
+		if (edge.confidence !== void 0 && (typeof edge.confidence !== "number" || edge.confidence < 0 || edge.confidence > 1)) errors.push(`关系 ${edge.id} 的 confidence 必须在 0–1 之间`);
+		if (edge.evidence !== void 0 && (!Array.isArray(edge.evidence) || !edge.evidence.every((item) => typeof item === "string" && item.trim()))) errors.push(`关系 ${edge.id} 的 evidence 必须是非空字符串数组`);
+		if (edge.userRenamed !== void 0 && typeof edge.userRenamed !== "boolean") errors.push(`关系 ${edge.id} 的 userRenamed 必须是布尔值`);
+		if ((edge.origin === "rule" || edge.origin === "ai") && (!Array.isArray(edge.evidence) || edge.evidence.length === 0)) errors.push(`关系 ${edge.id} 来源为 ${edge.origin} 但缺少 evidence`);
+		if (!isIsoTimestamp(edge.createdAt)) errors.push(`关系 ${edge.id} 的 createdAt 不是 ISO 时间`);
+		if (!isIsoTimestamp(edge.updatedAt)) errors.push(`关系 ${edge.id} 的 updatedAt 不是 ISO 时间`);
+	}
+	if (graph.viewport !== void 0) {
+		const viewport = graph.viewport;
+		if (!isRecord(viewport) || typeof viewport.zoom !== "number" || !Number.isFinite(viewport.zoom) || viewport.zoom <= 0 || typeof viewport.panX !== "number" || !Number.isFinite(viewport.panX) || typeof viewport.panY !== "number" || !Number.isFinite(viewport.panY)) errors.push("viewport 必须是合法的 zoom / panX / panY");
+	}
+	return errors;
+}
+function emptyDiscoveryApplication() {
+	return { state: "none" };
+}
+function emptyDiscoveryFile(now) {
+	return {
+		discoverySchemaVersion: 3,
+		identityVersion: 2,
+		updatedAt: now,
+		discoveries: []
+	};
+}
+//#endregion
+//#region src/discovery/identity.ts
+var KIND_DOMAIN = "cross-project-topic";
+/**
+* 长度前缀编码，避免 "a|b" 与 "a" + "|b" 之类的歧义拼接。
+* 字段顺序由调用方固定，字段自身可以包含分隔符。
+*/
+function encodeIdentityFields(fields) {
+	return `${fields.length}:${fields.map((field) => `${field.length}:${field}`).join("|")}`;
+}
+function normalizeIdentityKeys(values) {
+	const seen = /* @__PURE__ */ new Set();
+	const result = [];
+	for (const value of values) {
+		const normalized = value.trim().toLowerCase();
+		if (!normalized || seen.has(normalized)) continue;
+		seen.add(normalized);
+		result.push(normalized);
+	}
+	return result.sort();
+}
+function normalizeExactKeys(values) {
+	const seen = /* @__PURE__ */ new Set();
+	const result = [];
+	for (const value of values) {
+		const normalized = value.trim();
+		if (!normalized || seen.has(normalized)) continue;
+		seen.add(normalized);
+		result.push(normalized);
+	}
+	return result.sort();
+}
+function normalizeSubjectKeys(values) {
+	return normalizeIdentityKeys(values.map((value) => tagKey(value)));
+}
+function evidenceProfile(evidence) {
+	const seen = /* @__PURE__ */ new Set();
+	const result = [];
+	for (const item of evidence) {
+		if (!item.nodeId.trim()) continue;
+		const key = encodeIdentityFields([item.kind, item.nodeId.trim()]);
+		if (seen.has(key)) continue;
+		seen.add(key);
+		result.push(key);
+	}
+	return result.sort();
+}
+function dedupeKeyFor(projectKeys, subjectKeys) {
+	return hash64(encodeIdentityFields([
+		"interestseed/discovery/dedupe/v2",
+		KIND_DOMAIN,
+		...normalizeIdentityKeys(projectKeys),
+		"--subject--",
+		...normalizeSubjectKeys(subjectKeys)
+	]));
+}
+function suppressionKeyFor(projectKeys, subjectKeys, evidence, recordId) {
+	const profile = evidenceProfile(evidence);
+	if (profile.length === 0) {
+		if (recordId) return hash64(encodeIdentityFields([
+			"interestseed/discovery/suppression/record-scope/v2",
+			KIND_DOMAIN,
+			recordId
+		]));
+		return hash64(encodeIdentityFields(["interestseed/discovery/suppression/empty-profile/v2", KIND_DOMAIN]));
+	}
+	return hash64(encodeIdentityFields([
+		"interestseed/discovery/suppression/v2",
+		KIND_DOMAIN,
+		...normalizeIdentityKeys(projectKeys),
+		"--subject--",
+		...normalizeSubjectKeys(subjectKeys),
+		"--evidence--",
+		...profile
+	]));
+}
+/**
+* 身份槽：语义主题 + 节点对。
+* dedupeKey 负责主题，nodeIds 负责保留独立节点对，避免把独立变体强行合并。
+*/
+function identitySlotKey(dedupeKey, nodeIds) {
+	return hash64(encodeIdentityFields([
+		"interestseed/discovery/slot/v2",
+		KIND_DOMAIN,
+		dedupeKey,
+		"--nodes--",
+		...normalizeExactKeys(nodeIds)
+	]));
+}
+function discoveryIdFor(dedupeKey, evidence, ruleVersion) {
+	return `discovery_${hash64(encodeIdentityFields([
+		"interestseed/discovery/id/v2",
+		KIND_DOMAIN,
+		dedupeKey,
+		"--evidence--",
+		...normalizeExactKeys(evidence),
+		"--rule--",
+		ruleVersion
+	]))}`;
+}
+//#endregion
+//#region src/discovery/DiscoveryEngine.ts
+var DISCOVERY_RULE_VERSION = "cross-project-topic-v1";
+var MAX_DISCOVERIES = 20;
+function uniqueEvidence(items) {
+	const seen = /* @__PURE__ */ new Set();
+	const result = [];
+	for (const item of items) {
+		const key = `${item.kind}\u0000${item.nodeId}\u0000${item.text}`;
+		if (seen.has(key)) continue;
+		seen.add(key);
+		result.push(item);
+	}
+	return result;
+}
+/**
+* 最小发现规则：跨目录共同主题。
+*
+* 只使用现有图谱数据，不读取正文、不调用网络、不修改图谱。
+* 每个候选都要求至少两个不同顶层目录分组、共享标签，并且每个节点
+* 都有至少一条 confirmed 关系作为额外证据。
+*/
+var DiscoveryEngine = class {
+	now;
+	ruleVersion;
+	constructor(now = () => (/* @__PURE__ */ new Date()).toISOString(), ruleVersion = DISCOVERY_RULE_VERSION) {
+		this.now = now;
+		this.ruleVersion = ruleVersion;
+	}
+	generate(graph, previous) {
+		const nodesById = /* @__PURE__ */ new Map();
+		for (const node of graph.nodes) nodesById.set(node.id, node);
+		const candidates = [];
+		const groups = /* @__PURE__ */ new Map();
+		for (const node of graph.nodes) {
+			if (!node.sourceUri) continue;
+			if (node.type === "topic") continue;
+			const projectKey = this.projectKeyOf(node);
+			if (!projectKey) continue;
+			const list = groups.get(projectKey);
+			if (list) list.push(node);
+			else groups.set(projectKey, [node]);
+		}
+		const projectKeys = [...groups.keys()].sort(compareText);
+		if (projectKeys.length < 2) return this.reconcile(previous, candidates);
+		const confirmedByNode = /* @__PURE__ */ new Map();
+		for (const edge of graph.edges) {
+			if (edge.status !== "confirmed") continue;
+			if (!nodesById.has(edge.source) || !nodesById.has(edge.target)) continue;
+			this.pushEdge(confirmedByNode, edge.source, edge);
+			this.pushEdge(confirmedByNode, edge.target, edge);
+		}
+		const directConfirmed = /* @__PURE__ */ new Set();
+		for (const edge of graph.edges) {
+			if (edge.status !== "confirmed") continue;
+			directConfirmed.add(this.pairKey(edge.source, edge.target));
+		}
+		for (let left = 0; left < projectKeys.length; left += 1) for (let right = left + 1; right < projectKeys.length; right += 1) {
+			const projectLeft = projectKeys[left] ?? "";
+			const projectRight = projectKeys[right] ?? "";
+			const leftGroup = groups.get(projectLeft) ?? [];
+			const rightGroup = groups.get(projectRight) ?? [];
+			for (const a of leftGroup) for (const b of rightGroup) {
+				const discovery = this.consider(a, b, projectLeft, projectRight, confirmedByNode, directConfirmed, nodesById);
+				if (discovery) candidates.push(discovery);
+			}
+		}
+		candidates.sort((left, right) => compareText(left.id, right.id));
+		return this.reconcile(previous, candidates.slice(0, MAX_DISCOVERIES));
+	}
+	consider(a, b, projectA, projectB, confirmedByNode, directConfirmed, nodesById) {
+		if (directConfirmed.has(this.pairKey(a.id, b.id))) return null;
+		const shared = this.sharedTags(a, b);
+		if (shared.length === 0) return null;
+		const evidenceA = this.confirmedEvidence(a, confirmedByNode, nodesById);
+		const evidenceB = this.confirmedEvidence(b, confirmedByNode, nodesById);
+		if (evidenceA.length === 0 || evidenceB.length === 0) return null;
+		const unique = uniqueEvidence([
+			{
+				kind: "source",
+				nodeId: a.id,
+				sourceUri: a.sourceUri,
+				text: `来源：${a.sourceUri ?? ""}`
+			},
+			{
+				kind: "source",
+				nodeId: b.id,
+				sourceUri: b.sourceUri,
+				text: `来源：${b.sourceUri ?? ""}`
+			},
+			{
+				kind: "shared-tag",
+				nodeId: a.id,
+				text: `两个节点共享标签：${shared.map((tag) => `#${tag}`).join("、")}`
+			},
+			...evidenceA,
+			...evidenceB
+		]);
+		const nodeIds = [a.id, b.id].sort(compareText);
+		const subjectKeys = shared;
+		const projectKeys = [projectA, projectB].sort(compareText);
+		const dedupeKey = dedupeKeyFor(projectKeys, subjectKeys);
+		const suppressionKey = suppressionKeyFor(projectKeys, subjectKeys, unique);
+		const id = discoveryIdFor(dedupeKey, evidenceProfile(unique), this.ruleVersion);
+		const strength = evidenceA.length >= 2 && evidenceB.length >= 2 ? "strong" : "moderate";
+		const now = this.now();
+		return {
+			id,
+			kind: "cross-project-topic",
+			title: `共同主题：${shared.map((tag) => `#${tag}`).join("、")}`,
+			description: `这两份材料来自不同的推定目录，并共享同一主题；它们各自还有已确认关系作为额外证据。`,
+			nodeIds,
+			projectKeys,
+			subjectKeys,
+			evidence: unique,
+			ruleVersion: this.ruleVersion,
+			strength,
+			dedupeKey,
+			suppressionKey,
+			identityVersion: 2,
+			status: "active",
+			feedbackStatus: "none",
+			application: emptyDiscoveryApplication(),
+			createdAt: now,
+			updatedAt: now
+		};
+	}
+	reconcile(previous, candidates) {
+		const slotOf = (item) => identitySlotKey(item.identityVersion === 2 ? item.dedupeKey : dedupeKeyFor(item.projectKeys, item.subjectKeys), item.nodeIds);
+		const activeBySlot = /* @__PURE__ */ new Map();
+		for (const item of previous.discoveries) {
+			if (item.status !== "active" || item.supersededBy) continue;
+			const slot = slotOf(item);
+			const list = activeBySlot.get(slot);
+			if (list) list.push(item);
+			else activeBySlot.set(slot, [item]);
+		}
+		const statusRank = (item) => {
+			const app = item.application?.state;
+			const appScore = app === "applied" || app === "existing" ? 4 : app === "applying" || app === "recovery-required" ? 3 : app === "failed" || app === "stale" ? 2 : 1;
+			const feedbackScore = item.feedbackStatus === "accepted" ? 3 : item.feedbackStatus === "needs-verification" ? 2 : 1;
+			return appScore * 10 + feedbackScore;
+		};
+		const canonicalBySlot = /* @__PURE__ */ new Map();
+		for (const [slot, items] of activeBySlot) {
+			const sorted = [...items].sort((left, right) => {
+				const byStatus = statusRank(right) - statusRank(left);
+				if (byStatus !== 0) return byStatus;
+				const byCreated = compareText(left.createdAt, right.createdAt);
+				return byCreated !== 0 ? byCreated : compareText(left.id, right.id);
+			});
+			canonicalBySlot.set(slot, sorted[0]);
+		}
+		const normalized = {
+			...previous,
+			discoveries: previous.discoveries.map((item) => {
+				if (item.status !== "active") return item;
+				const canonical = canonicalBySlot.get(slotOf(item));
+				if (!canonical || canonical.id === item.id) return item;
+				return {
+					...item,
+					status: "dismissed",
+					supersededBy: canonical.id,
+					supersededAt: this.now(),
+					updatedAt: this.now()
+				};
+			})
+		};
+		const byId = /* @__PURE__ */ new Map();
+		const bySlot = /* @__PURE__ */ new Map();
+		for (const item of normalized.discoveries) {
+			byId.set(item.id, item);
+			if (item.status !== "active" || item.supersededBy) continue;
+			const slot = slotOf(item);
+			if (!bySlot.has(slot)) bySlot.set(slot, item);
+		}
+		const suppressedKeys = new Set(normalized.discoveries.filter((item) => item.status === "dismissed" && item.feedbackStatus === "rejected").map((item) => item.suppressionKey ?? suppressionKeyFor(item.projectKeys, item.subjectKeys, item.evidence, item.id)));
+		const merged = candidates.filter((candidate) => byId.has(candidate.id) || !suppressedKeys.has(candidate.suppressionKey ?? "")).map((candidate) => {
+			const existing = bySlot.get(slotOf(candidate)) ?? byId.get(candidate.id);
+			if (!existing) return candidate;
+			return {
+				...existing,
+				kind: candidate.kind,
+				title: candidate.title,
+				description: candidate.description,
+				nodeIds: candidate.nodeIds,
+				projectKeys: candidate.projectKeys,
+				subjectKeys: candidate.subjectKeys,
+				evidence: candidate.evidence,
+				ruleVersion: candidate.ruleVersion,
+				strength: candidate.strength,
+				dedupeKey: candidate.dedupeKey,
+				suppressionKey: candidate.suppressionKey,
+				identityVersion: candidate.identityVersion,
+				application: existing.application ?? emptyDiscoveryApplication(),
+				updatedAt: candidate.updatedAt
+			};
+		});
+		const mergedIds = new Set(merged.map((item) => item.id));
+		for (const item of normalized.discoveries) if (!mergedIds.has(item.id)) merged.push(item);
+		const ordered = [];
+		const mergedById = /* @__PURE__ */ new Map();
+		for (const item of merged) if (!mergedById.has(item.id)) mergedById.set(item.id, item);
+		for (const item of normalized.discoveries) {
+			const current = mergedById.get(item.id);
+			if (!current) continue;
+			ordered.push(current);
+			mergedById.delete(item.id);
+		}
+		for (const item of merged) {
+			const current = mergedById.get(item.id);
+			if (!current) continue;
+			ordered.push(current);
+			mergedById.delete(item.id);
+		}
+		return {
+			discoverySchemaVersion: 3,
+			identityVersion: ordered.some((item) => item.identityVersion !== 2) ? 1 : 2,
+			updatedAt: this.now(),
+			discoveries: ordered
+		};
+	}
+	projectKeyOf(node) {
+		const path = node.sourceUri ? pathFromUri(node.sourceUri) : "";
+		if (!path) return null;
+		return path.split("/").filter(Boolean)[0] ?? null;
+	}
+	sharedTags(a, b) {
+		const left = new Set(a.tags.map((tag) => tagKey(tag)).filter(Boolean));
+		const right = new Set(b.tags.map((tag) => tagKey(tag)).filter(Boolean));
+		return [...left].filter((tag) => right.has(tag)).sort(compareText);
+	}
+	confirmedEvidence(node, confirmedByNode, nodesById) {
+		return (confirmedByNode.get(node.id) ?? []).slice(0, 3).map((edge) => ({
+			kind: "confirmed-edge",
+			nodeId: node.id,
+			sourceUri: node.sourceUri,
+			text: `已确认关系：${this.edgeLabel(edge, node.id, nodesById)}`
+		}));
+	}
+	edgeLabel(edge, nodeId, nodesById) {
+		const other = edge.source === nodeId ? edge.target : edge.source;
+		return `${nodesById.get(other)?.title ?? other}（${edge.relation}）`;
+	}
+	pushEdge(map, nodeId, edge) {
+		const list = map.get(nodeId);
+		if (list) list.push(edge);
+		else map.set(nodeId, [edge]);
+	}
+	pairKey(left, right) {
+		return [left, right].sort(compareText).join("\0");
+	}
+};
+//#endregion
+//#region src/discovery/ranking.ts
+function discoveryPriority(item) {
+	if (item.status === "dismissed" || item.feedbackStatus === "rejected" || item.feedbackStatus === "low-value") return 5;
+	if (item.application?.state === "applied" || item.application?.state === "existing") return 4;
+	if (item.feedbackStatus === "accepted") return 0;
+	if (item.feedbackStatus === "corrected" || item.feedbackStatus === "needs-verification") return 1;
+	return 2;
+}
+function strengthRank(item) {
+	if (item.strength === "strong") return 0;
+	if (item.strength === "moderate") return 1;
+	return 2;
+}
+function compareDiscoveries(left, right) {
+	const priority = discoveryPriority(left) - discoveryPriority(right);
+	if (priority !== 0) return priority;
+	const strength = strengthRank(left) - strengthRank(right);
+	if (strength !== 0) return strength;
+	if (left.id === right.id) return 0;
+	return left.id < right.id ? -1 : 1;
+}
+function sortDiscoveries(discoveries) {
+	return [...discoveries].sort(compareDiscoveries);
+}
+//#endregion
+//#region standalone/src/discoveries.ts
+var FILE$2 = "discoveries.json";
+function pathFor$1(vaultPath) {
+	return join(stateDir(vaultPath), FILE$2);
+}
+async function loadDiscoveries(vaultPath) {
+	const path = pathFor$1(vaultPath);
+	if (!existsSync(path)) return emptyDiscoveryFile((/* @__PURE__ */ new Date()).toISOString());
+	const raw = (await readFile(path, "utf8")).replace(/^\uFEFF/, "");
+	const parsed = JSON.parse(raw);
+	if (!Array.isArray(parsed.discoveries)) throw new Error("Invalid InterestSeed discoveries file");
+	return {
+		discoverySchemaVersion: parsed.discoverySchemaVersion ?? 3,
+		...parsed.identityVersion ? { identityVersion: parsed.identityVersion } : {},
+		updatedAt: parsed.updatedAt ?? (/* @__PURE__ */ new Date()).toISOString(),
+		discoveries: parsed.discoveries
+	};
+}
+async function saveDiscoveries(vaultPath, file) {
+	await ensureStateDir(vaultPath);
+	const path = pathFor$1(vaultPath);
+	const temp = `${path}.tmp`;
+	await writeFile(temp, `${JSON.stringify(file, null, 2)}\n`, "utf8");
+	await rename(temp, path);
+}
+async function refreshDiscoveries(vaultPath) {
+	const state = await loadState(vaultPath);
+	const previous = await loadDiscoveries(vaultPath);
+	const next = new DiscoveryEngine().generate(state.graph, previous);
+	await saveDiscoveries(vaultPath, next);
+	return sortDiscoveries(next.discoveries.filter((item) => item.status === "active"));
+}
+async function listDiscoveries(vaultPath) {
+	return sortDiscoveries((await loadDiscoveries(vaultPath)).discoveries.filter((item) => item.status === "active"));
+}
+async function applyDiscovery(vaultPath, id) {
+	const file = await loadDiscoveries(vaultPath);
+	const discovery = file.discoveries.find((item) => item.id === id);
+	if (!discovery) return {
+		ok: false,
+		message: "Discovery not found."
+	};
+	const state = await loadState(vaultPath);
+	const [sourceId, targetId] = discovery.nodeIds;
+	if (!sourceId || !targetId) return {
+		ok: false,
+		message: "Discovery has no node pair."
+	};
+	const source = state.graph.nodes.find((node) => node.id === sourceId);
+	const target = state.graph.nodes.find((node) => node.id === targetId);
+	if (!source || !target) return {
+		ok: false,
+		message: "Node is missing from the graph."
+	};
+	const existing = state.graph.edges.find((edge) => edge.source === sourceId && edge.target === targetId || edge.source === targetId && edge.target === sourceId);
+	if (existing) {
+		const now = (/* @__PURE__ */ new Date()).toISOString();
+		if (existing.status !== "confirmed") {
+			const confirmed = {
+				...existing,
+				status: "confirmed",
+				origin: "rule",
+				evidence: [
+					...existing.evidence ?? [],
+					`发现：${discovery.title}`,
+					"用户确认"
+				],
+				updatedAt: now
+			};
+			await saveGraph(vaultPath, {
+				...state.graph,
+				edges: state.graph.edges.map((edge) => edge.id === existing.id ? confirmed : edge),
+				updatedAt: now
+			});
+			discovery.feedbackStatus = "accepted";
+			discovery.application = {
+				state: "applied",
+				edgeId: confirmed.id,
+				sourceNodeId: sourceId,
+				targetNodeId: targetId,
+				relation: confirmed.relation,
+				appliedAt: now,
+				updatedAt: now
+			};
+			discovery.updatedAt = now;
+			await saveDiscoveries(vaultPath, file);
+			return {
+				ok: true,
+				edge: confirmed
+			};
+		}
+		discovery.application = {
+			state: "existing",
+			edgeId: existing.id,
+			sourceNodeId: sourceId,
+			targetNodeId: targetId,
+			relation: existing.relation,
+			updatedAt: now
+		};
+		discovery.updatedAt = now;
+		await saveDiscoveries(vaultPath, file);
+		return {
+			ok: true,
+			edge: existing,
+			message: "This pair is already connected."
+		};
+	}
+	const relation = discovery.subjectKeys.length ? `共同主题：${discovery.subjectKeys.map((tag) => `#${tag}`).join("、")}` : "共同主题";
+	const now = (/* @__PURE__ */ new Date()).toISOString();
+	const edge = {
+		id: edgeIdFor(sourceId, targetId, relation),
+		source: sourceId,
+		target: targetId,
+		relation,
+		origin: "rule",
+		status: "confirmed",
+		evidence: [
+			`发现：${discovery.title}`,
+			...discovery.evidence.slice(0, 3).map((item) => item.text),
+			"用户确认"
+		],
+		createdAt: now,
+		updatedAt: now
+	};
+	await saveGraph(vaultPath, {
+		...state.graph,
+		edges: [...state.graph.edges, edge],
+		updatedAt: now
+	});
+	discovery.feedbackStatus = "accepted";
+	discovery.application = {
+		state: "applied",
+		edgeId: edge.id,
+		sourceNodeId: sourceId,
+		targetNodeId: targetId,
+		relation,
+		appliedAt: now,
+		updatedAt: now
+	};
+	discovery.updatedAt = now;
+	await saveDiscoveries(vaultPath, file);
+	return {
+		ok: true,
+		edge
+	};
+}
+async function dismissDiscovery(vaultPath, id) {
+	const file = await loadDiscoveries(vaultPath);
+	const discovery = file.discoveries.find((item) => item.id === id);
+	if (!discovery) return {
+		ok: false,
+		message: "Discovery not found."
+	};
+	const now = (/* @__PURE__ */ new Date()).toISOString();
+	discovery.status = "dismissed";
+	discovery.feedbackStatus = "rejected";
+	discovery.updatedAt = now;
+	discovery.feedbackHistory = [...discovery.feedbackHistory ?? [], {
+		id: `feedback_${Date.now()}`,
+		action: "rejected",
+		at: now,
+		previousStatus: "none"
+	}];
+	await saveDiscoveries(vaultPath, file);
+	return { ok: true };
+}
+function discoveryView(discovery) {
+	return {
+		id: discovery.id,
+		title: discovery.title,
+		description: discovery.description,
+		nodeIds: discovery.nodeIds,
+		projectKeys: discovery.projectKeys,
+		subjectKeys: discovery.subjectKeys,
+		evidence: discovery.evidence,
+		strength: discovery.strength,
+		feedbackStatus: discovery.feedbackStatus,
+		application: discovery.application ?? { state: "none" },
+		updatedAt: discovery.updatedAt
+	};
+}
+//#endregion
+//#region src/inbox/ShareInbox.ts
+function normalizeKey(text) {
+	const url = text.match(/https?:\/\/[^\s]+/i)?.[0];
+	if (url) return url.replace(/[?#].*$/, "").replace(/\/+$/, "").toLowerCase();
+	return text.replace(/\s+/g, " ").trim().toLowerCase();
+}
+/**
+* Local-first intake queue. It never writes to the graph by itself:
+* the user must still open a candidate and choose keep or pass.
+*/
+var ShareInbox = class {
+	items = [];
+	maxItems;
+	constructor(maxItems = 200) {
+		this.maxItems = maxItems;
+	}
+	enqueue(text, source = "share", sourceRef = "", now = (/* @__PURE__ */ new Date()).toISOString()) {
+		const value = text.trim();
+		if (!value) return null;
+		const key = normalizeKey(value);
+		const duplicate = this.items.find((item) => normalizeKey(item.text) === key && item.status === "pending");
+		if (duplicate) return {
+			item: duplicate,
+			duplicate: true
+		};
+		const item = {
+			id: `inbox_${hashString(key)}`,
+			text: value,
+			addedAt: now,
+			status: "pending",
+			source,
+			...sourceRef ? { sourceRef } : {}
+		};
+		this.items = [item, ...this.items].slice(0, this.maxItems);
+		return {
+			item,
+			duplicate: false
+		};
+	}
+	resolve(id, status) {
+		const item = this.items.find((candidate) => candidate.id === id);
+		if (!item) return null;
+		item.status = status;
+		return item;
+	}
+	pending() {
+		return this.items.filter((item) => item.status === "pending");
+	}
+	pendingCount() {
+		return this.pending().length;
+	}
+	all() {
+		return this.items;
+	}
+	serialize() {
+		return this.items.map((item) => ({ ...item }));
+	}
+	load(raw) {
+		if (!Array.isArray(raw)) return;
+		const seenIds = /* @__PURE__ */ new Set();
+		this.items = raw.filter((item) => Boolean(item && typeof item === "object")).map((item) => ({
+			id: String(item.id ?? ""),
+			text: String(item.text ?? ""),
+			addedAt: String(item.addedAt ?? ""),
+			status: item.status === "kept" || item.status === "passed" ? item.status : "pending",
+			source: item.source === "clipboard" || item.source === "note" ? item.source : "share",
+			...item.sourceRef ? { sourceRef: String(item.sourceRef) } : {}
+		})).filter((item) => {
+			if (!item.id || !item.text || seenIds.has(item.id)) return false;
+			seenIds.add(item.id);
+			return true;
+		}).slice(0, this.maxItems);
+	}
+};
+//#endregion
+//#region standalone/src/inbox.ts
+var FILE$1 = "inbox.json";
+function pathFor(vaultPath) {
+	return join(stateDir(vaultPath), FILE$1);
+}
+async function load(vaultPath) {
+	const inbox = new ShareInbox();
+	const path = pathFor(vaultPath);
+	if (!existsSync(path)) return inbox;
+	const raw = (await readFile(path, "utf8")).replace(/^\uFEFF/, "");
+	const parsed = JSON.parse(raw);
+	inbox.load(parsed.items);
+	return inbox;
+}
+async function save(vaultPath, inbox) {
+	await ensureStateDir(vaultPath);
+	const path = pathFor(vaultPath);
+	const temp = `${path}.tmp`;
+	await writeFile(temp, `${JSON.stringify({ items: inbox.serialize() }, null, 2)}\n`, "utf8");
+	await rename(temp, path);
+}
+async function listInbox(vaultPath) {
+	return [...(await load(vaultPath)).all()];
+}
+async function enqueueInbox(vaultPath, text, source = "clipboard", sourceRef = "") {
+	const inbox = await load(vaultPath);
+	const result = inbox.enqueue(text, source, sourceRef);
+	if (!result) throw new Error("Nothing to enqueue.");
+	await save(vaultPath, inbox);
+	return result;
+}
+async function resolveInbox(vaultPath, id, status) {
+	const inbox = await load(vaultPath);
+	const item = inbox.all().find((candidate) => candidate.id === id);
+	if (!item) throw new Error("Inbox item not found.");
+	let captured;
+	if (status === "kept") captured = await captureToVault(vaultPath, { text: item.text });
+	const resolved = inbox.resolve(id, status);
+	if (!resolved) throw new Error("Inbox item not found.");
+	await save(vaultPath, inbox);
+	return {
+		item: resolved,
+		...captured ? { captured } : {}
+	};
+}
 function localDate(now) {
 	return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 }
@@ -945,119 +1759,6 @@ function experimentView(experiment) {
 		logs: experiment.state.logs,
 		summary: experimentSummary(experiment.state)
 	};
-}
-//#endregion
-//#region src/utils/validation.ts
-function isRecord(value) {
-	return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-function toFiniteNumber(value, fallback) {
-	const numeric = typeof value === "number" ? value : typeof value === "string" && value.trim() !== "" ? Number(value) : NaN;
-	return Number.isFinite(numeric) ? numeric : fallback;
-}
-function clamp01(value, fallback = 0) {
-	const numeric = toFiniteNumber(value, fallback);
-	if (numeric <= 0) return 0;
-	if (numeric >= 1) return 1;
-	return numeric;
-}
-/** 接受 `"a, b"`、`['a', '#b']` 等输入，去重并去掉前导 #。 */
-function sanitizeTags(input) {
-	const source = Array.isArray(input) ? input : typeof input === "string" ? input.split(/[,，;；\s]+/) : [];
-	const seen = /* @__PURE__ */ new Set();
-	const tags = [];
-	for (const entry of source) {
-		if (typeof entry !== "string") continue;
-		const tag = entry.replace(/^#+/, "").trim();
-		if (!tag) continue;
-		const key = tag.toLowerCase();
-		if (seen.has(key)) continue;
-		seen.add(key);
-		tags.push(tag);
-	}
-	return tags;
-}
-function tagKey(tag) {
-	return tag.replace(/^#+/, "").trim().toLowerCase();
-}
-var ISO_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?Z$/;
-function isIsoTimestamp(value) {
-	return typeof value === "string" && ISO_PATTERN.test(value) && !Number.isNaN(Date.parse(value));
-}
-/**
-* 严格的结构校验：用于保存前检查，不修正数据，只报告问题。
-* 与 validateGraph（读入时的宽松清洗）互补。
-*/
-function validateGraphStructure(graph) {
-	const errors = [];
-	if (!isRecord(graph)) return ["图谱根对象不是对象"];
-	if (!Number.isInteger(graph.schemaVersion) || graph.schemaVersion < 1) errors.push("schemaVersion 必须是正整数");
-	if (!isIsoTimestamp(graph.updatedAt)) errors.push("updatedAt 必须是 ISO 8601 字符串");
-	if (!Array.isArray(graph.nodes)) errors.push("nodes 必须是数组");
-	if (!Array.isArray(graph.edges)) errors.push("edges 必须是数组");
-	if (errors.length > 0) return errors;
-	const nodeIds = /* @__PURE__ */ new Set();
-	const sourceUris = /* @__PURE__ */ new Set();
-	for (const node of graph.nodes) {
-		if (!isRecord(node)) {
-			errors.push("nodes 中存在非对象项");
-			continue;
-		}
-		if (typeof node.id !== "string" || !node.id.trim()) {
-			errors.push("节点缺少 id");
-			continue;
-		}
-		if (nodeIds.has(node.id)) errors.push(`节点 id 重复：${node.id}`);
-		nodeIds.add(node.id);
-		if (typeof node.sourceUri === "string" && node.sourceUri.trim()) {
-			const key = node.sourceUri.toLowerCase();
-			if (sourceUris.has(key)) errors.push(`节点 sourceUri 重复：${node.sourceUri}`);
-			sourceUris.add(key);
-		}
-		if (!isNodeType(node.type)) errors.push(`节点 ${node.id} 的 type 无效`);
-		if (typeof node.title !== "string" || !node.title.trim()) errors.push(`节点 ${node.id} 缺少 title`);
-		if (!Array.isArray(node.tags) || !node.tags.every((tag) => typeof tag === "string")) errors.push(`节点 ${node.id} 的 tags 必须是字符串数组`);
-		if (!isRecord(node.metadata)) errors.push(`节点 ${node.id} 的 metadata 必须是对象`);
-		if (!isIsoTimestamp(node.createdAt)) errors.push(`节点 ${node.id} 的 createdAt 不是 ISO 时间`);
-		if (!isIsoTimestamp(node.updatedAt)) errors.push(`节点 ${node.id} 的 updatedAt 不是 ISO 时间`);
-		if (node.sourceUri !== void 0 && typeof node.sourceUri !== "string") errors.push(`节点 ${node.id} 的 sourceUri 必须是字符串`);
-	}
-	const edgeIds = /* @__PURE__ */ new Set();
-	const edgeKeys = /* @__PURE__ */ new Set();
-	for (const edge of graph.edges) {
-		if (!isRecord(edge)) {
-			errors.push("edges 中存在非对象项");
-			continue;
-		}
-		if (typeof edge.id !== "string" || !edge.id.trim()) {
-			errors.push("关系缺少 id");
-			continue;
-		}
-		if (edgeIds.has(edge.id)) errors.push(`关系 id 重复：${edge.id}`);
-		edgeIds.add(edge.id);
-		if (typeof edge.source === "string" && typeof edge.target === "string" && typeof edge.relation === "string") {
-			const key = `${edge.source}\u0000${edge.target}\u0000${edge.relation}`;
-			if (edgeKeys.has(key)) errors.push(`关系重复：${edge.source} → ${edge.target}（${edge.relation}）`);
-			edgeKeys.add(key);
-		}
-		if (typeof edge.source !== "string" || !nodeIds.has(edge.source)) errors.push(`关系 ${edge.id} 的 source 不存在`);
-		if (typeof edge.target !== "string" || !nodeIds.has(edge.target)) errors.push(`关系 ${edge.id} 的 target 不存在`);
-		if (edge.source === edge.target) errors.push(`关系 ${edge.id} 是自环`);
-		if (typeof edge.relation !== "string" || !edge.relation.trim()) errors.push(`关系 ${edge.id} 缺少 relation`);
-		if (!isRelationOrigin(edge.origin)) errors.push(`关系 ${edge.id} 的 origin 无效`);
-		if (!isRelationStatus(edge.status)) errors.push(`关系 ${edge.id} 的 status 无效`);
-		if (edge.confidence !== void 0 && (typeof edge.confidence !== "number" || edge.confidence < 0 || edge.confidence > 1)) errors.push(`关系 ${edge.id} 的 confidence 必须在 0–1 之间`);
-		if (edge.evidence !== void 0 && (!Array.isArray(edge.evidence) || !edge.evidence.every((item) => typeof item === "string" && item.trim()))) errors.push(`关系 ${edge.id} 的 evidence 必须是非空字符串数组`);
-		if (edge.userRenamed !== void 0 && typeof edge.userRenamed !== "boolean") errors.push(`关系 ${edge.id} 的 userRenamed 必须是布尔值`);
-		if ((edge.origin === "rule" || edge.origin === "ai") && (!Array.isArray(edge.evidence) || edge.evidence.length === 0)) errors.push(`关系 ${edge.id} 来源为 ${edge.origin} 但缺少 evidence`);
-		if (!isIsoTimestamp(edge.createdAt)) errors.push(`关系 ${edge.id} 的 createdAt 不是 ISO 时间`);
-		if (!isIsoTimestamp(edge.updatedAt)) errors.push(`关系 ${edge.id} 的 updatedAt 不是 ISO 时间`);
-	}
-	if (graph.viewport !== void 0) {
-		const viewport = graph.viewport;
-		if (!isRecord(viewport) || typeof viewport.zoom !== "number" || !Number.isFinite(viewport.zoom) || viewport.zoom <= 0 || typeof viewport.panX !== "number" || !Number.isFinite(viewport.panX) || typeof viewport.panY !== "number" || !Number.isFinite(viewport.panY)) errors.push("viewport 必须是合法的 zoom / panX / panY");
-	}
-	return errors;
 }
 //#endregion
 //#region src/core/GraphStore.ts
@@ -2383,6 +3084,41 @@ async function route(request, response, options) {
 			}))
 		});
 	}
+	if (url.pathname === "/api/discoveries" && request.method === "GET") return sendJson(response, 200, { discoveries: (await listDiscoveries(options.vaultPath)).map(discoveryView) });
+	if (url.pathname === "/api/discoveries/refresh" && request.method === "POST") return sendJson(response, 200, {
+		ok: true,
+		discoveries: (await refreshDiscoveries(options.vaultPath)).map(discoveryView)
+	});
+	if (url.pathname === "/api/discoveries/apply" && request.method === "POST") {
+		const body = await readJson(request);
+		return sendJson(response, 200, {
+			...await applyDiscovery(options.vaultPath, typeof body.id === "string" ? body.id : ""),
+			...await statePayload(options.vaultPath)
+		});
+	}
+	if (url.pathname === "/api/discoveries/dismiss" && request.method === "POST") {
+		const body = await readJson(request);
+		return sendJson(response, 200, await dismissDiscovery(options.vaultPath, typeof body.id === "string" ? body.id : ""));
+	}
+	if (url.pathname === "/api/inbox" && request.method === "GET") return sendJson(response, 200, { items: await listInbox(options.vaultPath) });
+	if (url.pathname === "/api/inbox" && request.method === "POST") {
+		const body = await readJson(request);
+		return sendJson(response, 200, {
+			ok: true,
+			...await enqueueInbox(options.vaultPath, typeof body.text === "string" ? body.text : "", body.source === "share" || body.source === "note" ? body.source : "clipboard", typeof body.sourceRef === "string" ? body.sourceRef : "")
+		});
+	}
+	if (url.pathname === "/api/inbox/resolve" && request.method === "POST") {
+		const body = await readJson(request);
+		const status = body.status === "passed" ? "passed" : "kept";
+		const result = await resolveInbox(options.vaultPath, typeof body.id === "string" ? body.id : "", status);
+		if (status === "kept") await scanAndBuild(options.vaultPath);
+		return sendJson(response, 200, {
+			ok: true,
+			...result,
+			...await statePayload(options.vaultPath)
+		});
+	}
 	if (url.pathname === "/api/graph") return sendJson(response, 200, (await loadState(options.vaultPath)).graph);
 	const filePath = url.pathname === "/" ? join(webRoot, "index.html") : join(webRoot, url.pathname);
 	if (!filePath.startsWith(webRoot)) return sendText(response, 403, "Forbidden");
@@ -2400,6 +3136,8 @@ async function statePayload(vaultPath) {
 	const key = await resolveApiKey(vaultPath, config);
 	const active = await activeExperiment(vaultPath);
 	const experiments = (await listExperiments(vaultPath)).map(experimentView);
+	const discoveries = (await listDiscoveries(vaultPath)).map(discoveryView);
+	const inbox = await listInbox(vaultPath);
 	return {
 		vaultPath,
 		model: config.model,
@@ -2408,6 +3146,11 @@ async function statePayload(vaultPath) {
 		graph: state.graph,
 		activeExperiment: active ? experimentView(active) : null,
 		experiments,
+		discoveries,
+		inbox: {
+			pending: inbox.filter((item) => item.status === "pending").length,
+			items: inbox
+		},
 		stats: {
 			nodes: state.graph.nodes.length,
 			edges: state.graph.edges.length,
@@ -2503,7 +3246,9 @@ async function main() {
 			nodes: state.graph.nodes.length,
 			edges: state.graph.edges.length,
 			experiments: experiments.length,
-			activeExperiment: active ? experimentView(active) : null
+			activeExperiment: active ? experimentView(active) : null,
+			discoveries: (await listDiscoveries(vaultPath)).length,
+			inbox: (await listInbox(vaultPath)).filter((item) => item.status === "pending").length
 		});
 	}
 	if (command === "suggest") return print({ suggestions: await suggestRelations(vaultPath, typeof flags.node === "string" ? flags.node : void 0) });
@@ -2551,6 +3296,41 @@ async function main() {
 		}
 		throw new Error(`Unknown experiment command: ${sub}`);
 	}
+	if (command === "discoveries") {
+		const sub = args[1] ?? "list";
+		if (sub === "list") return print({ discoveries: (await listDiscoveries(vaultPath)).map(discoveryView) });
+		if (sub === "refresh") return print({
+			ok: true,
+			discoveries: (await refreshDiscoveries(vaultPath)).map(discoveryView)
+		});
+		if (sub === "apply") return print(await applyDiscovery(vaultPath, typeof flags.id === "string" ? flags.id : ""));
+		if (sub === "dismiss") return print(await dismissDiscovery(vaultPath, typeof flags.id === "string" ? flags.id : ""));
+		throw new Error(`Unknown discoveries command: ${sub}`);
+	}
+	if (command === "inbox") {
+		const sub = args[1] ?? "list";
+		if (sub === "list") return print({ items: await listInbox(vaultPath) });
+		if (sub === "add") return print({
+			ok: true,
+			...await enqueueInbox(vaultPath, typeof flags.text === "string" ? flags.text : "", "clipboard")
+		});
+		if (sub === "keep" || sub === "pass") {
+			const result = await resolveInbox(vaultPath, typeof flags.id === "string" ? flags.id : "", sub === "keep" ? "kept" : "passed");
+			if (sub === "keep") {
+				const graph = await scanAndBuild(vaultPath);
+				return print({
+					ok: true,
+					...result,
+					nodes: graph.graph.nodes.length
+				});
+			}
+			return print({
+				ok: true,
+				...result
+			});
+		}
+		throw new Error(`Unknown inbox command: ${sub}`);
+	}
 	if (command === "serve") {
 		startServer({
 			vaultPath,
@@ -2590,6 +3370,8 @@ Usage:
   interestseed scan [--vault <path>]
   interestseed capture --text <text> [--title <title>] [--url <url>]
   interestseed status [--vault <path>]
+  interestseed discoveries list | refresh | apply --id <id> | dismiss --id <id>
+  interestseed inbox list | add --text <text> | keep --id <id> | pass --id <id>
   interestseed suggest [--vault <path>] [--node <id>]
   interestseed connect --source <id> --target <id> --relation <name> [--reason <text>]
   interestseed experiment start --title <title> [--node <id>] [--days 3]

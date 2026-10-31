@@ -4,6 +4,14 @@ import { resolve } from 'node:path';
 import { connectSuggestion, suggestRelations } from './ai';
 import { captureToVault } from './capture';
 import {
+  applyDiscovery,
+  dismissDiscovery,
+  discoveryView,
+  listDiscoveries,
+  refreshDiscoveries,
+} from './discoveries';
+import { enqueueInbox, listInbox, resolveInbox } from './inbox';
+import {
   activeExperiment,
   experimentView,
   listExperiments,
@@ -86,6 +94,8 @@ async function main(): Promise<void> {
       edges: state.graph.edges.length,
       experiments: experiments.length,
       activeExperiment: active ? experimentView(active) : null,
+      discoveries: (await listDiscoveries(vaultPath)).length,
+      inbox: (await listInbox(vaultPath)).filter((item) => item.status === 'pending').length,
     });
   }
 
@@ -143,6 +153,46 @@ async function main(): Promise<void> {
     throw new Error(`Unknown experiment command: ${sub}`);
   }
 
+  if (command === 'discoveries') {
+    const sub = args[1] ?? 'list';
+    if (sub === 'list') {
+      return print({ discoveries: (await listDiscoveries(vaultPath)).map(discoveryView) });
+    }
+    if (sub === 'refresh') {
+      const discoveries = await refreshDiscoveries(vaultPath);
+      return print({ ok: true, discoveries: discoveries.map(discoveryView) });
+    }
+    if (sub === 'apply') {
+      return print(await applyDiscovery(vaultPath, typeof flags.id === 'string' ? flags.id : ''));
+    }
+    if (sub === 'dismiss') {
+      return print(await dismissDiscovery(vaultPath, typeof flags.id === 'string' ? flags.id : ''));
+    }
+    throw new Error(`Unknown discoveries command: ${sub}`);
+  }
+
+  if (command === 'inbox') {
+    const sub = args[1] ?? 'list';
+    if (sub === 'list') {
+      return print({ items: await listInbox(vaultPath) });
+    }
+    if (sub === 'add') {
+      const text = typeof flags.text === 'string' ? flags.text : '';
+      const result = await enqueueInbox(vaultPath, text, 'clipboard');
+      return print({ ok: true, ...result });
+    }
+    if (sub === 'keep' || sub === 'pass') {
+      const id = typeof flags.id === 'string' ? flags.id : '';
+      const result = await resolveInbox(vaultPath, id, sub === 'keep' ? 'kept' : 'passed');
+      if (sub === 'keep') {
+        const graph = await scanAndBuild(vaultPath);
+        return print({ ok: true, ...result, nodes: graph.graph.nodes.length });
+      }
+      return print({ ok: true, ...result });
+    }
+    throw new Error(`Unknown inbox command: ${sub}`);
+  }
+
   if (command === 'serve') {
     const port = Number(flags.port ?? 4173);
     startServer({ vaultPath, port });
@@ -187,6 +237,8 @@ Usage:
   interestseed scan [--vault <path>]
   interestseed capture --text <text> [--title <title>] [--url <url>]
   interestseed status [--vault <path>]
+  interestseed discoveries list | refresh | apply --id <id> | dismiss --id <id>
+  interestseed inbox list | add --text <text> | keep --id <id> | pass --id <id>
   interestseed suggest [--vault <path>] [--node <id>]
   interestseed connect --source <id> --target <id> --relation <name> [--reason <text>]
   interestseed experiment start --title <title> [--node <id>] [--days 3]

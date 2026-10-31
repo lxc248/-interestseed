@@ -59,7 +59,7 @@ node standalone/dist/cli.js serve --vault "standalone/demo-vault" --port 4173
 ## Verification
 
 ```text
-72 test files / 527 tests passing
+74 test files / 530 tests passing
 npm run typecheck:standalone
 npm run build:standalone
 ```

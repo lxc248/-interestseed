@@ -15,6 +15,14 @@ import {
   logExperiment,
   startExperiment,
 } from './experiments';
+import {
+  applyDiscovery,
+  dismissDiscovery,
+  discoveryView,
+  listDiscoveries,
+  refreshDiscoveries,
+} from './discoveries';
+import { enqueueInbox, listInbox, resolveInbox } from './inbox';
 import { scanAndBuild } from './graph';
 import { loadConfig, loadState, saveGraph } from './state';
 
@@ -121,6 +129,54 @@ async function route(
     );
     return sendJson(response, 200, { ok: true, experiment: experimentView(experiment) });
   }
+  if (url.pathname === '/api/discoveries' && request.method === 'GET') {
+    const discoveries = (await listDiscoveries(options.vaultPath)).map(discoveryView);
+    return sendJson(response, 200, { discoveries });
+  }
+  if (url.pathname === '/api/discoveries/refresh' && request.method === 'POST') {
+    const discoveries = (await refreshDiscoveries(options.vaultPath)).map(discoveryView);
+    return sendJson(response, 200, { ok: true, discoveries });
+  }
+  if (url.pathname === '/api/discoveries/apply' && request.method === 'POST') {
+    const body = await readJson(request);
+    const result = await applyDiscovery(
+      options.vaultPath,
+      typeof body.id === 'string' ? body.id : '',
+    );
+    return sendJson(response, 200, { ...result, ...(await statePayload(options.vaultPath)) });
+  }
+  if (url.pathname === '/api/discoveries/dismiss' && request.method === 'POST') {
+    const body = await readJson(request);
+    const result = await dismissDiscovery(
+      options.vaultPath,
+      typeof body.id === 'string' ? body.id : '',
+    );
+    return sendJson(response, 200, result);
+  }
+  if (url.pathname === '/api/inbox' && request.method === 'GET') {
+    return sendJson(response, 200, { items: await listInbox(options.vaultPath) });
+  }
+  if (url.pathname === '/api/inbox' && request.method === 'POST') {
+    const body = await readJson(request);
+    const result = await enqueueInbox(
+      options.vaultPath,
+      typeof body.text === 'string' ? body.text : '',
+      body.source === 'share' || body.source === 'note' ? body.source : 'clipboard',
+      typeof body.sourceRef === 'string' ? body.sourceRef : '',
+    );
+    return sendJson(response, 200, { ok: true, ...result });
+  }
+  if (url.pathname === '/api/inbox/resolve' && request.method === 'POST') {
+    const body = await readJson(request);
+    const status = body.status === 'passed' ? 'passed' : 'kept';
+    const result = await resolveInbox(
+      options.vaultPath,
+      typeof body.id === 'string' ? body.id : '',
+      status,
+    );
+    if (status === 'kept') await scanAndBuild(options.vaultPath);
+    return sendJson(response, 200, { ok: true, ...result, ...(await statePayload(options.vaultPath)) });
+  }
   if (url.pathname === '/api/graph') {
     return sendJson(response, 200, (await loadState(options.vaultPath)).graph);
   }
@@ -142,6 +198,8 @@ async function statePayload(vaultPath: string) {
   const key = await resolveApiKey(vaultPath, config);
   const active = await activeExperiment(vaultPath);
   const experiments = (await listExperiments(vaultPath)).map(experimentView);
+  const discoveries = (await listDiscoveries(vaultPath)).map(discoveryView);
+  const inbox = await listInbox(vaultPath);
   return {
     vaultPath,
     model: config.model,
@@ -150,6 +208,11 @@ async function statePayload(vaultPath: string) {
     graph: state.graph,
     activeExperiment: active ? experimentView(active) : null,
     experiments,
+    discoveries,
+    inbox: {
+      pending: inbox.filter((item) => item.status === 'pending').length,
+      items: inbox,
+    },
     stats: {
       nodes: state.graph.nodes.length,
       edges: state.graph.edges.length,

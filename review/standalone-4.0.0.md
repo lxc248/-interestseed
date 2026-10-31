@@ -36,6 +36,23 @@ AI suggestion: 1 / 5
 connect → 200
 undo → 200
 experiment strip: DAY 2 / 3
+lower panels: discoveries / share inbox / experiment history
+```
+
+## Discovery
+
+```text
+temp vault with P1/ and P2/, shared #focus / #ai
+refresh → 4 active discoveries
+apply → edge status confirmed
+```
+
+## Share inbox
+
+```text
+inbox add → pending, graph unchanged
+inbox keep → InterestSeed/Inbox/<date>-<title>.md
+rescan → 1 node
 ```
 
 ## CLI
@@ -50,7 +67,7 @@ second log on the same day → rejected: 今天已经记录过了，明天再来
 
 ```text
 release/interestseed-standalone-v4.0.0.zip
-sha256: 32734edbe689246555b72c64d85c6c0ecba145163b5a63d56162b3d72fa0cca3
+sha256: 35f07593bc3af729fa74338f7e1d90822100d8f6cea131e70aefc6eac5d9439c
 packaged cli.js status → 8 nodes / 10 edges
 packaged web / → 200
 ```
@@ -58,7 +75,7 @@ packaged web / → 200
 ## Tests
 
 ```text
-72 test files / 527 tests passing
+74 test files / 530 tests passing
 typecheck:standalone passing
 lint passing
 plugin build passing

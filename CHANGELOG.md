@@ -6,9 +6,10 @@
 - Added a CLI: `capture`, `scan`, `suggest`, `connect`, `experiment`, `serve`.
 - Added a local web dashboard with a clickable graph, one AI suggestion, and undo.
 - Added a 3-day experiment strip with one observation per day.
+- Added cross-folder discovery, share inbox, and experiment history panels.
 - Added `standalone/skill/SKILL.md` and a top-level `skills/interestseed` copy.
 - Obsidian vault is treated as a plain Markdown folder.
-- 527 tests passing.
+- 530 tests passing.
 
 ## 3.7.0 — AI as an Obsidian side panel
 

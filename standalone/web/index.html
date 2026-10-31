@@ -52,6 +52,44 @@
         <div id="ai-body" class="ai-body"></div>
       </aside>
     </main>
+
+    <section class="lower-grid">
+      <section class="panel discoveries-panel">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">CROSS-PROJECT</p>
+            <h2>跨目录发现</h2>
+          </div>
+          <button id="discoveries-refresh" class="button ghost">刷新</button>
+        </div>
+        <div id="discoveries-list" class="panel-body"></div>
+      </section>
+
+      <section class="panel inbox-panel">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">SHARE INBOX</p>
+            <h2>分享收件箱</h2>
+          </div>
+          <span id="inbox-count" class="pill">0</span>
+        </div>
+        <div class="inbox-compose">
+          <input id="inbox-input" placeholder="粘贴一条收藏或想法…" />
+          <button id="inbox-add" class="button primary">加入</button>
+        </div>
+        <div id="inbox-list" class="panel-body"></div>
+      </section>
+
+      <section class="panel history-panel">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">EXPERIMENTS</p>
+            <h2>实验历史</h2>
+          </div>
+        </div>
+        <div id="history-list" class="panel-body"></div>
+      </section>
+    </section>
   </div>
   <div id="toast" class="toast" hidden></div>
   <script type="module" src="/app.js"></script>

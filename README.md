@@ -18,8 +18,8 @@
   <img alt="Local model" src="https://img.shields.io/badge/LOCAL-MODEL-22c55e?style=for-the-badge" />
   <img alt="CI" src="https://github.com/lxc248/-interestseed/actions/workflows/ci.yml/badge.svg?branch=main" />
   <img alt="Release" src="https://img.shields.io/github/v/release/lxc248/-interestseed?style=for-the-badge" />
-  <img alt="Tests" src="https://img.shields.io/badge/tests-527%20passing-22c55e?style=for-the-badge" />
-  <img alt="Coverage" src="https://img.shields.io/badge/coverage-75.3%25-14b8a6?style=for-the-badge" />
+  <img alt="Tests" src="https://img.shields.io/badge/tests-530%20passing-22c55e?style=for-the-badge" />
+  <img alt="Coverage" src="https://img.shields.io/badge/coverage-75.4%25-14b8a6?style=for-the-badge" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b?style=for-the-badge" />
 </p>
 
@@ -218,8 +218,8 @@ AI 关系建议默认开启，只在你点击 AI 时请求所选模型；接入�
 这些数字不是装饰。每次改完，我都会重新跑一遍。
 
 ```text
-527 tests passing
-75.32% line coverage
+530 tests passing
+75.43% line coverage
 92.25% core coverage
 46.53% UI coverage
 axe: graph / inbox / share-card 0 violations

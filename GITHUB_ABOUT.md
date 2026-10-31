@@ -89,7 +89,7 @@ Download `interestseed-standalone-v4.0.0.zip`, then:
 node cli.js init --vault "<vault>"
 node cli.js serve --vault "<vault>" --port 4173
 
-527 tests passing. AGPL-3.0-only. Author: aicoder.
+530 tests passing. AGPL-3.0-only. Author: aicoder.
 ```
 
 ## Release body — 简体中文
@@ -115,7 +115,7 @@ capture → scan → 一条 AI 连接 → 3 天实验 → 证据
 node cli.js init --vault "<vault>"
 node cli.js serve --vault "<vault>" --port 4173
 
-527 个测试通过。AGPL-3.0-only. Author: aicoder.
+530 个测试通过。AGPL-3.0-only. Author: aicoder.
 ```
 
 ## Pinned issue / security notice
