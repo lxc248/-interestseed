@@ -2,13 +2,15 @@
 
 <h1>InterestSeed</h1>
 
-<p><strong>An interest validator for Obsidian</strong></p>
+<p><strong>A local-first interest validator</strong></p>
 
 <p>Turn one saved post into a real 3-day action.<br/>Then let evidence decide: keep it, or let it go.</p>
 
+<p>Works with any Markdown vault, standalone.</p>
+
 <p><strong>Local AI, one testable connection at a time.</strong></p>
 
-<img src="assets/ai-suggestions-live.png" alt="One AI suggestion at a time" width="820" />
+<img src="assets/standalone-ai.png" alt="InterestSeed standalone with local AI" width="900" />
 
 <p>
   <a href="assets/interestseed-launch.mp4"><img alt="Demo" src="https://img.shields.io/badge/%E2%96%B6%2040s%20demo-111827?style=for-the-badge" /></a>
@@ -16,8 +18,8 @@
   <img alt="Local model" src="https://img.shields.io/badge/LOCAL-MODEL-22c55e?style=for-the-badge" />
   <img alt="CI" src="https://github.com/lxc248/-interestseed/actions/workflows/ci.yml/badge.svg?branch=main" />
   <img alt="Release" src="https://img.shields.io/github/v/release/lxc248/-interestseed?style=for-the-badge" />
-  <img alt="Tests" src="https://img.shields.io/badge/tests-522%20passing-22c55e?style=for-the-badge" />
-  <img alt="Coverage" src="https://img.shields.io/badge/coverage-74.8%25-14b8a6?style=for-the-badge" />
+  <img alt="Tests" src="https://img.shields.io/badge/tests-527%20passing-22c55e?style=for-the-badge" />
+  <img alt="Coverage" src="https://img.shields.io/badge/coverage-75.3%25-14b8a6?style=for-the-badge" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b?style=for-the-badge" />
 </p>
 
@@ -63,6 +65,25 @@ One saved item → one AI suggestion → connect / next / not now → 3-day test
 - connect / next / not now; undo after connecting
 
 [How the AI works →](docs/ai.en.md)
+
+## Standalone: no longer just an Obsidian plugin
+
+InterestSeed now runs without the Obsidian plugin runtime. An Obsidian vault is just a Markdown folder.
+
+```text
+CLI        scan / suggest / connect / serve
+Local Web  graph, one AI suggestion, undo
+Skill      callable by an agent
+Storage    <vault>/.interestseed/
+```
+
+```bash
+npm run build:standalone
+node standalone/dist/cli.js init --vault "<vault>"
+node standalone/dist/cli.js serve --vault "<vault>" --port 4173
+```
+
+[Standalone docs →](docs/standalone.en.md) · [Agent Skill →](standalone/skill/SKILL.md) · [CLI →](standalone/README.md)
 
 ## Where it differs from a bookmark pile
 
@@ -143,7 +164,19 @@ These aren't a feature checklist. They're the moves I actually make every day.
 
 ## Install it
 
-It takes about three minutes.
+### Standalone (recommended)
+
+Or download `interestseed-standalone-v4.0.0.zip` from [Releases](https://github.com/lxc248/-interestseed/releases).
+
+```bash
+npm run build:standalone
+node standalone/dist/cli.js init --vault "<vault>"
+node standalone/dist/cli.js serve --vault "<vault>" --port 4173
+```
+
+Web: `http://127.0.0.1:4173`
+
+### Obsidian plugin (compatibility)
 
 1. Download `interestseed-v3.7.0.zip` from [Releases](https://github.com/lxc248/-interestseed/releases).
 2. Extract it into:
@@ -181,8 +214,8 @@ Rename a relation before confirming; after writing, the dialog offers an undo bu
 These numbers are not decoration. I rerun them after every change.
 
 ```text
-522 tests passing
-74.82% line coverage
+527 tests passing
+75.32% line coverage
 92.25% core coverage
 46.53% UI coverage
 axe: graph / inbox / share-card 0 violations

@@ -150,3 +150,8 @@ promo/interestseed-launch.mp4
 promo/promo-clips-ext/
 promo/promo-extended-audio.wav
 promo/promo-extended-noaudio.mp4
+
+# standalone runtime
+.interestseed/
+!standalone/dist/
+!standalone/dist/cli.js

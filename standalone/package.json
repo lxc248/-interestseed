@@ -1,0 +1,19 @@
+{
+  "name": "interestseed-standalone",
+  "version": "4.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Local-first interest validation for any Markdown vault. AI suggests one testable connection at a time.",
+  "bin": {
+    "interestseed": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "vite build --config standalone/vite.config.ts",
+    "start": "node standalone/dist/cli.js",
+    "serve": "node standalone/dist/cli.js serve"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "AGPL-3.0-only"
+}

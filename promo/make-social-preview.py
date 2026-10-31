@@ -35,7 +35,7 @@ d.rounded_rectangle((64, 84, 74, 168), radius=5, fill='#e18061')
 
 # Eyebrow pill.
 d.rounded_rectangle((96, 82, 430, 122), radius=20, fill=(232, 200, 132, 28), outline=(232, 200, 132, 120), width=1)
-d.text((116, 92), 'LOCAL AI · OBSIDIAN PLUGIN', font=pill_font, fill='#f0d6a0')
+d.text((116, 92), 'LOCAL AI · MARKDOWN VAULT', font=pill_font, fill='#f0d6a0')
 
 d.text((96, 148), 'InterestSeed', font=title_font, fill='#f4f6fb')
 d.text((100, 262), '本地 AI，给你一条能验证的连接。', font=sub_font, fill='#d7dcea')
@@ -47,7 +47,7 @@ loop = 'One suggestion  →  Decide  →  3-day test'
 d.text((100, 384), loop, font=loop_font, fill='#b9a7ff')
 
 # Bottom badges.
-badges = ['LOCAL MODEL', 'ONE SUGGESTION', 'UNDOABLE']
+badges = ['AGENT SKILL', 'CLI', 'LOCAL WEB']
 x = 100
 for label in badges:
     w = d.textlength(label, font=pill_font) + 26
@@ -56,7 +56,7 @@ for label in badges:
     x += w + 12
 
 # Screenshot card on the right.
-shot = Image.open(root / 'assets' / 'ai-suggestions-live.png').convert('RGB')
+shot = Image.open(root / 'assets' / 'standalone-ai.png').convert('RGB')
 target_w, target_h = 560, 350
 shot = shot.resize((target_w, target_h), Image.LANCZOS)
 mask = Image.new('L', (target_w, target_h), 0)

@@ -1,5 +1,15 @@
 # Changelog
 
+## 4.0.0 — Standalone
+
+- InterestSeed now runs without the Obsidian plugin runtime.
+- Added a CLI: `capture`, `scan`, `suggest`, `connect`, `experiment`, `serve`.
+- Added a local web dashboard with a clickable graph, one AI suggestion, and undo.
+- Added a 3-day experiment strip with one observation per day.
+- Added `standalone/skill/SKILL.md` and a top-level `skills/interestseed` copy.
+- Obsidian vault is treated as a plain Markdown folder.
+- 527 tests passing.
+
 ## 3.7.0 — AI as an Obsidian side panel
 
 - Moved AI suggestions from a modal to a native right-side ItemView.

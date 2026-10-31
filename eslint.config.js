@@ -3,7 +3,18 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
-    ignores: ['dist/**', 'node_modules/**', 'coverage/**', 'promo/**', 'viewer/**', 'skill/**', 'release/**'],
+    ignores: [
+      'dist/**',
+      'node_modules/**',
+      'coverage/**',
+      'promo/**',
+      'viewer/**',
+      'skill/**',
+      'skills/**',
+      'release/**',
+      'standalone/dist/**',
+      'standalone/web/**',
+    ],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
@@ -25,6 +36,12 @@ export default tseslint.config(
       '@typescript-eslint/no-explicit-any': 'error',
       'no-console': ['warn', { allow: ['warn', 'error'] }],
       eqeqeq: ['error', 'smart'],
+    },
+  },
+  {
+    files: ['standalone/src/**/*.ts'],
+    rules: {
+      'no-console': 'off',
     },
   },
 );

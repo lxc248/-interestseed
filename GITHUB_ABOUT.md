@@ -12,23 +12,26 @@ interestseed
 ## About — English
 
 ```text
-A small Obsidian plugin where your own local AI suggests one testable connection,
-then a 3-day experiment decides whether to keep it. Local-first,
-human-in-the-loop, MCP-ready.
+A local-first interest validator for any Markdown vault. Your own local AI
+suggests one testable connection; a 3-day experiment decides. CLI + local web
++ agent skill. Obsidian is optional.
 ```
 
 ## About — 简体中文
 
 ```text
-一个 Obsidian 小插件：你自己的本地 AI 一次给一条能验证的连接，
-再用 3 天实验决定继续还是放下。本地优先，人做决定，MCP 可连接。
+一个本地优先的兴趣验证器，读取任何 Markdown vault。你自己的本地 AI 一次给一条
+能验证的连接，再用 3 天实验决定继续还是放下。CLI + 本地 Web + Agent Skill，
+Obsidian 可选。
 ```
 
 ## Topics
 
 ```text
-obsidian
-obsidian-plugin
+markdown
+agent-skill
+cli
+local-web
 interest-validation
 interest-graph
 knowledge-graph
@@ -60,83 +63,59 @@ Set via: GitHub → Settings → Social preview
 ## Release title
 
 ```text
-InterestSeed 3.7.0 — AI 变成 Obsidian 侧边栏
+InterestSeed Standalone 4.0.0 — 脱离 Obsidian，成为 Skill
 ```
 
 ## Release body — English
 
 ```markdown
-InterestSeed is a small Obsidian plugin for a very specific moment: you saved
-something, and you already know you will probably never try it. It gives that
-save a 3-day test, then lets the evidence decide.
+InterestSeed no longer needs the Obsidian plugin runtime.
 
-![InterestSeed](https://raw.githubusercontent.com/lxc248/-interestseed/main/assets/github-social-preview.png)
+It treats a vault as a plain Markdown folder:
 
-![InterestSeed demo](https://raw.githubusercontent.com/lxc248/-interestseed/main/assets/interestseed-demo.gif)
+capture → scan → one AI connection → 3-day experiment → evidence
 
-### What 3.7.0 actually changes
+Three shapes:
 
-AI is now an Obsidian-native side panel, not a modal:
+- CLI: capture / scan / suggest / connect / experiment / serve
+- Local Web: graph, one suggestion, undo, experiment strip
+- Skill: standalone/skill/SKILL.md
 
-- right-click the active note → find a connection for this note;
-- command palette → find AI connection from current note;
-- graph selection → find connection from the selected node;
-- file explorer right-click → same note entry;
-- the panel stays in the right sidebar: connect / next / not now;
-- one local suggestion at a time, reason attached, relation editable;
-- undo after writing; no auto-write;
-- local model only, key in Obsidian SecretStorage;
-- 522 tests passing, CI and Release green.
+The model only receives node id, title, tags, and existing edge pairs.
+It never receives note bodies, source paths, or vault contents.
 
-### The loop
+Download `interestseed-standalone-v4.0.0.zip`, then:
 
-`Capture → Decide → Connect → Verify → Review → Next action`
+node cli.js init --vault "<vault>"
+node cli.js serve --vault "<vault>" --port 4173
 
-### Install
-
-1. Download `interestseed-v3.7.0.zip`.
-2. Extract into `<vault>/.obsidian/plugins/interestseed/`.
-3. Enable InterestSeed in Community plugins.
-4. Run the cold-start questionnaire, then process the Share Inbox.
-
-AGPL-3.0-only. Author: aicoder.
+527 tests passing. AGPL-3.0-only. Author: aicoder.
 ```
 
 ## Release body — 简体中文
 
 ```markdown
-InterestSeed 是 Obsidian 里的一个小插件，专门处理那个很具体的瞬间：你收藏了
-一条东西，心里其实知道自己大概率不会去做。它给这条收藏一个 3 天实验，然后
-让证据来决定。
+InterestSeed 不再依赖 Obsidian 插件运行时。
 
-![InterestSeed](https://raw.githubusercontent.com/lxc248/-interestseed/main/assets/github-social-preview.png)
+它把 vault 当成一个普通 Markdown 文件夹：
 
-![InterestSeed demo](https://raw.githubusercontent.com/lxc248/-interestseed/main/assets/interestseed-demo.gif)
+capture → scan → 一条 AI 连接 → 3 天实验 → 证据
 
-### 这次 3.7.0，AI 变成 Obsidian 原生侧边栏
+三种形态：
 
-- 当前笔记右键 → 用 AI 找这条笔记的连接
-- 命令面板 → 从当前笔记找 AI 连接
-- 图谱选中节点 → 从选中节点找连接
-- 文件树右键 → 同一条笔记入口
-- 面板常驻右侧：连上 / 换一个 / 先不用
-- 一次只给一条，带理由，关系名可改
-- 连上后可撤销，不会自动写图谱
-- 只使用本地模型，Key 存在 Obsidian SecretStorage
-- 522 个测试通过，CI 和 Release 都是绿的。
+- CLI：capture / scan / suggest / connect / experiment / serve
+- 本地 Web：图谱、单条建议、撤销、实验条
+- Skill：standalone/skill/SKILL.md
 
-### 它怎么跑
+只发送节点 id、标题、标签、已有关系 id 对。
+不发送笔记正文、来源路径、完整观察或 vault 内容。
 
-`Capture → Decide → Connect → Verify → Review → Next action`
+下载 `interestseed-standalone-v4.0.0.zip`，然后：
 
-### 装起来
+node cli.js init --vault "<vault>"
+node cli.js serve --vault "<vault>" --port 4173
 
-1. 下载 `interestseed-v3.7.0.zip`；
-2. 解压到 `<vault>/.obsidian/plugins/interestseed/`；
-3. 在第三方插件里启用 InterestSeed；
-4. 跑一遍冷启动，然后处理分享收件箱。
-
-AGPL-3.0-only. Author: aicoder.
+527 个测试通过。AGPL-3.0-only. Author: aicoder.
 ```
 
 ## Pinned issue / security notice

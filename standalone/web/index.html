@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>InterestSeed</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="mark">◈</div>
+        <div>
+          <h1>InterestSeed</h1>
+          <p>把收藏变成可验证的连接</p>
+        </div>
+      </div>
+      <div class="top-actions">
+        <span id="model-badge" class="pill">本地模型</span>
+        <button id="scan-button" class="button ghost">重新扫描</button>
+      </div>
+    </header>
+
+    <section class="stats" id="stats"></section>
+    <section class="experiment-strip" id="experiment-strip"></section>
+
+    <main class="workspace">
+      <section class="graph-pane">
+        <div class="pane-head">
+          <div>
+            <h2>你的兴趣图谱</h2>
+            <p id="graph-subtitle">选择一个节点，让 AI 找一条最值得验证的连接。</p>
+          </div>
+          <div class="legend">
+            <span><i class="dot project"></i>项目</span>
+            <span><i class="dot document"></i>笔记</span>
+            <span><i class="dot topic"></i>主题</span>
+          </div>
+        </div>
+        <svg id="graph" viewBox="0 0 820 560" role="img" aria-label="兴趣图谱"></svg>
+      </section>
+
+      <aside class="ai-pane">
+        <div class="ai-head">
+          <div>
+            <p class="eyebrow">LOCAL AI</p>
+            <h2>AI 建议</h2>
+          </div>
+          <span id="key-status" class="pill">检查中</span>
+        </div>
+        <div id="ai-body" class="ai-body"></div>
+      </aside>
+    </main>
+  </div>
+  <div id="toast" class="toast" hidden></div>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

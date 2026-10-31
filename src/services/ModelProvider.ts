@@ -108,10 +108,11 @@ export const DEEPSEEK_V4_PRO_CONFIG: ExperimentalModelConfig = {
 /** 本地服务的默认模型；可在设置里改成服务实际暴露的任意 ID。 */
 export const DEFAULT_AI_MODEL = 'cn:deepseek-v4.1-flash';
 
-export function localModelConfig(model?: string): ExperimentalModelConfig {
+export function localModelConfig(model?: string, baseUrl?: string): ExperimentalModelConfig {
   return {
     ...DEEPSEEK_V4_PRO_CONFIG,
     model: model?.trim() || DEFAULT_AI_MODEL,
+    baseUrl: baseUrl?.trim() || DEEPSEEK_V4_PRO_CONFIG.baseUrl,
   };
 }
 
@@ -125,6 +126,7 @@ export interface ModelProviderSettings {
   enableAI: boolean;
   aiConsentGranted: boolean;
   model?: string;
+  baseUrl?: string;
 }
 
 /**
@@ -758,7 +760,7 @@ export function createModelProvider(
     return new DisabledModelProvider();
   }
   return new OpenAICompatibleModelProvider(
-    localModelConfig(settings.model),
+    localModelConfig(settings.model, settings.baseUrl),
     requestImpl ?? ((input, init) => fetch(input, init)),
     apiKey,
   );

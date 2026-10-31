@@ -1,0 +1,75 @@
+# InterestSeed Standalone
+
+InterestSeed without the Obsidian plugin runtime.
+
+It reads any Markdown folder, builds the same interest graph, and lets your own local
+AI suggest one testable connection at a time. Obsidian is optional: it can still open
+the same vault, but InterestSeed no longer depends on it.
+
+## Shape
+
+```text
+standalone/
+  src/
+    cli.ts       command line
+    vault.ts     Markdown scanner
+    state.ts     .interestseed state/config
+    graph.ts     graph build
+    ai.ts        local model + edge writes
+    server.ts    local web server
+  web/           local dashboard
+  skill/         agent skill
+```
+
+## Build
+
+```bash
+npm run build --prefix standalone
+```
+
+## Use
+
+```bash
+node standalone/dist/cli.js init --vault "C:\path\to\vault"
+node standalone/dist/cli.js scan --vault "C:\path\to\vault"
+node standalone/dist/cli.js suggest --vault "C:\path\to\vault" --node "node_..."
+node standalone/dist/cli.js experiment start --vault "C:\path\to\vault" --title "AI 工具 × 习惯"
+node standalone/dist/cli.js experiment log --vault "C:\path\to\vault" --id "exp_..." --evidence "今天做了什么"
+node standalone/dist/cli.js serve --vault "C:\path\to\vault" --port 4173
+```
+
+## Demo vault
+
+`standalone/demo-vault/` contains eight small notes you can scan:
+
+```bash
+node standalone/dist/cli.js init --vault "standalone/demo-vault"
+node standalone/dist/cli.js serve --vault "standalone/demo-vault" --port 4173
+```
+
+## State
+
+```text
+<vault>/.interestseed/config.json
+<vault>/.interestseed/state.json
+<vault>/.interestseed/experiments.json
+<vault>/.interestseed/key        optional, gitignored
+```
+
+## Verification
+
+```text
+72 test files / 527 tests passing
+npm run typecheck:standalone
+npm run build:standalone
+```
+
+## Skill
+
+`skill/SKILL.md` is the agent-facing contract. It instructs the agent to show one
+suggestion, wait for connect / next / not now, and never write without confirmation.
+
+## Relationship to the plugin
+
+The plugin remains a compatibility shell for people who want Obsidian-native
+commands and sidebars. The standalone core is the product: CLI, local web, and skill.

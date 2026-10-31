@@ -2,13 +2,15 @@
 
 <h1>InterestSeed</h1>
 
-<p><strong>Obsidian 里的兴趣验证器</strong></p>
+<p><strong>本地优先的兴趣验证器</strong></p>
 
 <p>把一条收藏，变成 3 天真实行动；<br/>再用证据决定：继续，还是放下。</p>
 
+<p>读取任何 Markdown vault，独立运行。</p>
+
 <p><strong>本地 AI，一次只给一条能验证的连接。</strong></p>
 
-<img src="assets/ai-suggestions-live.png" alt="AI 一次只给一条建议" width="820" />
+<img src="assets/standalone-ai.png" alt="InterestSeed 独立版本地 AI" width="900" />
 
 <p>
   <a href="assets/interestseed-launch.mp4"><img alt="Demo" src="https://img.shields.io/badge/%E2%96%B6%2040%20%E7%A7%92%E6%BC%94%E7%A4%BA-111827?style=for-the-badge" /></a>
@@ -16,8 +18,8 @@
   <img alt="Local model" src="https://img.shields.io/badge/LOCAL-MODEL-22c55e?style=for-the-badge" />
   <img alt="CI" src="https://github.com/lxc248/-interestseed/actions/workflows/ci.yml/badge.svg?branch=main" />
   <img alt="Release" src="https://img.shields.io/github/v/release/lxc248/-interestseed?style=for-the-badge" />
-  <img alt="Tests" src="https://img.shields.io/badge/tests-522%20passing-22c55e?style=for-the-badge" />
-  <img alt="Coverage" src="https://img.shields.io/badge/coverage-74.8%25-14b8a6?style=for-the-badge" />
+  <img alt="Tests" src="https://img.shields.io/badge/tests-527%20passing-22c55e?style=for-the-badge" />
+  <img alt="Coverage" src="https://img.shields.io/badge/coverage-75.3%25-14b8a6?style=for-the-badge" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b?style=for-the-badge" />
 </p>
 
@@ -63,6 +65,25 @@
 - 连上 / 换一个 / 先不用，连上后可撤销
 
 [AI 建议是怎么工作的 →](docs/ai.md)
+
+## 独立版：不再只是 Obsidian 插件
+
+InterestSeed 现在可以脱离 Obsidian 运行。Obsidian vault 只作为 Markdown 数据层。
+
+```text
+CLI        scan / suggest / connect / serve
+Local Web  图谱、AI 单条建议、撤销
+Skill      Agent 可直接调用
+Storage    <vault>/.interestseed/
+```
+
+```bash
+npm run build:standalone
+node standalone/dist/cli.js init --vault "<vault>"
+node standalone/dist/cli.js serve --vault "<vault>" --port 4173
+```
+
+[独立版文档 →](docs/standalone.md) · [Agent Skill →](standalone/skill/SKILL.md) · [CLI →](standalone/README.md)
 
 ## 它和收藏夹到底差在哪
 
@@ -143,7 +164,19 @@ Capture → Decide → Connect → Verify → Review → Next action
 
 ## 装起来
 
-三分钟能跑起来。
+### 独立版（推荐）
+
+也可以直接从 [Releases](https://github.com/lxc248/-interestseed/releases) 下载 `interestseed-standalone-v4.0.0.zip`。
+
+```bash
+npm run build:standalone
+node standalone/dist/cli.js init --vault "<vault>"
+node standalone/dist/cli.js serve --vault "<vault>" --port 4173
+```
+
+Web：`http://127.0.0.1:4173`
+
+### Obsidian 插件（兼容）
 
 1. 从 [Releases](https://github.com/lxc248/-interestseed/releases) 下载 `interestseed-v3.7.0.zip`。
 2. 解压到：
@@ -181,8 +214,8 @@ AI 关系建议默认开启，只在你点击 AI 时请求所选模型；接入�
 这些数字不是装饰。每次改完，我都会重新跑一遍。
 
 ```text
-522 tests passing
-74.82% line coverage
+527 tests passing
+75.32% line coverage
 92.25% core coverage
 46.53% UI coverage
 axe: graph / inbox / share-card 0 violations

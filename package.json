@@ -17,7 +17,12 @@
     "coverage": "vitest run --coverage",
     "lint": "eslint .",
     "verify": "npm run typecheck && npm run test && npm run lint && npm run build",
-    "deploy": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/deploy.ps1"
+    "deploy": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/deploy.ps1",
+    "build:standalone": "vite build --config standalone/vite.config.ts",
+    "standalone": "node standalone/dist/cli.js",
+    "typecheck:standalone": "tsc -p standalone/tsconfig.json",
+    "verify:standalone": "npm run typecheck:standalone && npm run build:standalone",
+    "package:standalone": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/package-standalone.ps1"
   },
   "keywords": [
     "obsidian",
