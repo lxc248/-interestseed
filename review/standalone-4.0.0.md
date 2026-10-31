@@ -31,7 +31,7 @@ reason: AI 工具可用于知识采集、自动整理、检索与综合，增强
 
 ```text
 http://127.0.0.1:4173
-graph renders 8 nodes
+cosmic graph renders 8 planets / 150 stars
 AI suggestion: 1 / 5
 connect → 200
 undo → 200
@@ -67,7 +67,7 @@ second log on the same day → rejected: 今天已经记录过了，明天再来
 
 ```text
 release/interestseed-standalone-v4.0.0.zip
-sha256: 1f19bcb8aa51ca39805422ea1a71ab9c495f47e740e84faa5e09b3381db99fdb
+sha256: 58cce9f974b46fd34a1a77d16b2e171d4892642db76384e1e8c3d47f59890b7f
 packaged cli.js status → 8 nodes / 10 edges
 packaged web / → 200
 ```
