@@ -2,7 +2,7 @@ import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { applyDiscovery, refreshDiscoveries } from '../standalone/src/discoveries';
+import { applyDiscovery, feedbackDiscovery, listDiscoveries, loadDiscoveries, refreshDiscoveries } from '../standalone/src/discoveries';
 import { scanAndBuild } from '../standalone/src/graph';
 import { statePath } from '../standalone/src/state';
 
@@ -44,8 +44,20 @@ describe('standalone discoveries', () => {
 
     const discoveries = await refreshDiscoveries(root);
     expect(discoveries.length).toBeGreaterThan(0);
-    const result = await applyDiscovery(root, discoveries[0]!.id);
+    const id = discoveries[0]!.id;
+    const result = await applyDiscovery(root, id);
     expect(result.ok).toBe(true);
     expect(result.edge?.status).toBe('confirmed');
+
+    expect((await feedbackDiscovery(root, id, 'needs-verification')).ok).toBe(true);
+    let file = await loadDiscoveries(root);
+    expect(file.discoveries.find((item) => item.id === id)?.feedbackStatus).toBe('needs-verification');
+
+    expect((await feedbackDiscovery(root, id, 'corrected', '它们共享的是开始阻力。')).ok).toBe(true);
+    file = await loadDiscoveries(root);
+    expect(file.discoveries.find((item) => item.id === id)?.correction?.description).toContain('开始阻力');
+
+    expect((await feedbackDiscovery(root, id, 'rejected')).ok).toBe(true);
+    expect((await listDiscoveries(root)).some((item) => item.id === id)).toBe(false);
   });
 });
