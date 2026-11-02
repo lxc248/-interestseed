@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InterestSeed — turn saved notes into testable interests</title>
+  <meta name="description" content="InterestSeed is a local-first interest validator for any Markdown vault. Local AI suggests one testable connection; a 3-day experiment decides.">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --accent: #d97757;
+      --accent-hover: #e58a6c;
+      --bg: #010101;
+      --muted: #9ca3af;
+      --soft: #d1d5db;
+      --line: rgba(255, 255, 255, 0.14);
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: auto; }
+    html, body { overflow-x: hidden; }
+    body {
+      font-family: "Inter", sans-serif;
+      background: var(--bg);
+      color: #fff;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .fixed    { position: fixed; }
+    .absolute { position: absolute; }
+    .relative { position: relative; }
+    .inset-0  { top: 0; right: 0; bottom: 0; left: 0; }
+
+    /* Cosmic background */
+    #cosmic-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -10;
+      overflow: hidden;
+      background: #05070d;
+    }
+    #cosmic-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    #cosmic-bg .overlay {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to top, rgba(0, 0, 0, 0.72), transparent 46%, transparent),
+        rgba(0, 0, 0, 0.14);
+    }
+
+    /* Navigation */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 2.5rem;
+    }
+    nav .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      color: #fff;
+      text-decoration: none;
+    }
+    nav .brand-mark {
+      width: 1.4rem;
+      height: 1.4rem;
+      border-radius: 0.4rem;
+      background: var(--accent);
+      box-shadow: 0 0 24px rgba(217, 119, 87, 0.45);
+    }
+    nav .logo {
+      font-weight: 700;
+      font-size: 1.15rem;
+      letter-spacing: -0.03em;
+    }
+    nav .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    nav .nav-links a {
+      font-size: 0.8125rem;
+      color: var(--soft);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    nav .nav-links a:hover { color: #fff; }
+    nav .social {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    nav .social a {
+      color: var(--soft);
+      text-decoration: none;
+      font-size: 0.8125rem;
+      transition: color 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    nav .social a:hover { color: #fff; }
+    nav .social svg { width: 1.15rem; height: 1.15rem; }
+
+    /* Hero */
+    #hero {
+      position: relative;
+      height: 100vh;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    #hero .content {
+      position: relative;
+      z-index: 10;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      text-align: center;
+      padding: 0 1.5rem 6rem;
+    }
+    #hero .subtitle {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 1rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    #hero h1 {
+      font-size: clamp(1.6rem, 5vw, 3.75rem);
+      font-weight: 600;
+      line-height: 1.12;
+      max-width: 50rem;
+      letter-spacing: -0.035em;
+    }
+    #hero h1 .underlined {
+      position: relative;
+      display: inline-block;
+    }
+    #hero h1 .underlined .line {
+      position: absolute;
+      bottom: 0.22rem;
+      left: 0;
+      width: 100%;
+      height: 10px;
+      background: var(--accent);
+      border-radius: 2px;
+      z-index: 0;
+    }
+    #hero h1 .underlined span {
+      position: relative;
+      z-index: 1;
+    }
+    #hero .ctas {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 2.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    #hero .code-box {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(24, 24, 24, 0.86);
+      border: 1px solid var(--line);
+      border-radius: 0.5rem;
+      padding: 0.85rem 1.6rem;
+    }
+    #hero .code-box .prompt {
+      color: var(--accent);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.82rem;
+    }
+    #hero .code-box code {
+      font-size: 0.82rem;
+      color: #e5e7eb;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    #hero .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--accent);
+      color: #160b07;
+      font-weight: 600;
+      border-radius: 0.5rem;
+      padding: 0.85rem 1.8rem;
+      font-size: 0.84rem;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.2s;
+    }
+    #hero .cta-btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
+    #hero .bounce-arrow {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      justify-content: center;
+      padding-bottom: 2rem;
+    }
+    #hero .bounce-arrow svg {
+      width: 1.35rem;
+      height: 1.35rem;
+      color: #6b7280;
+      animation: bounce 1.6s ease-in-out infinite;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-25%); }
+    }
+
+    /* Fixed cards */
+    #fixed-cards {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      z-index: 4;
+      padding: 2rem 2.5rem;
+      opacity: 0;
+      pointer-events: none;
+      will-change: opacity;
+    }
+    #fixed-cards .grid {
+      max-width: 72rem;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2.5rem;
+      will-change: mask-image;
+    }
+    #fixed-cards .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.01));
+      border: 1px solid var(--line);
+      border-radius: 0.9rem;
+      padding: 1.35rem;
+    }
+    #fixed-cards .card h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.02em;
+    }
+    #fixed-cards .card p {
+      color: var(--soft);
+      font-size: 0.84rem;
+      line-height: 1.65;
+    }
+
+    /* Reveal section */
+    #section-three {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 0 2.5rem 8rem;
+    }
+    #section-three .inner {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(32px);
+      filter: blur(8px);
+      transition: opacity 1s ease-out, transform 1s ease-out, filter 1s ease-out;
+      will-change: opacity, transform, filter;
+    }
+    #section-three .inner.visible {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+    #section-three .inner p {
+      color: var(--soft);
+      font-size: 0.95rem;
+      margin-bottom: 0.75rem;
+    }
+    #section-three .inner h2 {
+      font-size: clamp(1.9rem, 6vw, 4.5rem);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+    }
+
+    #content { position: relative; z-index: 2; }
+
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.5rem; }
+      nav .nav-links { display: none; }
+      #hero .content { padding-bottom: 5rem; }
+      #hero h1 { font-size: 1.6rem; }
+      #hero .ctas { flex-direction: column; }
+      #fixed-cards .grid { grid-template-columns: 1fr; gap: 1rem; }
+      #fixed-cards { padding: 1.25rem 1rem; }
+      #fixed-cards .card { padding: 1rem; }
+      #fixed-cards .card h3 { font-size: 1.1rem; }
+      #section-three { padding-bottom: 5rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #hero .bounce-arrow svg { animation: none; }
+      #section-three .inner { transition: none; filter: none; transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <div id="cosmic-bg">
+    <canvas id="cosmic-canvas"></canvas>
+    <div class="overlay"></div>
+  </div>
+
+  <div id="fixed-cards">
+    <div class="grid">
+      <div class="card">
+        <h3>One connection at a time</h3>
+        <p>Local AI reads only node ids, titles, tags and existing edge pairs. It suggests one defensible connection, not a batch of pending cards. You connect, skip, or change the relation.</p>
+      </div>
+      <div class="card">
+        <h3>A 3-day experiment</h3>
+        <p>A connection is not a conclusion. Run a 3-day test, log one real observation per day, and let evidence decide whether to continue or drop it.</p>
+      </div>
+      <div class="card">
+        <h3>Local-first, human-in-the-loop</h3>
+        <p>Your Markdown vault stays a folder. No account, no cloud sync, no automatic writes. CLI, local web, agent skill and MCP share one graph.</p>
+      </div>
+    </div>
+  </div>
+
+  <nav>
+    <div style="display:flex; align-items:center; gap:2rem">
+      <a class="brand" href="#">
+        <span class="brand-mark"></span>
+        <span class="logo">interestseed</span>
+      </a>
+      <div class="nav-links">
+        <a href="#how-it-works">How it works</a>
+        <a href="https://github.com/lxc248/-interestseed#readme" target="_blank" rel="noreferrer">Docs</a>
+      </div>
+    </div>
+    <div class="social">
+      <a href="https://github.com/lxc248/-interestseed" target="_blank" rel="noreferrer" aria-label="GitHub">
+        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        GitHub
+      </a>
+      <a href="https://github.com/lxc248/-interestseed/releases/latest" target="_blank" rel="noreferrer">Release</a>
+    </div>
+  </nav>
+
+  <div id="content">
+    <section id="hero">
+      <div class="content">
+        <p class="subtitle">Local-first interest validation</p>
+        <h1>
+          Instantly turn saved notes into
+          <span class="underlined">
+            <span class="line"></span><span>testable interests</span>
+          </span>.
+        </h1>
+        <div class="ctas">
+          <div class="code-box">
+            <span class="prompt">&gt;</span>
+            <code>interestseed scan --vault ~/notes</code>
+          </div>
+          <a href="https://github.com/lxc248/-interestseed/releases/latest" class="cta-btn">Get Started <span>&rarr;</span></a>
+        </div>
+      </div>
+      <div class="bounce-arrow">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+             stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M19.5 8.25l-7.5 7.5-7.5-7.5"/>
+        </svg>
+      </div>
+    </section>
+
+    <div style="height:150vh"></div>
+    <div id="how-it-works"></div>
+    <div id="cards-trigger" style="height:200vh"></div>
+    <div style="height:100vh"></div>
+
+    <section id="section-three">
+      <div class="inner" id="section-three-inner">
+        <p>Presenting</p>
+        <h2>InterestSeed 4</h2>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var hero = document.getElementById("hero");
+      var fixedCards = document.getElementById("fixed-cards");
+      var cardsGrid = fixedCards.querySelector(".grid");
+      var trigger = document.getElementById("cards-trigger");
+      var sectionThreeInner = document.getElementById("section-three-inner");
+
+      var vh = window.innerHeight;
+      var docHeight = document.documentElement.scrollHeight;
+      var triggerTop = 0;
+      var triggerHeight = 0;
+      var lastHeroOpacity = -1;
+      var lastCardsOpacity = -1;
+      var lastReveal = -1;
+      var lastMaskMobile = null;
+      var lastScrollY = -1;
+
+      function measure() {
+        vh = window.innerHeight;
+        docHeight = document.documentElement.scrollHeight;
+        var rect = trigger.getBoundingClientRect();
+        triggerTop = rect.top + window.scrollY;
+        triggerHeight = rect.height;
+        lastReveal = -1;
+      }
+
+      function updateHero(y) {
+        var opacity = Math.max(0, 1 - y / (vh * 0.3));
+        if (Math.abs(opacity - lastHeroOpacity) > 0.002) {
+          hero.style.opacity = opacity.toFixed(3);
+          lastHeroOpacity = opacity;
+        }
+      }
+
+      function updateCards(y) {
+        var start = triggerTop - vh * 0.5;
+        var end = triggerTop + triggerHeight - vh * 0.3;
+        var range = end - start;
+        var progress = range > 0 ? (y - start) / range : 0;
+        progress = Math.max(0, Math.min(1, progress));
+
+        var isActive = y >= start - vh * 0.2 && y <= end + vh * 0.3;
+        var fadeIn = Math.min(1, Math.max(0, (y - (start - vh * 0.2)) / (vh * 0.2)));
+        var fadeOut = Math.min(1, Math.max(0, (end + vh * 0.3 - y) / (vh * 0.3)));
+        var opacity = isActive ? Math.min(fadeIn, fadeOut) : 0;
+
+        if (Math.abs(opacity - lastCardsOpacity) > 0.01) {
+          fixedCards.style.opacity = opacity.toFixed(3);
+          fixedCards.style.pointerEvents = opacity > 0.1 ? "auto" : "none";
+          lastCardsOpacity = opacity;
+        }
+
+        var reveal = progress * 130;
+        var isMobile = window.innerWidth < 768;
+        if (Math.abs(reveal - lastReveal) > 0.35 || isMobile !== lastMaskMobile) {
+          var mask;
+          if (isMobile) {
+            mask = "linear-gradient(to bottom, black " + reveal + "%, transparent " + (reveal + 20) + "%)";
+          } else {
+            mask = "linear-gradient(to right, black " + reveal + "%, transparent " + (reveal + 15) + "%)";
+          }
+          cardsGrid.style.maskImage = mask;
+          cardsGrid.style.webkitMaskImage = mask;
+          lastReveal = reveal;
+          lastMaskMobile = isMobile;
+        }
+      }
+
+      /* ---------- Cosmic canvas ---------- */
+      var canvas = document.getElementById("cosmic-canvas");
+      var ctx = canvas.getContext("2d", { alpha: false });
+      var w = 0, h = 0, dpr = 1;
+      var stars = [];
+      var nebula = null;
+      var lastDraw = 0;
+
+      function seedStars() {
+        stars = [];
+        var count = Math.max(70, Math.min(190, Math.floor((w * h) / 9000)));
+        for (var i = 0; i < count; i++) {
+          stars.push({
+            x: Math.random() * w,
+            y: Math.random() * h,
+            r: Math.random() * 1.25 + 0.3,
+            a: Math.random() * 0.55 + 0.15,
+            ph: Math.random() * Math.PI * 2,
+            sp: Math.random() * 1.4 + 0.35
+          });
+        }
+      }
+
+      function buildNebula() {
+        var off = document.createElement("canvas");
+        off.width = Math.max(1, Math.round(w * dpr));
+        off.height = Math.max(1, Math.round(h * dpr));
+        var g = off.getContext("2d");
+        g.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        var base = g.createLinearGradient(0, 0, 0, h);
+        base.addColorStop(0, "#0a1024");
+        base.addColorStop(0.5, "#05070d");
+        base.addColorStop(1, "#010101");
+        g.fillStyle = base;
+        g.fillRect(0, 0, w, h);
+
+        var coral = g.createRadialGradient(w * 0.5, h * 0.44, 0, w * 0.5, h * 0.44, Math.max(w, h) * 0.34);
+        coral.addColorStop(0, "rgba(217, 119, 87, 0.22)");
+        coral.addColorStop(0.42, "rgba(217, 119, 87, 0.07)");
+        coral.addColorStop(1, "rgba(217, 119, 87, 0)");
+        g.fillStyle = coral;
+        g.fillRect(0, 0, w, h);
+
+        var blue = g.createRadialGradient(w * 0.68, h * 0.6, 0, w * 0.68, h * 0.6, Math.max(w, h) * 0.3);
+        blue.addColorStop(0, "rgba(56, 189, 248, 0.08)");
+        blue.addColorStop(1, "rgba(56, 189, 248, 0)");
+        g.fillStyle = blue;
+        g.fillRect(0, 0, w, h);
+
+        nebula = off;
+      }
+
+      function resizeCanvas() {
+        dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+        w = window.innerWidth;
+        h = window.innerHeight;
+        canvas.width = Math.max(1, Math.round(w * dpr));
+        canvas.height = Math.max(1, Math.round(h * dpr));
+        seedStars();
+        buildNebula();
+        lastDraw = 0;
+      }
+
+      var planets = [
+        { angle: -0.55, orbit: 0.19, size: 7, color: "#38bdf8" },
+        { angle: 0.95, orbit: 0.26, size: 6, color: "#34d399" },
+        { angle: 2.25, orbit: 0.15, size: 5, color: "#a78bfa" },
+        { angle: 3.5, orbit: 0.31, size: 8, color: "#f59e0b" },
+        { angle: 4.7, orbit: 0.23, size: 5, color: "#38bdf8" }
+      ];
+
+      function drawCosmic(now, scrollY) {
+        if (!nebula) return;
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(nebula, 0, 0);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        var p = Math.max(0, Math.min(1, scrollY / Math.max(1, docHeight - vh)));
+        var zoom = 1 + p * 0.28;
+        var time = now / 1000;
+        var cx = w * 0.5;
+        var cy = h * 0.43;
+
+        for (var i = 0; i < stars.length; i++) {
+          var s = stars[i];
+          var twinkle = 0.72 + 0.28 * Math.sin(time * s.sp + s.ph);
+          ctx.globalAlpha = s.a * twinkle;
+          ctx.fillStyle = "#dfe8ff";
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.scale(zoom, zoom);
+        ctx.translate(-cx, -cy);
+
+        var orbitColor = "rgba(255, 255, 255, 0.10)";
+        for (var ring = 1; ring <= 3; ring++) {
+          ctx.strokeStyle = orbitColor;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, w * (0.1 + ring * 0.075), h * (0.065 + ring * 0.045), -0.18, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        var rotation = p * 0.5;
+        for (var j = 0; j < planets.length; j++) {
+          var planet = planets[j];
+          var px = cx + Math.cos(planet.angle + rotation) * w * planet.orbit;
+          var py = cy + Math.sin(planet.angle + rotation) * h * planet.orbit * 0.56;
+
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.11)";
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy);
+          ctx.lineTo(px, py);
+          ctx.stroke();
+
+          ctx.fillStyle = planet.color;
+          ctx.globalAlpha = 0.9;
+          ctx.beginPath();
+          ctx.arc(px, py, planet.size, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        }
+
+        var glowRadius = Math.max(110, Math.min(190, w * 0.16));
+        var glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowRadius);
+        glow.addColorStop(0, "rgba(255, 228, 210, 0.85)");
+        glow.addColorStop(0.18, "rgba(240, 160, 125, 0.32)");
+        glow.addColorStop(0.55, "rgba(217, 119, 87, 0.10)");
+        glow.addColorStop(1, "rgba(217, 119, 87, 0)");
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(cx, cy, glowRadius, 0, Math.PI * 2);
+        ctx.fill();
+
+        var pulse = 1 + Math.sin(time * 1.3) * 0.025;
+        ctx.fillStyle = "#d97757";
+        ctx.beginPath();
+        ctx.arc(cx, cy, 24 * pulse, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+      }
+
+      /* ---------- One animation loop for scroll + canvas ---------- */
+      function tick(now) {
+        var y = window.scrollY;
+        if (y !== lastScrollY) {
+          updateHero(y);
+          updateCards(y);
+          lastScrollY = y;
+        }
+
+        if (now - lastDraw > 33) {
+          drawCosmic(now, y);
+          lastDraw = now;
+        }
+
+        if (!reduceMotion) requestAnimationFrame(tick);
+      }
+
+      resizeCanvas();
+      measure();
+      updateHero(window.scrollY);
+      updateCards(window.scrollY);
+      drawCosmic(0, window.scrollY);
+
+      window.addEventListener("resize", function () {
+        resizeCanvas();
+        measure();
+        lastHeroOpacity = -1;
+        lastCardsOpacity = -1;
+        lastScrollY = -1;
+      }, { passive: true });
+
+      window.addEventListener("load", measure);
+      setTimeout(measure, 300);
+
+      if (!reduceMotion) {
+        requestAnimationFrame(tick);
+      } else {
+        window.addEventListener("scroll", function () {
+          updateHero(window.scrollY);
+          updateCards(window.scrollY);
+          drawCosmic(0, window.scrollY);
+        }, { passive: true });
+      }
+
+      /* Reveal section */
+      var observer = new IntersectionObserver(function (entries) {
+        if (entries[0] && entries[0].isIntersecting) {
+          sectionThreeInner.classList.add("visible");
+          observer.unobserve(sectionThreeInner);
+        }
+      }, { threshold: 0.15 });
+      observer.observe(sectionThreeInner);
+    })();
+  </script>
+</body>
+</html>
