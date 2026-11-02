@@ -1,4 +1,4 @@
-﻿<div align="center">
+<div align="center">
 
 <h1>InterestSeed</h1>
 
@@ -166,7 +166,7 @@ These aren't a feature checklist. They're the moves I actually make every day.
 
 ### Standalone (recommended)
 
-Or download `interestseed-standalone-v4.0.0.zip` from [Releases](https://github.com/lxc248/-interestseed/releases).
+Or download `interestseed-standalone-v4.0.1.zip` from [Releases](https://github.com/lxc248/-interestseed/releases).
 
 ```bash
 npm run build:standalone

@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.0.1 — Standalone polish
+
+- Added graph search by title and tag, with `/` focus and `Esc` clear.
+- Added a friendly AI error card with retry and settings actions.
+- Added a `测试连接` button in settings and `/api/config/test`.
+- Added discovery feedback and experiment extension regression tests.
+- 531 tests passing.
+
 ## 4.0.0 — Standalone
 
 - InterestSeed now runs without the Obsidian plugin runtime.
