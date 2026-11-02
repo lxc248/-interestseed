@@ -8,6 +8,7 @@ export default tseslint.config(
       'node_modules/**',
       'coverage/**',
       'promo/**',
+      'scripts/**',
       'viewer/**',
       'skill/**',
       'skills/**',
