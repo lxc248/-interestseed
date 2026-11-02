@@ -2,7 +2,7 @@ import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { activeExperiment, logExperiment, startExperiment } from '../standalone/src/experiments';
+import { activeExperiment, extendExperiment, logExperiment, startExperiment } from '../standalone/src/experiments';
 
 const dirs: string[] = [];
 
@@ -59,5 +59,14 @@ describe('standalone experiments', () => {
         new Date('2026-01-02T10:00:00Z'),
       ),
     ).rejects.toThrow('至少 4 个字');
+  });
+
+  it('extends a 3-day experiment to 7 days without shrinking it', async () => {
+    const root = await vault();
+    const experiment = await startExperiment(root, { title: '深度工作', targetDays: 3 });
+    const extended = await extendExperiment(root, experiment.id, 7);
+    expect(extended.state.targetDays).toBe(7);
+    const notShrunk = await extendExperiment(root, experiment.id, 3);
+    expect(notShrunk.state.targetDays).toBe(7);
   });
 });

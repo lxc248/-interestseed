@@ -6,6 +6,8 @@ const state = {
   lastConnected: null,
   busy: false,
   filterStage: 'all',
+  query: '',
+  aiError: null,
 };
 
 const $ = (selector) => document.querySelector(selector);
@@ -47,8 +49,8 @@ function render() {
   sprintButton.hidden = (state.data.graph.nodes?.length ?? 0) > 0;
   renderStats();
   renderInsights();
-  renderChainStrip();
   renderGraph();
+  renderChainStrip();
   renderExperiment();
   renderDiscoveries();
   renderInbox();
@@ -532,13 +534,16 @@ function renderGraph() {
     return;
   }
 
-  const nodes = state.filterStage === 'all'
-    ? allNodes
-    : allNodes.filter((node) => chainStateOf(node.id) === state.filterStage);
+  const query = state.query.trim().toLowerCase();
+  const nodes = allNodes.filter((node) => {
+    if (state.filterStage !== 'all' && chainStateOf(node.id) !== state.filterStage) return false;
+    if (!query) return true;
+    return `${node.title} ${(node.tags ?? []).join(' ')}`.toLowerCase().includes(query);
+  });
   if (!nodes.length) {
     svg.appendChild(svgEl('text', {
       x: cx, y: cy, fill: '#8b96ad', 'text-anchor': 'middle', 'font-size': 13,
-      text: '这个阶段还没有节点。',
+      text: query ? `没有匹配「${state.query.trim()}」的节点。` : '这个阶段还没有节点。',
     }));
     return;
   }
@@ -728,6 +733,7 @@ function renderGraph() {
       state.suggestions = [];
       state.index = 0;
       state.lastConnected = null;
+      state.aiError = null;
       render();
     });
     group.appendChild(svgEl('title', {})).textContent = `${node.title} · ${stageMeta.label}`;
@@ -763,8 +769,9 @@ function renderGraph() {
 
   const focusStage = chainStateOf(state.selectedId);
   const focusMeta = chainMeta(focusStage);
+  const searchNote = query ? `搜索「${state.query.trim()}」· ${nodes.length} 个结果 · ` : '';
   document.getElementById('graph-subtitle').textContent = state.selectedId
-    ? `当前恒星：${nodeTitle(state.selectedId)} · ${focusMeta.label} · 下一步：${focusMeta.next}`
+    ? `${searchNote}当前恒星：${nodeTitle(state.selectedId)} · ${focusMeta.label} · 下一步：${focusMeta.next}`
     : '选择一个节点，让 AI 找一条最值得验证的连接。';
 }
 
@@ -814,6 +821,25 @@ function renderAI() {
       waiting.className = 'ai-empty';
       waiting.innerHTML = `<h3>AI 正在看你的图谱…</h3><p>它只会挑一条最值得验证的连接。第一次调用本地模型可能需要一点时间。</p>`;
       body.appendChild(waiting);
+      return;
+    }
+    if (state.aiError) {
+      const failed = document.createElement('div');
+      failed.className = 'ai-empty';
+      failed.innerHTML = `<h3>AI 没连上</h3><p>${escapeHtml(state.aiError)}</p>`;
+      const stack = document.createElement('div');
+      stack.className = 'stack';
+      const retry = document.createElement('button');
+      retry.className = 'button primary';
+      retry.textContent = '重试';
+      retry.addEventListener('click', () => suggestFor(selected.id));
+      const settings = document.createElement('button');
+      settings.className = 'button ghost';
+      settings.textContent = '打开设置';
+      settings.addEventListener('click', openSettings);
+      stack.append(retry, settings);
+      failed.appendChild(stack);
+      body.appendChild(failed);
       return;
     }
     const stage = chainStateOf(selected.id);
@@ -925,8 +951,23 @@ async function scanVault() {
   }
 }
 
+function friendlyAiError(message) {
+  const text = String(message ?? '');
+  if (/failed to fetch|networkerror|load failed/i.test(text)) {
+    return '本地模型没有响应。确认本地服务在运行，或打开设置检查地址和 Key。';
+  }
+  if (/401|403|unauthorized|forbidden/i.test(text)) {
+    return 'Key 或权限不对。打开设置检查本地模型配置。';
+  }
+  if (/timeout|timed out|超时/i.test(text)) {
+    return '模型响应超时。第一次冷启动可能较慢，可以重试。';
+  }
+  return text || 'AI 暂时没有返回结果。';
+}
+
 async function suggestFor(nodeId) {
   try {
+    state.aiError = null;
     setBusy(true);
     const result = await api(`/api/suggest?nodeId=${encodeURIComponent(nodeId)}`);
     state.suggestions = result.suggestions ?? [];
@@ -934,7 +975,9 @@ async function suggestFor(nodeId) {
     renderAI();
     if (!state.suggestions.length) toast('模型没有返回候选关系。');
   } catch (error) {
-    toast(error.message, true);
+    const message = friendlyAiError(error.message);
+    state.aiError = message;
+    toast(message, true);
   } finally {
     setBusy(false);
   }
@@ -1075,6 +1118,26 @@ for (const chip of document.querySelectorAll('.filter-chip')) {
     render();
   });
 }
+const graphSearch = $('#graph-search');
+graphSearch.addEventListener('input', () => {
+  state.query = graphSearch.value;
+  render();
+});
+document.addEventListener('keydown', (event) => {
+  const target = event.target;
+  const typing = target instanceof HTMLElement
+    && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable);
+  if (event.key === '/' && !typing) {
+    event.preventDefault();
+    graphSearch.focus();
+    graphSearch.select();
+  }
+  if (event.key === 'Escape' && state.query) {
+    state.query = '';
+    graphSearch.value = '';
+    render();
+  }
+});
 $('#capture-button').addEventListener('click', () => openModal('capture-modal'));
 $('#sprint-button').addEventListener('click', () => openModal('sprint-modal'));
 $('#sprint-submit').addEventListener('click', submitSprint);
