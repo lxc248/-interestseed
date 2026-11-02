@@ -1,6 +1,12 @@
-# InterestSeed Standalone 4.0.0
+# InterestSeed Standalone 4.0.1
 
 This zip is self-contained. It does not need the Obsidian plugin runtime.
+
+## 4.0.1 highlights
+
+- Search the graph by node title or tag; press `/` to focus, `Esc` to clear.
+- The AI panel now shows a readable error card with retry and settings actions.
+- Settings has a `测试连接` button that checks the model, endpoint and key.
 
 ```bash
 node cli.js init --vault "<vault>"

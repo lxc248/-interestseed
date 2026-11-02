@@ -166,7 +166,7 @@ Capture → Decide → Connect → Verify → Review → Next action
 
 ### 独立版（推荐）
 
-也可以直接从 [Releases](https://github.com/lxc248/-interestseed/releases) 下载 `interestseed-standalone-v4.0.0.zip`。
+也可以直接从 [Releases](https://github.com/lxc248/-interestseed/releases) 下载 `interestseed-standalone-v4.0.1.zip`。
 
 ```bash
 npm run build:standalone

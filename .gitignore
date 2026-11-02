@@ -111,6 +111,7 @@ graphs/
 !RELEASE_NOTES_3.5.0.md
 !RELEASE_NOTES_3.6.0.md
 !RELEASE_NOTES_3.7.0.md
+!RELEASE_NOTES_STANDALONE_4.0.1.md
 !COMMUNITY_SUBMISSION.md
 /1/
 /T2-B-BCF-*
@@ -156,6 +157,3 @@ promo/promo-extended-noaudio.mp4
 .interestseed/
 !standalone/dist/
 !standalone/dist/cli.js
-
-# generated copy-monitor reports
-/review/copy-monitor-*.md
