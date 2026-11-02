@@ -1,4 +1,4 @@
-﻿<div align="center">
+<div align="center">
 
 <h1>InterestSeed</h1>
 
@@ -267,6 +267,16 @@ InterestSeed 不抓取平台、不保存 cookie、不自动发布、不自动写
 ## License
 
 AGPL-3.0-only. Author: [aicoder](https://github.com/lxc248).
+
+- [LICENSE](LICENSE) — full AGPL-3.0 text
+- [NOTICE](NOTICE) — attribution and original works
+- [TRADEMARKS.md](TRADEMARKS.md) — the name, logo and brand are not licensed by AGPL
+- [COMMERCIAL_LICENSE.md](COMMERCIAL_LICENSE.md) — closed-source and hosted-use path
+- [docs/open-source-protection.md](docs/open-source-protection.md) — how the open-source and brand protection layers fit together
+
+Forks are welcome if they use a different product name and icon, preserve the
+LICENSE, NOTICE and copyright notices, disclose modifications, and link back to
+the original repository.
 
 如果你也有过“收藏了就等于学了”的错觉，欢迎试试它。  
 觉得有用就 star；发现问题就提 issue；想一起改，先读 [CONTRIBUTING.md](CONTRIBUTING.md) 和 [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)。

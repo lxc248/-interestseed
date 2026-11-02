@@ -71,6 +71,27 @@ Keep pure logic out of UI classes. Keep persistence behind repositories. Keep
 user decisions explicit. Do not let AI silently mutate discoveries or graph
 data. Prefer explicit failure over silent success.
 
+## Contribution licensing
+
+By submitting a contribution, you agree that:
+
+- your contribution is licensed under `AGPL-3.0-only`; and
+- you grant the maintainer a perpetual, worldwide, non-exclusive, royalty-free
+  license to relicense your contribution under other terms, including a
+  commercial license.
+
+This keeps the open-source project and the commercial licensing path compatible.
+If your employer owns the work, make sure you have permission to contribute.
+
+Sign off every commit with the Developer Certificate of Origin:
+
+```bash
+git commit -s -m "your message"
+```
+
+The sign-off is a statement that you wrote the contribution or have the right
+to submit it under these terms.
+
 ## Pull request checklist
 
 - [ ] `npm run verify` passes
@@ -78,6 +99,7 @@ data. Prefer explicit failure over silent success.
 - [ ] user-facing changes are reflected in README or docs
 - [ ] no new runtime dependency without a clear reason
 - [ ] no automatic graph writes or hidden network calls
+- [ ] commits are signed off (`git commit -s`)
 - [ ] screenshots are from a disposable vault and contain no personal data
 - [ ] PR description explains the user-visible effect and the tradeoff
 

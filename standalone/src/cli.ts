@@ -1,4 +1,8 @@
 #!/usr/bin/env node
+/*
+ * SPDX-License-Identifier: AGPL-3.0-only
+ * Copyright (C) 2026 aicoder
+ */
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { connectSuggestion, suggestRelations } from './ai';
