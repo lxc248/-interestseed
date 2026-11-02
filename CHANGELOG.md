@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.0.2 — Security hardening
+
+- Fixed a critical API-key exfiltration path in `/api/config/test`.
+- State-changing routes now require `application/json` and reject cross-origin requests.
+- Hardened static file serving with a real path-boundary check and security headers.
+- Updated `SECURITY.md` for standalone key storage and the MCP data surface.
+- Added the 4.0.1 security audit and the 2026-11-02 GEO audit.
+
 ## 4.0.1 — Standalone polish
 
 - Added graph search by title and tag, with `/` focus and `Esc` clear.

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { existsSync } from "node:fs";
-import { extname, join, relative, resolve } from "node:path";
+import { extname, join, relative, resolve, sep } from "node:path";
 import { mkdir, readFile, readdir, rename, rm, stat, writeFile } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
 import { createServer } from "node:http";
@@ -3297,6 +3297,15 @@ function startServer(options) {
 }
 async function route(request, response, options) {
 	const url = new URL(request.url ?? "/", `http://${request.headers.host ?? "localhost"}`);
+	if ([
+		"POST",
+		"PUT",
+		"PATCH",
+		"DELETE"
+	].includes(request.method ?? "")) {
+		if (!String(request.headers["content-type"] ?? "").toLowerCase().startsWith("application/json")) return sendJson(response, 415, { error: "Content-Type must be application/json." });
+		if (!isAllowedOrigin(request)) return sendJson(response, 403, { error: "Cross-origin request rejected." });
+	}
 	if (url.pathname === "/api/state") return sendJson(response, 200, await statePayload(options.vaultPath));
 	if (url.pathname === "/api/scan" && request.method === "POST") {
 		const result = await scanAndBuild(options.vaultPath);
@@ -3453,7 +3462,16 @@ async function route(request, response, options) {
 	if (url.pathname === "/api/config/test" && request.method === "POST") {
 		const body = await readJson(request);
 		const config = await loadConfig(options.vaultPath);
-		const baseUrl = (typeof body.baseUrl === "string" && body.baseUrl.trim() ? body.baseUrl.trim() : config.baseUrl).replace(/\/+$/, "");
+		const rawBaseUrl = typeof body.baseUrl === "string" && body.baseUrl.trim() ? body.baseUrl.trim() : config.baseUrl;
+		let baseUrl;
+		try {
+			baseUrl = normalizeHttpBaseUrl(rawBaseUrl);
+		} catch (error) {
+			return sendJson(response, 400, {
+				ok: false,
+				message: error instanceof Error ? error.message : "API 地址无效。"
+			});
+		}
 		const model = typeof body.model === "string" && body.model.trim() ? body.model.trim() : config.model;
 		const key = typeof body.apiKey === "string" && body.apiKey.trim() ? body.apiKey.trim() : await resolveApiKey(options.vaultPath, config);
 		if (!key) return sendJson(response, 400, {
@@ -3519,10 +3537,17 @@ async function route(request, response, options) {
 	}
 	if (url.pathname === "/api/graph") return sendJson(response, 200, (await loadState(options.vaultPath)).graph);
 	const filePath = url.pathname === "/" ? join(webRoot, "index.html") : join(webRoot, url.pathname);
-	if (!filePath.startsWith(webRoot)) return sendText(response, 403, "Forbidden");
+	const relativePath = relative(webRoot, filePath);
+	if (!relativePath || relativePath.startsWith("..") || relativePath.includes(`..${sep}`)) return sendText(response, 403, "Forbidden");
 	try {
 		const content = await readFile(filePath);
-		response.writeHead(200, { "Content-Type": mime(filePath) });
+		response.writeHead(200, {
+			"Content-Type": mime(filePath),
+			"X-Content-Type-Options": "nosniff",
+			"X-Frame-Options": "DENY",
+			"Referrer-Policy": "no-referrer",
+			"Content-Security-Policy": "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'"
+		});
 		response.end(content);
 	} catch {
 		sendText(response, 404, "Not found");
@@ -3598,6 +3623,30 @@ function sendJson(response, status, value) {
 function sendText(response, status, value) {
 	response.writeHead(status, { "Content-Type": "text/plain; charset=utf-8" });
 	response.end(value);
+}
+function isAllowedOrigin(request) {
+	const origin = request.headers.origin;
+	if (origin) {
+		if (origin === "null") return false;
+		try {
+			const parsed = new URL(origin);
+			return (/* @__PURE__ */ new Set([
+				"127.0.0.1",
+				"localhost",
+				"::1",
+				"[::1]"
+			])).has(parsed.hostname);
+		} catch {
+			return false;
+		}
+	}
+	const site = String(request.headers["sec-fetch-site"] ?? "");
+	return !site || site === "same-origin" || site === "none";
+}
+function normalizeHttpBaseUrl(value) {
+	const parsed = new URL(value);
+	if (parsed.protocol !== "http:" && parsed.protocol !== "https:") throw new Error("API 地址只支持 http(s)。");
+	return parsed.toString().replace(/\/+$/, "");
 }
 async function readJson(request) {
 	const chunks = [];

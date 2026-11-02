@@ -4,7 +4,8 @@
 
 | Version | Supported |
 | --- | --- |
-| 3.0.x | Yes |
+| 4.0.x standalone | Yes |
+| 3.0.x plugin | Yes |
 | 2.7.x | Best effort |
 | Older | Best effort |
 
@@ -27,13 +28,22 @@ synthetic fixtures.
 
 ## Trust boundaries
 
-InterestSeed is a local Obsidian plugin. It:
+InterestSeed is local-first. It:
 
 - does not operate a remote InterestSeed service;
 - does not require an account;
-- does not store model provider keys;
 - does not send note bodies to the Explore AI provider;
 - does not automatically mutate the graph or discoveries.
+
+Key storage differs by runtime:
+
+- the Obsidian plugin uses Obsidian SecretStorage;
+- the standalone CLI/web stores the key in `<vault>/.interestseed/key`.
+
+The standalone web server binds to `127.0.0.1` only. State-changing routes
+require `application/json` and reject cross-origin browser requests. The MCP
+server is read-only, but it can expose node summaries and source references to
+the MCP client you connect; only connect MCP clients you trust with that data.
 
 The optional DSH Agent starts a local child process and uses DSH's own model,
 tool, sandbox and permission system. DSH permissions are controlled by DSH,

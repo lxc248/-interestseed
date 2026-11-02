@@ -1,4 +1,4 @@
-# InterestSeed Standalone 4.0.1
+# InterestSeed Standalone 4.0.2
 
 This zip is self-contained. It does not need the Obsidian plugin runtime.
 
