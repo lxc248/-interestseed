@@ -221,6 +221,73 @@ async function route(
     const key = await resolveApiKey(options.vaultPath, config);
     return sendJson(response, 200, { ok: true, config, keyReady: Boolean(key) });
   }
+  if (url.pathname === '/api/config/test' && request.method === 'POST') {
+    const body = await readJson(request);
+    const config = await loadConfig(options.vaultPath);
+    const baseUrl = (typeof body.baseUrl === 'string' && body.baseUrl.trim()
+      ? body.baseUrl.trim()
+      : config.baseUrl).replace(/\/+$/, '');
+    const model = typeof body.model === 'string' && body.model.trim()
+      ? body.model.trim()
+      : config.model;
+    const key = typeof body.apiKey === 'string' && body.apiKey.trim()
+      ? body.apiKey.trim()
+      : await resolveApiKey(options.vaultPath, config);
+    if (!key) {
+      return sendJson(response, 400, { ok: false, message: '还没有配置 Key。' });
+    }
+    const started = Date.now();
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 20000);
+    try {
+      const headers = {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${key}`,
+      };
+      const models = await fetch(`${baseUrl}/models`, { headers, signal: controller.signal });
+      if (models.ok) {
+        const payload = await models.json() as { data?: unknown[] };
+        return sendJson(response, 200, {
+          ok: true,
+          mode: 'models',
+          latencyMs: Date.now() - started,
+          modelCount: Array.isArray(payload.data) ? payload.data.length : undefined,
+        });
+      }
+      const chat = await fetch(`${baseUrl}/chat/completions`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          model,
+          messages: [{ role: 'user', content: 'ping' }],
+          max_tokens: 1,
+        }),
+        signal: controller.signal,
+      });
+      if (!chat.ok) {
+        const detail = (await chat.text()).slice(0, 180);
+        return sendJson(response, 502, {
+          ok: false,
+          message: `模型返回 HTTP ${chat.status}${detail ? `：${detail}` : ''}`,
+        });
+      }
+      const payload = await chat.json() as { model?: string };
+      return sendJson(response, 200, {
+        ok: true,
+        mode: 'chat',
+        latencyMs: Date.now() - started,
+        model: payload.model ?? model,
+      });
+    } catch (error) {
+      const detail = error instanceof Error ? error.message : String(error);
+      return sendJson(response, 502, {
+        ok: false,
+        message: `连接失败：${detail}`,
+      });
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
   if (url.pathname === '/api/graph') {
     return sendJson(response, 200, (await loadState(options.vaultPath)).graph);
   }

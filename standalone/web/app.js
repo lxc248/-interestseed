@@ -19,7 +19,7 @@ async function api(path, options = {}) {
     ...options,
   });
   const body = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(body.error || `HTTP ${response.status}`);
+  if (!response.ok) throw new Error(body.error || body.message || `HTTP ${response.status}`);
   return body;
 }
 
@@ -1145,6 +1145,7 @@ $('#settings-button').addEventListener('click', openSettings);
 $('#model-badge').addEventListener('click', openSettings);
 $('#capture-submit').addEventListener('click', submitCapture);
 $('#settings-submit').addEventListener('click', saveSettings);
+$('#settings-test').addEventListener('click', testSettings);
 $('#experiment-submit').addEventListener('click', submitExperimentStart);
 $('#correction-submit').addEventListener('click', submitCorrection);
 $('#settings-clear-key').addEventListener('click', clearKey);
@@ -1181,9 +1182,35 @@ async function openSettings() {
     $('#settings-include').value = (result.config.includeFolders ?? []).join('\n');
     $('#settings-exclude').value = (result.config.excludeFolders ?? []).join('\n');
     $('#settings-include-tags').value = (result.config.includeTags ?? []).join('\n');
+    const testResult = $('#settings-test-result');
+    testResult.textContent = '';
+    testResult.className = 'hint';
     openModal('settings-modal');
   } catch (error) {
     toast(error.message, true);
+  }
+}
+
+async function testSettings() {
+  const result = $('#settings-test-result');
+  result.textContent = '正在连接…';
+  result.className = 'hint';
+  try {
+    const payload = await api('/api/config/test', {
+      method: 'POST',
+      body: JSON.stringify({
+        model: $('#settings-model').value.trim(),
+        baseUrl: $('#settings-base-url').value.trim(),
+        apiKey: $('#settings-key').value.trim() || undefined,
+      }),
+    });
+    result.textContent = payload.mode === 'models'
+      ? `连接成功 · ${payload.latencyMs}ms · ${payload.modelCount ?? '若干'} 个模型`
+      : `连接成功 · ${payload.latencyMs}ms · ${payload.model ?? '模型可用'}`;
+    result.className = 'hint settings-test-result ok';
+  } catch (error) {
+    result.textContent = error.message;
+    result.className = 'hint settings-test-result fail';
   }
 }
 
