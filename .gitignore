@@ -156,3 +156,6 @@ promo/promo-extended-noaudio.mp4
 .interestseed/
 !standalone/dist/
 !standalone/dist/cli.js
+
+# generated copy-monitor reports
+/review/copy-monitor-*.md
