@@ -1,7 +1,7 @@
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { existsSync } from 'node:fs';
 import { readFile, rm, writeFile } from 'node:fs/promises';
-import { extname, join, resolve } from 'node:path';
+import { extname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { InsightEngine } from '../../src/core/InsightEngine';
 import type { AiRelationSuggestion } from '../../src/services/ModelProvider';
@@ -58,6 +58,15 @@ async function route(
   options: ServerOptions,
 ): Promise<void> {
   const url = new URL(request.url ?? '/', `http://${request.headers.host ?? 'localhost'}`);
+  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method ?? '')) {
+    const contentType = String(request.headers['content-type'] ?? '').toLowerCase();
+    if (!contentType.startsWith('application/json')) {
+      return sendJson(response, 415, { error: 'Content-Type must be application/json.' });
+    }
+    if (!isAllowedOrigin(request)) {
+      return sendJson(response, 403, { error: 'Cross-origin request rejected.' });
+    }
+  }
   if (url.pathname === '/api/state') return sendJson(response, 200, await statePayload(options.vaultPath));
   if (url.pathname === '/api/scan' && request.method === 'POST') {
     const result = await scanAndBuild(options.vaultPath);
@@ -224,9 +233,18 @@ async function route(
   if (url.pathname === '/api/config/test' && request.method === 'POST') {
     const body = await readJson(request);
     const config = await loadConfig(options.vaultPath);
-    const baseUrl = (typeof body.baseUrl === 'string' && body.baseUrl.trim()
+    const rawBaseUrl = typeof body.baseUrl === 'string' && body.baseUrl.trim()
       ? body.baseUrl.trim()
-      : config.baseUrl).replace(/\/+$/, '');
+      : config.baseUrl;
+    let baseUrl: string;
+    try {
+      baseUrl = normalizeHttpBaseUrl(rawBaseUrl);
+    } catch (error) {
+      return sendJson(response, 400, {
+        ok: false,
+        message: error instanceof Error ? error.message : 'API 地址无效。',
+      });
+    }
     const model = typeof body.model === 'string' && body.model.trim()
       ? body.model.trim()
       : config.model;
@@ -293,10 +311,19 @@ async function route(
   }
 
   const filePath = url.pathname === '/' ? join(webRoot, 'index.html') : join(webRoot, url.pathname);
-  if (!filePath.startsWith(webRoot)) return sendText(response, 403, 'Forbidden');
+  const relativePath = relative(webRoot, filePath);
+  if (!relativePath || relativePath.startsWith('..') || relativePath.includes(`..${sep}`)) {
+    return sendText(response, 403, 'Forbidden');
+  }
   try {
     const content = await readFile(filePath);
-    response.writeHead(200, { 'Content-Type': mime(filePath) });
+    response.writeHead(200, {
+      'Content-Type': mime(filePath),
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
+      'Referrer-Policy': 'no-referrer',
+      'Content-Security-Policy': "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'",
+    });
     response.end(content);
   } catch {
     sendText(response, 404, 'Not found');
@@ -383,6 +410,30 @@ function sendText(
 ): void {
   response.writeHead(status, { 'Content-Type': 'text/plain; charset=utf-8' });
   response.end(value);
+}
+
+function isAllowedOrigin(request: IncomingMessage): boolean {
+  const origin = request.headers.origin;
+  if (origin) {
+    if (origin === 'null') return false;
+    try {
+      const parsed = new URL(origin);
+      const localHosts = new Set(['127.0.0.1', 'localhost', '::1', '[::1]']);
+      return localHosts.has(parsed.hostname);
+    } catch {
+      return false;
+    }
+  }
+  const site = String(request.headers['sec-fetch-site'] ?? '');
+  return !site || site === 'same-origin' || site === 'none';
+}
+
+function normalizeHttpBaseUrl(value: string): string {
+  const parsed = new URL(value);
+  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+    throw new Error('API 地址只支持 http(s)。');
+  }
+  return parsed.toString().replace(/\/+$/, '');
 }
 
 async function readJson(request: IncomingMessage): Promise<Record<string, unknown>> {

@@ -63,7 +63,7 @@ Set via: GitHub → Settings → Social preview
 ## Release title
 
 ```text
-InterestSeed Standalone 4.0.1 — 脱离 Obsidian，成为 Skill
+InterestSeed Standalone 4.0.2 — 脱离 Obsidian，成为 Skill
 ```
 
 ## Release body — English
@@ -84,7 +84,7 @@ Three shapes:
 The model only receives node id, title, tags, and existing edge pairs.
 It never receives note bodies, source paths, or vault contents.
 
-Download `interestseed-standalone-v4.0.1.zip`, then:
+Download `interestseed-standalone-v4.0.2.zip`, then:
 
 node cli.js init --vault "<vault>"
 node cli.js serve --vault "<vault>" --port 4173
@@ -110,7 +110,7 @@ capture → scan → 一条 AI 连接 → 3 天实验 → 证据
 只发送节点 id、标题、标签、已有关系 id 对。
 不发送笔记正文、来源路径、完整观察或 vault 内容。
 
-下载 `interestseed-standalone-v4.0.1.zip`，然后：
+下载 `interestseed-standalone-v4.0.2.zip`，然后：
 
 node cli.js init --vault "<vault>"
 node cli.js serve --vault "<vault>" --port 4173
