@@ -148,6 +148,10 @@
         <label>Key</label>
         <input id="settings-key" type="password" placeholder="留空保持不变；输入新 Key 可替换" />
         <p class="hint">Key 只写入本机 <code>.interestseed/key</code>，不会进 Web。</p>
+        <div class="settings-test">
+          <button id="settings-test" class="button ghost">测试连接</button>
+          <span id="settings-test-result" class="hint"></span>
+        </div>
         <label>只扫描这些标签（每行一个，可选）</label>
         <textarea id="settings-include-tags" placeholder="例如：focus"></textarea>
         <label>扫描目录（每行一个）</label>
