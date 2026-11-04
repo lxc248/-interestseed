@@ -105,7 +105,7 @@ Vault 内容
 ## 截图
 
 ```text
-review/experiment-3.0.8/65-ai-panel-empty.png
-review/experiment-3.0.8/66-ai-panel-suggestion.png
-review/experiment-3.0.8/67-ai-from-note.png
+archive/review/experiment-3.0.8/65-ai-panel-empty.png
+archive/review/experiment-3.0.8/66-ai-panel-suggestion.png
+archive/review/experiment-3.0.8/67-ai-from-note.png
 ```
