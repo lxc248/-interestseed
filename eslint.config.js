@@ -9,6 +9,8 @@ export default tseslint.config(
       'coverage/**',
       'archive/**',
       'promo/**',
+      'scripts/**',
+      'site/**',
       'viewer/**',
       'skill/**',
       'skills/**',
