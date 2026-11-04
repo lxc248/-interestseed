@@ -18,12 +18,14 @@
   <img alt="Local model" src="https://img.shields.io/badge/LOCAL-MODEL-22c55e?style=for-the-badge" />
   <img alt="CI" src="https://github.com/lxc248/-interestseed/actions/workflows/ci.yml/badge.svg?branch=main" />
   <img alt="Release" src="https://img.shields.io/github/v/release/lxc248/-interestseed?style=for-the-badge" />
-  <img alt="Tests" src="https://img.shields.io/badge/tests-530%20passing-22c55e?style=for-the-badge" />
+  <img alt="Tests" src="https://img.shields.io/badge/tests-531%20passing-22c55e?style=for-the-badge" />
   <img alt="Coverage" src="https://img.shields.io/badge/coverage-75.4%25-14b8a6?style=for-the-badge" />
+  <img alt="Latest" src="https://img.shields.io/badge/latest-4.0.2-d97757?style=for-the-badge" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b?style=for-the-badge" />
 </p>
 
 <p>
+  <a href="https://lxc248.github.io/-interestseed/">官网</a> ·
   <a href="README.en.md">English</a> ·
   <a href="assets/interestseed-launch.mp4">40 秒演示</a> ·
   <a href="docs/ai.md">AI 建议</a> ·
@@ -262,7 +264,26 @@ InterestSeed 不抓取平台、不保存 cookie、不自动发布、不自动写
 | [docs/context-packet.md](docs/context-packet.md) | 数据模型与任务状态 |
 | [docs/share-cards.md](docs/share-cards.md) | 分享卡导出行为 |
 | [docs/commands.md](docs/commands.md) | 命令面板参考 |
+| [docs/audits/](docs/audits/) | 当前安全、GEO 与版本审计 |
+| [site/](site/) | 官网落地页源码 |
 | [SECURITY.md](SECURITY.md) | 安全模型与漏洞披露 |
+
+## 仓库结构
+
+```text
+src/             Obsidian 插件源码
+standalone/      CLI + 本地 Web + Agent Skill
+site/            官网落地页（GitHub Pages）
+mcp/             只读 MCP server
+tests/           测试
+docs/            当前文档
+docs/audits/     当前审计报告
+assets/          README / Release / 社交预览资源
+scripts/         构建、打包、监控脚本
+archive/         旧版本、旧审计、旧截图、旧宣传素材
+```
+
+`archive/` 只用于保留历史，不参与构建，也不再维护。
 
 ## License
 

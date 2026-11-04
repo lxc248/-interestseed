@@ -18,12 +18,14 @@
   <img alt="Local model" src="https://img.shields.io/badge/LOCAL-MODEL-22c55e?style=for-the-badge" />
   <img alt="CI" src="https://github.com/lxc248/-interestseed/actions/workflows/ci.yml/badge.svg?branch=main" />
   <img alt="Release" src="https://img.shields.io/github/v/release/lxc248/-interestseed?style=for-the-badge" />
-  <img alt="Tests" src="https://img.shields.io/badge/tests-530%20passing-22c55e?style=for-the-badge" />
+  <img alt="Tests" src="https://img.shields.io/badge/tests-531%20passing-22c55e?style=for-the-badge" />
   <img alt="Coverage" src="https://img.shields.io/badge/coverage-75.4%25-14b8a6?style=for-the-badge" />
+  <img alt="Latest" src="https://img.shields.io/badge/latest-4.0.2-d97757?style=for-the-badge" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b?style=for-the-badge" />
 </p>
 
 <p>
+  <a href="https://lxc248.github.io/-interestseed/">Website</a> ·
   <a href="README.md">简体中文</a> ·
   <a href="assets/interestseed-launch.mp4">40s demo</a> ·
   <a href="docs/ai.en.md">AI suggestions</a> ·
@@ -262,7 +264,26 @@ The user keeps the decision rights.
 | [docs/context-packet.md](docs/context-packet.md) | Data model and task state |
 | [docs/share-cards.md](docs/share-cards.md) | Share-card export behavior |
 | [docs/commands.md](docs/commands.md) | Command palette reference |
+| [docs/audits/](docs/audits/) | Current security, GEO and version audits |
+| [site/](site/) | Landing page source |
 | [SECURITY.md](SECURITY.md) | Security model and disclosure |
+
+## Repository layout
+
+```text
+src/            Obsidian plugin source
+standalone/     CLI + local web + agent skill
+site/           Landing page (GitHub Pages)
+mcp/            Read-only MCP server
+tests/          Tests
+docs/           Current documentation
+docs/audits/    Current audit reports
+assets/         README / release / social assets
+scripts/        Build, package and monitor scripts
+archive/        Old releases, audits, screenshots and promo material
+```
+
+`archive/` is history only. It is not part of the build and is not maintained.
 
 ## License
 

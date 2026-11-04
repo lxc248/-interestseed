@@ -1,0 +1,9 @@
+# Current audits
+
+These are the reports that still describe the current product (4.0.x).
+Older audits are in [`../../archive/review/`](../../archive/review/).
+
+- [security-audit-4.0.1.md](security-audit-4.0.1.md) — code and security audit
+- [geo-audit-2026-11-02.md](geo-audit-2026-11-02.md) — AI visibility / GEO audit
+- [standalone-4.0.2.md](standalone-4.0.2.md) — 4.0.2 package verification
+- [version-comparison-4.0.0.md](version-comparison-4.0.0.md) — plugin vs standalone parity

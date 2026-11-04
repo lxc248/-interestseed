@@ -120,8 +120,8 @@ Day 14  发“从 0 到 1”完整案例
 ## 视频工程
 
 ```text
-promo/index.html      Canvas 逐帧渲染
-promo/render.mjs      Playwright → FFmpeg
-promo/synth_audio.py  120 BPM 配乐
+archive/promo/index.html      Canvas 逐帧渲染
+archive/promo/render.mjs      Playwright → FFmpeg
+archive/promo/synth_audio.py  120 BPM 配乐
 assets/interestseed-launch.mp4
 ```
