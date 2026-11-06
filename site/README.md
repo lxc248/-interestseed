@@ -52,3 +52,12 @@ Keep the description consistent with the repository and release notes:
 InterestSeed is a local-first interest validator for any Markdown vault.
 Local AI suggests one testable connection; a 3-day experiment decides.
 ```
+
+## Pages
+
+- `/` — immersive hero + cards + reveal
+- `/how-it-works/` — long-form explanation, install, FAQ and FAQPage schema
+- `/llms.txt` — canonical summary for AI crawlers
+- `/robots.txt` — allows search and AI crawlers
+- `/sitemap.xml` — home and how-it-works
+

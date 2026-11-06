@@ -1,0 +1,25 @@
+# InterestSeed
+
+> A local-first interest validator for any Markdown vault.
+
+InterestSeed turns saved notes into one testable connection. Your own local AI
+suggests one connection at a time; a 3-day experiment decides whether to
+continue, change direction, or drop it.
+
+## What it does
+
+- Reads any Markdown vault.
+- Uses local AI with a narrow boundary: node ids, titles, tags and existing
+  edge pairs only.
+- Suggests one connection, not a batch of pending cards.
+- Runs a 3-day experiment with one real observation per day.
+- Keeps the human in control: connect, skip, change the relation, or undo.
+- Ships as CLI, local web, agent skill and read-only MCP.
+
+## Links
+
+- Website: https://lxc248.github.io/-interestseed/
+- How it works: https://lxc248.github.io/-interestseed/how-it-works/
+- GitHub: https://github.com/lxc248/-interestseed
+- Latest release: https://github.com/lxc248/-interestseed/releases/latest
+- License: AGPL-3.0-only

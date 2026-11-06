@@ -26,6 +26,7 @@
 
 <p>
   <a href="https://lxc248.github.io/-interestseed/">官网</a> ·
+  <a href="https://lxc248.github.io/-interestseed/how-it-works/">How it works</a> ·
   <a href="README.en.md">English</a> ·
   <a href="assets/interestseed-launch.mp4">40 秒演示</a> ·
   <a href="docs/ai.md">AI 建议</a> ·
