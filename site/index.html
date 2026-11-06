@@ -323,6 +323,32 @@
 
     #content { position: relative; z-index: 2; }
 
+    .site-footer {
+      position: relative;
+      z-index: 2;
+      max-width: 72rem;
+      margin: 0 auto;
+      padding: 2rem 2.5rem 3.5rem;
+      border-top: 1px solid var(--line);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.8rem 1.5rem;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+    .site-footer .links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 1rem;
+    }
+    .site-footer a {
+      color: var(--soft);
+      text-decoration: none;
+    }
+    .site-footer a:hover { color: #fff; }
+
     @media (max-width: 768px) {
       nav { padding: 1rem 1.5rem; }
       nav .nav-links { display: none; }
@@ -423,6 +449,17 @@
         <h2>InterestSeed 4</h2>
       </div>
     </section>
+
+    <footer class="site-footer">
+      <div class="links">
+        <a href="./how-it-works/">How it works</a>
+        <a href="./3-day-interest-experiment/">3-day experiment</a>
+        <a href="./interestseed-vs-readwise/">vs Readwise</a>
+        <a href="./interestseed-vs-obsidian/">vs Obsidian</a>
+        <a href="https://github.com/lxc248/-interestseed">GitHub</a>
+      </div>
+      <div>AGPL-3.0-only · InterestSeed 4.0.2</div>
+    </footer>
   </div>
 
   <script>
