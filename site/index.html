@@ -5,6 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>InterestSeed — turn saved notes into testable interests</title>
   <meta name="description" content="InterestSeed is a local-first interest validator for any Markdown vault. Local AI suggests one testable connection; a 3-day experiment decides.">
+  <link rel="canonical" href="https://lxc248.github.io/-interestseed/" />
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="InterestSeed — turn saved notes into testable interests">
+  <meta property="og:description" content="Local AI suggests one testable connection. A 3-day experiment decides. Local-first, human-in-the-loop.">
+  <meta property="og:url" content="https://lxc248.github.io/-interestseed/">
+  <meta property="og:image" content="https://raw.githubusercontent.com/lxc248/-interestseed/main/assets/github-social-preview.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="InterestSeed">
+  <meta name="twitter:description" content="Turn saved notes into testable interests with local AI and a 3-day experiment.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "InterestSeed",
+    "applicationCategory": "ProductivityApplication",
+    "operatingSystem": "macOS, Windows, Linux",
+    "description": "A local-first interest validator for any Markdown vault. Local AI suggests one testable connection; a 3-day experiment decides.",
+    "url": "https://lxc248.github.io/-interestseed/",
+    "codeRepository": "https://github.com/lxc248/-interestseed",
+    "license": "https://www.gnu.org/licenses/agpl-3.0.html",
+    "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}
+  }
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -349,7 +372,8 @@
         <span class="logo">interestseed</span>
       </a>
       <div class="nav-links">
-        <a href="#how-it-works">How it works</a>
+        <a href="./how-it-works/">How it works</a>
+        <a href="./how-it-works/#faq">FAQ</a>
         <a href="https://github.com/lxc248/-interestseed#readme" target="_blank" rel="noreferrer">Docs</a>
       </div>
     </div>
@@ -390,7 +414,6 @@
     </section>
 
     <div style="height:150vh"></div>
-    <div id="how-it-works"></div>
     <div id="cards-trigger" style="height:200vh"></div>
     <div style="height:100vh"></div>
 
@@ -626,7 +649,12 @@
       }
 
       /* ---------- One animation loop for scroll + canvas ---------- */
+      var animationId = 0;
+
       function tick(now) {
+        animationId = 0;
+        if (document.hidden) return;
+
         var y = window.scrollY;
         if (y !== lastScrollY) {
           updateHero(y);
@@ -639,8 +667,29 @@
           lastDraw = now;
         }
 
-        if (!reduceMotion) requestAnimationFrame(tick);
+        if (!reduceMotion) startLoop();
       }
+
+      function startLoop() {
+        if (!reduceMotion && !animationId) {
+          animationId = requestAnimationFrame(tick);
+        }
+      }
+
+      function stopLoop() {
+        if (animationId) {
+          cancelAnimationFrame(animationId);
+          animationId = 0;
+        }
+      }
+
+      document.addEventListener("visibilitychange", function () {
+        if (document.hidden) stopLoop();
+        else {
+          lastDraw = 0;
+          startLoop();
+        }
+      });
 
       resizeCanvas();
       measure();
@@ -660,7 +709,7 @@
       setTimeout(measure, 300);
 
       if (!reduceMotion) {
-        requestAnimationFrame(tick);
+        startLoop();
       } else {
         window.addEventListener("scroll", function () {
           updateHero(window.scrollY);
