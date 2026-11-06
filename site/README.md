@@ -57,7 +57,11 @@ Local AI suggests one testable connection; a 3-day experiment decides.
 
 - `/` — immersive hero + cards + reveal
 - `/how-it-works/` — long-form explanation, install, FAQ and FAQPage schema
+- `/3-day-interest-experiment/` — practical experiment guide and template
+- `/interestseed-vs-readwise/` — capture vs validation comparison
+- `/interestseed-vs-obsidian/` — workspace vs validation-layer comparison
 - `/llms.txt` — canonical summary for AI crawlers
 - `/robots.txt` — allows search and AI crawlers
-- `/sitemap.xml` — home and how-it-works
+- `/sitemap.xml` — all public pages
+- `content.css` — shared stylesheet for article pages
 

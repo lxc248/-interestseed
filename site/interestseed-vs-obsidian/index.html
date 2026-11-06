@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InterestSeed vs Obsidian — workspace vs validation layer</title>
+  <meta name="description" content="Obsidian is a local Markdown workspace. InterestSeed is a validation layer that turns one saved note into a testable connection and a 3-day experiment. They can work together.">
+  <link rel="canonical" href="https://lxc248.github.io/-interestseed/interestseed-vs-obsidian/" />
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="InterestSeed vs Obsidian">
+  <meta property="og:description" content="A workspace vs a validation layer. Obsidian organizes notes; InterestSeed tests what deserves action.">
+  <meta property="og:url" content="https://lxc248.github.io/-interestseed/interestseed-vs-obsidian/">
+  <meta name="twitter:card" content="summary">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../content.css" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "InterestSeed vs Obsidian: workspace vs validation layer",
+    "description": "Obsidian is a local Markdown workspace. InterestSeed is a validation layer that tests whether a saved interest deserves action.",
+    "datePublished": "2026-11-06",
+    "dateModified": "2026-11-06",
+    "author": {"@type": "Organization", "name": "InterestSeed"},
+    "publisher": {"@type": "Organization", "name": "InterestSeed"},
+    "mainEntityOfPage": "https://lxc248.github.io/-interestseed/interestseed-vs-obsidian/"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is InterestSeed an Obsidian replacement?",
+        "acceptedAnswer": {"@type": "Answer", "text": "No. Obsidian is a general local Markdown workspace. InterestSeed is a validation layer for one specific job: turning a saved interest into a testable connection and a 3-day experiment."}
+      },
+      {
+        "@type": "Question",
+        "name": "Do I need Obsidian to use InterestSeed?",
+        "acceptedAnswer": {"@type": "Answer", "text": "No. The standalone runtime reads any Markdown vault and includes a CLI, local web dashboard, agent skill and read-only MCP server. The Obsidian plugin is optional."}
+      },
+      {
+        "@type": "Question",
+        "name": "Can InterestSeed write into my Obsidian vault?",
+        "acceptedAnswer": {"@type": "Answer", "text": "Yes, when you explicitly confirm a write. InterestSeed does not auto-write the graph, auto-publish, or generate routes without your decision."}
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header>
+    <div class="inner">
+      <a class="brand" href="../"><span class="brand-mark"></span><span>interestseed</span></a>
+      <nav>
+        <a href="../">Home</a>
+        <a href="../how-it-works/">How it works</a>
+        <a href="https://github.com/lxc248/-interestseed">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <p class="breadcrumbs"><a href="../">Home</a> / Compare / Obsidian</p>
+    <p class="eyebrow">Compare</p>
+    <h1>InterestSeed vs Obsidian</h1>
+    <p class="lede">
+      Obsidian is the workspace. InterestSeed is the validation layer. Obsidian
+      helps you organize what you know; InterestSeed helps you test whether a
+      saved interest deserves three days of your attention.
+    </p>
+    <p class="article-meta">Updated 2026-11-06 · 5 min read</p>
+
+    <h2>The short version</h2>
+    <table class="compare">
+      <tr><th>Dimension</th><th>Obsidian</th><th>InterestSeed</th></tr>
+      <tr><td>Primary job</td><td>Local Markdown notes, links, graph and plugins.</td><td>Turn one saved note into a testable connection and a decision.</td></tr>
+      <tr><td>Scope</td><td>General knowledge workspace.</td><td>One opinionated loop: capture → connect → experiment → review.</td></tr>
+      <tr><td>AI</td><td>Depending on plugins and setup.</td><td>One local suggestion; narrow context boundary.</td></tr>
+      <tr><td>Data</td><td>Your vault.</td><td>Your vault; standalone CLI or local web.</td></tr>
+      <tr><td>Best for</td><td>People who want a flexible PKM system.</td><td>People who save a lot and need a decision loop.</td></tr>
+    </table>
+
+    <h2>Where Obsidian is stronger</h2>
+    <p>
+      Obsidian is a much broader tool. It is better when you need a general
+      writing environment, a large plugin ecosystem, custom views, canvas,
+      publishing, or a system you shape yourself. InterestSeed is deliberately
+      narrower.
+    </p>
+
+    <h2>Where InterestSeed is different</h2>
+    <p>
+      InterestSeed does not try to be a better note app. It adds a small,
+      opinionated layer on top of a Markdown vault:
+    </p>
+    <ul>
+      <li>one AI-suggested connection at a time;</li>
+      <li>a 3-day experiment with one observation per day;</li>
+      <li>an explicit connect / skip / change decision;</li>
+      <li>CLI, local web, agent skill and read-only MCP over one graph.</li>
+    </ul>
+    <div class="callout">
+      If Obsidian is where you keep your notes, InterestSeed is where you test
+      whether one of them should change what you do next.
+    </div>
+
+    <h2>Do I need Obsidian?</h2>
+    <p>
+      No. The standalone runtime reads any Markdown vault. The Obsidian plugin
+      is a compatibility surface for people who already work inside Obsidian.
+      You can also use the CLI, the local web dashboard, or an agent skill.
+    </p>
+
+    <h2>Use both</h2>
+    <ol>
+      <li>Keep writing and linking notes in Obsidian.</li>
+      <li>Point InterestSeed at the same vault.</li>
+      <li>Let it suggest one connection.</li>
+      <li>Run the 3-day experiment and write the evidence back only when you confirm.</li>
+    </ol>
+    <p>
+      InterestSeed does not auto-write your graph, auto-publish, or generate
+      routes without a human decision.
+    </p>
+
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://github.com/lxc248/-interestseed/releases/latest">Try InterestSeed 4.0.2</a>
+      <a class="btn btn-secondary" href="../how-it-works/">See how it works</a>
+    </div>
+
+    <h2>FAQ</h2>
+    <details>
+      <summary>Is InterestSeed an Obsidian replacement?</summary>
+      <p>No. Obsidian is a general local Markdown workspace. InterestSeed is a validation layer for one specific job: turning a saved interest into a testable connection and a 3-day experiment.</p>
+    </details>
+    <details>
+      <summary>Do I need Obsidian to use InterestSeed?</summary>
+      <p>No. The standalone runtime reads any Markdown vault and includes a CLI, local web dashboard, agent skill and read-only MCP server. The Obsidian plugin is optional.</p>
+    </details>
+    <details>
+      <summary>Can InterestSeed write into my Obsidian vault?</summary>
+      <p>Yes, when you explicitly confirm a write. InterestSeed does not auto-write the graph, auto-publish, or generate routes without your decision.</p>
+    </details>
+
+    <div class="footer">
+      <div class="footer-nav">
+        <a href="../">Home</a>
+        <a href="../how-it-works/">How it works</a>
+        <a href="../3-day-interest-experiment/">3-day experiment</a>
+        <a href="../interestseed-vs-readwise/">vs Readwise</a>
+      </div>
+      <a href="https://github.com/lxc248/-interestseed">GitHub</a> ·
+      <a href="https://github.com/lxc248/-interestseed/releases/latest">Release</a> ·
+      <a href="https://github.com/lxc248/-interestseed/blob/main/LICENSE">AGPL-3.0</a>
+    </div>
+  </main>
+</body>
+</html>
