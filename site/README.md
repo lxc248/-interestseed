@@ -65,3 +65,7 @@ Local AI suggests one testable connection; a 3-day experiment decides.
 - `/sitemap.xml` — all public pages
 - `content.css` — shared stylesheet for article pages
 
+- `/404.html` — GitHub Pages not-found page
+- `/favicon.svg` — site icon
+- `/og.png` — 1280x640 social preview
+

@@ -249,3 +249,29 @@
   .compare { display: block; overflow-x: auto; }
   .compare th, .compare td { min-width: 11rem; }
 }
+
+/* Accessibility */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0.75rem;
+  z-index: 100;
+  background: var(--accent);
+  color: #160b07;
+  padding: 0.55rem 0.8rem;
+  border-radius: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.skip-link:focus {
+  left: 0.75rem;
+}
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
