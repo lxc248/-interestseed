@@ -1,6 +1,6 @@
 # Global assessment — 2026-11-08
 
-Strict engineering and product review of `interestseed` at `2c6b366`.
+Strict engineering and product review of `interestseed` at `112223e`.
 
 This is not a marketing score. It measures whether the project is ready to be
 treated as a mature open-source product. Evidence was collected from the
@@ -8,13 +8,13 @@ repository, CI, release, GitHub metadata, coverage and manual checks.
 
 ## Verdict
 
-**6.4 / 10 — promising, not yet mature.**
+**6.5 / 10 — promising, not yet mature.**
 
 The product idea, safety boundaries and documentation are stronger than the
-average hobby project. Coverage is now above the 80% line threshold after
-adding GraphCanvas, ShareCardRenderer and AI tests. Public-site E2E now runs in
-CI. The two hard limits remain external adoption and repository weight;
-app-level E2E, accessibility and release automation are still gaps.
+average hobby project. Coverage is now above the 80% line threshold, and both
+public-site and app-level E2E now run in CI. The two hard limits remain external
+adoption and repository weight; accessibility, visual regression, release
+automation and app depth are still gaps.
 
 | Grade | Meaning |
 | --- | --- |
@@ -29,14 +29,14 @@ app-level E2E, accessibility and release automation are still gaps.
 | Category | Weight | Score | Weighted | Why this score |
 | --- | ---: | ---: | ---: | --- |
 | Product value / differentiation | 15% | 7.0 | 1.05 | Clear “capture → one connection → 3-day experiment → evidence” loop; unproven demand |
-| Product completeness / UX | 15% | 7.0 | 1.05 | CLI, web, skill, MCP and site exist; public-site E2E gated; app E2E still missing |
+| Product completeness / UX | 15% | 7.2 | 1.08 | CLI, web, skill, MCP and site exist; site + app E2E gated; visual regression missing |
 | Code quality / maintainability | 15% | 7.0 | 1.05 | Strict TypeScript, modular layout, lint/typecheck; some large low-coverage modules |
-| Tests / QA | 15% | 7.0 | 1.05 | 580 tests, 85.50% line / 71.83% branch coverage; app E2E and axe still missing |
+| Tests / QA | 15% | 7.2 | 1.08 | 584 tests, 85.50% line / 71.83% branch coverage; axe and visual regression missing |
 | Security / privacy | 15% | 7.5 | 1.125 | Critical leak fixed, guards and body limit tested; no independent 4.0.3 audit |
 | Docs / repo hygiene | 5% | 6.5 | 0.325 | Excellent current docs and checks; 171.8 MB tree, 149.3 MB archive |
 | Release / supply chain | 10% | 6.0 | 0.60 | 4.0.3 hash and release notes; new workflow not exercised; provenance unverified |
 | Distribution / adoption | 10% | 1.5 | 0.15 | 1 star, 0 forks, 3 downloads of 4.0.3, no external citations |
-| **Total** | **100%** |  | **6.4** | **Promising, not yet mature** |
+| **Total** | **100%** |  | **6.5** | **Promising, not yet mature** |
 
 ## Evidence
 
@@ -46,12 +46,12 @@ app-level E2E, accessibility and release automation are still gaps.
 main:                 9042384
 Vitest:              564 passed
 MCP smoke:            11 passed
-Total tests:         580 passed
+Total tests:         584 passed
 Coverage statements:  82.74%
 Coverage branches:    71.83%
 Coverage functions:   85.07%
 Coverage lines:       85.50%
-Playwright E2E:       5 passed
+Playwright E2E:       9 passed
 Typecheck:            passed
 Lint:                 passed
 Build:                passed
@@ -154,15 +154,12 @@ Still open:
 
 ### P1 — engineering quality
 
-4. **Coverage is uneven.** The floor is now 81/70/84/84, but
+4. **Coverage is uneven.** The floor is now 82/71/85/85, but
    `standalone/src/server.ts` is 60.69% lines and `GraphCanvas` is 63.97%.
-5. **No app-level browser E2E / visual regression.** Public-site smoke tests now
-   run in CI, but graph interactions, modals and mobile app layout are still
-   only covered by jsdom tests.
-6. **No accessibility audit.** Skip links and focus styles are present, but no
-   axe/Lighthouse result is recorded.
-7. **Repository weight.** 171.8 MB tracked is excessive; archive media dominates.
-8. **Release workflow is new and untested.** The 4.0.3 release was assembled
+5. **No visual regression or accessibility gate.** Site and app E2E now run in
+   CI, but there is no screenshot diffing and no axe/Lighthouse result recorded.
+6. **Repository weight.** 171.8 MB tracked is excessive; archive media dominates.
+7. **Release workflow is new and untested.** The 4.0.3 release was assembled
    before the workflow existed.
 
 ## Strict score by dimension
@@ -171,22 +168,21 @@ Still open:
 | --- | ---: | --- |
 | Idea | 8.0 | Clear, differentiated, worth testing |
 | Implementation | 7.0 | Broad and coherent; uneven depth |
-| Test confidence | 7.0 | Coverage above 80% lines; E2E and branch depth still missing |
+| Test confidence | 7.2 | Coverage above 80% lines; site and app E2E gated; no visual/axe gate |
 | Security | 7.5 | Strong recent hardening; not independently audited |
 | Documentation | 8.0 | Current docs are good; archive bloat hurts repo hygiene |
 | Release discipline | 6.0 | Checksums and rules exist; automation not proven |
 | Distribution | 1.5 | Effectively zero reach |
-| **Overall** | **6.4** | **Promising prototype, not yet a mature product** |
+| **Overall** | **6.5** | **Promising prototype, not yet a mature product** |
 
 ## 30-day improvement plan
 
 ### Week 1 — quality floor
 
 - Keep the coverage floor at `81/70/84/84`; raise branches to 72.
+- Extend app E2E to cover graph selection and modal error states.
 - Add `axe` checks for the landing page and content pages.
-- Add an app-level Playwright smoke test for: load, search, filter, select node,
-  open settings, close modal.
-- Add server route coverage for capture / connect / config.
+- Add server route coverage for experiments and discoveries.
 
 ### Week 2 — repository weight
 
@@ -213,7 +209,7 @@ The project reaches “good” only when all of these are true:
 
 ```text
 coverage >= 85% lines / 72% branches
-browser app E2E and visual regression run in CI
+visual regression runs in CI
 axe passes on all public pages
 tracked tree < 40 MB
 4.0.4 released through the automated workflow
