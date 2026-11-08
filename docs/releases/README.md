@@ -4,7 +4,7 @@ The latest release is **InterestSeed Standalone 4.0.4**:
 
 - https://github.com/lxc248/-interestseed/releases/tag/standalone-v4.0.4
 - `interestseed-standalone-v4.0.4.zip`
-- SHA-256: `e2005bba0cf492c68c5a9e2b1533e2ef9be28e6102ec49636f0c8186501f3633`
+- SHA-256: `839e6421b3cadabf7c55eff4b9284a36c94c6337baffa6f483f4ca47b5cd080a`
 
 Old release notes are in [`../../archive/releases/`](../../archive/releases/).
 
