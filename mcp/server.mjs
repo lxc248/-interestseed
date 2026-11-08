@@ -53,8 +53,12 @@ function readGraph() {
 
 function readStandaloneJson(fileName) {
   const path = join(dirname(graphPath), fileName);
-  if (!existsSync(path)) return { experiments: [], discoveries: [] }[fileName] ?? [];
-  const raw = readFileSync(path, 'utf8').replace(/^\uFEFF/, '');
+  let raw;
+  try {
+    raw = readFileSync(path, 'utf8').replace(/^\uFEFF/, '');
+  } catch {
+    return { experiments: [], discoveries: [] }[fileName] ?? [];
+  }
   const parsed = JSON.parse(raw);
   if (fileName === 'experiments.json') return Array.isArray(parsed.experiments) ? parsed.experiments : [];
   if (fileName === 'discoveries.json') return Array.isArray(parsed.discoveries) ? parsed.discoveries : [];
