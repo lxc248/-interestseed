@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Exported `createInterestSeedServer()` for in-process HTTP tests.
+- Added six regression tests for content-type, null-origin, cross-origin and cross-site request guards.
+- 537 tests passing.
+
 ## 4.0.2 — Security hardening
 
 - Fixed a critical API-key exfiltration path in `/api/config/test`.
