@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 4.0.6 — Hardening and observability
 
 - Removed the local vault path from the /api/state response.
 - Added frame-ancestors, base-uri, form-action, Permissions-Policy, COOP and X-Permitted-Cross-Domain-Policies headers.
