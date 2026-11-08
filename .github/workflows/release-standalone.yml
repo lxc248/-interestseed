@@ -6,6 +6,10 @@ on:
       - 'standalone-v*'
   workflow_dispatch:
     inputs:
+      tag:
+        description: 'Tag to build, for example standalone-v4.0.4'
+        type: string
+        default: ''
       dry_run:
         description: 'Build and attest without publishing'
         type: boolean
@@ -36,7 +40,7 @@ jobs:
 
       - name: Check version and notes
         env:
-          TAG: ${{ github.ref_name }}
+          TAG: ${{ inputs.tag || github.ref_name }}
         run: |
           set -euo pipefail
           VERSION="${TAG#standalone-v}"
@@ -57,7 +61,7 @@ jobs:
         if: ${{ inputs.dry_run != true }}
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ github.ref_name }}
+          TAG: ${{ inputs.tag || github.ref_name }}
         run: |
           set -euo pipefail
           VERSION="${TAG#standalone-v}"
@@ -76,7 +80,7 @@ jobs:
         if: ${{ inputs.dry_run != true }}
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ github.ref_name }}
+          TAG: ${{ inputs.tag || github.ref_name }}
         run: |
           set -euo pipefail
           VERSION="${TAG#standalone-v}"
