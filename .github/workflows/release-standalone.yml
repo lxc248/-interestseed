@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - 'standalone-v*'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Build and attest without publishing'
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -48,6 +54,7 @@ jobs:
             release/interestseed-standalone-v*.sha256
 
       - name: Publish release assets
+        if: ${{ inputs.dry_run != true }}
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.ref_name }}
@@ -64,3 +71,18 @@ jobs:
             "release/interestseed-standalone-v${VERSION}.zip" \
             "release/interestseed-standalone-v${VERSION}.sha256" \
             --clobber
+
+      - name: Verify published asset
+        if: ${{ inputs.dry_run != true }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          VERSION="${TAG#standalone-v}"
+          mkdir -p /tmp/interestseed-release-check
+          gh release download "$TAG" --pattern "interestseed-standalone-v${VERSION}.zip" -D /tmp/interestseed-release-check
+          expected=$(cut -d' ' -f1 "release/interestseed-standalone-v${VERSION}.sha256")
+          actual=$(sha256sum "/tmp/interestseed-release-check/interestseed-standalone-v${VERSION}.zip" | cut -d' ' -f1)
+          test "$expected" = "$actual"
+          echo "Published digest verified: $actual"
