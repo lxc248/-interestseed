@@ -18,7 +18,8 @@
     "lint": "eslint .",
     "check:site": "node scripts/check-site.mjs",
     "check:docs": "node scripts/check-docs.mjs",
-    "verify": "npm run typecheck && npm run test && npm run lint && npm run check:site && npm run check:docs && npm run build",
+    "check:version": "node scripts/check-version.mjs",
+    "verify": "npm run typecheck && npm run test && npm run lint && npm run check:site && npm run check:docs && npm run check:version && npm run build",
     "deploy": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/deploy.ps1",
     "build:standalone": "vite build --config standalone/vite.config.ts",
     "standalone": "node standalone/dist/cli.js",
@@ -42,15 +43,18 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@types/node": "^26.6.5",
-    "@vitest/coverage-v8": "^5.0.5",
-    "eslint": "^10.13.0",
+    "@types/node": "^26.6.6",
+    "@vitest/coverage-v8": "^5.1.0",
+    "eslint": "^10.14.0",
     "jsdom": "^30.1.3",
     "obsidian": "^1.14.4",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.71.2",
-    "vite": "^8.3.4",
+    "typescript-eslint": "^8.72.1",
+    "vite": "^8.3.5",
     "vitest": "^5.0.5"
+  },
+  "overrides": {
+    "minimatch": "^11.0.1"
   },
   "author": "aicoder"
 }
