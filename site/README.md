@@ -73,3 +73,10 @@ Local AI suggests one testable connection; a 3-day experiment decides.
 
 - `/download/` — 4.0.3 download, checksum and install commands
 
+
+## Check
+
+```bash
+npm run check:site
+```
+Checks local links, required meta tags, JSON-LD and sitemap targets.
