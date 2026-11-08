@@ -4,7 +4,7 @@ History only. Nothing in this directory is part of the build, the release
 package, or the current documentation.
 
 ```text
-archive/releases/     old release notes (pre-4.0.2 and older plugin releases)
+archive/releases/     old release notes (pre-4.0.3 and older plugin releases)
 archive/review/       old audits, simulations, screenshots and experiments
 archive/audits/       old root-level Chinese audit reports
 archive/research/     early simulation scripts and reports
