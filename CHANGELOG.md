@@ -10,6 +10,7 @@
 - Added a 40 MB tracked-tree budget to CI.
 - Added `interestseed version` and `--version`.
 - Added `GET /api/health` with service version and local-only status.
+- Added a local-only startup warning and a friendly EADDRINUSE message.
 
 
 ## 4.0.5 — Security, accessibility and release proof
