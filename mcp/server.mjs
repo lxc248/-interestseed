@@ -21,7 +21,7 @@
  * `interestseed_get_experiment`, with the single `interestseed://next` resource.
  * Use it when the MCP client only needs the next action, not the full graph.
  */
-import { existsSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 
 const PROTOCOL_VERSION = '2026-07-28';
@@ -36,20 +36,18 @@ const graphPath = resolve(
     (existsSync(standaloneDefault) ? standaloneDefault : pluginDefault),
 );
 
-let graphCache = { mtimeMs: 0, graph: null };
 function readGraph() {
-  if (!existsSync(graphPath)) throw new Error('图谱文件不存在');
-  const stats = statSync(graphPath);
-  if (!stats.isFile()) throw new Error('图谱路径不是文件');
-  const mtimeMs = stats.mtimeMs;
-  if (graphCache.graph && graphCache.mtimeMs === mtimeMs) return graphCache.graph;
-  const raw = readFileSync(graphPath, 'utf8').replace(/^\uFEFF/, '');
+  let raw;
+  try {
+    raw = readFileSync(graphPath, 'utf8').replace(/^\uFEFF/, '');
+  } catch {
+    throw new Error('图谱文件不存在');
+  }
   const parsed = JSON.parse(raw);
   const graph = parsed?.graph && Array.isArray(parsed.graph.nodes) ? parsed.graph : parsed;
   if (!graph || !Array.isArray(graph.nodes) || !Array.isArray(graph.edges)) {
     throw new Error('图谱文件缺少 nodes / edges');
   }
-  graphCache = { mtimeMs, graph };
   return graph;
 }
 
