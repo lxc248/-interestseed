@@ -1,4 +1,4 @@
-# Distribution kit
+﻿# Distribution kit
 
 Use this file when submitting InterestSeed to directories, newsletters, awesome
 lists, or communities. Keep the claims narrow and verifiable.
@@ -62,7 +62,7 @@ Obsidian is optional; the Markdown vault is the data layer.
 ## Facts
 
 ```text
-Latest release: 4.0.2
+Latest release: 4.0.3
 License: AGPL-3.0-only
 Platform: macOS / Windows / Linux
 Runtime: Node.js
@@ -151,7 +151,8 @@ Do say:
 
 ```text
 Website: live
-Latest release: 4.0.2
+Latest release: 4.0.3
 External citations: not yet established
 Next action: submit to one directory, then measure referral traffic
 ```
+

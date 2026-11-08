@@ -1,4 +1,4 @@
-# Open Source, Brand Protected
+﻿# Open Source, Brand Protected
 
 InterestSeed is open source. That is deliberate: the code, the data model, the
 tests and the release process are public.
@@ -68,7 +68,7 @@ Users can verify a download with:
 
 ```bash
 sha256sum -c SHA256SUMS.txt
-gh attestation verify interestseed-v4.0.2.zip --repo lxc248/-interestseed
+gh attestation verify interestseed-v4.0.3.zip --repo lxc248/-interestseed
 ```
 
 ## Layer 5: commercial license
@@ -109,3 +109,4 @@ A public fork that follows the rules should be welcome:
 
 This document is not legal advice. For a real dispute, consult qualified counsel
 in the relevant jurisdiction.
+

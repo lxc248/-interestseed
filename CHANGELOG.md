@@ -1,14 +1,13 @@
 # Changelog
 
-## Unreleased
+## 4.0.3 — Security hardening follow-up
 
 - Exported `createInterestSeedServer()` for in-process HTTP tests.
 - Added six regression tests for content-type, null-origin, cross-origin and cross-site request guards.
-- Added MCP `--minimal` / `INTERESTSEED_MCP_MINIMAL=1` mode: next step and current experiment only.
-- Added MCP minimal-mode smoke tests.
-- Added static-file security-header and path-boundary regression tests.
 - Route failures now return a stable generic 500 instead of internal exception text.
+- Added MCP `--minimal` / `INTERESTSEED_MCP_MINIMAL=1` mode: next step and current experiment only.
 - MCP graph path errors (missing, directory, malformed, missing nodes/edges) return stable tool errors.
+- Added static-file security-header and path-boundary regression tests.
 - 540 Vitest tests + 11 MCP smoke tests passing.
 
 ## 4.0.2 — Security hardening

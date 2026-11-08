@@ -1,12 +1,14 @@
-# InterestSeed Standalone 4.0.2
+# InterestSeed Standalone 4.0.3
 
 This zip is self-contained. It does not need the Obsidian plugin runtime.
 
-## 4.0.1 highlights
+## 4.0.3 highlights
 
-- Search the graph by node title or tag; press `/` to focus, `Esc` to clear.
-- The AI panel now shows a readable error card with retry and settings actions.
-- Settings has a `测试连接` button that checks the model, endpoint and key.
+- Route failures return a stable generic 500; internal exception text stays on stderr.
+- MCP `--minimal` exposes only the next step and current experiment.
+- MCP graph path errors (missing, directory, malformed, incomplete) are stable tool errors.
+- Static file headers and encoded path boundaries are covered by regression tests.
+- 540 Vitest + 11 MCP smoke tests passing.
 
 ```bash
 node cli.js init --vault "<vault>"
