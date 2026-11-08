@@ -71,6 +71,9 @@ test('filters the graph with search input', async ({ page }) => {
   await page.locator('#graph-search').fill('E2E');
   await expect(page.locator('#graph')).toBeVisible();
   await expect(page.locator('#graph-search')).toHaveValue('E2E');
+  await page.locator('[data-stage="captured"]').click();
+  await expect(page.locator('[data-stage="captured"]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('[data-stage="all"]')).toHaveAttribute('aria-pressed', 'false');
 });
 
 test('starts a 3-day experiment from the selected node', async ({ page }) => {

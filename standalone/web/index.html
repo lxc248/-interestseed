@@ -49,11 +49,11 @@
           </div>
         </div>
         <div class="graph-filter" id="graph-filter">
-          <button class="filter-chip active" data-stage="all">全部</button>
-          <button class="filter-chip" data-stage="captured">收藏</button>
-          <button class="filter-chip" data-stage="connected">已连接</button>
-          <button class="filter-chip" data-stage="experimenting">实验中</button>
-          <button class="filter-chip" data-stage="reviewed">已复盘</button>
+          <button class="filter-chip active" data-stage="all" aria-pressed="true">全部</button>
+          <button class="filter-chip" data-stage="captured" aria-pressed="false">收藏</button>
+          <button class="filter-chip" data-stage="connected" aria-pressed="false">已连接</button>
+          <button class="filter-chip" data-stage="experimenting" aria-pressed="false">实验中</button>
+          <button class="filter-chip" data-stage="reviewed" aria-pressed="false">已复盘</button>
           <input id="graph-search" class="graph-search" type="search" placeholder="搜节点 / 标签…" aria-label="搜索节点或标签" />
         </div>
         <svg id="graph" viewBox="0 0 820 560" role="img" aria-label="兴趣链路星图"></svg>
