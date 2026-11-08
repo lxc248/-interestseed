@@ -18,7 +18,7 @@ export interface EnqueueResult {
 }
 
 function normalizeKey(text: string): string {
-  const url = text.match(/https?:\/\/[^\s]+/i)?.[0];
+  const url = text.split(/\s+/).find((part) => /^https?:\/\//i.test(part));
   if (url) return url.replace(/[?#].*$/, '').replace(/\/+$/, '').toLowerCase();
   return text.replace(/\s+/g, ' ').trim().toLowerCase();
 }

@@ -29,10 +29,10 @@ const PLATFORM_RULES: Array<{
   label: string;
   test: RegExp;
 }> = [
-  { platform: 'douyin', label: '抖音', test: /douyin\.com|iesdouyin\.com/i },
-  { platform: 'xiaohongshu', label: '小红书', test: /xiaohongshu\.com|xhslink\.com|rednote\.com/i },
-  { platform: 'bilibili', label: 'B 站', test: /bilibili\.com|b23\.tv/i },
-  { platform: 'youtube', label: 'YouTube', test: /youtube\.com|youtu\.be/i },
+  { platform: 'douyin', label: '抖音', test: /(?:^|\s)(?:https?:\/\/)?(?:[^/\s]+\.)?douyin\.com(?:\/|\s|$)/i },
+  { platform: 'xiaohongshu', label: '小红书', test: /(?:^|\s)(?:https?:\/\/)?(?:[^/\s]+\.)?(?:xiaohongshu\.com|xhslink\.com|rednote\.com)(?:\/|\s|$)/i },
+  { platform: 'bilibili', label: 'B 站', test: /(?:^|\s)(?:https?:\/\/)?(?:[^/\s]+\.)?(?:bilibili\.com|b23\.tv)(?:\/|\s|$)/i },
+  { platform: 'youtube', label: 'YouTube', test: /(?:^|\s)(?:https?:\/\/)?(?:[^/\s]+\.)?(?:youtube\.com|youtu\.be)(?:\/|\s|$)/i },
   { platform: 'web', label: '网页', test: /https?:\/\//i },
 ];
 

@@ -13,6 +13,7 @@
 - Added friendly HTTP 429 messages using Retry-After, including the config connection test.
 - Excluded generated bundles and archived code from CodeQL scans.
 - Removed MCP graph and JSON read exists/stat races.
+- Fixed CodeQL findings in the site server, share analysis, inbox normalization and simulation temp file.
 - Added a CI check that `interestseed version` and `--version` match package.json.
 
 

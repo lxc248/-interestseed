@@ -1,6 +1,6 @@
 import { createServer } from 'node:http';
-import { readFile, stat } from 'node:fs/promises';
-import { extname, join, normalize, resolve } from 'node:path';
+import { readFile } from 'node:fs/promises';
+import { extname, normalize, resolve } from 'node:path';
 
 const root = resolve(process.cwd(), 'site');
 const port = Number(process.env.PORT ?? 4173);
@@ -29,12 +29,13 @@ createServer(async (request, response) => {
       response.writeHead(403).end('Forbidden');
       return;
     }
-    const info = await stat(file).catch(() => null);
-    if (!info?.isFile()) {
+    let body;
+    try {
+      body = await readFile(file);
+    } catch {
       response.writeHead(404).end('Not found');
       return;
     }
-    const body = await readFile(file);
     response.writeHead(200, {
       'Content-Type': TYPES[extname(file)] ?? 'application/octet-stream',
       'Cache-Control': 'no-store',

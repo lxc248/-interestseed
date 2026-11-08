@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { writeFileSync } from 'node:fs';
+import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -308,8 +308,9 @@ describe('20-user daily-life simulation', () => {
       elapsedMs: Math.round(elapsed),
       summary,
     }, null, 2));
+    const summaryDir = mkdtempSync(join(tmpdir(), 'interestseed-simulation-'));
     writeFileSync(
-      join(tmpdir(), 'interestseed-simulation-summary.json'),
+      join(summaryDir, 'summary.json'),
       JSON.stringify({ users: results.length, totalDiscoveries, feedbackEvents, undoEvents, elapsedMs: Math.round(elapsed), summary }, null, 2),
       'utf8',
     );
