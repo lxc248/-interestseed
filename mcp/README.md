@@ -14,6 +14,24 @@ node mcp/server.mjs --graph "/path/to/vault/.obsidian/plugins/interestseed/graph
 INTERESTSEED_GRAPH="/path/to/.../graphs/default.json" node mcp/server.mjs
 ```
 
+最小暴露模式：
+
+```bash
+node mcp/server.mjs --minimal --graph "/path/to/vault/.interestseed/state.json"
+# 或
+INTERESTSEED_MCP_MINIMAL=1 INTERESTSEED_GRAPH="..." node mcp/server.mjs
+```
+
+minimal 模式只暴露：
+
+```text
+tools:     interestseed_next_step, interestseed_get_experiment
+resources: interestseed://next
+prompts:   无
+```
+
+适合只需要“下一步”和当前实验、不需要完整图谱上下文的 MCP 客户端。
+
 ## Claude Desktop / Cursor / DSH 配置
 
 ```json
@@ -49,6 +67,8 @@ interestseed://graph
 interestseed://experiment
 interestseed://next
 interestseed://context
+interestseed://experiments
+interestseed://discoveries
 ```
 
 ## Prompts
@@ -65,6 +85,8 @@ MCP 2026-07-28
 ```
 
 保留 tools，同时提供 resources 和 prompts；仍然是只读。
+
+`--minimal` 会关闭完整图谱、context、实验列表、发现列表和 prompts，只保留下一步与当前实验。
 
 ## 示例问题
 
@@ -87,4 +109,4 @@ MCP 2026-07-28
 
 ## 版本
 
-随插件版本发布；当前 `2.7.x`。
+随插件版本发布；当前 `4.0.2`。

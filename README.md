@@ -19,7 +19,7 @@
   <img alt="Local model" src="https://img.shields.io/badge/LOCAL-MODEL-22c55e?style=for-the-badge" />
   <img alt="CI" src="https://github.com/lxc248/-interestseed/actions/workflows/ci.yml/badge.svg?branch=main" />
   <img alt="Release" src="https://img.shields.io/github/v/release/lxc248/-interestseed?style=for-the-badge" />
-  <img alt="Tests" src="https://img.shields.io/badge/tests-537%20passing-22c55e?style=for-the-badge" />
+  <img alt="Tests" src="https://img.shields.io/badge/tests-544%20passing-22c55e?style=for-the-badge" />
   <img alt="Coverage" src="https://img.shields.io/badge/coverage-75.4%25-14b8a6?style=for-the-badge" />
   <img alt="Latest" src="https://img.shields.io/badge/latest-4.0.2-d97757?style=for-the-badge" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b?style=for-the-badge" />
@@ -208,9 +208,17 @@ node mcp/server.mjs --graph "<vault>/.obsidian/plugins/interestseed/graphs/defau
 
 ```text
 tools:      interestseed_get_graph / next_step / search_interest / get_experiment / get_context
-resources:  interestseed://graph / experiment / next / context
+resources:  interestseed://graph / experiment / next / context / experiments / discoveries
 prompts:    review-interest / plan-next-experiment
 ```
+
+最小暴露模式：
+
+```bash
+node mcp/server.mjs --minimal --graph "<vault>/.interestseed/state.json"
+```
+
+`--minimal` 只暴露 `next_step`、`get_experiment` 和 `interestseed://next`，不暴露完整图谱、context、实验列表、发现列表和 prompts。
 
 MCP 是只读的。核心功能不需要账号或模型凭据。  
 AI 关系建议默认开启，只在你点击 AI 时请求所选模型；接入引导窗口可以填写自己的本地服务 Key，模型 ID 可在设置里改成服务实际暴露的 ID；密钥存进 Obsidian 安全存储，不进入 data.json。不可用时会自动保留本地规则发现。  

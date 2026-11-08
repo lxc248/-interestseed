@@ -24,7 +24,12 @@ function runServer(input, options = {}) {
     ],
   });
   writeFileSync(graph, `${options.bom ? '\uFEFF' : ''}${payload}`);
-  const result = spawnSync(process.execPath, [server, '--graph', graph], {
+  const result = spawnSync(process.execPath, [
+    server,
+    ...(options.minimal ? ['--minimal'] : []),
+    '--graph',
+    graph,
+  ], {
     input: input.join('\n'),
     encoding: 'utf8',
     windowsHide: true,
@@ -77,4 +82,44 @@ test('keeps serving after malformed JSON', () => {
   ]);
   assert.equal(lines[0].error.code, -32700);
   assert.equal(lines[1].result.protocolVersion, '2026-07-28');
+});
+
+test('minimal mode exposes only next-step and experiment', () => {
+  const { lines } = runServer([
+    JSON.stringify({ jsonrpc: '2.0', id: 6, method: 'initialize', params: {} }),
+    JSON.stringify({ jsonrpc: '2.0', id: 7, method: 'tools/list', params: {} }),
+    JSON.stringify({ jsonrpc: '2.0', id: 8, method: 'resources/list', params: {} }),
+    JSON.stringify({ jsonrpc: '2.0', id: 9, method: 'prompts/list', params: {} }),
+  ], { minimal: true });
+
+  assert.deepEqual(
+    lines[1].result.tools.map((tool) => tool.name),
+    ['interestseed_next_step', 'interestseed_get_experiment'],
+  );
+  assert.deepEqual(
+    lines[2].result.resources.map((resource) => resource.uri),
+    ['interestseed://next'],
+  );
+  assert.equal(lines[3].result.prompts.length, 0);
+});
+
+test('minimal mode rejects full graph and prompt access', () => {
+  const { lines } = runServer([
+    JSON.stringify({ jsonrpc: '2.0', id: 10, method: 'tools/call', params: { name: 'interestseed_get_graph', arguments: {} } }),
+    JSON.stringify({ jsonrpc: '2.0', id: 11, method: 'resources/read', params: { uri: 'interestseed://graph' } }),
+    JSON.stringify({ jsonrpc: '2.0', id: 12, method: 'prompts/get', params: { name: 'review-interest', arguments: {} } }),
+  ], { minimal: true });
+
+  assert.match(lines[0].result.content[0].text, /InterestSeed MCP 错误/);
+  assert.equal(lines[1].error.code, -32602);
+  assert.equal(lines[2].error.code, -32602);
+});
+
+test('minimal mode still returns the next step', () => {
+  const { lines } = runServer([
+    JSON.stringify({ jsonrpc: '2.0', id: 13, method: 'tools/call', params: { name: 'interestseed_next_step', arguments: {} } }),
+  ], { minimal: true });
+
+  const payload = JSON.parse(lines[0].result.content[0].text);
+  assert.equal(payload.action, 'capture_spark');
 });

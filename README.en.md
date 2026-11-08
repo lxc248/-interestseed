@@ -19,7 +19,7 @@
   <img alt="Local model" src="https://img.shields.io/badge/LOCAL-MODEL-22c55e?style=for-the-badge" />
   <img alt="CI" src="https://github.com/lxc248/-interestseed/actions/workflows/ci.yml/badge.svg?branch=main" />
   <img alt="Release" src="https://img.shields.io/github/v/release/lxc248/-interestseed?style=for-the-badge" />
-  <img alt="Tests" src="https://img.shields.io/badge/tests-537%20passing-22c55e?style=for-the-badge" />
+  <img alt="Tests" src="https://img.shields.io/badge/tests-544%20passing-22c55e?style=for-the-badge" />
   <img alt="Coverage" src="https://img.shields.io/badge/coverage-75.4%25-14b8a6?style=for-the-badge" />
   <img alt="Latest" src="https://img.shields.io/badge/latest-4.0.2-d97757?style=for-the-badge" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b?style=for-the-badge" />
@@ -208,9 +208,17 @@ node mcp/server.mjs --graph "<vault>/.obsidian/plugins/interestseed/graphs/defau
 
 ```text
 tools:      interestseed_get_graph / next_step / search_interest / get_experiment / get_context
-resources:  interestseed://graph / experiment / next / context
+resources:  interestseed://graph / experiment / next / context / experiments / discoveries
 prompts:    review-interest / plan-next-experiment
 ```
+
+Minimal exposure:
+
+```bash
+node mcp/server.mjs --minimal --graph "<vault>/.interestseed/state.json"
+```
+
+`--minimal` exposes only `next_step`, `get_experiment` and `interestseed://next`; the full graph, context, experiment list, discoveries and prompts stay off.
 
 The MCP surface is read-only. Core functionality needs no account or model credentials.  
 AI relation suggestions are on by default and only call the selected model when you ask. A setup window lets you connect your own local service key, and the model ID can be changed in settings; it lives in Obsidian SecretStorage, never in data.json. If unavailable, local rule discovery stays intact.  
