@@ -1,6 +1,6 @@
 # Global assessment — 2026-11-08
 
-Strict engineering and product review of `interestseed` at `5cfbec7`.
+Strict engineering and product review of `interestseed` at `9042384`.
 
 This is not a marketing score. It measures whether the project is ready to be
 treated as a mature open-source product. Evidence was collected from the
@@ -31,9 +31,9 @@ automation are still gaps.
 | Product value / differentiation | 15% | 7.0 | 1.05 | Clear “capture → one connection → 3-day experiment → evidence” loop; unproven demand |
 | Product completeness / UX | 15% | 7.0 | 1.05 | CLI, web, skill, MCP and site exist; no browser E2E or accessibility audit |
 | Code quality / maintainability | 15% | 7.0 | 1.05 | Strict TypeScript, modular layout, lint/typecheck; some large low-coverage modules |
-| Tests / QA | 15% | 7.0 | 1.05 | 570 tests, 84.81% line / 70.77% branch coverage; E2E and axe still missing |
+| Tests / QA | 15% | 7.0 | 1.05 | 575 tests, 85.50% line / 71.83% branch coverage; E2E and axe still missing |
 | Security / privacy | 15% | 7.5 | 1.125 | Critical leak fixed, guards and body limit tested; no independent 4.0.3 audit |
-| Docs / repo hygiene | 5% | 6.5 | 0.325 | Excellent current docs and checks; 215 MB tree, 192.6 MB archive |
+| Docs / repo hygiene | 5% | 6.5 | 0.325 | Excellent current docs and checks; 171.8 MB tree, 149.3 MB archive |
 | Release / supply chain | 10% | 6.0 | 0.60 | 4.0.3 hash and release notes; new workflow not exercised; provenance unverified |
 | Distribution / adoption | 10% | 1.5 | 0.15 | 1 star, 0 forks, 3 downloads of 4.0.3, no external citations |
 | **Total** | **100%** |  | **6.4** | **Promising, not yet mature** |
@@ -43,14 +43,14 @@ automation are still gaps.
 ### Engineering
 
 ```text
-main:                 5cfbec7
-Vitest:              559 passed
+main:                 9042384
+Vitest:              564 passed
 MCP smoke:            11 passed
-Total tests:         570 passed
-Coverage statements:  81.98%
-Coverage branches:    70.77%
-Coverage functions:   84.72%
-Coverage lines:       84.81%
+Total tests:         575 passed
+Coverage statements:  82.74%
+Coverage branches:    71.83%
+Coverage functions:   85.07%
+Coverage lines:       85.50%
 Typecheck:            passed
 Lint:                 passed
 Build:                passed
@@ -63,7 +63,7 @@ Low-coverage areas that still matter:
 
 ```text
 src/ui/GraphCanvas.ts          63.97% lines
-standalone/src/server.ts       44.54% lines
+standalone/src/server.ts       60.69% lines
 standalone/src/state.ts        71.42% lines
 ```
 
@@ -80,10 +80,10 @@ Site manual FPS:      ~61 fps at 1440×1000
 ### Repository weight
 
 ```text
-Tracked tree:         215 MB
-archive/:             192.6 MB (459 files)
+Tracked tree:         171.8 MB
+archive/:             149.3 MB (455 files)
 assets/:              20.2 MB (13 files)
-largest file:         archive/promo/interestseed-launch-extended.mp4 (16 MB)
+largest file:         assets/interestseed-launch.mp4 (10.9 MB)
 ```
 
 This is a serious fork/clone and CI-cache cost. The current tree is larger than
@@ -154,12 +154,12 @@ Still open:
 ### P1 — engineering quality
 
 4. **Coverage is uneven.** The floor is now 81/70/84/84, but
-   `standalone/src/server.ts` is 44.54% lines and `GraphCanvas` is 63.97%.
+   `standalone/src/server.ts` is 60.69% lines and `GraphCanvas` is 63.97%.
 5. **No browser E2E / visual regression.** Static checks cannot catch a broken
    graph interaction, modal, drag, filter or mobile layout.
 6. **No accessibility audit.** Skip links and focus styles are present, but no
    axe/Lighthouse result is recorded.
-7. **Repository weight.** 215 MB tracked is excessive; archive media dominates.
+7. **Repository weight.** 171.8 MB tracked is excessive; archive media dominates.
 8. **Release workflow is new and untested.** The 4.0.3 release was assembled
    before the workflow existed.
 

@@ -7,6 +7,7 @@
 - Added GraphCanvas runtime tests for load, selection, focus, viewport and empty graph.
 - Added ShareCardRenderer preset, caption and canvas rendering tests.
 - Added standalone server route tests for state, config, capture, inbox and connect guards.
+- Removed duplicate promo videos, a source WAV and an unreferenced GIF; tracked tree is now 171.8 MB.
 - Added a 1 MiB request body limit; oversized bodies return 413.
 - Added coverage thresholds to prevent quality regression.
 - Pinned `minimatch` through npm overrides; `npm audit` now reports 0 vulnerabilities.
