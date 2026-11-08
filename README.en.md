@@ -21,7 +21,7 @@
   <img alt="Release" src="https://img.shields.io/github/v/release/lxc248/-interestseed?style=for-the-badge" />
   <img alt="Tests" src="https://img.shields.io/badge/tests-601%20passing-22c55e?style=for-the-badge" />
   <img alt="Coverage" src="https://img.shields.io/badge/coverage-75.4%25-14b8a6?style=for-the-badge" />
-  <img alt="Latest" src="https://img.shields.io/badge/latest-4.0.4-d97757?style=for-the-badge" />
+  <img alt="Latest" src="https://img.shields.io/badge/latest-4.0.5-d97757?style=for-the-badge" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b?style=for-the-badge" />
 </p>
 
@@ -170,7 +170,7 @@ These aren't a feature checklist. They're the moves I actually make every day.
 
 ### Standalone (recommended)
 
-Or download `interestseed-standalone-v4.0.4.zip` from [Releases](https://github.com/lxc248/-interestseed/releases).
+Or download `interestseed-standalone-v4.0.5.zip` from [Releases](https://github.com/lxc248/-interestseed/releases).
 
 ```bash
 npm run build:standalone

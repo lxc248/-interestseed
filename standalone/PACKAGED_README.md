@@ -1,13 +1,14 @@
-# InterestSeed Standalone 4.0.4
+# InterestSeed Standalone 4.0.5
 
 This zip is self-contained. It does not need the Obsidian plugin runtime.
 
-## 4.0.4 highlights
+## 4.0.5 highlights
 
 - 1 MiB request-body limit; oversized bodies return 413.
-- 593-test quality gate: 564 Vitest + 11 MCP smoke + 18 Playwright E2E.
-- Public site, app flow and axe WCAG 2A/2AA checks run in CI.
-- Version consistency and release references are validated in CI.
+- 601-test quality gate: 570 Vitest + 11 MCP smoke + 20 Playwright E2E.
+- CodeQL, axe WCAG 2A/2AA zero-violation and npm audit gates run in CI.
+- Deterministic ZIP packaging; the same source produces the same SHA-256.
+- API responses use no-store, nosniff, no-referrer and same-origin policies.
 - Route failures return a stable generic 500; internal exception text stays on stderr.
 
 ```bash
