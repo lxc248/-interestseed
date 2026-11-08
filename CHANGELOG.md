@@ -9,12 +9,13 @@
 - Added standalone server route tests for state, config, capture, inbox and connect guards.
 - Added 5 Playwright site E2E checks for navigation, download asset, content pages, mobile overflow and llms-full.
 - Added 4 Playwright app E2E checks for load, settings, capture and inbox.
+- Added axe WCAG 2A/2AA checks across public pages, app shell and settings/capture modals; added missing form labels.
 - Removed duplicate promo videos, a source WAV and an unreferenced GIF; tracked tree is now 171.8 MB.
 - Added a 1 MiB request body limit; oversized bodies return 413.
 - Added coverage thresholds to prevent quality regression.
 - Pinned `minimatch` through npm overrides; `npm audit` now reports 0 vulnerabilities.
 - Fixed `llms-full.txt` version drift and added it to the version check.
-- 564 Vitest + 11 MCP smoke + 9 Playwright E2E tests passing.
+- 564 Vitest + 11 MCP smoke + 18 Playwright E2E tests passing.
 
 ## 4.0.3 — Security hardening follow-up
 
