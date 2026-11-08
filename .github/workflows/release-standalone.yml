@@ -86,3 +86,9 @@ jobs:
           actual=$(sha256sum "/tmp/interestseed-release-check/interestseed-standalone-v${VERSION}.zip" | cut -d' ' -f1)
           test "$expected" = "$actual"
           echo "Published digest verified: $actual"
+
+      - name: Verify release metadata and attestation
+        if: ${{ inputs.dry_run != true }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: npm run check:release
