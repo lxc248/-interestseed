@@ -1,10 +1,10 @@
 # Releases
 
-The latest release is **InterestSeed Standalone 4.0.2**:
+The latest release is **InterestSeed Standalone 4.0.3**:
 
-- https://github.com/lxc248/-interestseed/releases/tag/standalone-v4.0.2
-- `interestseed-standalone-v4.0.2.zip`
-- SHA-256: `4606b74ae69939b7be6544fe4a8e5d4cc99664209623b41a52180f5874acc8c5`
+- https://github.com/lxc248/-interestseed/releases/tag/standalone-v4.0.3
+- `interestseed-standalone-v4.0.3.zip`
+- SHA-256: `d3bb3dad973345b8b1d420411d875c1349bd482858d28c584b12117cbcbbc9ff`
 
 Old release notes are in [`../../archive/releases/`](../../archive/releases/).
 
@@ -14,3 +14,4 @@ Old release notes are in [`../../archive/releases/`](../../archive/releases/).
   an existing one.
 - Every release asset is covered by `SHA256SUMS.txt`.
 - Release workflows run from CI, not a maintainer machine.
+
