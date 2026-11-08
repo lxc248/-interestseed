@@ -13,8 +13,7 @@ for (const path of pages) {
   test(`site a11y ${path}`, async ({ page }) => {
     await page.goto(path);
     const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
-    const serious = results.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
-    expect(serious).toEqual([]);
+    expect(results.violations).toEqual([]);
   });
 }
 
@@ -41,29 +40,26 @@ test.afterAll(async () => {
   await rm(appVault, { recursive: true, force: true });
 });
 
-test('app home has no serious accessibility violations', async ({ page }) => {
+test('app home has no accessibility violations', async ({ page }) => {
   await page.goto(appBase);
   const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
-  const serious = results.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
-  expect(serious).toEqual([]);
+  expect(results.violations).toEqual([]);
 });
 
-test('settings modal has no serious accessibility violations', async ({ page }) => {
+test('settings modal has no accessibility violations', async ({ page }) => {
   await page.goto(appBase);
   await page.locator('#settings-button').click();
   await expect(page.locator('#settings-modal')).toBeVisible();
   const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
-  const serious = results.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
-  expect(serious).toEqual([]);
+  expect(results.violations).toEqual([]);
 });
 
-test('capture modal has no serious accessibility violations', async ({ page }) => {
+test('capture modal has no accessibility violations', async ({ page }) => {
   await page.goto(appBase);
   await page.locator('#capture-button').click();
   await expect(page.locator('#capture-modal')).toBeVisible();
   const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
-  const serious = results.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
-  expect(serious).toEqual([]);
+  expect(results.violations).toEqual([]);
 });
 
 
