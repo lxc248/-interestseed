@@ -36,7 +36,7 @@ jobs:
       - run: npm run build:standalone
 
       - name: Package standalone
-        run: pwsh -NoProfile -File scripts/package-standalone.ps1
+        run: node scripts/package-standalone.mjs
 
       - name: Check version and notes
         env:
