@@ -61,8 +61,41 @@ if (!releaseResponse.ok) {
       errors.push(`attestation lookup: HTTP ${attestationResponse.status}`);
     } else {
       const attestations = await attestationResponse.json();
-      if (!Array.isArray(attestations.attestations) || attestations.attestations.length === 0) {
+      const first = attestations.attestations?.[0];
+      if (!first) {
         errors.push('no build provenance attestation found');
+      } else {
+        try {
+          const statement = JSON.parse(
+            Buffer.from(first.bundle.dsseEnvelope.payload, 'base64').toString('utf8'),
+          );
+          const zipDigest = String(zip.digest).replace(/^sha256:/, '');
+          const zipSubject = statement.subject?.find(
+            (subject) => subject.name === zip.name && subject.digest?.sha256 === zipDigest,
+          );
+          if (!zipSubject) {
+            errors.push('attestation subject does not match the release zip');
+          }
+          if (checksum?.digest) {
+            const checksumDigest = String(checksum.digest).replace(/^sha256:/, '');
+            const checksumSubject = statement.subject?.find(
+              (subject) =>
+                subject.name === checksum.name && subject.digest?.sha256 === checksumDigest,
+            );
+            if (!checksumSubject) {
+              errors.push('attestation subject does not match the checksum asset');
+            }
+          }
+          const workflow = statement.predicate?.buildDefinition?.externalParameters?.workflow;
+          if (workflow?.ref !== `refs/tags/${tag}`) {
+            errors.push(`attestation workflow ref ${workflow?.ref ?? '(missing)'} != refs/tags/${tag}`);
+          }
+          if (!String(workflow?.path ?? '').endsWith('release-standalone.yml')) {
+            errors.push('attestation workflow is not release-standalone.yml');
+          }
+        } catch {
+          errors.push('attestation payload is not valid JSON');
+        }
       }
     }
   }
