@@ -15,7 +15,7 @@
 - Added coverage thresholds to prevent quality regression.
 - Pinned `minimatch` through npm overrides; `npm audit` now reports 0 vulnerabilities.
 - Fixed `llms-full.txt` version drift and added it to the version check.
-- Published 4.0.4 through the automated workflow; added `npm run check:release` for published asset digest and provenance verification.
+- Published 4.0.4 through the automated workflow; added `npm run check:release` for published asset digest, attestation subject and workflow verification.
 - 564 Vitest + 11 MCP smoke + 18 Playwright E2E tests passing.
 
 ## 4.0.3 — Security hardening follow-up
