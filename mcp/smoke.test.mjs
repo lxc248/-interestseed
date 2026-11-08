@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -11,7 +11,7 @@ const server = fileURLToPath(new URL('./server.mjs', import.meta.url));
 
 function runServer(input, options = {}) {
   const dir = mkdtempSync(join(tmpdir(), 'interestseed-mcp-'));
-  const graph = join(dir, 'graph.json');
+  const graph = options.graphPath || join(dir, 'graph.json');
   const payload = JSON.stringify({
     schemaVersion: 2,
     updatedAt: '2026-01-01T00:00:00.000Z',
@@ -23,7 +23,11 @@ function runServer(input, options = {}) {
       { id: 'e1', source: 'a', target: 'b', relation: '引出', origin: 'user', status: 'confirmed', createdAt: '', updatedAt: '' },
     ],
   });
-  writeFileSync(graph, `${options.bom ? '\uFEFF' : ''}${payload}`);
+  if (options.graphDirectory) {
+    mkdirSync(graph);
+  } else if (options.graphContent !== null) {
+    writeFileSync(graph, `${options.bom ? '\uFEFF' : ''}${options.graphContent ?? payload}`);
+  }
   const result = spawnSync(process.execPath, [
     server,
     ...(options.minimal ? ['--minimal'] : []),
@@ -122,4 +126,45 @@ test('minimal mode still returns the next step', () => {
 
   const payload = JSON.parse(lines[0].result.content[0].text);
   assert.equal(payload.action, 'capture_spark');
+});
+
+test('missing graph returns a stable tool error', () => {
+  const { lines } = runServer([
+    JSON.stringify({ jsonrpc: '2.0', id: 14, method: 'tools/call', params: { name: 'interestseed_next_step', arguments: {} } }),
+  ], { graphContent: null });
+
+  const text = lines[0].result.content[0].text;
+  assert.equal(lines[0].result.isError, true);
+  assert.match(text, /InterestSeed MCP 错误/);
+  assert.doesNotMatch(text, /ENOENT|no such file|graph\.json|图谱文件/i);
+});
+
+test('malformed graph returns a stable tool error', () => {
+  const { lines } = runServer([
+    JSON.stringify({ jsonrpc: '2.0', id: 15, method: 'tools/call', params: { name: 'interestseed_next_step', arguments: {} } }),
+  ], { graphContent: 'not json' });
+
+  const text = lines[0].result.content[0].text;
+  assert.equal(lines[0].result.isError, true);
+  assert.doesNotMatch(text, /SyntaxError|Unexpected token|not json/i);
+});
+
+test('graph without nodes or edges returns a stable tool error', () => {
+  const { lines } = runServer([
+    JSON.stringify({ jsonrpc: '2.0', id: 16, method: 'tools/call', params: { name: 'interestseed_next_step', arguments: {} } }),
+  ], { graphContent: JSON.stringify({ nodes: [] }) });
+
+  const text = lines[0].result.content[0].text;
+  assert.equal(lines[0].result.isError, true);
+  assert.doesNotMatch(text, /nodes|edges|图谱文件缺少/i);
+});
+
+test('directory graph path returns a stable tool error', () => {
+  const { lines } = runServer([
+    JSON.stringify({ jsonrpc: '2.0', id: 17, method: 'tools/call', params: { name: 'interestseed_next_step', arguments: {} } }),
+  ], { graphDirectory: true });
+
+  const text = lines[0].result.content[0].text;
+  assert.equal(lines[0].result.isError, true);
+  assert.doesNotMatch(text, /EISDIR|is a directory|graph\.json/i);
 });

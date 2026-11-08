@@ -45,7 +45,9 @@ require `application/json` and reject cross-origin browser requests. The MCP
 server is read-only, but it can expose node summaries and source references to
 the MCP client you connect; only connect MCP clients you trust with that data.
 Use `--minimal` or `INTERESTSEED_MCP_MINIMAL=1` to expose only the next step
-and current experiment instead of the full graph.
+and current experiment instead of the full graph. Missing, directory, malformed
+or incomplete graph files are returned as stable MCP tool errors; filesystem
+details stay on stderr.
 
 Regression coverage lives in `tests/standaloneServerSecurity.test.ts`: non-JSON
 requests return 415, null/cross-origin/cross-site requests return 403, localhost
