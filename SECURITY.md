@@ -44,6 +44,8 @@ The standalone web server binds to `127.0.0.1` only. State-changing routes
 require `application/json` and reject cross-origin browser requests. The MCP
 server is read-only, but it can expose node summaries and source references to
 the MCP client you connect; only connect MCP clients you trust with that data.
+Use `--minimal` or `INTERESTSEED_MCP_MINIMAL=1` to expose only the next step
+and current experiment instead of the full graph.
 
 Regression coverage lives in `tests/standaloneServerSecurity.test.ts`: non-JSON
 requests return 415, null/cross-origin/cross-site requests return 403, and

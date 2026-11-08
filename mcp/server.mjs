@@ -13,13 +13,20 @@
  * Usage:
  *   node mcp/server.mjs --graph "<vault>/.interestseed/state.json"
  *   node mcp/server.mjs --graph "<vault>/.obsidian/plugins/interestseed/graphs/default.json"
+ *   node mcp/server.mjs --minimal --graph "<vault>/.interestseed/state.json"
  *   INTERESTSEED_GRAPH=... node mcp/server.mjs
+ *   INTERESTSEED_MCP_MINIMAL=1 node mcp/server.mjs
+ *
+ * Minimal mode exposes only `interestseed_next_step` and
+ * `interestseed_get_experiment`, with the single `interestseed://next` resource.
+ * Use it when the MCP client only needs the next action, not the full graph.
  */
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 
 const PROTOCOL_VERSION = '2026-07-28';
 const args = process.argv.slice(2);
+const minimal = args.includes('--minimal') || process.env.INTERESTSEED_MCP_MINIMAL === '1';
 const graphArgIndex = args.indexOf('--graph');
 const standaloneDefault = resolve(process.cwd(), '.interestseed/state.json');
 const pluginDefault = resolve(process.cwd(), '.obsidian/plugins/interestseed/graphs/default.json');
@@ -255,6 +262,12 @@ const tools = [
   },
 ];
 
+const minimalToolNames = new Set([
+  'interestseed_next_step',
+  'interestseed_get_experiment',
+]);
+const exposedTools = minimal ? tools.filter((tool) => minimalToolNames.has(tool.name)) : tools;
+
 function toolResult(value) {
   return {
     content: [{ type: 'text', text: JSON.stringify(value, null, 2) }],
@@ -262,6 +275,9 @@ function toolResult(value) {
 }
 
 function callTool(name, input) {
+  if (minimal && !minimalToolNames.has(name)) {
+    throw new Error(`未知工具：${name}`);
+  }
   const graph = readGraph();
   if (name === 'interestseed_get_graph') {
     const degrees = degreeMap(graph);
@@ -337,6 +353,10 @@ const resources = [
   },
 ];
 
+const exposedResources = minimal
+  ? resources.filter((resource) => resource.uri === 'interestseed://next')
+  : resources;
+
 const prompts = [
   {
     name: 'review-interest',
@@ -350,7 +370,12 @@ const prompts = [
   },
 ];
 
+const exposedPrompts = minimal ? [] : prompts;
+
 function readResource(uri) {
+  if (minimal && uri !== 'interestseed://next') {
+    throw new Error(`资源不可用：${uri}`);
+  }
   const graph = readGraph();
   if (uri === 'interestseed://graph') {
     return { contents: [{ uri, mimeType: 'application/json', text: JSON.stringify({
@@ -377,6 +402,7 @@ function readResource(uri) {
 }
 
 function getPrompt(name, args) {
+  if (minimal) throw new Error('Prompt 在 minimal 模式下不可用。');
   const graph = readGraph();
   const requested = typeof args?.interest === 'string' ? args.interest.trim() : '';
   const next = nextStep(graph);
@@ -448,13 +474,13 @@ function handle(message) {
         resources: { subscribe: false, listChanged: false },
         prompts: { listChanged: false },
       },
-      serverInfo: { name: 'interestseed', version: '4.0.0' },
+      serverInfo: { name: 'interestseed', version: '4.0.2' },
     });
   }
   if (method === 'notifications/initialized') return null;
   if (method === 'ping') return response(id, {});
-  if (method === 'tools/list') return response(id, { tools });
-  if (method === 'resources/list') return response(id, { resources });
+  if (method === 'tools/list') return response(id, { tools: exposedTools });
+  if (method === 'resources/list') return response(id, { resources: exposedResources });
   if (method === 'resources/read') {
     try {
       return response(id, readResource(params?.uri));
@@ -462,7 +488,7 @@ function handle(message) {
       return fail(id, -32602, '资源读取失败', 'resource error', cause);
     }
   }
-  if (method === 'prompts/list') return response(id, { prompts });
+  if (method === 'prompts/list') return response(id, { prompts: exposedPrompts });
   if (method === 'prompts/get') {
     try {
       return response(id, getPrompt(params?.name, params?.arguments ?? {}));
