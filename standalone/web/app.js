@@ -1035,6 +1035,7 @@ function escapeHtml(value) {
 let toastTimer = null;
 function toast(message, error = false) {
   const element = $('#toast');
+  element.setAttribute('role', error ? 'alert' : 'status');
   element.textContent = message;
   element.style.color = error ? '#fecdd3' : '';
   element.hidden = false;
