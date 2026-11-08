@@ -1,4 +1,4 @@
-import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
+import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
 import { existsSync } from 'node:fs';
 import { readFile, rm, writeFile } from 'node:fs/promises';
 import { extname, join, relative, resolve, sep } from 'node:path';
@@ -38,18 +38,23 @@ const webRoot = [
   resolve(fileURLToPath(new URL('./web', import.meta.url))),
 ].find((path) => existsSync(join(path, 'index.html'))) ?? resolve(fileURLToPath(new URL('../web', import.meta.url)));
 
-export function startServer(options: ServerOptions): void {
-  const server = createServer(async (request, response) => {
+export function createInterestSeedServer(options: ServerOptions): Server {
+  return createServer(async (request, response) => {
     try {
       await route(request, response, options);
     } catch (error) {
       sendJson(response, 500, { error: error instanceof Error ? error.message : String(error) });
     }
   });
+}
+
+export function startServer(options: ServerOptions): Server {
+  const server = createInterestSeedServer(options);
   server.listen(options.port, '127.0.0.1', () => {
     console.log(`InterestSeed running at http://127.0.0.1:${options.port}`);
     console.log(`Vault: ${options.vaultPath}`);
   });
+  return server;
 }
 
 async function route(

@@ -45,6 +45,10 @@ require `application/json` and reject cross-origin browser requests. The MCP
 server is read-only, but it can expose node summaries and source references to
 the MCP client you connect; only connect MCP clients you trust with that data.
 
+Regression coverage lives in `tests/standaloneServerSecurity.test.ts`: non-JSON
+requests return 415, null/cross-origin/cross-site requests return 403, and
+localhost or CLI-style requests reach the route.
+
 The optional DSH Agent starts a local child process and uses DSH's own model,
 tool, sandbox and permission system. DSH permissions are controlled by DSH,
 not by InterestSeed. Review DSH settings and permissions before enabling it.

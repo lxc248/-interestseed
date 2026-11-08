@@ -68,7 +68,7 @@ Platform: macOS / Windows / Linux
 Runtime: Node.js
 AI: OpenAI-compatible endpoint, local by default
 Obsidian: optional
-Tests: 531 passing
+Tests: 537 passing
 Repository: https://github.com/lxc248/-interestseed
 Website: https://lxc248.github.io/-interestseed/
 ```
