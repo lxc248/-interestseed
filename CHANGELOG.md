@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Removed the local vault path from the /api/state response.
+
+
 ## 4.0.5 — Security, accessibility and release proof
 
 - Added no-store, nosniff, no-referrer and same-origin resource headers to JSON/text API responses.
