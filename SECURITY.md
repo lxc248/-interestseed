@@ -48,8 +48,9 @@ Use `--minimal` or `INTERESTSEED_MCP_MINIMAL=1` to expose only the next step
 and current experiment instead of the full graph.
 
 Regression coverage lives in `tests/standaloneServerSecurity.test.ts`: non-JSON
-requests return 415, null/cross-origin/cross-site requests return 403, and
-localhost or CLI-style requests reach the route.
+requests return 415, null/cross-origin/cross-site requests return 403, localhost
+or CLI-style requests reach the route, static files carry CSP/nosniff/DENY
+headers, and encoded `..` paths do not escape the web root.
 
 The optional DSH Agent starts a local child process and uses DSH's own model,
 tool, sandbox and permission system. DSH permissions are controlled by DSH,

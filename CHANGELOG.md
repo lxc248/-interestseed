@@ -6,7 +6,8 @@
 - Added six regression tests for content-type, null-origin, cross-origin and cross-site request guards.
 - Added MCP `--minimal` / `INTERESTSEED_MCP_MINIMAL=1` mode: next step and current experiment only.
 - Added MCP minimal-mode smoke tests.
-- 537 Vitest tests + 7 MCP smoke tests passing.
+- Added static-file security-header and path-boundary regression tests.
+- 539 Vitest tests + 7 MCP smoke tests passing.
 
 ## 4.0.2 — Security hardening
 
