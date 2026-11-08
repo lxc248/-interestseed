@@ -19,7 +19,7 @@ test('download page exposes the current standalone asset', async ({ page }) => {
   await expect(page).toHaveTitle(/Download/);
   await expect(page.getByText('4.0.4').first()).toBeVisible();
   const asset = page.locator('a[href*="interestseed-standalone-v4.0.4.zip"]').first();
-  await expect(asset).toHaveAttribute('href', /interestseed-standalone-v4\.0\.3\.zip/);
+  await expect(asset).toHaveAttribute('href', /interestseed-standalone-v4\.0\.4\.zip/);
 });
 
 test('content pages render a heading', async ({ page }) => {
