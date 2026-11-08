@@ -1,6 +1,6 @@
 # Global assessment — 2026-11-08
 
-Strict engineering and product review of `interestseed` at `1339b30`.
+Strict engineering and product review of `interestseed` at `30db0f7`.
 
 This is not a marketing score. It measures whether the project is ready to be
 treated as a mature open-source product. Evidence was collected from the
@@ -30,11 +30,11 @@ limits remain external adoption and repository weight; visual regression and app
 | Product value / differentiation | 15% | 7.0 | 1.05 | Clear “capture → one connection → 3-day experiment → evidence” loop; unproven demand |
 | Product completeness / UX | 15% | 7.4 | 1.11 | CLI, web, skill, MCP and site exist; site + app E2E and axe gated; visual regression missing |
 | Code quality / maintainability | 15% | 7.0 | 1.05 | Strict TypeScript, modular layout, lint/typecheck; some large low-coverage modules |
-| Tests / QA | 15% | 7.4 | 1.11 | 601 tests, 85.71% line / 72.15% branch coverage; visual regression missing |
-| Security / privacy | 15% | 7.5 | 1.125 | Critical leak fixed, guards and body limit tested; no independent 4.0.5 audit |
+| Tests / QA | 15% | 7.4 | 1.11 | 602 tests, 85.71% line / 72.15% branch coverage; visual regression missing |
+| Security / privacy | 15% | 7.5 | 1.125 | Critical leak fixed, guards and body limit tested; no independent 4.0.6 audit |
 | Docs / repo hygiene | 5% | 6.5 | 0.325 | Excellent current docs and checks; 29.6 MB tree, 2.5 MB archive; history still large |
-| Release / supply chain | 10% | 8.0 | 0.80 | 4.0.5 built by workflow; digest and Sigstore attestation verified; no independent audit |
-| Distribution / adoption | 10% | 1.5 | 0.15 | 1 star, 0 forks, 0 downloads of 4.0.5, no external citations |
+| Release / supply chain | 10% | 8.0 | 0.80 | 4.0.6 built by workflow; digest and Sigstore attestation verified; no independent audit |
+| Distribution / adoption | 10% | 1.5 | 0.15 | 1 star, 0 forks, 0 downloads of 4.0.6, no external citations |
 | **Total** | **100%** |  | **6.7** | **Promising, not yet mature** |
 
 ## Evidence
@@ -45,12 +45,12 @@ limits remain external adoption and repository weight; visual regression and app
 main:                 9042384
 Vitest:              570 passed
 MCP smoke:            11 passed
-Total tests:         601 passed
+Total tests:         602 passed
 Coverage statements:  82.96%
 Coverage branches:    72.15%
 Coverage functions:   85.16%
 Coverage lines:       85.71%
-Playwright E2E:       20 passed
+Playwright E2E:       21 passed
 Typecheck:            passed
 Lint:                 passed
 Build:                passed
@@ -72,7 +72,7 @@ standalone/src/state.ts        71.42% lines
 ```text
 Site check:           8 HTML pages passed
 Docs check:           44 Markdown files passed
-Version check:        all references = 4.0.5
+Version check:        all references = 4.0.6
 npm audit:            0 vulnerabilities
 Site manual FPS:      ~61 fps at 1440×1000
 ```
@@ -92,7 +92,7 @@ historical media is retained; a full history rewrite is still pending.
 ### Release and adoption
 
 ```text
-Latest release:       standalone-v4.0.5
+Latest release:       standalone-v4.0.6
 Release downloads:    0
 Stars:                1
 Forks:                0
@@ -121,12 +121,12 @@ Dependabot + npm audit 0
 
 Still open:
 
-- No independent audit of the 4.0.5 changes.
+- No independent audit of the 4.0.6 changes.
 - The local server still trusts any local process; that is the model, but it
   should be stated more explicitly for users.
 - Full MCP mode exposes graph summaries and `sourceRef`; `--minimal` reduces
   this but is not the default.
-- The automated release workflow has now run and published 4.0.5; its Sigstore
+- The automated release workflow has now run and published 4.0.6; its Sigstore
   attestation signature is verified by `check:release`, but no independent
   human audit exists.
 
@@ -140,7 +140,7 @@ Still open:
    one graph.
 4. **The docs and checks are better than most small projects.** Version, site,
    docs, JSON-LD, sitemap and security checks are automated.
-5. **Release artifacts are checksummed and the 4.0.5 digest is verified.**
+5. **Release artifacts are checksummed and the 4.0.6 digest is verified.**
 
 ## What prevents a higher score
 
@@ -162,7 +162,7 @@ Still open:
    diffing.
 6. **Repository weight.** The current tree is 29.6 MB, under the 40 MB target, but the Git clone history still retains historical media.
 7. **No independent release audit.** The workflow executed and the digest was
-   verified, but provenance and the 4.0.5 changes have not been independently
+   verified, but provenance and the 4.0.6 changes have not been independently
    checked.
 
 ## Strict score by dimension
@@ -197,7 +197,7 @@ Still open:
 ### Week 3 — release proof
 
 - Verify the downloaded zip hash and provenance attestation.
-- Record an independent 4.0.5 audit covering the server/MCP changes.
+- Record an independent 4.0.6 audit covering the server/MCP changes.
 
 ### Week 4 — distribution proof
 
@@ -213,7 +213,7 @@ The project reaches “good” only when all of these are true:
 coverage >= 85% lines / 72% branches
 visual regression runs in CI
 tracked tree < 40 MB
-independent 4.0.5 audit completed
+independent 4.0.6 audit completed
 at least 3 external citations
 at least 10 real users or 3 interviews
 ```
@@ -223,6 +223,6 @@ at least 10 real users or 3 interviews
 - Scores are based on repository evidence, not interviews or telemetry.
 - There is no production analytics, so retention and conversion are unknown.
 - The manual FPS check is a single headless run, not a field performance study.
-- No independent security review of 4.0.5 was available.
+- No independent security review of 4.0.6 was available.
 - A high engineering score cannot compensate for zero distribution; the weights
   intentionally keep adoption material.
