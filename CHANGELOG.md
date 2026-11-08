@@ -9,6 +9,7 @@
 - Removed 219 unreferenced archived review screenshots (142.2 MB) from the current tree; retained the three images referenced by current docs.
 - Added a 40 MB tracked-tree budget to CI.
 - Added `interestseed version` and `--version`.
+- Added `GET /api/health` with service version and local-only status.
 
 
 ## 4.0.5 — Security, accessibility and release proof

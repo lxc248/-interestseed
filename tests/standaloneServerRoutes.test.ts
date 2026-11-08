@@ -43,6 +43,12 @@ describe('standalone server routes', () => {
     expect(stateBody.graph.nodes).toEqual([]);
     expect(stateBody.vaultPath).toBeUndefined();
 
+    const health = await fetch(`${base}/api/health`);
+    expect(health.status).toBe(200);
+    const healthBody = await health.json();
+    expect(healthBody).toMatchObject({ ok: true, service: 'interestseed', localOnly: true });
+    expect(typeof healthBody.version).toBe('string');
+
     const config = await fetch(`${base}/api/config`);
     expect(config.status).toBe(200);
     expect((await config.json()).config.model).toBeTruthy();
