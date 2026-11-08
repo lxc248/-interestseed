@@ -123,6 +123,9 @@ npm run coverage
 node --test mcp/smoke.test.mjs
 ```
 
+`npm run coverage` enforces minimums: 71% statements, 65% branches, 79%
+functions and 73% lines.
+
 ## Extension points
 
 - Add a new discovery rule in `src/discovery/DiscoveryEngine.ts` and prove it

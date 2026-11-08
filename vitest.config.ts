@@ -12,5 +12,14 @@ export default defineConfig({
     environment: 'node',
     reporters: ['default'],
     isolate: true,
+    coverage: {
+      provider: 'v8',
+      thresholds: {
+        statements: 71,
+        branches: 65,
+        functions: 79,
+        lines: 73,
+      },
+    },
   },
 });

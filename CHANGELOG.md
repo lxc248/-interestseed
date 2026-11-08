@@ -4,6 +4,7 @@
 
 - Added static asset MIME and missing-file regression tests.
 - Added a 1 MiB request body limit; oversized bodies return 413.
+- Added coverage thresholds to prevent quality regression.
 - Pinned `minimatch` through npm overrides; `npm audit` now reports 0 vulnerabilities.
 - Fixed `llms-full.txt` version drift and added it to the version check.
 - 543 Vitest tests + 11 MCP smoke tests passing.
