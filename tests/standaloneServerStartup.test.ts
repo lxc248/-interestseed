@@ -35,6 +35,10 @@ describe('standalone server startup', () => {
     spy.mockRestore();
   });
 
+it('rejects an invalid port', () => {
+    expect(() => startServer({ vaultPath: '/tmp', port: 70000 })).toThrow(/between 0 and 65535/);
+  });
+
   it('reports an occupied port without an unhandled exception', async () => {
     const vaultPath = await mkdtemp(join(tmpdir(), 'interestseed-startup-'));
     dirs.push(vaultPath);
