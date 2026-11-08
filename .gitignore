@@ -8,6 +8,8 @@ dist/
 # 测试与覆盖率
 coverage/
 .vitest/
+test-results/
+playwright-report/
 
 # 编辑器 / 系统
 .vscode/*
