@@ -54,6 +54,16 @@ describe('standalone server routes', () => {
     expect((await discoveries.json()).discoveries).toEqual([]);
   });
 
+  it('accepts an empty scan body', async () => {
+    const base = await start();
+    const response = await fetch(`${base}/api/scan`, {
+      method: 'POST',
+      headers: jsonHeaders(),
+    });
+    expect(response.status).toBe(200);
+    expect((await response.json()).graph.nodes).toEqual([]);
+  });
+
   it('updates config through PUT', async () => {
     const base = await start();
     const response = await fetch(`${base}/api/config`, {

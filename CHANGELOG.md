@@ -14,11 +14,11 @@
 - Added a 1 MiB request body limit; oversized bodies return 413.
 - Added no-store, nosniff, no-referrer and same-origin resource headers to JSON/text API responses.
 - Added CodeQL security-and-quality analysis in CI.
-- Added coverage thresholds to prevent quality regression.
+- Added coverage thresholds (82/72/85/85) to prevent quality regression.
 - Pinned `minimatch` through npm overrides; `npm audit` now reports 0 vulnerabilities.
 - Fixed `llms-full.txt` version drift and added it to the version check.
 - Published 4.0.4 through the automated workflow; added `npm run check:release` for published asset digest, attestation subject/workflow and Sigstore signature verification.
-- 565 Vitest + 11 MCP smoke + 19 Playwright E2E tests passing.
+- 570 Vitest + 11 MCP smoke + 19 Playwright E2E tests passing.
 
 ## 4.0.3 — Security hardening follow-up
 
