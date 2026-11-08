@@ -1019,6 +1019,7 @@ async function undoConnect() {
 
 function setBusy(value) {
   state.busy = value;
+  document.querySelector('.app-shell')?.setAttribute('aria-busy', String(value));
   renderAI();
 }
 
