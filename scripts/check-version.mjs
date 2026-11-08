@@ -16,6 +16,8 @@ const checks = [
   ['site/index.html', `InterestSeed ${version}`],
   ['site/download/index.html', `InterestSeed Standalone ${version}`],
   ['site/download/index.html', `interestseed-standalone-v${version}.zip`],
+  ['site/llms-full.txt', `Latest release: ${version}`],
+  ['site/llms-full.txt', `interestseed-standalone-v${version}.zip`],
   ['docs/releases/README.md', `InterestSeed Standalone ${version}`],
   ['docs/releases/README.md', `interestseed-standalone-v${version}.zip`],
 ];
