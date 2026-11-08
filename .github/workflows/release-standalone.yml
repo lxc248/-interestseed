@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - 'standalone-v*'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Build and attest without publishing'
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -48,6 +54,7 @@ jobs:
             release/interestseed-standalone-v*.sha256
 
       - name: Publish release assets
+        if: ${{ inputs.dry_run != true }}
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.ref_name }}
