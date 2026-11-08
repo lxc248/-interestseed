@@ -9,6 +9,7 @@ release notes live in [`../archive/`](../archive/).
 - [standalone.md](standalone.md) — CLI, local web, agent skill
 - [commands.md](commands.md) — command palette reference
 - [architecture.md](architecture.md) — module map and invariants
+- [troubleshooting.md](troubleshooting.md) — 429, ports, keys and local-server errors
 
 ## Product
 

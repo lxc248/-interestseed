@@ -274,6 +274,7 @@ InterestSeed 不抓取平台、不保存 cookie、不自动发布、不自动写
 | [docs/context-packet.md](docs/context-packet.md) | 数据模型与任务状态 |
 | [docs/share-cards.md](docs/share-cards.md) | 分享卡导出行为 |
 | [docs/commands.md](docs/commands.md) | 命令面板参考 |
+| [docs/troubleshooting.md](docs/troubleshooting.md) | 429、端口、Key 与本地服务排错 |
 | [docs/audits/](docs/audits/) | 当前安全、GEO 与版本审计 |
 | [docs/distribution.md](docs/distribution.md) | 对外发布文案、投稿目标与事实边界 |
 | [site/](site/) | 官网落地页源码 |
