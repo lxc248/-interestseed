@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Download InterestSeed 4.0.3 — standalone</title>
+  <meta name="description" content="Download InterestSeed Standalone 4.0.3 for macOS, Windows or Linux. Node.js 22+, no account, no cloud sync, local-first.">
+  <link rel="canonical" href="https://lxc248.github.io/-interestseed/download/" />
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+  <meta name="theme-color" content="#010101">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Download InterestSeed 4.0.3">
+  <meta property="og:description" content="Standalone release for macOS, Windows and Linux. Node.js 22+, local-first.">
+  <meta property="og:url" content="https://lxc248.github.io/-interestseed/download/">
+  <meta property="og:image" content="https://lxc248.github.io/-interestseed/og.png">
+  <meta property="og:image:width" content="1280">
+  <meta property="og:image:height" content="640">
+  <meta property="og:image:alt" content="InterestSeed — local-first interest validation">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://lxc248.github.io/-interestseed/og.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../content.css" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "InterestSeed",
+    "softwareVersion": "4.0.3",
+    "applicationCategory": "ProductivityApplication",
+    "operatingSystem": "macOS, Windows, Linux",
+    "description": "A local-first interest validator for any Markdown vault.",
+    "downloadUrl": "https://github.com/lxc248/-interestseed/releases/download/standalone-v4.0.3/interestseed-standalone-v4.0.3.zip",
+    "url": "https://lxc248.github.io/-interestseed/",
+    "codeRepository": "https://github.com/lxc248/-interestseed",
+    "license": "https://www.gnu.org/licenses/agpl-3.0.html"
+  }
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header>
+    <div class="inner">
+      <a class="brand" href="../"><span class="brand-mark"></span><span>interestseed</span></a>
+      <nav aria-label="Primary">
+        <a href="../">Home</a>
+        <a href="../how-it-works/">How it works</a>
+        <a href="../download/">Download</a>
+        <a href="https://github.com/lxc248/-interestseed">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <p class="breadcrumbs"><a href="../">Home</a> / Download</p>
+    <p class="eyebrow">Download</p>
+    <h1>InterestSeed Standalone 4.0.3</h1>
+    <p class="lede">
+      One zip. Node.js 22+. Any Markdown vault. No account, no cloud sync and no
+      automatic graph writes.
+    </p>
+    <p class="article-meta">Released 2026-11-08 · macOS / Windows / Linux</p>
+
+    <div class="download-card">
+      <div>
+        <strong>interestseed-standalone-v4.0.3.zip</strong>
+        <p>79 KB · CLI + local web + agent skill + read-only MCP</p>
+      </div>
+      <a class="btn btn-primary" href="https://github.com/lxc248/-interestseed/releases/download/standalone-v4.0.3/interestseed-standalone-v4.0.3.zip">Download</a>
+    </div>
+
+    <div class="checksum">
+      <strong>SHA-256</strong>
+      <code>d3bb3dad973345b8b1d420411d875c1349bd482858d28c584b12117cbcbbc9ff</code>
+    </div>
+
+    <h2>Install</h2>
+    <pre>unzip interestseed-standalone-v4.0.3.zip
+node interestseed-standalone-v4.0.3/cli.js init --vault "&lt;vault&gt;"
+node interestseed-standalone-v4.0.3/cli.js serve --vault "&lt;vault&gt;" --port 4173</pre>
+    <p>Open <code>http://127.0.0.1:4173</code>.</p>
+
+    <h2>What is in 4.0.3</h2>
+    <ul>
+      <li>Route failures return a stable generic 500; internal exception text stays on stderr.</li>
+      <li>MCP <code>--minimal</code> exposes only the next step and current experiment.</li>
+      <li>MCP graph path errors are stable tool errors, not filesystem details.</li>
+      <li>Static file headers and encoded path boundaries are covered by regression tests.</li>
+      <li>540 Vitest + 11 MCP smoke tests passing.</li>
+    </ul>
+
+    <h2>Verify the download</h2>
+    <pre>sha256sum interestseed-standalone-v4.0.3.zip
+# d3bb3dad973345b8b1d420411d875c1349bd482858d28c584b12117cbcbbc9ff</pre>
+    <p>
+      Release page:
+      <a href="https://github.com/lxc248/-interestseed/releases/tag/standalone-v4.0.3">standalone-v4.0.3</a>
+    </p>
+
+    <h2>Which surface do I use?</h2>
+    <table>
+      <tr><th>Surface</th><th>Use it when</th></tr>
+      <tr><td>CLI</td><td>You want scripts, or you do not use Obsidian.</td></tr>
+      <tr><td>Local web</td><td>You want the graph, one AI suggestion and the experiment strip.</td></tr>
+      <tr><td>Agent skill</td><td>You want an agent to follow the one-suggestion contract.</td></tr>
+      <tr><td>MCP</td><td>You want read-only graph context in an MCP client.</td></tr>
+    </table>
+
+    <h2>Requirements</h2>
+    <ul>
+      <li>Node.js 22 or newer.</li>
+      <li>A folder of Markdown files.</li>
+      <li>Optional: an OpenAI-compatible local endpoint for AI suggestions.</li>
+    </ul>
+
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://github.com/lxc248/-interestseed/releases/download/standalone-v4.0.3/interestseed-standalone-v4.0.3.zip">Download 4.0.3</a>
+      <a class="btn btn-secondary" href="../how-it-works/">How it works</a>
+      <a class="btn btn-secondary" href="../3-day-interest-experiment/">3-day experiment</a>
+    </div>
+
+    <div class="footer">
+      <div class="footer-nav">
+        <a href="../">Home</a>
+        <a href="../how-it-works/">How it works</a>
+        <a href="../3-day-interest-experiment/">3-day experiment</a>
+        <a href="../interestseed-vs-readwise/">vs Readwise</a>
+        <a href="../interestseed-vs-obsidian/">vs Obsidian</a>
+      </div>
+      <a href="https://github.com/lxc248/-interestseed">GitHub</a> ·
+      <a href="https://github.com/lxc248/-interestseed/releases">All releases</a> ·
+      <a href="https://github.com/lxc248/-interestseed/blob/main/LICENSE">AGPL-3.0</a>
+    </div>
+  </main>
+</body>
+</html>
