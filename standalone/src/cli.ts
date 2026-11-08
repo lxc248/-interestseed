@@ -33,6 +33,8 @@ import {
   undoGraph,
 } from './state';
 
+declare const __INTERESTSEED_VERSION__: string;
+
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const command = args[0] ?? 'help';
@@ -42,6 +44,10 @@ async function main(): Promise<void> {
   );
 
   if (command === 'help' || flags.help) return help();
+  if (command === 'version' || command === '--version' || flags.version) {
+    console.log(__INTERESTSEED_VERSION__);
+    return;
+  }
   if (!existsSync(vaultPath)) throw new Error(`Vault not found: ${vaultPath}`);
 
   if (command === 'init') {
@@ -258,6 +264,7 @@ Usage:
   interestseed experiment list
   interestseed serve [--vault <path>] [--port 4173]
   interestseed skill
+  interestseed version
 
 Environment:
   INTERESTSEED_AI_API_KEY   local model key
