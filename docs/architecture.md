@@ -120,6 +120,7 @@ Run everything with:
 ```bash
 npm run verify
 npm run coverage
+npm run test:e2e
 node --test mcp/smoke.test.mjs
 ```
 
