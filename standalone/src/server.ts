@@ -33,6 +33,17 @@ export interface ServerOptions {
   port: number;
 }
 
+const MAX_REQUEST_BODY_BYTES = 1024 * 1024;
+
+class HttpError extends Error {
+  constructor(
+    readonly status: number,
+    message: string,
+  ) {
+    super(message);
+  }
+}
+
 const webRoot = [
   resolve(fileURLToPath(new URL('../web', import.meta.url))),
   resolve(fileURLToPath(new URL('./web', import.meta.url))),
@@ -43,6 +54,14 @@ export function createInterestSeedServer(options: ServerOptions): Server {
     try {
       await route(request, response, options);
     } catch (error) {
+      if (error instanceof HttpError) {
+        if (!response.headersSent) {
+          sendJson(response, error.status, { error: error.message });
+        } else {
+          response.end();
+        }
+        return;
+      }
       console.error('InterestSeed server error:', error);
       if (response.headersSent) {
         response.end();
@@ -448,7 +467,15 @@ function normalizeHttpBaseUrl(value: string): string {
 
 async function readJson(request: IncomingMessage): Promise<Record<string, unknown>> {
   const chunks: Buffer[] = [];
-  for await (const chunk of request) chunks.push(Buffer.from(chunk));
+  let size = 0;
+  for await (const chunk of request) {
+    const buffer = Buffer.from(chunk);
+    size += buffer.length;
+    if (size > MAX_REQUEST_BODY_BYTES) {
+      throw new HttpError(413, 'Request body too large.');
+    }
+    chunks.push(buffer);
+  }
   const raw = Buffer.concat(chunks).toString('utf8').trim();
   if (!raw) return {};
   return JSON.parse(raw) as Record<string, unknown>;

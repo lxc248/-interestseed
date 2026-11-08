@@ -143,4 +143,15 @@ describe('standalone server request guards', () => {
       log.mockRestore();
     }
   });
+
+  it('rejects request bodies above 1 MiB', async () => {
+    const base = await start();
+    const response = await fetch(`${base}/api/capture`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: 'x'.repeat(1024 * 1024 + 1),
+    });
+    expect(response.status).toBe(413);
+    expect(await response.json()).toEqual({ error: 'Request body too large.' });
+  });
 });
