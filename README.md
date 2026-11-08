@@ -13,6 +13,7 @@
 <img src="assets/standalone-ai.png" alt="InterestSeed 独立版本地 AI" width="900" />
 
 <p>
+  <a href="https://lxc248.github.io/-interestseed/"><img alt="Website" src="https://img.shields.io/badge/website-live-d97757?style=for-the-badge" /></a>
   <a href="assets/interestseed-launch.mp4"><img alt="Demo" src="https://img.shields.io/badge/%E2%96%B6%2040%20%E7%A7%92%E6%BC%94%E7%A4%BA-111827?style=for-the-badge" /></a>
   <img alt="AI" src="https://img.shields.io/badge/AI-READY-8b5cf6?style=for-the-badge" />
   <img alt="Local model" src="https://img.shields.io/badge/LOCAL-MODEL-22c55e?style=for-the-badge" />
@@ -266,6 +267,7 @@ InterestSeed 不抓取平台、不保存 cookie、不自动发布、不自动写
 | [docs/share-cards.md](docs/share-cards.md) | 分享卡导出行为 |
 | [docs/commands.md](docs/commands.md) | 命令面板参考 |
 | [docs/audits/](docs/audits/) | 当前安全、GEO 与版本审计 |
+| [docs/distribution.md](docs/distribution.md) | 对外发布文案、投稿目标与事实边界 |
 | [site/](site/) | 官网落地页源码 |
 | [SECURITY.md](SECURITY.md) | 安全模型与漏洞披露 |
 

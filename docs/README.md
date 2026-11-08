@@ -31,6 +31,10 @@ release notes live in [`../archive/`](../archive/).
 
 - [audits/](audits/) — current security, GEO and version reports
 
+## Distribution
+
+- [distribution.md](distribution.md) — launch copy, directory targets and claim guardrails
+
 ## Open source
 
 - [open-source-protection.md](open-source-protection.md)
