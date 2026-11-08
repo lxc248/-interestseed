@@ -2,6 +2,9 @@ import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { bundleFromJSON } from '@sigstore/bundle';
+import { toSignedEntity, toTrustMaterial, Verifier } from '@sigstore/verify';
+import { getTrustedRoot } from '@sigstore/tuf';
 
 const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const version = JSON.parse(await readFile(resolve(root, 'standalone/package.json'), 'utf8')).version;
@@ -19,6 +22,7 @@ function digestFrom(text, file) {
 const pageDigest = digestFrom(downloadPage, 'site/download/index.html');
 const indexDigest = digestFrom(releaseIndex, 'docs/releases/README.md');
 const errors = [];
+let signatureVerified = false;
 
 if (!existsSync(notes)) errors.push(`missing ${notes}`);
 if (pageDigest !== indexDigest) {
@@ -93,8 +97,13 @@ if (!releaseResponse.ok) {
           if (!String(workflow?.path ?? '').endsWith('release-standalone.yml')) {
             errors.push('attestation workflow is not release-standalone.yml');
           }
+          const bundle = bundleFromJSON(first.bundle);
+          const trustedRoot = await getTrustedRoot();
+          const verifier = new Verifier(toTrustMaterial(trustedRoot));
+          verifier.verify(toSignedEntity(bundle));
+          signatureVerified = true;
         } catch {
-          errors.push('attestation payload is not valid JSON');
+          errors.push('attestation signature verification failed');
         }
       }
     }
@@ -106,5 +115,8 @@ if (errors.length) {
   for (const error of errors) console.error(`- ${error}`);
   process.exitCode = 1;
 } else {
-  console.log(`Release check passed: ${tag}, asset digest ${pageDigest}.`);
+  console.log(
+    `Release check passed: ${tag}, asset digest ${pageDigest}` +
+      `${signatureVerified ? ', attestation signature verified.' : '.'}`,
+  );
 }

@@ -34,7 +34,7 @@ release automation and app depth are still gaps.
 | Tests / QA | 15% | 7.4 | 1.11 | 593 tests, 85.50% line / 71.83% branch coverage; visual regression missing |
 | Security / privacy | 15% | 7.5 | 1.125 | Critical leak fixed, guards and body limit tested; no independent 4.0.4 audit |
 | Docs / repo hygiene | 5% | 6.5 | 0.325 | Excellent current docs and checks; 171.8 MB tree, 149.3 MB archive |
-| Release / supply chain | 10% | 7.5 | 0.75 | 4.0.4 built by the automated workflow; digest verified; no independent audit |
+| Release / supply chain | 10% | 8.0 | 0.80 | 4.0.4 built by workflow; digest and Sigstore attestation verified; no independent audit |
 | Distribution / adoption | 10% | 1.5 | 0.15 | 1 star, 0 forks, 0 downloads of 4.0.4, no external citations |
 | **Total** | **100%** |  | **6.7** | **Promising, not yet mature** |
 
@@ -127,8 +127,9 @@ Still open:
   should be stated more explicitly for users.
 - Full MCP mode exposes graph summaries and `sourceRef`; `--minimal` reduces
   this but is not the default.
-- The automated release workflow has now run and published 4.0.4; an independent
-  provenance verification is still pending.
+- The automated release workflow has now run and published 4.0.4; its Sigstore
+  attestation signature is verified by `check:release`, but no independent
+  human audit exists.
 
 ## What is genuinely strong
 
@@ -174,7 +175,7 @@ Still open:
 | Test confidence | 7.4 | Coverage above 80% lines; site/app E2E and axe gated; no visual gate |
 | Security | 7.5 | Strong recent hardening; not independently audited |
 | Documentation | 8.0 | Current docs are good; archive bloat hurts repo hygiene |
-| Release discipline | 7.5 | Automated workflow executed; checksum and attestation generated |
+| Release discipline | 8.0 | Automated workflow, digest and Sigstore signature verified |
 | Distribution | 1.5 | Effectively zero reach |
 | **Overall** | **6.7** | **Promising prototype, not yet a mature product** |
 

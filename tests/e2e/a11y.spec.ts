@@ -14,7 +14,6 @@ for (const path of pages) {
     await page.goto(path);
     const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
     const serious = results.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
-    if (serious.length) console.log(path, JSON.stringify(serious.map((v) => ({ id: v.id, impact: v.impact, nodes: v.nodes.length, help: v.help })), null, 2));
     expect(serious).toEqual([]);
   });
 }
@@ -46,7 +45,6 @@ test('app home has no serious accessibility violations', async ({ page }) => {
   await page.goto(appBase);
   const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
   const serious = results.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
-  if (serious.length) console.log(JSON.stringify(serious.map((v) => ({ id: v.id, impact: v.impact, nodes: v.nodes.length, help: v.help })), null, 2));
   expect(serious).toEqual([]);
 });
 
@@ -56,7 +54,6 @@ test('settings modal has no serious accessibility violations', async ({ page }) 
   await expect(page.locator('#settings-modal')).toBeVisible();
   const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
   const serious = results.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
-  if (serious.length) console.log(JSON.stringify(serious.map((v) => ({ id: v.id, impact: v.impact, nodes: v.nodes.length, help: v.help })), null, 2));
   expect(serious).toEqual([]);
 });
 
@@ -66,7 +63,6 @@ test('capture modal has no serious accessibility violations', async ({ page }) =
   await expect(page.locator('#capture-modal')).toBeVisible();
   const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
   const serious = results.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
-  if (serious.length) console.log(JSON.stringify(serious.map((v) => ({ id: v.id, impact: v.impact, nodes: v.nodes.length, help: v.help })), null, 2));
   expect(serious).toEqual([]);
 });
 
