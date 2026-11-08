@@ -127,4 +127,18 @@ describe('GraphCanvas runtime', () => {
     view.setGraph({ schemaVersion: 2, updatedAt: now, nodes: [], edges: [] });
     expect(view.getViewport().zoom).toBeGreaterThan(0);
   });
+
+  it('ignores undefined viewport and missing focus targets', () => {
+    const view = mount();
+    view.setGraph(graph);
+    expect(() => view.setViewport(undefined)).not.toThrow();
+    expect(() => view.focusNode('missing')).not.toThrow();
+  });
+
+  it('fits a small graph when a persisted zoom is too small', () => {
+    const view = mount();
+    view.setGraph(graph);
+    view.setViewport({ zoom: 0.2, panX: 0, panY: 0 });
+    expect(view.getViewport().zoom).toBeGreaterThan(0.2);
+  });
 });

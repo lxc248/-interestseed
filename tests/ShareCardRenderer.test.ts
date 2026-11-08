@@ -82,6 +82,7 @@ describe('share presets and caption', () => {
     expect(getSharePreset('x').width).toBe(1600);
     expect(getSharePreset('story').height).toBe(1920);
     expect(getSharePreset('xiaohongshu')).toBe(SHARE_PRESETS[0]);
+    expect(getSharePreset('unknown' as never)).toBe(SHARE_PRESETS[0]);
     expect(shareCardFilename(getSharePreset('instagram'))).toBe(
       'interestseed-star-map-instagram-1080x1350.png',
     );

@@ -124,9 +124,9 @@ npm run test:e2e
 node --test mcp/smoke.test.mjs
 ```
 
-`npm run coverage` enforces minimums: 82% statements, 71% branches, 85%
+`npm run coverage` enforces minimums: 82% statements, 72% branches, 85%
 functions and 85% lines. `npm run test:e2e` includes axe WCAG 2A/2AA checks and
-fails on serious or critical violations.
+fails on any violation.
 
 ## Extension points
 

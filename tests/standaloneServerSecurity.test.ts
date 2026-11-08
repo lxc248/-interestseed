@@ -83,6 +83,16 @@ describe('standalone server request guards', () => {
     expect(response.status).toBe(200);
   });
 
+  it('allows an IPv6 loopback origin', async () => {
+    const base = await start();
+    const response = await fetch(`${base}/api/scan`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Origin: 'http://[::1]:4173' },
+      body: '{}',
+    });
+    expect(response.status).toBe(200);
+  });
+
   it('allows a CLI-style request without an origin', async () => {
     const base = await start();
     const response = await fetch(`${base}/api/scan`, {
@@ -164,5 +174,16 @@ describe('standalone server request guards', () => {
     });
     expect(response.status).toBe(413);
     expect(await response.json()).toEqual({ error: 'Request body too large.' });
+  });
+
+  it('rejects non-http API base URLs', async () => {
+    const base = await start();
+    const response = await fetch(`${base}/api/config/test`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ baseUrl: 'ftp://127.0.0.1/model' }),
+    });
+    expect(response.status).toBe(400);
+    expect(await response.json()).toMatchObject({ ok: false });
   });
 });
