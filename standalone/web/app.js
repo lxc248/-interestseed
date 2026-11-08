@@ -1123,6 +1123,14 @@ graphSearch.addEventListener('input', () => {
   state.query = graphSearch.value;
   render();
 });
+const modalFocusOrigins = new WeakMap();
+function activeModal() {
+  return [...document.querySelectorAll('.modal-backdrop')].find((modal) => !modal.hidden) ?? null;
+}
+function focusableIn(modal) {
+  return [...modal.querySelectorAll('button, input, textarea, select, a[href], [tabindex]:not([tabindex="-1"])')]
+    .filter((element) => !element.disabled && element.getClientRects().length > 0);
+}
 document.addEventListener('keydown', (event) => {
   const target = event.target;
   const typing = target instanceof HTMLElement
@@ -1132,10 +1140,29 @@ document.addEventListener('keydown', (event) => {
     graphSearch.focus();
     graphSearch.select();
   }
+  if (event.key === 'Tab') {
+    const modal = activeModal();
+    if (!modal) return;
+    const items = focusableIn(modal);
+    if (items.length === 0) {
+      event.preventDefault();
+      return;
+    }
+    const first = items[0];
+    const last = items[items.length - 1];
+    const active = document.activeElement;
+    if (event.shiftKey && (active === first || !modal.contains(active))) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && (active === last || !modal.contains(active))) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
   if (event.key === 'Escape') {
-    const openModal = [...document.querySelectorAll('.modal-backdrop')].find((modal) => !modal.hidden);
-    if (openModal) {
-      closeModal(openModal.id);
+    const modal = activeModal();
+    if (modal) {
+      closeModal(modal.id);
       return;
     }
     if (state.query) {
@@ -1164,15 +1191,26 @@ for (const button of document.querySelectorAll('.modal-close')) {
 }
 for (const backdrop of document.querySelectorAll('.modal-backdrop')) {
   backdrop.addEventListener('click', (event) => {
-    if (event.target === backdrop) backdrop.hidden = true;
+    if (event.target === backdrop) closeModal(backdrop.id);
   });
 }
 
 function openModal(id) {
-  document.getElementById(id).hidden = false;
+  const modal = document.getElementById(id);
+  if (!modal) return;
+  if (document.activeElement instanceof HTMLElement) {
+    modalFocusOrigins.set(modal, document.activeElement);
+  }
+  modal.hidden = false;
+  focusableIn(modal)[0]?.focus();
 }
 function closeModal(id) {
-  document.getElementById(id).hidden = true;
+  const modal = document.getElementById(id);
+  if (!modal) return;
+  modal.hidden = true;
+  const origin = modalFocusOrigins.get(modal);
+  modalFocusOrigins.delete(modal);
+  if (origin instanceof HTMLElement) origin.focus();
 }
 
 async function openSettings() {
