@@ -8,6 +8,7 @@
 - Added a polite live region for toasts, switching to `role="alert"` on errors.
 - Added a skip-to-content link to the app.
 - Added `aria-busy` on the app shell during async operations.
+- Added a CI check that `interestseed version` and `--version` match package.json.
 
 
 ## 4.0.6 — Hardening and observability
