@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createInterestSeedServer } from '../standalone/src/server';
 
 const dirs: string[] = [];
@@ -108,5 +108,21 @@ describe('standalone server request guards', () => {
     const response = await fetch(`${base}/%2e%2e/%2e%2e/package.json`);
     expect(response.status).not.toBe(200);
     expect(await response.text()).not.toContain('"name": "interestseed"');
+  });
+
+  it('does not leak internal exception text on a route error', async () => {
+    const base = await start();
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const response = await fetch(`${base}/api/capture`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: '{',
+      });
+      expect(response.status).toBe(500);
+      expect(await response.json()).toEqual({ error: 'Internal server error.' });
+    } finally {
+      log.mockRestore();
+    }
   });
 });

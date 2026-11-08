@@ -43,7 +43,12 @@ export function createInterestSeedServer(options: ServerOptions): Server {
     try {
       await route(request, response, options);
     } catch (error) {
-      sendJson(response, 500, { error: error instanceof Error ? error.message : String(error) });
+      console.error('InterestSeed server error:', error);
+      if (response.headersSent) {
+        response.end();
+        return;
+      }
+      sendJson(response, 500, { error: 'Internal server error.' });
     }
   });
 }

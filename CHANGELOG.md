@@ -7,7 +7,8 @@
 - Added MCP `--minimal` / `INTERESTSEED_MCP_MINIMAL=1` mode: next step and current experiment only.
 - Added MCP minimal-mode smoke tests.
 - Added static-file security-header and path-boundary regression tests.
-- 539 Vitest tests + 7 MCP smoke tests passing.
+- Route failures now return a stable generic 500 instead of internal exception text.
+- 540 Vitest tests + 7 MCP smoke tests passing.
 
 ## 4.0.2 — Security hardening
 
