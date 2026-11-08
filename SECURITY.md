@@ -52,8 +52,9 @@ details stay on stderr.
 Regression coverage lives in `tests/standaloneServerSecurity.test.ts`: non-JSON
 requests return 415, null/cross-origin/cross-site requests return 403, localhost
 or CLI-style requests reach the route, static files carry CSP/nosniff/DENY
-headers, encoded `..` paths do not escape the web root, and route failures
-return a generic 500 without internal exception text.
+headers, encoded `..` paths do not escape the web root, missing static files
+return 404, and route failures return a generic 500 without internal exception
+text.
 
 The optional DSH Agent starts a local child process and uses DSH's own model,
 tool, sandbox and permission system. DSH permissions are controlled by DSH,

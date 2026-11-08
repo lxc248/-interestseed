@@ -1,4 +1,4 @@
-﻿# Distribution kit
+# Distribution kit
 
 Use this file when submitting InterestSeed to directories, newsletters, awesome
 lists, or communities. Keep the claims narrow and verifiable.
@@ -68,7 +68,7 @@ Platform: macOS / Windows / Linux
 Runtime: Node.js
 AI: OpenAI-compatible endpoint, local by default
 Obsidian: optional
-Tests: 551 passing (540 Vitest + 11 MCP smoke)
+Tests: 553 passing (542 Vitest + 11 MCP smoke)
 Repository: https://github.com/lxc248/-interestseed
 Website: https://lxc248.github.io/-interestseed/
 ```

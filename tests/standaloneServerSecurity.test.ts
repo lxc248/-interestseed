@@ -101,6 +101,24 @@ describe('standalone server request guards', () => {
     expect(response.headers.get('x-content-type-options')).toBe('nosniff');
     expect(response.headers.get('x-frame-options')).toBe('DENY');
     expect(response.headers.get('referrer-policy')).toBe('no-referrer');
+    expect(response.headers.get('content-type')).toContain('text/html');
+  });
+
+  it('serves the standalone web assets with correct MIME types', async () => {
+    const base = await start();
+    const script = await fetch(`${base}/app.js`);
+    expect(script.status).toBe(200);
+    expect(script.headers.get('content-type')).toContain('javascript');
+
+    const styles = await fetch(`${base}/styles.css`);
+    expect(styles.status).toBe(200);
+    expect(styles.headers.get('content-type')).toContain('text/css');
+  });
+
+  it('returns 404 for missing static files', async () => {
+    const base = await start();
+    const response = await fetch(`${base}/missing-file.js`);
+    expect(response.status).toBe(404);
   });
 
   it('does not serve files outside the web root', async () => {

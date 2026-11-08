@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Added static asset MIME and missing-file regression tests.
+- 542 Vitest tests + 11 MCP smoke tests passing.
+
 ## 4.0.3 — Security hardening follow-up
 
 - Exported `createInterestSeedServer()` for in-process HTTP tests.
