@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 4.0.7 — Accessibility and runtime hardening
 
 - Added a startup logging test for the actual bound port and local-only warning.
 - Added Escape-to-close for app modals, focus trapping and focus restoration.
