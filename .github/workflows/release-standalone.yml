@@ -1,59 +1,6 @@
-name: Release InterestSeed Standalone
 
-on:
-  push:
-    tags:
-      - 'standalone-v*'
-  workflow_dispatch:
-    inputs:
-      dry_run:
-        description: 'Build and attest without publishing'
-        type: boolean
-        default: false
 
-permissions:
-  contents: write
-  id-token: write
-  attestations: write
-
-jobs:
-  release:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version: '22'
-          cache: npm
-
-      - run: npm ci
-      - run: npm run verify
-      - run: npm run build:standalone
-
-      - name: Package standalone
-        run: pwsh -NoProfile -File scripts/package-standalone.ps1
-
-      - name: Check version and notes
-        env:
-          TAG: ${{ github.ref_name }}
-        run: |
-          set -euo pipefail
-          VERSION="${TAG#standalone-v}"
-          export VERSION
-          node -e "const fs=require('fs'); const v=JSON.parse(fs.readFileSync('standalone/package.json','utf8')).version; if(v!==process.env.VERSION){console.error('standalone/package.json version '+v+' != '+process.env.VERSION); process.exit(1)}"
-          test -f "RELEASE_NOTES_STANDALONE_${VERSION}.md"
-          test -f "release/interestseed-standalone-v${VERSION}.zip"
-          test -f "release/interestseed-standalone-v${VERSION}.sha256"
-
-      - name: Attest release provenance
-        uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2
-        with:
-          subject-path: |
-            release/interestseed-standalone-v*.zip
-            release/interestseed-standalone-v*.sha256
-
-      - name: Publish release assets
+      - name: Verify published asset
         if: ${{ inputs.dry_run != true }}
         env:
           GH_TOKEN: ${{ github.token }}
@@ -61,13 +8,9 @@ jobs:
         run: |
           set -euo pipefail
           VERSION="${TAG#standalone-v}"
-          NOTES="RELEASE_NOTES_STANDALONE_${VERSION}.md"
-          if gh release view "$TAG" >/dev/null 2>&1; then
-            gh release edit "$TAG" --notes-file "$NOTES"
-          else
-            gh release create "$TAG" --title "InterestSeed Standalone ${VERSION}" --notes-file "$NOTES"
-          fi
-          gh release upload "$TAG" \
-            "release/interestseed-standalone-v${VERSION}.zip" \
-            "release/interestseed-standalone-v${VERSION}.sha256" \
-            --clobber
+          mkdir -p /tmp/interestseed-release-check
+          gh release download "$TAG" --pattern "interestseed-standalone-v${VERSION}.zip" -D /tmp/interestseed-release-check
+          expected=$(cut -d' ' -f1 "release/interestseed-standalone-v${VERSION}.sha256")
+          actual=$(sha256sum "/tmp/interestseed-release-check/interestseed-standalone-v${VERSION}.zip" | cut -d' ' -f1)
+          test "$expected" = "$actual"
+          echo "Published digest verified: $actual"
