@@ -21,6 +21,7 @@
     "check:docs": "node scripts/check-docs.mjs",
     "check:version": "node scripts/check-version.mjs",
     "check:release": "node scripts/check-release.mjs",
+    "check:size": "node scripts/check-size.mjs",
     "verify": "npm run typecheck && npm run test && npm run lint && npm run check:site && npm run check:docs && npm run check:version && npm run build",
     "deploy": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/deploy.ps1",
     "build:standalone": "vite build --config standalone/vite.config.ts",

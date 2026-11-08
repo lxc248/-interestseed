@@ -7,6 +7,7 @@
 - Added a visible “仅本机” badge with a warning not to expose the server.
 - Added an E2E check that logs experiment evidence and advances DAY 1 → DAY 2.
 - Removed 219 unreferenced archived review screenshots (142.2 MB) from the current tree; retained the three images referenced by current docs.
+- Added a 40 MB tracked-tree budget to CI.
 
 
 ## 4.0.5 — Security, accessibility and release proof
