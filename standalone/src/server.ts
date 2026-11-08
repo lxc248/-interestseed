@@ -338,6 +338,15 @@ async function route(
       });
       if (!chat.ok) {
         const detail = (await chat.text()).slice(0, 180);
+        const retryAfter = chat.headers.get('retry-after')?.trim();
+        if (chat.status === 429) {
+          return sendJson(response, 429, {
+            ok: false,
+            message: retryAfter
+              ? `模型限流（429），请 ${retryAfter} 秒后重试。`
+              : '模型限流（429），请稍后重试。',
+          });
+        }
         return sendJson(response, 502, {
           ok: false,
           message: `模型返回 HTTP ${chat.status}${detail ? `：${detail}` : ''}`,
