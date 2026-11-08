@@ -72,3 +72,9 @@ test('starts a 3-day experiment from the selected node', async ({ page }) => {
   await page.locator('#experiment-submit').click();
   await expect(page.locator('#experiment-strip')).toContainText('DAY 1 / 3');
 });
+test('logs experiment evidence and advances to the next day', async ({ page }) => {
+  await page.goto(base);
+  await expect(page.locator('#experiment-strip')).toContainText('DAY 1 / 3');
+  await page.getByRole('button', { name: '今天做了', exact: true }).click();
+  await expect(page.locator('#experiment-strip')).toContainText('DAY 2 / 3');
+});
