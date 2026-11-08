@@ -38,8 +38,10 @@ const graphPath = resolve(
 
 let graphCache = { mtimeMs: 0, graph: null };
 function readGraph() {
-  let mtimeMs = 0;
-  if (existsSync(graphPath)) mtimeMs = statSync(graphPath).mtimeMs;
+  if (!existsSync(graphPath)) throw new Error('图谱文件不存在');
+  const stats = statSync(graphPath);
+  if (!stats.isFile()) throw new Error('图谱路径不是文件');
+  const mtimeMs = stats.mtimeMs;
   if (graphCache.graph && graphCache.mtimeMs === mtimeMs) return graphCache.graph;
   const raw = readFileSync(graphPath, 'utf8').replace(/^\uFEFF/, '');
   const parsed = JSON.parse(raw);

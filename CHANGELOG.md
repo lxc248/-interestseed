@@ -8,7 +8,8 @@
 - Added MCP minimal-mode smoke tests.
 - Added static-file security-header and path-boundary regression tests.
 - Route failures now return a stable generic 500 instead of internal exception text.
-- 540 Vitest tests + 7 MCP smoke tests passing.
+- MCP graph path errors (missing, directory, malformed, missing nodes/edges) return stable tool errors.
+- 540 Vitest tests + 11 MCP smoke tests passing.
 
 ## 4.0.2 — Security hardening
 
