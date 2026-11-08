@@ -1,0 +1,8 @@
+name: InterestSeed CodeQL config
+
+paths-ignore:
+  - archive/**
+  - promo/**
+  - review/**
+  - standalone/dist/**
+  - viewer/**
