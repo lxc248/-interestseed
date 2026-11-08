@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Added a startup logging test for the actual bound port and local-only warning.
+
+
 ## 4.0.6 — Hardening and observability
 
 - Removed the local vault path from the /api/state response.
