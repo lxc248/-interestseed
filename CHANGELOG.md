@@ -11,6 +11,7 @@
 - Added 5 Playwright app E2E checks for load, settings, capture, inbox and experiment start.
 - Added axe WCAG 2A/2AA checks across public pages, app shell and settings/capture modals; added missing form labels and now fail on any violation.
 - Removed duplicate promo videos, a source WAV and an unreferenced GIF; tracked tree is now 171.8 MB.
+- Switched standalone packaging to deterministic Node ZIP generation with fixed timestamps.
 - Added a 1 MiB request body limit; oversized bodies return 413.
 - Added no-store, nosniff, no-referrer and same-origin resource headers to JSON/text API responses.
 - Added CodeQL security-and-quality analysis in CI.
