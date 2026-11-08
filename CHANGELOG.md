@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Added static asset MIME and missing-file regression tests.
+- Pinned `minimatch` through npm overrides; `npm audit` now reports 0 vulnerabilities.
 - 542 Vitest tests + 11 MCP smoke tests passing.
 
 ## 4.0.3 — Security hardening follow-up
