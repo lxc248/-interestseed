@@ -201,6 +201,24 @@ describe('OpenAI-compatible experimental provider', () => {
     network.dispose();
   });
 
+  it('reports 429 with Retry-After', async () => {
+    const provider = new OpenAICompatibleModelProvider(
+      DEEPSEEK_V4_PRO_CONFIG,
+      (async () =>
+        ({
+          ok: false,
+          status: 429,
+          headers: new Headers({ 'retry-after': '12' }),
+        }) as Response) as typeof fetch,
+    );
+    await expect(
+      provider.suggestRelations(buildRelationRequest([node()])),
+    ).rejects.toMatchObject({
+      code: 'http',
+      message: 'AI 服务限流（429），请 12 秒后重试。',
+    });
+    provider.dispose();
+  });
   it('accepts pure JSON and a fully fenced JSON object', async () => {
     for (const content of [
       '{"suggestions":[{"source":"node-1","target":"node-2","relation":"related-to"}]}',

@@ -80,6 +80,19 @@ export type ModelProviderErrorCode =
   | 'http'
   | 'invalid-response';
 
+function modelHttpError(response: Response): ModelProviderError {
+  const retryAfter = response.headers?.get('retry-after')?.trim();
+  if (response.status === 429) {
+    return new ModelProviderError(
+      'http',
+      retryAfter
+        ? `AI 服务限流（429），请 ${retryAfter} 秒后重试。`
+        : 'AI 服务限流（429），请稍后重试。',
+    );
+  }
+  return new ModelProviderError('http', `AI 服务返回 HTTP ${response.status}`);
+}
+
 export class ModelProviderError extends Error {
   constructor(
     readonly code: ModelProviderErrorCode,
@@ -238,7 +251,7 @@ export class OpenAICompatibleModelProvider implements ModelProvider {
     }
 
     if (!response.ok) {
-      throw new ModelProviderError('http', `AI 服务返回 HTTP ${response.status}`);
+      throw modelHttpError(response);
     }
 
     let payload: unknown;
@@ -308,7 +321,7 @@ export class OpenAICompatibleModelProvider implements ModelProvider {
         }),
       });
       if (!response.ok) {
-        throw new ModelProviderError('http', `AI 服务返回 HTTP ${response.status}`);
+        throw modelHttpError(response);
       }
       let payload: unknown;
       try {
