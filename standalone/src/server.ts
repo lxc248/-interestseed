@@ -402,7 +402,6 @@ async function statePayload(vaultPath: string) {
   if (!advice && orphans > 0) advice = `有 ${orphans} 个孤岛，先从它们开始连一条。`;
   const insights = { top, themes, orphans, advice };
   return {
-    vaultPath,
     model: config.model,
     baseUrl: config.baseUrl,
     keyReady: Boolean(key),

@@ -39,7 +39,9 @@ describe('standalone server routes', () => {
     const base = await start();
     const state = await fetch(`${base}/api/state`);
     expect(state.status).toBe(200);
-    expect((await state.json()).graph.nodes).toEqual([]);
+    const stateBody = await state.json();
+    expect(stateBody.graph.nodes).toEqual([]);
+    expect(stateBody.vaultPath).toBeUndefined();
 
     const config = await fetch(`${base}/api/config`);
     expect(config.status).toBe(200);
