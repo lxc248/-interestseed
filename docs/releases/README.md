@@ -1,9 +1,9 @@
 # Releases
 
-The latest release is **InterestSeed Standalone 4.0.6**:
+The latest release is **InterestSeed Standalone 4.0.7**:
 
-- https://github.com/lxc248/-interestseed/releases/tag/standalone-v4.0.6
-- `interestseed-standalone-v4.0.6.zip`
+- https://github.com/lxc248/-interestseed/releases/tag/standalone-v4.0.7
+- `interestseed-standalone-v4.0.7.zip`
 - SHA-256: `c7a5e8a3b4139f7215d365a17dd3e19763315d6d87c3872179934e26a50e631c`
 
 Old release notes are in [`../../archive/releases/`](../../archive/releases/).
