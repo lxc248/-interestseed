@@ -1,5 +1,6 @@
 import { mkdtemp, rm } from 'node:fs/promises';
 import { once } from 'node:events';
+import { createServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -32,5 +33,27 @@ describe('standalone server startup', () => {
       server.close((error) => (error ? reject(error) : resolve(undefined)));
     });
     spy.mockRestore();
+  });
+
+  it('reports an occupied port without an unhandled exception', async () => {
+    const vaultPath = await mkdtemp(join(tmpdir(), 'interestseed-startup-'));
+    dirs.push(vaultPath);
+    const blocker = createServer();
+    blocker.listen(0, '127.0.0.1');
+    await once(blocker, 'listening');
+    const address = blocker.address();
+    const port = typeof address === 'object' && address ? address.port : 0;
+    const errors: string[] = [];
+    const spy = vi.spyOn(console, 'error').mockImplementation((...args: unknown[]) => {
+      errors.push(args.map(String).join(' '));
+    });
+
+    const server = startServer({ vaultPath, port });
+    await once(server, 'error');
+    expect(errors.join('\n')).toContain('already in use');
+
+    spy.mockRestore();
+    process.exitCode = 0;
+    await new Promise((resolve) => blocker.close(() => resolve(undefined)));
   });
 });
