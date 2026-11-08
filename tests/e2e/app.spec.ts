@@ -31,6 +31,10 @@ test.afterAll(async () => {
 
 test('loads the app and opens settings', async ({ page }) => {
   await page.goto(base);
+  const skip = page.getByRole('link', { name: '跳到主要内容' });
+  await skip.focus();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('#main')).toBeFocused();
   await expect(page.getByText('仅本机')).toBeVisible();
   await expect(page.locator('#header-status')).toHaveText(/未配置 Key/);
   await page.locator('#settings-button').click();

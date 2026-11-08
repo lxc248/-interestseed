@@ -6,6 +6,7 @@
 - Added Escape-to-close for app modals, focus trapping and focus restoration.
 - Added dialog semantics (`role="dialog"`, `aria-modal`, labels) to all app modals.
 - Added a polite live region for toasts, switching to `role="alert"` on errors.
+- Added a skip-to-content link to the app.
 
 
 ## 4.0.6 — Hardening and observability
