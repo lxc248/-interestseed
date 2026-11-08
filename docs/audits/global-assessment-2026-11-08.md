@@ -32,7 +32,7 @@ limits remain external adoption and repository weight; visual regression and app
 | Code quality / maintainability | 15% | 7.0 | 1.05 | Strict TypeScript, modular layout, lint/typecheck; some large low-coverage modules |
 | Tests / QA | 15% | 7.4 | 1.11 | 601 tests, 85.71% line / 72.15% branch coverage; visual regression missing |
 | Security / privacy | 15% | 7.5 | 1.125 | Critical leak fixed, guards and body limit tested; no independent 4.0.5 audit |
-| Docs / repo hygiene | 5% | 6.5 | 0.325 | Excellent current docs and checks; 171.8 MB tree, 149.3 MB archive |
+| Docs / repo hygiene | 5% | 6.5 | 0.325 | Excellent current docs and checks; 29.6 MB tree, 2.5 MB archive; history still large |
 | Release / supply chain | 10% | 8.0 | 0.80 | 4.0.5 built by workflow; digest and Sigstore attestation verified; no independent audit |
 | Distribution / adoption | 10% | 1.5 | 0.15 | 1 star, 0 forks, 0 downloads of 4.0.5, no external citations |
 | **Total** | **100%** |  | **6.7** | **Promising, not yet mature** |
@@ -80,14 +80,14 @@ Site manual FPS:      ~61 fps at 1440×1000
 ### Repository weight
 
 ```text
-Tracked tree:         171.8 MB
-archive/:             149.3 MB (455 files)
+Tracked tree:         29.6 MB
+archive/:             2.5 MB (97 files)
 assets/:              20.2 MB (13 files)
 largest file:         assets/interestseed-launch.mp4 (10.9 MB)
 ```
 
-This is a serious fork/clone and CI-cache cost. The current tree is larger than
-many production applications.
+The current tree is now 29.6 MB. The Git clone history remains large because
+historical media is retained; a full history rewrite is still pending.
 
 ### Release and adoption
 
@@ -160,7 +160,7 @@ Still open:
 5. **No visual regression gate.** axe WCAG 2A/2AA checks now run across public
    pages, the app shell and settings/capture modals, but there is no screenshot
    diffing.
-6. **Repository weight.** 171.8 MB tracked is excessive; archive media dominates.
+6. **Repository weight.** The current tree is 29.6 MB, under the 40 MB target, but the Git clone history still retains historical media.
 7. **No independent release audit.** The workflow executed and the digest was
    verified, but provenance and the 4.0.5 changes have not been independently
    checked.
@@ -191,7 +191,7 @@ Still open:
 
 - Move archived MP4/GIF/WAV assets out of Git into release assets or object
   storage.
-- Keep only small thumbnails in `archive/`.
+- Keep the current tree under 40 MB; historical media remains in Git history.
 - Target tracked tree: **< 40 MB**.
 
 ### Week 3 — release proof
