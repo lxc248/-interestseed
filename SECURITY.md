@@ -72,6 +72,7 @@ Never commit:
 
 ## Dependency and release hygiene
 
+- Dependabot checks npm and GitHub Actions weekly.
 - Builds are produced from tagged commits by CI.
 - Release artifacts include `main.js`, `manifest.json` and `styles.css`.
 - Verify the SHA-256 digest published with the release.
