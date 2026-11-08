@@ -1132,10 +1132,17 @@ document.addEventListener('keydown', (event) => {
     graphSearch.focus();
     graphSearch.select();
   }
-  if (event.key === 'Escape' && state.query) {
-    state.query = '';
-    graphSearch.value = '';
-    render();
+  if (event.key === 'Escape') {
+    const openModal = [...document.querySelectorAll('.modal-backdrop')].find((modal) => !modal.hidden);
+    if (openModal) {
+      closeModal(openModal.id);
+      return;
+    }
+    if (state.query) {
+      state.query = '';
+      graphSearch.value = '';
+      render();
+    }
   }
 });
 $('#capture-button').addEventListener('click', () => openModal('capture-modal'));

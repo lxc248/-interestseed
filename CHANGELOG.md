@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Added a startup logging test for the actual bound port and local-only warning.
+- Added Escape-to-close for app modals.
 
 
 ## 4.0.6 — Hardening and observability

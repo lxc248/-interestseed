@@ -36,6 +36,9 @@ test('loads the app and opens settings', async ({ page }) => {
   await page.locator('#settings-button').click();
   await expect(page.locator('#settings-modal')).toBeVisible();
   await expect(page.locator('#settings-model')).toHaveValue(/deepseek/);
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#settings-modal')).toBeHidden();
+  await page.locator('#settings-button').click();
   await page.locator('#settings-modal .modal-close').click();
   await expect(page.locator('#settings-modal')).toBeHidden();
 });
