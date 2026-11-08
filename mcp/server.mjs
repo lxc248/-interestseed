@@ -38,8 +38,12 @@ const graphPath = resolve(
 
 let graphCache = { mtimeMs: 0, graph: null };
 function readGraph() {
-  if (!existsSync(graphPath)) throw new Error('图谱文件不存在');
-  const stats = statSync(graphPath);
+  let stats;
+  try {
+    stats = statSync(graphPath);
+  } catch {
+    throw new Error('图谱文件不存在');
+  }
   if (!stats.isFile()) throw new Error('图谱路径不是文件');
   const mtimeMs = stats.mtimeMs;
   if (graphCache.graph && graphCache.mtimeMs === mtimeMs) return graphCache.graph;
