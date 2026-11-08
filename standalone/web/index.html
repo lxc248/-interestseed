@@ -93,7 +93,7 @@
           <span id="inbox-count" class="pill">0</span>
         </div>
         <div class="inbox-compose">
-          <input id="inbox-input" placeholder="粘贴一条收藏或想法…" />
+          <input id="inbox-input" aria-label="收件箱条目" placeholder="粘贴一条收藏或想法…" />
           <button id="inbox-add" class="button primary">加入</button>
         </div>
         <div id="inbox-list" class="panel-body"></div>
@@ -121,9 +121,9 @@
         <button class="modal-close button ghost" data-close="capture-modal">关闭</button>
       </div>
       <div class="modal-body">
-        <input id="capture-title" placeholder="标题（可选）" />
-        <input id="capture-url" placeholder="来源链接（可选）" />
-        <textarea id="capture-text" placeholder="把这条收藏粘进来：为什么想保存它？"></textarea>
+        <input id="capture-title" aria-label="收藏标题" placeholder="标题（可选）" />
+        <input id="capture-url" aria-label="来源链接" placeholder="来源链接（可选）" />
+        <textarea id="capture-text" aria-label="收藏内容" placeholder="把这条收藏粘进来：为什么想保存它？"></textarea>
         <button id="capture-submit" class="button primary">保存并扫描</button>
       </div>
     </div>
@@ -140,24 +140,24 @@
       </div>
       <div class="modal-body">
         <label>模型 ID</label>
-        <input id="settings-model" placeholder="cn:deepseek-v4.1-flash" />
+        <input id="settings-model" aria-label="模型 ID" placeholder="cn:deepseek-v4.1-flash" />
         <label>API 地址</label>
-        <input id="settings-base-url" placeholder="http://localhost:7863/v1" />
+        <input id="settings-base-url" aria-label="API 地址" placeholder="http://localhost:7863/v1" />
         <label class="check"><input type="checkbox" id="settings-enable-ai" /> 启用 AI 建议</label>
         <label class="check"><input type="checkbox" id="settings-ai-consent" /> 我同意只发送节点 id、标题、标签</label>
         <label>Key</label>
-        <input id="settings-key" type="password" placeholder="留空保持不变；输入新 Key 可替换" />
+        <input id="settings-key" aria-label="API Key" type="password" placeholder="留空保持不变；输入新 Key 可替换" />
         <p class="hint">Key 只写入本机 <code>.interestseed/key</code>，不会进 Web。</p>
         <div class="settings-test">
           <button id="settings-test" class="button ghost">测试连接</button>
           <span id="settings-test-result" class="hint"></span>
         </div>
         <label>只扫描这些标签（每行一个，可选）</label>
-        <textarea id="settings-include-tags" placeholder="例如：focus"></textarea>
+        <textarea id="settings-include-tags" aria-label="只扫描这些标签" placeholder="例如：focus"></textarea>
         <label>扫描目录（每行一个）</label>
-        <textarea id="settings-include"></textarea>
+        <textarea id="settings-include" aria-label="扫描目录"></textarea>
         <label>排除目录（每行一个）</label>
-        <textarea id="settings-exclude"></textarea>
+        <textarea id="settings-exclude" aria-label="排除目录"></textarea>
         <div class="modal-actions">
           <button id="settings-submit" class="button primary">保存</button>
           <button id="settings-clear-key" class="button danger">清除 Key</button>
@@ -177,11 +177,11 @@
       </div>
       <div class="modal-body">
         <label>标题</label>
-        <input id="experiment-title" />
+        <input id="experiment-title" aria-label="实验标题" />
         <label>假设</label>
-        <input id="experiment-hypothesis" />
+        <input id="experiment-hypothesis" aria-label="实验假设" />
         <label>天数</label>
-        <select id="experiment-days">
+        <select id="experiment-days" aria-label="实验天数">
           <option value="3">3 天试跑</option>
           <option value="7">7 天完整实验</option>
         </select>
@@ -202,7 +202,7 @@
       <div class="modal-body">
         <input type="hidden" id="correction-id" />
         <label>你觉得它应该怎么说？</label>
-        <textarea id="correction-text" placeholder="例如：它们共享的是“如何让人愿意开始”，而不是单纯标签相同"></textarea>
+        <textarea id="correction-text" aria-label="修改说明" placeholder="例如：它们共享的是“如何让人愿意开始”，而不是单纯标签相同"></textarea>
         <button id="correction-submit" class="button primary">保存修改</button>
       </div>
     </div>
@@ -235,11 +235,11 @@
       </div>
       <div class="modal-body">
         <label>最近想试的一个兴趣</label>
-        <input id="sprint-title" placeholder="例如：AI 工具" />
+        <input id="sprint-title" aria-label="冷启动主题" placeholder="例如：AI 工具" />
         <label>为什么想保存它？</label>
-        <textarea id="sprint-why" placeholder="一句话说清楚它为什么吸引你"></textarea>
+        <textarea id="sprint-why" aria-label="冷启动原因" placeholder="一句话说清楚它为什么吸引你"></textarea>
         <label>3 天里想做的第一件事</label>
-        <input id="sprint-action" placeholder="例如：用它整理三篇旧笔记" />
+        <input id="sprint-action" aria-label="冷启动行动" placeholder="例如：用它整理三篇旧笔记" />
         <button id="sprint-submit" class="button primary">种下第一颗种子</button>
       </div>
     </div>
