@@ -77,9 +77,20 @@ export function createInterestSeedServer(options: ServerOptions): Server {
 
 export function startServer(options: ServerOptions): Server {
   const server = createInterestSeedServer(options);
+  server.on('error', (error: NodeJS.ErrnoException) => {
+    if (error.code === 'EADDRINUSE') {
+      console.error(`Port ${options.port} is already in use. Try another --port value.`);
+    } else {
+      console.error(`InterestSeed server failed: ${error.message}`);
+    }
+    process.exitCode = 1;
+  });
   server.listen(options.port, '127.0.0.1', () => {
-    console.log(`InterestSeed running at http://127.0.0.1:${options.port}`);
+    const address = server.address();
+    const port = typeof address === 'object' && address ? address.port : options.port;
+    console.log(`InterestSeed running at http://127.0.0.1:${port}`);
     console.log(`Vault: ${options.vaultPath}`);
+    console.log('Local only: do not expose this port to a network.');
   });
   return server;
 }
