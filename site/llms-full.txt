@@ -1,8 +1,8 @@
-# InterestSeed — full text
+﻿# InterestSeed — full text
 
 Source: https://lxc248.github.io/-interestseed/
 Repository: https://github.com/lxc248/-interestseed
-Latest release: 4.0.2
+Latest release: 4.0.3
 License: AGPL-3.0-only
 
 ## What it is
@@ -53,9 +53,9 @@ what felt easier or harder, what you avoided, and what changed.
 ## Install
 
 ```bash
-unzip interestseed-standalone-v4.0.2.zip
-node interestseed-standalone-v4.0.2/cli.js init --vault "<vault>"
-node interestseed-standalone-v4.0.2/cli.js serve --vault "<vault>" --port 4173
+unzip interestseed-standalone-v4.0.3.zip
+node interestseed-standalone-v4.0.3/cli.js init --vault "<vault>"
+node interestseed-standalone-v4.0.3/cli.js serve --vault "<vault>" --port 4173
 ```
 
 Open http://127.0.0.1:4173. No account, no cloud sync, no automatic graph writes.
@@ -115,3 +115,4 @@ commercial license.
 - vs Obsidian: https://lxc248.github.io/-interestseed/interestseed-vs-obsidian/
 - GitHub: https://github.com/lxc248/-interestseed
 - Latest release: https://github.com/lxc248/-interestseed/releases/latest
+

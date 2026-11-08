@@ -47,4 +47,5 @@ release notes live in [`../archive/`](../archive/).
 ```bash
 npm run check:site
 npm run check:docs
+npm run check:version
 ```

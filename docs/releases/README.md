@@ -12,6 +12,9 @@ Old release notes are in [`../../archive/releases/`](../../archive/releases/).
 
 - `standalone-v*` tags are immutable; create a new patch tag instead of moving
   an existing one.
-- Every release asset is covered by `SHA256SUMS.txt`.
+- `standalone-v*` releases are built by `.github/workflows/release-standalone.yml`.
+- `standalone/package.json` version must equal the tag without `standalone-v`.
+- `RELEASE_NOTES_STANDALONE_<version>.md` must exist before tagging.
+- Every release asset is covered by `SHA256SUMS.txt` or a matching `.sha256`.
 - Release workflows run from CI, not a maintainer machine.
 
