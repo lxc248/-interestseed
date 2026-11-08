@@ -6,11 +6,12 @@
 - Added `standalone/src/ai.ts` key, precondition and connect tests.
 - Added GraphCanvas runtime tests for load, selection, focus, viewport and empty graph.
 - Added ShareCardRenderer preset, caption and canvas rendering tests.
+- Added standalone server route tests for state, config, capture, inbox and connect guards.
 - Added a 1 MiB request body limit; oversized bodies return 413.
 - Added coverage thresholds to prevent quality regression.
 - Pinned `minimatch` through npm overrides; `npm audit` now reports 0 vulnerabilities.
 - Fixed `llms-full.txt` version drift and added it to the version check.
-- 559 Vitest tests + 11 MCP smoke tests passing.
+- 564 Vitest tests + 11 MCP smoke tests passing.
 
 ## 4.0.3 — Security hardening follow-up
 
