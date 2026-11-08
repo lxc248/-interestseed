@@ -1,4 +1,4 @@
-# InterestSeed landing page
+﻿# InterestSeed landing page
 
 `index.html` is a single-file immersive landing page for InterestSeed.
 
@@ -71,7 +71,7 @@ Local AI suggests one testable connection; a 3-day experiment decides.
 
 - `/llms-full.txt` — full product text for AI crawlers
 
-- `/download/` — 4.0.3 download, checksum and install commands
+- `/download/` — 4.0.4 download, checksum and install commands
 
 
 ## Check
