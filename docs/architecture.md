@@ -123,8 +123,8 @@ npm run coverage
 node --test mcp/smoke.test.mjs
 ```
 
-`npm run coverage` enforces minimums: 77% statements, 69% branches, 82%
-functions and 80% lines.
+`npm run coverage` enforces minimums: 81% statements, 70% branches, 84%
+functions and 84% lines.
 
 ## Extension points
 
