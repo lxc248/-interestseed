@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+  <meta name="theme-color" content="#010101">
+  <title>Security and privacy — InterestSeed</title>
+  <meta name="description" content="How InterestSeed keeps data local: loopback-only server, narrow AI requests, origin checks, request limits, read-only MCP and verifiable releases.">
+  <link rel="canonical" href="https://lxc248.github.io/-interestseed/security/" />
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Security and privacy — InterestSeed">
+  <meta property="og:description" content="Local-first by default, narrow AI requests, loopback-only server and verifiable release assets.">
+  <meta property="og:image" content="https://lxc248.github.io/-interestseed/og.png">
+  <meta property="og:image:width" content="1280">
+  <meta property="og:image:height" content="640">
+  <meta property="og:image:alt" content="InterestSeed — local-first interest validation">
+  <meta property="og:url" content="https://lxc248.github.io/-interestseed/security/">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://lxc248.github.io/-interestseed/og.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../content.css" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Security and privacy — InterestSeed",
+    "description": "How InterestSeed keeps data local: loopback-only server, narrow AI requests, origin checks, request limits, read-only MCP and verifiable releases.",
+    "url": "https://lxc248.github.io/-interestseed/security/"
+  }
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header>
+    <div class="inner">
+      <a class="brand" href="../">
+        <span class="brand-mark"></span>
+        <span>interestseed</span>
+      </a>
+      <nav aria-label="Primary">
+        <a href="../">Home</a>
+        <a href="../how-it-works/">How it works</a>
+        <a href="../download/">Download</a>
+        <a href="https://github.com/lxc248/-interestseed/releases/latest">Release</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <p class="eyebrow">Security &amp; privacy</p>
+    <h1>Local by default.<br>Verifiable by design.</h1>
+    <p class="lede">
+      InterestSeed reads a vault you already own. It does not need an account,
+      a hosted database or a cloud sync service. This page states the actual
+      boundaries, including the limits.
+    </p>
+
+    <h2>What stays local</h2>
+    <ul>
+      <li>Notes, source paths and the graph stay in your Markdown vault.</li>
+      <li>The standalone dashboard binds to <code>127.0.0.1</code>, not a public interface.</li>
+      <li>The API key lives in the environment or <code>.interestseed/key</code>, not in the browser.</li>
+      <li>No telemetry and no automatic graph writes.</li>
+    </ul>
+
+    <h2>The AI boundary</h2>
+    <p>
+      The relation request sends only node ids, titles, tags and existing edge
+      pairs. It does not send note bodies, source paths or the whole vault.
+      You must explicitly grant AI consent before a request is made.
+    </p>
+
+    <h2>Server protections</h2>
+    <ul>
+      <li>State-changing routes accept JSON only.</li>
+      <li>Cross-origin and cross-site browser requests are rejected.</li>
+      <li>Static paths are resolved inside the web root; encoded traversal is tested.</li>
+      <li>Request bodies are capped at 1 MiB; oversized bodies return <code>413</code>.</li>
+      <li>API responses use <code>no-store</code>, <code>nosniff</code>, <code>no-referrer</code> and same-origin resource policy.</li>
+      <li>Static pages use CSP, <code>X-Frame-Options: DENY</code> and no-referrer.</li>
+    </ul>
+    <p>
+      The local server deliberately trusts the local machine. Any process that
+      can talk to loopback is inside the trust boundary. It is not a multi-tenant
+      service and should not be exposed to a network.
+    </p>
+
+    <h2>MCP is read-only</h2>
+    <p>
+      The MCP server exposes the graph, the next step and experiment state. It
+      does not write. <code>--minimal</code> limits the surface to the next step
+      and the current experiment.
+    </p>
+
+    <h2>Release integrity</h2>
+    <ul>
+      <li>4.0.4 is built by the <code>release-standalone</code> workflow.</li>
+      <li>The published zip has a SHA-256 digest on the download page.</li>
+      <li>GitHub build provenance is generated with Sigstore.</li>
+      <li><code>npm run check:release</code> verifies the digest, attestation subject, workflow ref and Sigstore signature.</li>
+      <li>CI runs CodeQL, npm audit and the full unit, E2E and accessibility gates.</li>
+    </ul>
+
+    <h2>Reporting a problem</h2>
+    <p>
+      Use the repository's private security advisory flow:
+      <a href="https://github.com/lxc248/-interestseed/security/advisories/new">Report a vulnerability</a>.
+      Do not post secrets or private vault content in a public issue.
+    </p>
+
+    <h2>Limits</h2>
+    <ul>
+      <li>There is no independent human security audit yet.</li>
+      <li>The local server is not designed to be exposed beyond loopback.</li>
+      <li>MCP full mode exposes more graph metadata than <code>--minimal</code>.</li>
+    </ul>
+
+    <div class="footer">
+      <div class="footer-nav">
+        <a href="../">Home</a>
+        <a href="../download/">Download</a>
+        <a href="../how-it-works/">How it works</a>
+        <a href="../3-day-interest-experiment/">3-day experiment</a>
+        <a href="../interestseed-vs-readwise/">vs Readwise</a>
+        <a href="../interestseed-vs-obsidian/">vs Obsidian</a>
+      </div>
+      <a href="https://github.com/lxc248/-interestseed">GitHub</a> ·
+      <a href="https://github.com/lxc248/-interestseed/releases/latest">Release</a> ·
+      <a href="https://github.com/lxc248/-interestseed/blob/main/LICENSE">AGPL-3.0</a>
+    </div>
+  </main>
+</body>
+</html>

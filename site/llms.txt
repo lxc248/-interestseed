@@ -25,6 +25,7 @@ continue, change direction, or drop it.
 - 3-day experiment: https://lxc248.github.io/-interestseed/3-day-interest-experiment/
 - vs Readwise: https://lxc248.github.io/-interestseed/interestseed-vs-readwise/
 - vs Obsidian: https://lxc248.github.io/-interestseed/interestseed-vs-obsidian/
+- Security: https://lxc248.github.io/-interestseed/security/
 - GitHub: https://github.com/lxc248/-interestseed
 - Latest release: https://github.com/lxc248/-interestseed/releases/latest
 - License: AGPL-3.0-only

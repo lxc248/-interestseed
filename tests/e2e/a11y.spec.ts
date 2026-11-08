@@ -7,7 +7,7 @@ import type { Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { createInterestSeedServer } from '../../standalone/src/server';
 
-const pages = ['/', '/download/', '/how-it-works/', '/3-day-interest-experiment/', '/interestseed-vs-readwise/', '/interestseed-vs-obsidian/'];
+const pages = ['/', '/download/', '/how-it-works/', '/3-day-interest-experiment/', '/interestseed-vs-readwise/', '/interestseed-vs-obsidian/', '/security/'];
 
 for (const path of pages) {
   test(`site a11y ${path}`, async ({ page }) => {
