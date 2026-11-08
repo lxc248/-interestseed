@@ -12,11 +12,12 @@
 - Added axe WCAG 2A/2AA checks across public pages, app shell and settings/capture modals; added missing form labels and now fail on any violation.
 - Removed duplicate promo videos, a source WAV and an unreferenced GIF; tracked tree is now 171.8 MB.
 - Added a 1 MiB request body limit; oversized bodies return 413.
+- Added no-store, nosniff, no-referrer and same-origin resource headers to JSON/text API responses.
 - Added coverage thresholds to prevent quality regression.
 - Pinned `minimatch` through npm overrides; `npm audit` now reports 0 vulnerabilities.
 - Fixed `llms-full.txt` version drift and added it to the version check.
 - Published 4.0.4 through the automated workflow; added `npm run check:release` for published asset digest, attestation subject/workflow and Sigstore signature verification.
-- 564 Vitest + 11 MCP smoke + 18 Playwright E2E tests passing.
+- 565 Vitest + 11 MCP smoke + 18 Playwright E2E tests passing.
 
 ## 4.0.3 — Security hardening follow-up
 

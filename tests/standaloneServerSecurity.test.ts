@@ -101,7 +101,18 @@ describe('standalone server request guards', () => {
     expect(response.headers.get('x-content-type-options')).toBe('nosniff');
     expect(response.headers.get('x-frame-options')).toBe('DENY');
     expect(response.headers.get('referrer-policy')).toBe('no-referrer');
+    expect(response.headers.get('cross-origin-resource-policy')).toBe('same-origin');
     expect(response.headers.get('content-type')).toContain('text/html');
+  });
+
+  it('sets no-store and nosniff headers on JSON API responses', async () => {
+    const base = await start();
+    const response = await fetch(`${base}/api/state`);
+    expect(response.status).toBe(200);
+    expect(response.headers.get('content-type')).toContain('application/json');
+    expect(response.headers.get('cache-control')).toBe('no-store');
+    expect(response.headers.get('x-content-type-options')).toBe('nosniff');
+    expect(response.headers.get('referrer-policy')).toBe('no-referrer');
   });
 
   it('serves the standalone web assets with correct MIME types', async () => {
