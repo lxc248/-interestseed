@@ -1,4 +1,4 @@
-﻿# InterestSeed landing page
+# InterestSeed landing page
 
 `index.html` is a single-file immersive landing page for InterestSeed.
 
@@ -60,6 +60,7 @@ Local AI suggests one testable connection; a 3-day experiment decides.
 - `/3-day-interest-experiment/` — practical experiment guide and template
 - `/interestseed-vs-readwise/` — capture vs validation comparison
 - `/interestseed-vs-obsidian/` — workspace vs validation-layer comparison
+- `/security/` — local trust boundary, AI boundary and release integrity
 - `/llms.txt` — canonical summary for AI crawlers
 - `/robots.txt` — allows search and AI crawlers
 - `/sitemap.xml` — all public pages

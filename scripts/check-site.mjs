@@ -57,6 +57,7 @@ const publicPages = [
   '3-day-interest-experiment/index.html',
   'interestseed-vs-readwise/index.html',
   'interestseed-vs-obsidian/index.html',
+  'security/index.html',
 ];
 for (const page of publicPages) {
   const html = await readFile(join(root, page), 'utf8');

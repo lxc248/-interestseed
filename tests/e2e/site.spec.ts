@@ -5,6 +5,7 @@ const contentPages = [
   '/3-day-interest-experiment/',
   '/interestseed-vs-readwise/',
   '/interestseed-vs-obsidian/',
+  '/security/',
 ];
 
 test('home page loads with primary navigation', async ({ page }) => {
