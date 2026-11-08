@@ -109,6 +109,7 @@ commercial license.
 
 - Home: https://lxc248.github.io/-interestseed/
 - How it works: https://lxc248.github.io/-interestseed/how-it-works/
+- Download: https://lxc248.github.io/-interestseed/download/
 - 3-day experiment: https://lxc248.github.io/-interestseed/3-day-interest-experiment/
 - vs Readwise: https://lxc248.github.io/-interestseed/interestseed-vs-readwise/
 - vs Obsidian: https://lxc248.github.io/-interestseed/interestseed-vs-obsidian/
