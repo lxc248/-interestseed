@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 /*
  * SPDX-License-Identifier: AGPL-3.0-only
  * Copyright (C) 2026 aicoder
@@ -476,7 +476,7 @@ function handle(message) {
         resources: { subscribe: false, listChanged: false },
         prompts: { listChanged: false },
       },
-      serverInfo: { name: 'interestseed', version: '4.0.3' },
+      serverInfo: { name: 'interestseed', version: '4.0.4' },
     });
   }
   if (method === 'notifications/initialized') return null;
