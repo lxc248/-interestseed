@@ -3,7 +3,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
-const roots = ['README.md', 'README.en.md', 'docs', 'standalone', 'mcp', 'archive'];
+const roots = ['README.md', 'README.en.md', 'docs', 'standalone', 'mcp'];
 const errors = [];
 
 async function walk(dir) {
