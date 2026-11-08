@@ -63,3 +63,11 @@ test('filters the graph with search input', async ({ page }) => {
   await expect(page.locator('#graph')).toBeVisible();
   await expect(page.locator('#graph-search')).toHaveValue('E2E');
 });
+
+test('starts a 3-day experiment from the selected node', async ({ page }) => {
+  await page.goto(base);
+  await page.getByRole('button', { name: '开始 3 天实验' }).click();
+  await expect(page.locator('#experiment-modal')).toBeVisible();
+  await page.locator('#experiment-submit').click();
+  await expect(page.locator('#experiment-strip')).toContainText('DAY 1 / 3');
+});
