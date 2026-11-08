@@ -76,6 +76,9 @@ export function createInterestSeedServer(options: ServerOptions): Server {
 }
 
 export function startServer(options: ServerOptions): Server {
+  if (!Number.isInteger(options.port) || options.port < 0 || options.port > 65535) {
+    throw new Error('Port must be an integer between 0 and 65535.');
+  }
   const server = createInterestSeedServer(options);
   server.on('error', (error: NodeJS.ErrnoException) => {
     if (error.code === 'EADDRINUSE') {

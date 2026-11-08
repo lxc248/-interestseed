@@ -9,6 +9,7 @@
 - Added a skip-to-content link to the app.
 - Added `aria-busy` on the app shell during async operations.
 - Added `aria-pressed` state to graph filter chips.
+- Added port range validation for `serve`.
 - Added a CI check that `interestseed version` and `--version` match package.json.
 
 
