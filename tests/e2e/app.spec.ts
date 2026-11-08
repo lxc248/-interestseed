@@ -31,6 +31,7 @@ test.afterAll(async () => {
 
 test('loads the app and opens settings', async ({ page }) => {
   await page.goto(base);
+  await expect(page.getByText('仅本机')).toBeVisible();
   await expect(page.locator('#header-status')).toHaveText(/未配置 Key/);
   await page.locator('#settings-button').click();
   await expect(page.locator('#settings-modal')).toBeVisible();
