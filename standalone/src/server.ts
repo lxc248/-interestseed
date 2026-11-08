@@ -352,7 +352,10 @@ async function route(
       'X-Frame-Options': 'DENY',
       'Referrer-Policy': 'no-referrer',
       'Cross-Origin-Resource-Policy': 'same-origin',
-      'Content-Security-Policy': "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'",
+      'Content-Security-Policy': "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
+      'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+      'Cross-Origin-Opener-Policy': 'same-origin',
+      'X-Permitted-Cross-Domain-Policies': 'none',
     });
     response.end(content);
   } catch {
