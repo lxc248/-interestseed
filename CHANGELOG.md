@@ -16,6 +16,7 @@
 - Fixed CodeQL findings in the site server, share analysis, inbox normalization and simulation temp file.
 - Added a CI check that `interestseed version` and `--version` match package.json.
 - Added a pre-publish package/page digest check.
+- Added troubleshooting documentation for 429, ports, keys and local-server errors.
 
 
 ## 4.0.6 — Hardening and observability
