@@ -69,3 +69,5 @@ Local AI suggests one testable connection; a 3-day experiment decides.
 - `/favicon.svg` — site icon
 - `/og.png` — 1280x640 social preview
 
+- `/llms-full.txt` — full product text for AI crawlers
+

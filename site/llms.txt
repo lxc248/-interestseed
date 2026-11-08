@@ -18,6 +18,7 @@ continue, change direction, or drop it.
 
 ## Links
 
+- Full text: https://lxc248.github.io/-interestseed/llms-full.txt
 - Website: https://lxc248.github.io/-interestseed/
 - How it works: https://lxc248.github.io/-interestseed/how-it-works/
 - 3-day experiment: https://lxc248.github.io/-interestseed/3-day-interest-experiment/

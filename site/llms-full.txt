@@ -1,0 +1,116 @@
+# InterestSeed — full text
+
+Source: https://lxc248.github.io/-interestseed/
+Repository: https://github.com/lxc248/-interestseed
+Latest release: 4.0.2
+License: AGPL-3.0-only
+
+## What it is
+
+InterestSeed is a local-first interest validator for any Markdown vault. It is
+for people who save a lot but rarely test what they saved. It does not try to
+be a read-it-later app or a general PKM workspace.
+
+The loop is:
+
+capture → connect → 3-day experiment → evidence → next action
+
+## What the AI sees
+
+The AI request is limited to:
+
+- node ids;
+- short titles;
+- tags;
+- existing edge id pairs.
+
+It does not send note bodies, source paths, full vault contents, cookies or
+platform data. The result is one suggestion, not a batch of pending cards.
+
+The user decides whether to connect, skip, or change the relation. InterestSeed
+does not auto-write the graph, auto-publish, or generate routes without a human
+decision.
+
+## The 3-day experiment
+
+A connection is a hypothesis. The experiment is a small reality check, not a
+clinical trial or a productivity score.
+
+- Day 1: do one small action and write what actually happened.
+- Day 2: repeat, or notice that you avoided it.
+- Day 3: write the evidence, then choose continue / change / drop.
+
+Useful evidence is concrete: what you did, for how long, what you finished,
+what felt easier or harder, what you avoided, and what changed.
+
+## Four surfaces
+
+- CLI: scriptable scan, capture, suggest, connect and experiment commands.
+- Local web: cosmic graph, one-suggestion AI panel, experiment strip and inbox.
+- Agent skill: one suggestion, wait for confirmation, never auto-write.
+- MCP: read-only graph context for an MCP client.
+
+## Install
+
+```bash
+unzip interestseed-standalone-v4.0.2.zip
+node interestseed-standalone-v4.0.2/cli.js init --vault "<vault>"
+node interestseed-standalone-v4.0.2/cli.js serve --vault "<vault>" --port 4173
+```
+
+Open http://127.0.0.1:4173. No account, no cloud sync, no automatic graph writes.
+
+## How it differs from Readwise
+
+Readwise helps you collect and revisit highlights. InterestSeed tests whether a
+saved interest deserves a 3-day experiment. Readwise is a capture and review
+tool; InterestSeed is a decision tool. They can coexist: export highlights to
+Markdown, point InterestSeed at the vault, test one connection.
+
+## How it differs from Obsidian
+
+Obsidian is a general local Markdown workspace. InterestSeed is a validation
+layer for one job: turning a saved interest into a testable connection and a
+decision. Obsidian is optional. The standalone runtime reads any Markdown
+vault; the Obsidian plugin is a compatibility surface.
+
+## FAQ
+
+### What is InterestSeed?
+
+InterestSeed is a local-first interest validator for any Markdown vault. Local
+AI suggests one testable connection, then a 3-day experiment decides whether to
+continue or drop it.
+
+### Is InterestSeed an Obsidian plugin?
+
+Obsidian is optional. The standalone runtime includes a CLI, a local web
+dashboard, an agent skill and a read-only MCP server. The Obsidian plugin is a
+compatibility surface.
+
+### Does InterestSeed send my notes to a cloud model?
+
+The Explore AI request sends only node ids, titles, tags and existing edge
+pairs. It never sends note bodies, source paths or vault contents.
+
+### What is a 3-day experiment?
+
+A 3-day experiment is a small test after you connect two notes. You log one real
+observation per day; evidence decides whether to continue, change the direction,
+or drop the interest.
+
+### Is InterestSeed open source?
+
+Yes. The code is AGPL-3.0-only. The name, logo and visual identity are covered by
+a separate trademark policy. Commercial closed-source or hosted use needs a
+commercial license.
+
+## Links
+
+- Home: https://lxc248.github.io/-interestseed/
+- How it works: https://lxc248.github.io/-interestseed/how-it-works/
+- 3-day experiment: https://lxc248.github.io/-interestseed/3-day-interest-experiment/
+- vs Readwise: https://lxc248.github.io/-interestseed/interestseed-vs-readwise/
+- vs Obsidian: https://lxc248.github.io/-interestseed/interestseed-vs-obsidian/
+- GitHub: https://github.com/lxc248/-interestseed
+- Latest release: https://github.com/lxc248/-interestseed/releases/latest

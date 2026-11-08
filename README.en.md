@@ -13,6 +13,7 @@
 <img src="assets/standalone-ai.png" alt="InterestSeed standalone with local AI" width="900" />
 
 <p>
+  <a href="https://lxc248.github.io/-interestseed/"><img alt="Website" src="https://img.shields.io/badge/website-live-d97757?style=for-the-badge" /></a>
   <a href="assets/interestseed-launch.mp4"><img alt="Demo" src="https://img.shields.io/badge/%E2%96%B6%2040s%20demo-111827?style=for-the-badge" /></a>
   <img alt="AI" src="https://img.shields.io/badge/AI-READY-8b5cf6?style=for-the-badge" />
   <img alt="Local model" src="https://img.shields.io/badge/LOCAL-MODEL-22c55e?style=for-the-badge" />
