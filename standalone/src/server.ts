@@ -28,6 +28,9 @@ import { enqueueInbox, listInbox, resolveInbox } from './inbox';
 import { scanAndBuild } from './graph';
 import { ensureStateDir, loadConfig, loadState, saveConfig, stateDir, undoGraph } from './state';
 
+declare const __INTERESTSEED_VERSION__: string | undefined;
+const SERVICE_VERSION = typeof __INTERESTSEED_VERSION__ === 'string' ? __INTERESTSEED_VERSION__ : 'dev';
+
 export interface ServerOptions {
   vaultPath: string;
   port: number;
@@ -95,6 +98,14 @@ async function route(
     if (!isAllowedOrigin(request)) {
       return sendJson(response, 403, { error: 'Cross-origin request rejected.' });
     }
+  }
+  if (url.pathname === '/api/health' && request.method === 'GET') {
+    return sendJson(response, 200, {
+      ok: true,
+      service: 'interestseed',
+      version: SERVICE_VERSION,
+      localOnly: true,
+    });
   }
   if (url.pathname === '/api/state') return sendJson(response, 200, await statePayload(options.vaultPath));
   if (url.pathname === '/api/scan' && request.method === 'POST') {
