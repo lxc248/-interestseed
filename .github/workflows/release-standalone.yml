@@ -38,6 +38,9 @@ jobs:
       - name: Package standalone
         run: node scripts/package-standalone.mjs
 
+      - name: Check package and page digest
+        run: npm run check:package-digest
+
       - name: Check version and notes
         env:
           TAG: ${{ inputs.tag || github.ref_name }}
