@@ -19,7 +19,15 @@ export interface EnqueueResult {
 
 function normalizeKey(text: string): string {
   const url = text.split(/\s+/).find((part) => /^https?:\/\//i.test(part));
-  if (url) return url.replace(/[?#].*$/, '').replace(/\/+$/, '').toLowerCase();
+  if (url) {
+    let normalized = url;
+    for (const marker of ['?', '#']) {
+      const index = normalized.indexOf(marker);
+      if (index >= 0) normalized = normalized.slice(0, index);
+    }
+    while (normalized.endsWith('/')) normalized = normalized.slice(0, -1);
+    return normalized.toLowerCase();
+  }
   return text.replace(/\s+/g, ' ').trim().toLowerCase();
 }
 
