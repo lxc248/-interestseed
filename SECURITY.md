@@ -73,6 +73,7 @@ Never commit:
 ## Dependency and release hygiene
 
 - Dependabot checks npm and GitHub Actions weekly.
+- `minimatch` is pinned through npm overrides to a non-vulnerable release.
 - Builds are produced from tagged commits by CI.
 - Release artifacts include `main.js`, `manifest.json` and `styles.css`.
 - Verify the SHA-256 digest published with the release.
