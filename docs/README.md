@@ -41,3 +41,10 @@ release notes live in [`../archive/`](../archive/).
 - [../SECURITY.md](../SECURITY.md)
 - [../TRADEMARKS.md](../TRADEMARKS.md)
 - [../COMMERCIAL_LICENSE.md](../COMMERCIAL_LICENSE.md)
+
+## Checks
+
+```bash
+npm run check:site
+npm run check:docs
+```
