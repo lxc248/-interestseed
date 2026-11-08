@@ -9,7 +9,7 @@
 - Added standalone server route tests for state, config, capture, inbox and connect guards.
 - Added 5 Playwright site E2E checks for navigation, download asset, content pages, mobile overflow and llms-full.
 - Added 4 Playwright app E2E checks for load, settings, capture and inbox.
-- Added axe WCAG 2A/2AA checks across public pages, app shell and settings/capture modals; added missing form labels.
+- Added axe WCAG 2A/2AA checks across public pages, app shell and settings/capture modals; added missing form labels and now fail on any violation.
 - Removed duplicate promo videos, a source WAV and an unreferenced GIF; tracked tree is now 171.8 MB.
 - Added a 1 MiB request body limit; oversized bodies return 413.
 - Added coverage thresholds to prevent quality regression.
