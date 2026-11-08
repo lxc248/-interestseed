@@ -1,5 +1,15 @@
 # Changelog
 
+## 4.0.5 — Security, accessibility and release proof
+
+- Added no-store, nosniff, no-referrer and same-origin resource headers to JSON/text API responses.
+- Added CodeQL security-and-quality analysis and a public security page.
+- Tightened axe checks to zero WCAG 2A/2AA violations across public pages and app modals.
+- Added deterministic standalone ZIP packaging with a stable SHA-256.
+- Added release dry-run, published-asset digest and Sigstore signature verification.
+- Reached 601 tests with 82.96% statements / 72.15% branches / 85.16% functions / 85.71% lines.
+- npm audit: 0 vulnerabilities.
+
 ## 4.0.4 — Release hardening and accessibility
 
 - Added static asset MIME and missing-file regression tests.
