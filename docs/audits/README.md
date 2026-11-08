@@ -7,4 +7,4 @@ Older audits are in [`../../archive/review/`](../../archive/review/).
 - [geo-audit-2026-11-02.md](geo-audit-2026-11-02.md) — AI visibility / GEO audit
 - [standalone-4.0.2.md](standalone-4.0.2.md) — 4.0.2 package verification
 - [version-comparison-4.0.0.md](version-comparison-4.0.0.md) — plugin vs standalone parity
-- [global-assessment-2026-11-08.md](global-assessment-2026-11-08.md) — strict global assessment at 3137fbe
+- [global-assessment-2026-11-08.md](global-assessment-2026-11-08.md) — strict global assessment at 5cfbec7

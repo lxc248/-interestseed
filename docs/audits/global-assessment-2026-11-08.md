@@ -1,6 +1,6 @@
 # Global assessment — 2026-11-08
 
-Strict engineering and product review of `interestseed` at `3137fbe`.
+Strict engineering and product review of `interestseed` at `5cfbec7`.
 
 This is not a marketing score. It measures whether the project is ready to be
 treated as a mature open-source product. Evidence was collected from the
@@ -8,12 +8,13 @@ repository, CI, release, GitHub metadata, coverage and manual checks.
 
 ## Verdict
 
-**6.2 / 10 — promising, not yet mature.**
+**6.4 / 10 — promising, not yet mature.**
 
 The product idea, safety boundaries and documentation are stronger than the
-average hobby project. The two hard limits are test depth and external
-adoption. The repository is also carrying too much historical media for a
-project of this size.
+average hobby project. Coverage is now above the 80% line threshold after
+adding GraphCanvas, ShareCardRenderer and AI tests. The two hard limits remain
+external adoption and repository weight; browser E2E, accessibility and release
+automation are still gaps.
 
 | Grade | Meaning |
 | --- | --- |
@@ -30,26 +31,26 @@ project of this size.
 | Product value / differentiation | 15% | 7.0 | 1.05 | Clear “capture → one connection → 3-day experiment → evidence” loop; unproven demand |
 | Product completeness / UX | 15% | 7.0 | 1.05 | CLI, web, skill, MCP and site exist; no browser E2E or accessibility audit |
 | Code quality / maintainability | 15% | 7.0 | 1.05 | Strict TypeScript, modular layout, lint/typecheck; some large low-coverage modules |
-| Tests / QA | 15% | 5.5 | 0.825 | 554 tests, but 73.73% line / 65.6% branch coverage; core modules at 1–41% |
+| Tests / QA | 15% | 7.0 | 1.05 | 570 tests, 84.81% line / 70.77% branch coverage; E2E and axe still missing |
 | Security / privacy | 15% | 7.5 | 1.125 | Critical leak fixed, guards and body limit tested; no independent 4.0.3 audit |
 | Docs / repo hygiene | 5% | 6.5 | 0.325 | Excellent current docs and checks; 215 MB tree, 192.6 MB archive |
 | Release / supply chain | 10% | 6.0 | 0.60 | 4.0.3 hash and release notes; new workflow not exercised; provenance unverified |
 | Distribution / adoption | 10% | 1.5 | 0.15 | 1 star, 0 forks, 3 downloads of 4.0.3, no external citations |
-| **Total** | **100%** |  | **6.2** | **Promising, not yet mature** |
+| **Total** | **100%** |  | **6.4** | **Promising, not yet mature** |
 
 ## Evidence
 
 ### Engineering
 
 ```text
-main:                 3137fbe
-Vitest:              543 passed
+main:                 5cfbec7
+Vitest:              559 passed
 MCP smoke:            11 passed
-Total tests:         554 passed
-Coverage statements:  71.71%
-Coverage branches:    65.6%
-Coverage functions:   79.48%
-Coverage lines:       73.73%
+Total tests:         570 passed
+Coverage statements:  81.98%
+Coverage branches:    70.77%
+Coverage functions:   84.72%
+Coverage lines:       84.81%
 Typecheck:            passed
 Lint:                 passed
 Build:                passed
@@ -58,21 +59,19 @@ Plugin bundle:        652.23 kB (gzip 164.87 kB)
 Standalone CLI:       145.48 kB (gzip 37.87 kB)
 ```
 
-Low-coverage areas that matter:
+Low-coverage areas that still matter:
 
 ```text
-src/ui/GraphCanvas.ts          1.73% statements
-src/share/ShareCardRenderer.ts 5.72% statements
-standalone/src/ai.ts           10.41% statements
-standalone/src/server.ts       41.03% statements
-standalone/src/state.ts        58.49% statements
+src/ui/GraphCanvas.ts          63.97% lines
+standalone/src/server.ts       44.54% lines
+standalone/src/state.ts        71.42% lines
 ```
 
 ### Site and docs
 
 ```text
 Site check:           7 HTML pages passed
-Docs check:           43 Markdown files passed
+Docs check:           44 Markdown files passed
 Version check:        all references = 4.0.3
 npm audit:            0 vulnerabilities
 Site manual FPS:      ~61 fps at 1440×1000
@@ -154,8 +153,8 @@ Still open:
 
 ### P1 — engineering quality
 
-4. **Coverage is not gated.** 73.73% lines and 65.6% branches is acceptable for
-   an early project, not for a mature one. Core UI and AI paths are far lower.
+4. **Coverage is uneven.** The floor is now 81/70/84/84, but
+   `standalone/src/server.ts` is 44.54% lines and `GraphCanvas` is 63.97%.
 5. **No browser E2E / visual regression.** Static checks cannot catch a broken
    graph interaction, modal, drag, filter or mobile layout.
 6. **No accessibility audit.** Skip links and focus styles are present, but no
@@ -170,22 +169,22 @@ Still open:
 | --- | ---: | --- |
 | Idea | 8.0 | Clear, differentiated, worth testing |
 | Implementation | 7.0 | Broad and coherent; uneven depth |
-| Test confidence | 5.5 | Good count, weak depth in critical paths |
+| Test confidence | 7.0 | Coverage above 80% lines; E2E and branch depth still missing |
 | Security | 7.5 | Strong recent hardening; not independently audited |
 | Documentation | 8.0 | Current docs are good; archive bloat hurts repo hygiene |
 | Release discipline | 6.0 | Checksums and rules exist; automation not proven |
 | Distribution | 1.5 | Effectively zero reach |
-| **Overall** | **6.2** | **Promising prototype, not yet a mature product** |
+| **Overall** | **6.4** | **Promising prototype, not yet a mature product** |
 
 ## 30-day improvement plan
 
 ### Week 1 — quality floor
 
-- Set coverage thresholds: `lines >= 78`, `branches >= 70`.
-- Add tests for `GraphCanvas`, `ShareCardRenderer`, `standalone/src/ai.ts`.
+- Keep the coverage floor at `81/70/84/84`; raise branches to 72.
 - Add `axe` checks for the landing page and content pages.
 - Add a Playwright smoke test for: load, search, filter, select node, open
   settings, close modal.
+- Add server route coverage for capture / connect / config.
 
 ### Week 2 — repository weight
 
@@ -211,7 +210,7 @@ Still open:
 The project reaches “good” only when all of these are true:
 
 ```text
-coverage >= 80% lines / 72% branches
+coverage >= 85% lines / 72% branches
 browser E2E runs in CI
 axe passes on all public pages
 tracked tree < 40 MB
