@@ -10,6 +10,7 @@
 - Added `aria-busy` on the app shell during async operations.
 - Added `aria-pressed` state to graph filter chips.
 - Added port range validation for `serve`.
+- Added friendly HTTP 429 messages using Retry-After.
 - Added a CI check that `interestseed version` and `--version` match package.json.
 
 
