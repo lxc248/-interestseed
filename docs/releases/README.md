@@ -17,4 +17,6 @@ Old release notes are in [`../../archive/releases/`](../../archive/releases/).
 - `RELEASE_NOTES_STANDALONE_<version>.md` must exist before tagging.
 - Every release asset is covered by `SHA256SUMS.txt` or a matching `.sha256`.
 - Release workflows run from CI, not a maintainer machine.
+- Run `GITHUB_TOKEN=... npm run check:release` to compare the published asset
+  digest with the site and verify that provenance exists.
 
