@@ -1116,6 +1116,7 @@ for (const chip of document.querySelectorAll('.filter-chip')) {
     state.filterStage = chip.getAttribute('data-stage') ?? 'all';
     for (const item of document.querySelectorAll('.filter-chip')) {
       item.classList.toggle('active', item === chip);
+      item.setAttribute('aria-pressed', String(item === chip));
     }
     render();
   });
