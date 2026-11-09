@@ -234,6 +234,32 @@ async function route(
     );
     return sendJson(response, 200, { ok: true, experiment: experimentView(experiment) });
   }
+  if (url.pathname === '/api/experiments/decision' && request.method === 'POST') {
+    const body = await readJson(request);
+    const decision = body.decision;
+    if (decision !== 'keep' && decision !== 'change' && decision !== 'drop') {
+      return sendJson(response, 400, { error: 'decision must be keep, change or drop' });
+    }
+    const id = typeof body.id === 'string' ? body.id : '';
+    if (!id) return sendJson(response, 400, { error: 'id required' });
+    await ensureStateDir(options.vaultPath);
+    const path = join(stateDir(options.vaultPath), 'decisions.json');
+    let decisions: unknown[] = [];
+    try {
+      const parsed = JSON.parse(await readFile(path, 'utf8')) as { decisions?: unknown[] };
+      if (Array.isArray(parsed.decisions)) decisions = parsed.decisions;
+    } catch {
+      decisions = [];
+    }
+    decisions.push({
+      experimentId: id,
+      decision,
+      note: typeof body.note === 'string' ? body.note.slice(0, 500) : '',
+      at: new Date().toISOString(),
+    });
+    await writeFile(path, `${JSON.stringify({ decisions }, null, 2)}\n`, 'utf8');
+    return sendJson(response, 200, { ok: true, decision });
+  }
   if (url.pathname === '/api/discoveries' && request.method === 'GET') {
     const discoveries = (await listDiscoveries(options.vaultPath)).map(discoveryView);
     return sendJson(response, 200, { discoveries });
