@@ -224,6 +224,21 @@ describe('standalone server request guards', () => {
     expect(await response.json()).toEqual({ error: 'Request body too large.' });
   });
 
+  it('rejects remote AI base URLs unless explicitly allowed', async () => {
+    const base = await start();
+    const tested = await fetch(`${base}/api/config/test`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ baseUrl: 'https://api.example.com/v1' }),
+    });
+    expect(tested.status).toBe(400);
+    const saved = await fetch(`${base}/api/config`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ baseUrl: 'https://api.example.com/v1' }),
+    });
+    expect(saved.status).toBe(400);
+  });
   it('rejects non-http API base URLs', async () => {
     const base = await start();
     const response = await fetch(`${base}/api/config/test`, {

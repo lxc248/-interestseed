@@ -328,7 +328,16 @@ async function route(
     const body = await readJson(request);
     const config = await loadConfig(options.vaultPath);
     if (typeof body.model === 'string' && body.model.trim()) config.model = body.model.trim();
-    if (typeof body.baseUrl === 'string' && body.baseUrl.trim()) config.baseUrl = body.baseUrl.trim();
+    if (typeof body.baseUrl === 'string' && body.baseUrl.trim()) {
+      try {
+        config.baseUrl = normalizeHttpBaseUrl(body.baseUrl.trim());
+      } catch (error) {
+        return sendJson(response, 400, {
+          ok: false,
+          message: error instanceof Error ? error.message : 'API 地址无效。',
+        });
+      }
+    }
     if (typeof body.keyEnv === 'string' && body.keyEnv.trim()) config.keyEnv = body.keyEnv.trim();
     if (typeof body.enableAI === 'boolean') config.enableAI = body.enableAI;
     if (typeof body.aiConsentGranted === 'boolean') config.aiConsentGranted = body.aiConsentGranted;
@@ -600,6 +609,10 @@ function normalizeHttpBaseUrl(value: string): string {
   const parsed = new URL(value);
   if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
     throw new Error('API 地址只支持 http(s)。');
+  }
+  const local = ['127.0.0.1', 'localhost', '::1', '[::1]'].includes(parsed.hostname);
+  if (!local && process.env.INTERESTSEED_ALLOW_REMOTE_AI !== '1') {
+    throw new Error('API 地址只允许本地 loopback；如需远端地址，请显式设置 INTERESTSEED_ALLOW_REMOTE_AI=1。');
   }
   return parsed.toString().replace(/\/+$/, '');
 }
