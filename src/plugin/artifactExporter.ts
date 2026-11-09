@@ -26,6 +26,55 @@ export async function exportJsonCanvas(app: App, graph: InterestSeedGraph): Prom
   new Notice(`已导出 JSON Canvas：${path}`);
 }
 
+export function buildRoutePlan(input: {
+  selected?: InterestSeedNode | null;
+  allNodes: readonly InterestSeedNode[];
+  neighbors: (id: string) => unknown[];
+  active?: { state: { title: string; logs: { next?: string }[]; targetDays: number; status: string } } | null;
+}): {
+  theme: string;
+  nodes: readonly InterestSeedNode[];
+  connectedIds: Set<string>;
+  experiment: {
+    title: string;
+    day: number;
+    targetDays: number;
+    status: string;
+    next?: string;
+  } | null;
+} | null {
+  const tag = input.selected?.tags.find(
+    (value) =>
+      value.trim().length > 0 && value !== '火花' && value !== '文本' && value !== '视频',
+  );
+  const theme = tag ?? '全部兴趣';
+  const filtered = tag
+    ? input.allNodes.filter((node) => node.tags.includes(tag))
+    : input.allNodes;
+  const nodes = filtered.length > 0 ? filtered : input.allNodes;
+  if (nodes.length === 0) return null;
+  const active = input.active;
+  const connectedIds = new Set(
+    nodes
+      .filter((node) => input.neighbors(node.id).length > 0)
+      .map((node) => node.id),
+  );
+  return {
+    theme,
+    nodes,
+    connectedIds,
+    experiment: active
+      ? {
+          title: active.state.title,
+          day: active.state.logs.length,
+          targetDays: active.state.targetDays,
+          status: active.state.status,
+          next: active.state.logs.at(-1)?.next,
+        }
+      : null,
+  };
+}
+
 export async function exportInterestRoute(
   app: App,
   input: {
