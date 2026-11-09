@@ -86,6 +86,7 @@ import {
 import type { SeedSprintDraft } from './onboarding/seedSprint';
 import { edgeIdFor, hashString, nodeIdForUri } from './utils/ids';
 import { pathFromUri, vaultUri } from './utils/paths';
+import { readAiApiKey, saveAiApiKey } from './plugin/aiKeyStore';
 import { exportInterestRoute as writeInterestRoute, exportJsonCanvas as writeJsonCanvas } from './plugin/artifactExporter';
 import { RelationCreateModal } from './ui/RelationCreateModal';
 import { RelationEditModal } from './ui/RelationEditModal';
@@ -1358,36 +1359,12 @@ export default class InterestSeedPlugin extends Plugin {
   // ------------------------------------------------------------ 设置与持久化
 
   async getAiApiKey(): Promise<string | undefined> {
-    const storage = (
-      this.app as unknown as {
-        secretStorage?: { getSecret(id: string): Promise<string | null> };
-      }
-    ).secretStorage;
-    if (!storage) return undefined;
-    try {
-      const value = await storage.getSecret('interestseed-ai-key');
-      return value?.trim() || undefined;
-    } catch {
-      return undefined;
-    }
+    return readAiApiKey(this.app);
   }
 
   async saveAiApiKey(value: string): Promise<void> {
-    const storage = (
-      this.app as unknown as {
-        secretStorage?: {
-          setSecret(id: string, secret: string): Promise<void>;
-          deleteSecret(id: string): Promise<void>;
-        };
-      }
-    ).secretStorage;
-    if (!storage) {
-      new Notice('当前 Obsidian 不支持安全存储，无法保存 API Key。');
-      return;
-    }
-    const trimmed = value.trim();
-    if (trimmed) await storage.setSecret('interestseed-ai-key', trimmed);
-    else await storage.deleteSecret('interestseed-ai-key');
+    const saved = await saveAiApiKey(this.app, value);
+    if (!saved) new Notice('当前 Obsidian 不支持安全存储，无法保存 API Key。');
   }
 
   openAiSetup(): void {
