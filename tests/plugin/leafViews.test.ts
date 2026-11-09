@@ -17,7 +17,7 @@ import { AiSuggestionView } from '../../src/ui/AiSuggestionView';
 
 function makeWorkspace() {
   const leaf = {
-    view: new AiSuggestionView(),
+    view: new AiSuggestionView({} as never, {} as never),
     setViewState: vi.fn(async () => undefined),
   };
   const workspace = {
