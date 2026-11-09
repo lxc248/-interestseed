@@ -1,6 +1,6 @@
 # Global assessment — 2026-11-08
 
-Strict engineering and product review of `interestseed` at `d2297a1`.
+Strict engineering and product review of `interestseed` at `36444e0`.
 
 This is not a marketing score. It measures whether the project is ready to be
 treated as a mature open-source product. Evidence was collected from the
@@ -28,9 +28,9 @@ limits remain external adoption and repository weight; app-state visual coverage
 | Category | Weight | Score | Weighted | Why this score |
 | --- | ---: | ---: | ---: | --- |
 | Product value / differentiation | 15% | 7.0 | 1.05 | Clear “capture → one connection → 3-day experiment → evidence” loop; unproven demand |
-| Product completeness / UX | 15% | 7.4 | 1.11 | CLI, web, skill, MCP and site exist; site + app E2E and axe gated; public pages plus app home/settings/capture/experiment visuals; landing and secondary modals missing |
+| Product completeness / UX | 15% | 7.4 | 1.11 | CLI, web, skill, MCP and site exist; site + app E2E and axe gated; public pages plus app home/settings/capture/experiment/sprint visuals; landing and secondary modals missing |
 | Code quality / maintainability | 15% | 7.0 | 1.05 | Strict TypeScript, modular layout, lint/typecheck; some large low-coverage modules |
-| Tests / QA | 15% | 7.5 | 1.125 | 612 tests, 85.71% line / 72.15% branch coverage; public pages plus app home/settings/capture/experiment visuals; landing and secondary modals missing |
+| Tests / QA | 15% | 7.5 | 1.125 | 613 tests, 85.71% line / 72.15% branch coverage; public pages plus app home/settings/capture/experiment/sprint visuals; landing and secondary modals missing |
 | Security / privacy | 15% | 7.5 | 1.125 | Critical leak fixed, guards and body limit tested; no independent 4.0.8 audit |
 | Docs / repo hygiene | 5% | 6.5 | 0.325 | Excellent current docs and checks; 29.6 MB tree, 2.5 MB archive; history still large |
 | Release / supply chain | 10% | 8.0 | 0.80 | 4.0.8 built by workflow; digest and Sigstore attestation verified; no independent audit |
@@ -42,15 +42,15 @@ limits remain external adoption and repository weight; app-state visual coverage
 ### Engineering
 
 ```text
-main:                 d2297a1
+main:                 36444e0
 Vitest:              574 passed
 MCP smoke:            11 passed
-Total tests:         612 passed
+Total tests:         613 passed
 Coverage statements:  82.96%
 Coverage branches:    72.15%
 Coverage functions:   85.16%
 Coverage lines:       85.71%
-Playwright E2E:       27 passed
+Playwright E2E:       28 passed
 Typecheck:            passed
 Lint:                 passed
 Build:                passed
@@ -160,8 +160,8 @@ Still open:
 4. **Coverage is uneven.** The floor is now 82/71/85/85, but
    `standalone/src/server.ts` is 60.69% lines and `GraphCanvas` is 63.97%.
 5. **Visual regression is partial.** Linux screenshot baselines cover
-   `/how-it-works/`, `/download/`, app home, settings, capture and experiment;
-   the landing page and secondary modals still lack baselines.
+   `/how-it-works/`, `/download/`, app home, settings, capture, experiment and
+   sprint; the landing page and secondary modals still lack baselines.
 6. **Repository weight.** The current tree is 29.6 MB, under the 40 MB target, but the Git clone history still retains historical media.
 7. **No independent release audit.** The workflow executed and the digest was
    verified, but provenance and the 4.0.8 changes have not been independently
@@ -173,7 +173,7 @@ Still open:
 | --- | ---: | --- |
 | Idea | 8.0 | Clear, differentiated, worth testing |
 | Implementation | 7.0 | Broad and coherent; uneven depth |
-| Test confidence | 7.5 | Coverage above 80% lines; site/app E2E and axe gated; six visual baselines |
+| Test confidence | 7.5 | Coverage above 80% lines; site/app E2E and axe gated; seven visual baselines |
 | Security | 7.5 | Strong recent hardening; not independently audited |
 | Documentation | 8.0 | Current docs are good; archive bloat hurts repo hygiene |
 | Release discipline | 8.0 | Automated workflow, digest and Sigstore signature verified |
