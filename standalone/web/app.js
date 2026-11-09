@@ -207,6 +207,24 @@ function renderExperiment() {
     summary.className = 'pill ready';
     summary.textContent = `已完成 · 兴趣 ${experiment.summary.averageInterest} / 精力 ${experiment.summary.averageEnergy}`;
     actions.appendChild(summary);
+    const decide = async (decision) => {
+      try {
+        await api('/api/experiments/decision', {
+          method: 'POST',
+          body: JSON.stringify({ id: experiment.id, decision }),
+        });
+        toast(decision === 'keep' ? '已记下：继续。' : decision === 'change' ? '已记下：换一种做法。' : '已记下：放下。');
+      } catch (error) {
+        toast(error instanceof Error ? error.message : '决定保存失败。', true);
+      }
+    };
+    for (const [label, decision] of [['继续', 'keep'], ['换一种做法', 'change'], ['放下', 'drop']]) {
+      const button = document.createElement('button');
+      button.className = decision === 'keep' ? 'button primary' : 'button ghost';
+      button.textContent = label;
+      button.addEventListener('click', () => decide(decision));
+      actions.appendChild(button);
+    }
     strip.appendChild(actions);
     return;
   }
