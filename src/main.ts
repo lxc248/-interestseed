@@ -112,17 +112,8 @@ import { isRecord } from './utils/validation';
 const DATA_SCHEMA_VERSION = 1;
 
 /** 主界面底部状态栏使用的快照。 */
-export interface InterestSeedStatus {
-  scanning: boolean;
-  lastError: string | null;
-  blocked: boolean;
-  blockedReason: string | null;
-  saveFailed: boolean;
-  nodes: number;
-  edges: number;
-  confirmed: number;
-  suggested: number;
-}
+import { buildStatus, statusBarText, type InterestSeedStatus } from './plugin/status';
+export type { InterestSeedStatus };
 
 interface StoredPluginData {
   schemaVersion?: unknown;
@@ -1471,19 +1462,12 @@ export default class InterestSeedPlugin extends Plugin {
   }
 
   getStatus(): InterestSeedStatus {
-    const stats = this.store.stats();
-    const state = this.persistence?.state;
-    return {
+    return buildStatus({
       scanning: this.scanning,
       lastError: this.lastError,
-      blocked: state?.blocked ?? false,
-      blockedReason: state?.blockedReason ?? null,
-      saveFailed: state?.saveFailed ?? false,
-      nodes: stats.nodes,
-      edges: stats.edges,
-      confirmed: stats.confirmed,
-      suggested: stats.suggested,
-    };
+      state: this.persistence?.state,
+      stats: this.store.stats(),
+    });
   }
 
   subscribeStatus(listener: (status: InterestSeedStatus) => void): () => void {
@@ -1604,20 +1588,9 @@ export default class InterestSeedPlugin extends Plugin {
 
   private updateStatusBar(): void {
     if (!this.statusBarEl) return;
-
     const stats = this.store.stats();
     const state = this.persistence?.state;
-    const suffix = state?.blocked
-      ? ' · ⚠ 存储已暂停'
-      : state?.saveFailed
-        ? ' · ⚠ 未保存'
-        : this.lastError
-          ? ' · ⚠ 错误'
-          : '';
-
-    this.statusBarEl.setText(
-      `InterestSeed · ${stats.nodes} 节点 / ${stats.confirmed} 已确认 / ${stats.suggested} 建议${suffix}`,
-    );
+    this.statusBarEl.setText(statusBarText(stats, state, this.lastError));
     this.statusBarEl.setAttribute('aria-label', '打开兴趣图谱');
     const tooltip = state?.blockedReason ?? this.lastError ?? null;
     if (tooltip) {
@@ -1627,3 +1600,4 @@ export default class InterestSeedPlugin extends Plugin {
     }
   }
 }
+
