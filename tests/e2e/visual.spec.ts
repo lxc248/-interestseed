@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { expect, test } from '@playwright/test';
 
 const baselineDir = join(process.cwd(), 'tests', 'e2e', 'visual.spec.ts-snapshots');
-const updating = process.argv.includes('--update-snapshots');
+const updating = process.env.UPDATE_SNAPSHOTS === '1';
 const hasBaseline = existsSync(join(baselineDir, 'how-it-works-linux.png'));
 test('how-it-works page visual', async ({ page }) => {
   test.skip(process.platform !== 'linux', 'Visual baselines are generated on Linux CI.');
