@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { slugifyFileName } from '../../src/utils/paths';
@@ -23,9 +24,15 @@ export async function captureToVault(
   if (!text) throw new Error('Nothing to capture.');
   const title = (input.title?.trim() || firstLine(text) || '未命名收藏').slice(0, 120);
   const date = new Date().toISOString().slice(0, 10);
-  const name = `${date}-${slugifyFileName(title).slice(0, 60) || 'capture'}.md`;
+  const base = `${date}-${slugifyFileName(title).slice(0, 60) || 'capture'}`;
   const dir = join(vaultPath, INBOX);
   await mkdir(dir, { recursive: true });
+  let name = `${base}.md`;
+  let suffix = 2;
+  while (existsSync(join(dir, name))) {
+    name = `${base}-${suffix}.md`;
+    suffix += 1;
+  }
   const path = join(dir, name);
   const frontmatter = [
     '---',
