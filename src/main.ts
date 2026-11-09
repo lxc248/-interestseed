@@ -88,9 +88,8 @@ import { edgeIdFor, hashString, nodeIdForUri } from './utils/ids';
 import { pathFromUri, vaultUri } from './utils/paths';
 import { readAiApiKey, saveAiApiKey } from './plugin/aiKeyStore';
 import { buildRoutePlan, exportInterestRoute as writeInterestRoute, exportJsonCanvas as writeJsonCanvas } from './plugin/artifactExporter';
-import { RelationCreateModal } from './ui/RelationCreateModal';
-import { RelationEditModal } from './ui/RelationEditModal';
-import { ScanConfirmModal } from './ui/ScanConfirmModal';
+import { openRelationCreateModal, openRelationEditModal } from './plugin/relationPrompts';
+import { openScanConfirmModal } from './plugin/scanPrompts';
 import {
   DiscoveryAuditPreviewModal,
   DiscoveryAuditSaveModal,
@@ -1404,25 +1403,16 @@ export default class InterestSeedPlugin extends Plugin {
 
   /** 重新扫描前展示范围、预计读取数量与操作说明。 */
   promptRebuild(): void {
-    const options = {
+    openScanConfirmModal({
+      app: this.app,
       includeFolders: this.settings.includeFolders,
       excludeFolders: this.settings.excludeFolders,
       includeTags: this.settings.includeTags,
-      maxFiles: 5000,
-    };
-
-    new ScanConfirmModal(
-      this.app,
-      {
-        count: this.vaultAdapter.countMarkdown(options),
-        includeFolders: this.settings.includeFolders,
-        excludeFolders: this.settings.excludeFolders,
-        includeTags: this.settings.includeTags,
-      },
-      () => {
+      countMarkdown: (options) => this.vaultAdapter.countMarkdown(options),
+      onConfirm: () => {
         void this.controller.rebuildGraph();
       },
-    ).open();
+    });
   }
 
   promptCreateRelation(sourceId: string): void {
@@ -1435,9 +1425,14 @@ export default class InterestSeedPlugin extends Plugin {
       return;
     }
 
-    new RelationCreateModal(this.app, source, targets, ({ targetId, relation }) => {
-      this.controller.createRelation(sourceId, targetId, relation);
-    }).open();
+    openRelationCreateModal({
+      app: this.app,
+      source,
+      targets,
+      onConfirm: ({ targetId, relation }) => {
+        this.controller.createRelation(sourceId, targetId, relation);
+      },
+    });
   }
 
   createRelation(sourceId: string, targetId: string, relation: string): void {
@@ -1447,9 +1442,13 @@ export default class InterestSeedPlugin extends Plugin {
   promptEditRelation(edgeId: string): void {
     const edge = this.store.getEdge(edgeId);
     if (!edge) return;
-    new RelationEditModal(this.app, edge.relation, (relation) => {
-      this.controller.editRelation(edgeId, relation);
-    }).open();
+    openRelationEditModal({
+      app: this.app,
+      relation: edge.relation,
+      onConfirm: (relation) => {
+        this.controller.editRelation(edgeId, relation);
+      },
+    });
   }
 
   editRelation(edgeId: string, relation: string): void {
