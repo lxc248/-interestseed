@@ -56,7 +56,9 @@ if (!releaseResponse.ok) {
     }
   }
   if (checksum && !checksum.size) errors.push('release checksum is empty');
-  if (process.env.GITHUB_TOKEN && zip?.digest) {
+  if (!process.env.GITHUB_TOKEN) {
+    errors.push('GITHUB_TOKEN is required to verify the attestation');
+  } else if (zip?.digest) {
     const attestationResponse = await fetch(
       `https://api.github.com/repos/lxc248/-interestseed/attestations/${zip.digest}`,
       { headers },
@@ -100,7 +102,9 @@ if (!releaseResponse.ok) {
           const bundle = bundleFromJSON(first.bundle);
           const trustedRoot = await getTrustedRoot();
           const verifier = new Verifier(toTrustMaterial(trustedRoot));
-          verifier.verify(toSignedEntity(bundle));
+          verifier.verify(toSignedEntity(bundle), {
+            subjectAlternativeName: `https://github.com/lxc248/-interestseed/.github/workflows/release-standalone.yml@refs/tags/${tag}`,
+          });
           signatureVerified = true;
         } catch {
           errors.push('attestation signature verification failed');
