@@ -245,13 +245,11 @@ async function route(
     await ensureStateDir(options.vaultPath);
     const path = join(stateDir(options.vaultPath), 'decisions.json');
     let decisions: unknown[] = [];
-    if (existsSync(path)) {
-      try {
-        const parsed = JSON.parse(await readFile(path, 'utf8')) as { decisions?: unknown[] };
-        if (Array.isArray(parsed.decisions)) decisions = parsed.decisions;
-      } catch {
-        decisions = [];
-      }
+    try {
+      const parsed = JSON.parse(await readFile(path, 'utf8')) as { decisions?: unknown[] };
+      if (Array.isArray(parsed.decisions)) decisions = parsed.decisions;
+    } catch {
+      decisions = [];
     }
     decisions.push({
       experimentId: id,
