@@ -84,13 +84,13 @@ import {
 } from './experiment/experiment';
 import type { SeedSprintDraft } from './onboarding/seedSprint';
 import { edgeIdFor, hashString, nodeIdForUri } from './utils/ids';
-import { pathFromUri, vaultUri } from './utils/paths';
 import { enqueueActiveNote as enqueueActiveNoteFromApp, openSparkFromClipboard as openSparkFromClipboardFromApp } from './plugin/inboxActions';
 import { readAiApiKey, saveAiApiKey } from './plugin/aiKeyStore';
 import { buildRoutePlan, exportInterestRoute as writeInterestRoute, exportJsonCanvas as writeJsonCanvas } from './plugin/artifactExporter';
 import { openRelationCreateModal, openRelationEditModal } from './plugin/relationPrompts';
 import { openScanConfirmModal } from './plugin/scanPrompts';
 import { activateAgentView as activateAgentLeaf, activateAiView as activateAiLeaf } from './plugin/leafViews';
+import { suggestForActiveNote as suggestActiveNote, suggestForFile as suggestFile, suggestForSelectedNode as suggestSelectedNode } from './plugin/aiSuggestions';
 import { captureInterestSpark as captureInterestSparkFromModule } from './plugin/sparkCapture';
 import { applySeedSprint as applySeedSprintFromModule } from './plugin/seedSprintApply';
 import {
@@ -748,35 +748,26 @@ export default class InterestSeedPlugin extends Plugin {
   }
 
   async suggestForFile(file: TFile): Promise<void> {
-    const node =
-      this.store.findNodeByUri(vaultUri(file.path)) ??
-      this.store.listNodes().find((item) => {
-        if (!item.sourceUri) return false;
-        return pathFromUri(item.sourceUri).toLowerCase() === file.path.toLowerCase();
-      });
-    if (!node) {
-      new Notice('这篇笔记还没进入图谱；先运行一次“重新扫描”。');
-      return;
-    }
-    await this.expandWithAI(node.id);
+    await suggestFile({
+      file,
+      findNodeByUri: (uri) => this.store.findNodeByUri(uri),
+      listNodes: () => this.store.listNodes(),
+      expandWithAI: (nodeId) => this.expandWithAI(nodeId),
+    });
   }
 
   async suggestForActiveNote(): Promise<void> {
-    const file = this.app.workspace.getActiveFile();
-    if (!file) {
-      new Notice('先打开一篇 Markdown 笔记。');
-      return;
-    }
-    await this.suggestForFile(file);
+    await suggestActiveNote({
+      app: this.app,
+      suggestForFile: (file) => this.suggestForFile(file),
+    });
   }
 
   async suggestForSelectedNode(): Promise<void> {
-    const nodeId = this.getSelectedNodeId();
-    if (!nodeId) {
-      new Notice('先在图谱里选中一个节点。');
-      return;
-    }
-    await this.expandWithAI(nodeId);
+    await suggestSelectedNode({
+      nodeId: this.getSelectedNodeId(),
+      expandWithAI: (nodeId) => this.expandWithAI(nodeId),
+    });
   }
 
   confirmAiSuggestion(
