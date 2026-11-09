@@ -62,6 +62,13 @@ describe('artifactExporter', () => {
     expect(String(createMock.mock.calls[0]?.[0])).toContain('.canvas');
   });
 
+  it('does not write a canvas for an empty graph', async () => {
+    const { app } = makeApp([]);
+    await exportJsonCanvas(app, { nodes: [], edges: [] } as never);
+    expect(createFolderMock).not.toHaveBeenCalled();
+    expect(notices.at(-1)).toBe('图谱里还没有节点，先留下一个火花。');
+  });
+
   it('adds a numeric suffix when a route already exists', async () => {
     const { app } = makeApp(['InterestSeed', 'InterestSeed/兴趣路线 - 测试兴趣 - 2026-11-09.md']);
     await exportInterestRoute(app, {
