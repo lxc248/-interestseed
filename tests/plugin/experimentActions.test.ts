@@ -120,4 +120,27 @@ describe('experimentActions', () => {
     );
     expect(result).toBe(false);
   });
+
+  it('records a full check-in for an active experiment', () => {
+    const state = createExperiment({
+      title: '兴趣',
+      hypothesis: '验证',
+      metric: '记录',
+      startedAt: new Date().toISOString(),
+      targetDays: 7,
+    }) as ExperimentState;
+    const updateNode = vi.fn();
+    const result = recordExperimentCheckIn(
+      {
+        updateNode,
+        invalidateInsights: vi.fn(),
+        notifyStatus: vi.fn(),
+        persist: vi.fn(),
+      },
+      { node: { id: 'a', metadata: {} } as never, state, day: 1, gate: {} as never, summary: {} as never },
+      { interest: 4, energy: 4, evidence: '今天做了' },
+    );
+    expect(result).toBe(true);
+    expect(updateNode).toHaveBeenCalledTimes(1);
+  });
 });
