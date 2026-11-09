@@ -753,6 +753,7 @@ export default class InterestSeedPlugin extends Plugin {
             day: active.state.logs.length,
             targetDays: active.state.targetDays,
             status: active.state.status,
+            next: active.state.logs.at(-1)?.next,
           }
         : null,
     });
