@@ -4,7 +4,12 @@ vi.mock('obsidian', () => ({
   Notice: class {},
 }));
 
-import { getActiveExperiment } from '../../src/plugin/experimentActions';
+import {
+  extendExperimentToSeven,
+  getActiveExperiment,
+  startStarterExperiment,
+} from '../../src/plugin/experimentActions';
+import { createExperiment, type ExperimentState } from '../../src/experiment/experiment';
 
 describe('experimentActions.getActiveExperiment', () => {
   it('returns null when no node is marked as next step', () => {
@@ -23,5 +28,55 @@ describe('experimentActions.getActiveExperiment', () => {
     expect(result?.node.id).toBe('a');
     expect(result?.state.title).toBe('学琴');
     expect(result?.day).toBe(1);
+  });
+
+  it('starts a 3-day starter experiment', () => {
+    const state = createExperiment({
+      title: '兴趣',
+      hypothesis: '验证一周',
+      metric: '记录',
+      startedAt: new Date().toISOString(),
+      targetDays: 7,
+    });
+    const updateNode = vi.fn();
+    const result = startStarterExperiment(
+      {
+        updateNode,
+        invalidateInsights: vi.fn(),
+        notifyStatus: vi.fn(),
+        persist: vi.fn(),
+      },
+      { node: { id: 'a', metadata: {} } as never, state, day: 1, gate: {} as never, summary: {} as never },
+    );
+    expect(result).toBe(true);
+    expect(updateNode).toHaveBeenCalledTimes(1);
+  });
+
+  it('extends a completed 3-day starter to 7 days', () => {
+    const state = createExperiment({
+      title: '兴趣',
+      hypothesis: '验证',
+      metric: '记录',
+      startedAt: new Date().toISOString(),
+      targetDays: 3,
+    }) as ExperimentState;
+    const extended = {
+      ...state,
+      targetDays: 3,
+      status: 'complete',
+      logs: [{ day: 1 }, { day: 2 }, { day: 3 }],
+    } as never;
+    const updateNode = vi.fn();
+    const result = extendExperimentToSeven(
+      {
+        updateNode,
+        invalidateInsights: vi.fn(),
+        notifyStatus: vi.fn(),
+        persist: vi.fn(),
+      },
+      { node: { id: 'a', metadata: {} } as never, state: extended, day: 3, gate: {} as never, summary: {} as never },
+    );
+    expect(result).toBe(true);
+    expect(updateNode).toHaveBeenCalledTimes(1);
   });
 });
