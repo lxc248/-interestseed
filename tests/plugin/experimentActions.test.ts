@@ -7,11 +7,12 @@ vi.mock('obsidian', () => ({
 import {
   extendExperimentToSeven,
   getActiveExperiment,
+  recordQuickExperiment,
   startStarterExperiment,
 } from '../../src/plugin/experimentActions';
 import { createExperiment, type ExperimentState } from '../../src/experiment/experiment';
 
-describe('experimentActions.getActiveExperiment', () => {
+describe('experimentActions', () => {
   it('returns null when no node is marked as next step', () => {
     const result = getActiveExperiment({
       listNodes: () => [{ id: 'a', metadata: { nextStep: false } } as never],
@@ -75,6 +76,29 @@ describe('experimentActions.getActiveExperiment', () => {
         persist: vi.fn(),
       },
       { node: { id: 'a', metadata: {} } as never, state: extended, day: 3, gate: {} as never, summary: {} as never },
+    );
+    expect(result).toBe(true);
+    expect(updateNode).toHaveBeenCalledTimes(1);
+  });
+
+  it('records a quick check-in', () => {
+    const state = createExperiment({
+      title: '兴趣',
+      hypothesis: '验证',
+      metric: '记录',
+      startedAt: new Date().toISOString(),
+      targetDays: 7,
+    }) as ExperimentState;
+    const updateNode = vi.fn();
+    const result = recordQuickExperiment(
+      {
+        updateNode,
+        invalidateInsights: vi.fn(),
+        notifyStatus: vi.fn(),
+        persist: vi.fn(),
+      },
+      { node: { id: 'a', metadata: {} } as never, state, day: 1, gate: {} as never, summary: {} as never },
+      'did',
     );
     expect(result).toBe(true);
     expect(updateNode).toHaveBeenCalledTimes(1);
