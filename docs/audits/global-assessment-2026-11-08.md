@@ -30,7 +30,7 @@ limits remain external adoption and repository weight; app-state visual coverage
 | Product value / differentiation | 15% | 7.2 | 1.08 | Clear “capture → one connection → 3-day experiment → evidence” loop; unproven demand |
 | Product completeness / UX | 15% | 7.5 | 1.125 | CLI, web, skill, MCP and site exist; site + app E2E and axe gated; public pages plus app home/settings/capture/experiment/sprint/share/audit/correction visuals; landing layout with canvas hidden; animation itself not diffed |
 | Code quality / maintainability | 15% | 6.8 | 1.02 | Strict TypeScript, modular layout, lint/typecheck; some large low-coverage modules |
-| Tests / QA | 15% | 7.6 | 1.14 | 632 tests, 85.71% line / 72.15% branch coverage; public pages plus app home/settings/capture/experiment/sprint/share/audit/correction visuals; landing layout with canvas hidden; animation itself not diffed |
+| Tests / QA | 15% | 7.6 | 1.14 | 633 tests, 85.71% line / 72.15% branch coverage; public pages plus app home/settings/capture/experiment/sprint/share/audit/correction visuals; landing layout with canvas hidden; animation itself not diffed |
 | Security / privacy | 15% | 8.0 | 1.20 | Critical leak fixed, guards and body limit tested; no independent 4.0.9 audit |
 | Docs / repo hygiene | 5% | 7.0 | 0.35 | Excellent current docs and checks; 29.6 MB tree, 2.5 MB archive; history still large |
 | Release / supply chain | 10% | 8.5 | 0.85 | 4.0.9 built by workflow; digest and Sigstore attestation verified; no independent audit |
@@ -45,7 +45,7 @@ limits remain external adoption and repository weight; app-state visual coverage
 main:                 9e9d99a
 Vitest:              574 passed
 MCP smoke:            11 passed
-Total tests:         632 passed
+Total tests:         633 passed
 Coverage statements:  82.96%
 Coverage branches:    72.15%
 Coverage functions:   85.16%
