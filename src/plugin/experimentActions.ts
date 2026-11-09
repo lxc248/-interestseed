@@ -5,6 +5,10 @@ import { appendObservation } from '../core/observations';
 import {
   QUICK_CHECK_INS,
   STARTER_DAYS,
+  canRecordToday,
+  createExperiment,
+  experimentSummary,
+  parseExperiment,
   recordExperimentLog,
   type ExperimentInput,
   type ExperimentState,
@@ -15,8 +19,8 @@ export interface ActiveExperimentSnapshot {
   node: InterestSeedNode;
   state: ExperimentState;
   day: number;
-  gate: unknown;
-  summary: unknown;
+  gate: ReturnType<typeof canRecordToday>;
+  summary: ReturnType<typeof experimentSummary>;
 }
 
 interface ExperimentActions {
@@ -24,6 +28,23 @@ interface ExperimentActions {
   invalidateInsights: () => void;
   notifyStatus: () => void;
   persist: () => void;
+}
+
+export function getActiveExperiment(input: {
+  listNodes: () => InterestSeedNode[];
+}): ActiveExperimentSnapshot | null {
+  const node = input.listNodes().find((candidate) => candidate.metadata?.nextStep === true);
+  if (!node) return null;
+  const state =
+    parseExperiment(node.metadata, node.title) ??
+    createExperiment({ title: node.title, hypothesis: '这个兴趣值得我投入一周的真实注意力。' });
+  return {
+    node,
+    state,
+    day: Math.min(state.targetDays, state.logs.length + 1),
+    gate: canRecordToday(state),
+    summary: experimentSummary(state),
+  };
 }
 
 export function recordExperimentCheckIn(
