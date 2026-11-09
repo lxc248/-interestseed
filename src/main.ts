@@ -83,7 +83,6 @@ import {
   type QuickCheckInKind,
 } from './experiment/experiment';
 import type { SeedSprintDraft } from './onboarding/seedSprint';
-import { edgeIdFor, hashString, nodeIdForUri } from './utils/ids';
 import { enqueueActiveNote as enqueueActiveNoteFromApp, openSparkFromClipboard as openSparkFromClipboardFromApp } from './plugin/inboxActions';
 import { readAiApiKey, saveAiApiKey } from './plugin/aiKeyStore';
 import { buildRoutePlan, exportInterestRoute as writeInterestRoute, exportJsonCanvas as writeJsonCanvas } from './plugin/artifactExporter';
@@ -91,6 +90,7 @@ import { openRelationCreateModal, openRelationEditModal } from './plugin/relatio
 import { openScanConfirmModal } from './plugin/scanPrompts';
 import { activateAgentView as activateAgentLeaf, activateAiView as activateAiLeaf } from './plugin/leafViews';
 import { suggestForActiveNote as suggestActiveNote, suggestForFile as suggestFile, suggestForSelectedNode as suggestSelectedNode } from './plugin/aiSuggestions';
+import { captureGapSeed as captureGapSeedFromModule } from './plugin/gapCapture';
 import { captureInterestSpark as captureInterestSparkFromModule } from './plugin/sparkCapture';
 import { applySeedSprint as applySeedSprintFromModule } from './plugin/seedSprintApply';
 import {
@@ -574,50 +574,19 @@ export default class InterestSeedPlugin extends Plugin {
   }
 
   captureGapSeed(insight: Insight, text: string): string | null {
-    const value = text.trim();
-    if (!value) return null;
-    const now = new Date().toISOString();
-    const id = nodeIdForUri(`interestseed://gap/${hashString(`${insight.id}:${value}`)}`);
-    if (this.store.getNode(id)) return id;
-    this.session.addNode(
-      {
-        id,
-        type: 'topic',
-        title: value.slice(0, 96),
-        tags: ['缺口', '观察'],
-        createdAt: now,
-        updatedAt: now,
-        metadata: {
-          gapCoach: true,
-          insightId: insight.id,
-          insightTitle: insight.title,
-          evidence: insight.detail,
-        },
+    return captureGapSeedFromModule({
+      insight,
+      text,
+      getNode: (id) => this.store.getNode(id),
+      addNode: (node, message) => this.session.addNode(node, message),
+      addEdge: (edge, message) => this.session.addEdge(edge, message),
+      invalidateInsights: () => {
+        this.insightsCache = null;
       },
-      '兴趣缺口：种下一个观察',
-    );
-    const target = insight.nodeIds.find((nodeId) => this.store.getNode(nodeId));
-    if (target) {
-      this.session.addEdge(
-        {
-          id: edgeIdFor(target, id, '补充观察'),
-          source: target,
-          target: id,
-          relation: '补充观察',
-          origin: 'user',
-          status: 'suggested',
-          evidence: [`来自图谱缺口：${insight.title}`],
-          createdAt: now,
-          updatedAt: now,
-        },
-        '把观察接到缺口上',
-      );
-    }
-    this.insightsCache = null;
-    this.notifyStatus();
-    void this.persist();
-    this.setSelectedNode(id);
-    return id;
+      notifyStatus: () => this.notifyStatus(),
+      persist: () => void this.persist(),
+      setSelectedNode: (id) => this.setSelectedNode(id),
+    });
   }
 
   openSparkCapture(
