@@ -19,8 +19,8 @@ Local trust-boundary and closed-loop hardening.
 ```text
 Vitest        579 passed
 MCP smoke      11 passed
-Playwright     32 passed
-Total         622 passed
+Playwright     31 passed
+Total         621 passed
 npm audit     0 vulnerabilities
 CodeQL        open alerts: 0
 ```

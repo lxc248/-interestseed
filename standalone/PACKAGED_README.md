@@ -5,7 +5,7 @@ This zip is self-contained. It does not need the Obsidian plugin runtime.
 ## 4.0.9 highlights
 
 - 1 MiB request-body limit; oversized bodies return 413.
-- 606-test quality gate: 574 Vitest + 11 MCP smoke + 21 Playwright E2E.
+- 621-test quality gate: 579 Vitest + 11 MCP smoke + 31 Playwright E2E.
 - CodeQL source-scoped, axe WCAG 2A/2AA zero-violation, size-budget and npm audit gates run in CI.
 - Deterministic ZIP packaging; the same source produces the same SHA-256.
 - API responses use no-store, nosniff, no-referrer and same-origin policies.
