@@ -9,7 +9,7 @@ vi.mock('obsidian', () => ({
   },
 }));
 
-import { pluginDataPayload, reportLoadResult } from '../../src/plugin/persistence';
+import { persistPluginData, pluginDataPayload, reportLoadResult } from '../../src/plugin/persistence';
 
 describe('persistence', () => {
   it('builds a payload with schema version and inbox', () => {
@@ -24,6 +24,14 @@ describe('persistence', () => {
       lastRebuiltAt: '2026-11-09T00:00:00.000Z',
       inbox: '[]',
     });
+  });
+
+  it('notices when persistence fails', async () => {
+    const saveData = vi.fn(async () => {
+      throw new Error('disk full');
+    });
+    await persistPluginData(saveData, { schemaVersion: 1 });
+    expect(notices.some((entry) => entry.message.includes('设置保存失败'))).toBe(true);
   });
 
   it('reports a blocked load result', () => {
