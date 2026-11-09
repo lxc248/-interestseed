@@ -1,5 +1,14 @@
 # Changelog
 
+## 4.0.8 — Security follow-up
+
+- Redacted the local API key from upstream error details.
+- Added a pre-publish package/page digest check.
+- Added troubleshooting docs for 429, ports, keys and local-server errors.
+- Cleared all open CodeQL alerts via source fixes, scan scoping and documented design triage.
+- npm audit: 0 vulnerabilities.
+
+
 ## 4.0.7 — Accessibility and runtime hardening
 
 - Added a startup logging test for the actual bound port and local-only warning.

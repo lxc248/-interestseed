@@ -68,7 +68,7 @@ Users can verify a download with:
 
 ```bash
 sha256sum -c SHA256SUMS.txt
-gh attestation verify interestseed-v4.0.7.zip --repo lxc248/-interestseed
+gh attestation verify interestseed-v4.0.8.zip --repo lxc248/-interestseed
 ```
 
 ## Layer 5: commercial license

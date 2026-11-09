@@ -1,8 +1,8 @@
-# InterestSeed Standalone 4.0.7
+# InterestSeed Standalone 4.0.8
 
 This zip is self-contained. It does not need the Obsidian plugin runtime.
 
-## 4.0.7 highlights
+## 4.0.8 highlights
 
 - 1 MiB request-body limit; oversized bodies return 413.
 - 606-test quality gate: 574 Vitest + 11 MCP smoke + 21 Playwright E2E.
@@ -11,6 +11,7 @@ This zip is self-contained. It does not need the Obsidian plugin runtime.
 - API responses use no-store, nosniff, no-referrer and same-origin policies.
 - `interestseed version`, `GET /api/health`, local-only badge and accessible modals.
 - Friendly 429 Retry-After messages and EADDRINUSE guidance.
+- Upstream API keys are redacted from error details; CodeQL open alerts: 0.
 - Route failures return a stable generic 500; internal exception text stays on stderr.
 
 ```bash
