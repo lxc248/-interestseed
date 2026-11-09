@@ -27,15 +27,15 @@ limits remain external adoption and repository weight; app-state visual coverage
 
 | Category | Weight | Score | Weighted | Why this score |
 | --- | ---: | ---: | ---: | --- |
-| Product value / differentiation | 15% | 7.0 | 1.05 | Clear “capture → one connection → 3-day experiment → evidence” loop; unproven demand |
-| Product completeness / UX | 15% | 7.4 | 1.11 | CLI, web, skill, MCP and site exist; site + app E2E and axe gated; public pages plus app home/settings/capture/experiment/sprint/share/audit/correction visuals; landing layout with canvas hidden; animation itself not diffed |
-| Code quality / maintainability | 15% | 7.0 | 1.05 | Strict TypeScript, modular layout, lint/typecheck; some large low-coverage modules |
-| Tests / QA | 15% | 7.5 | 1.125 | 617 tests, 85.71% line / 72.15% branch coverage; public pages plus app home/settings/capture/experiment/sprint/share/audit/correction visuals; landing layout with canvas hidden; animation itself not diffed |
-| Security / privacy | 15% | 7.5 | 1.125 | Critical leak fixed, guards and body limit tested; no independent 4.0.8 audit |
-| Docs / repo hygiene | 5% | 6.5 | 0.325 | Excellent current docs and checks; 29.6 MB tree, 2.5 MB archive; history still large |
-| Release / supply chain | 10% | 8.0 | 0.80 | 4.0.8 built by workflow; digest and Sigstore attestation verified; no independent audit |
-| Distribution / adoption | 10% | 1.5 | 0.15 | 1 star, 0 forks, 0 downloads of 4.0.8, no external citations |
-| **Total** | **100%** |  | **6.7** | **Promising, not yet mature** |
+| Product value / differentiation | 15% | 7.2 | 1.08 | Clear “capture → one connection → 3-day experiment → evidence” loop; unproven demand |
+| Product completeness / UX | 15% | 7.5 | 1.125 | CLI, web, skill, MCP and site exist; site + app E2E and axe gated; public pages plus app home/settings/capture/experiment/sprint/share/audit/correction visuals; landing layout with canvas hidden; animation itself not diffed |
+| Code quality / maintainability | 15% | 6.8 | 1.02 | Strict TypeScript, modular layout, lint/typecheck; some large low-coverage modules |
+| Tests / QA | 15% | 7.6 | 1.14 | 621 tests, 85.71% line / 72.15% branch coverage; public pages plus app home/settings/capture/experiment/sprint/share/audit/correction visuals; landing layout with canvas hidden; animation itself not diffed |
+| Security / privacy | 15% | 8.0 | 1.20 | Critical leak fixed, guards and body limit tested; no independent 4.0.9 audit |
+| Docs / repo hygiene | 5% | 7.0 | 0.35 | Excellent current docs and checks; 29.6 MB tree, 2.5 MB archive; history still large |
+| Release / supply chain | 10% | 8.5 | 0.85 | 4.0.9 built by workflow; digest and Sigstore attestation verified; no independent audit |
+| Distribution / adoption | 10% | 1.5 | 0.15 | 1 star, 0 forks, 0 downloads of 4.0.9, no external citations |
+| **Total** | **100%** |  | **6.9** | **Promising, not yet mature** |
 
 ## Evidence
 
@@ -45,12 +45,12 @@ limits remain external adoption and repository weight; app-state visual coverage
 main:                 9e9d99a
 Vitest:              574 passed
 MCP smoke:            11 passed
-Total tests:         617 passed
+Total tests:         621 passed
 Coverage statements:  82.96%
 Coverage branches:    72.15%
 Coverage functions:   85.16%
 Coverage lines:       85.71%
-Playwright E2E:       32 passed
+Playwright E2E:       31 passed
 Typecheck:            passed
 Lint:                 passed
 Build:                passed
@@ -73,7 +73,7 @@ standalone/src/state.ts        71.42% lines
 ```text
 Site check:           8 HTML pages passed
 Docs check:           44 Markdown files passed
-Version check:        all references = 4.0.8
+Version check:        all references = 4.0.9
 npm audit:            0 vulnerabilities
 CodeQL open alerts:   0
 Site manual FPS:      ~61 fps at 1440×1000
@@ -94,7 +94,7 @@ historical media is retained; a full history rewrite is still pending.
 ### Release and adoption
 
 ```text
-Latest release:       standalone-v4.0.8
+Latest release:       standalone-v4.0.9
 Release downloads:    0
 Stars:                1
 Forks:                0
@@ -123,12 +123,12 @@ Dependabot + npm audit 0
 
 Still open:
 
-- No independent audit of the 4.0.8 changes.
+- No independent audit of the 4.0.9 changes.
 - The local server still trusts any local process; that is the model, but it
   should be stated more explicitly for users.
 - Full MCP mode exposes graph summaries and `sourceRef`; `--minimal` reduces
   this but is not the default.
-- The automated release workflow has now run and published 4.0.8; its Sigstore
+- The automated release workflow has now run and published 4.0.9; its Sigstore
   attestation signature is verified by `check:release`, but no independent
   human audit exists.
 
@@ -142,7 +142,7 @@ Still open:
    one graph.
 4. **The docs and checks are better than most small projects.** Version, site,
    docs, JSON-LD, sitemap and security checks are automated.
-5. **Release artifacts are checksummed and the 4.0.8 digest is verified.**
+5. **Release artifacts are checksummed and the 4.0.9 digest is verified.**
 
 ## What prevents a higher score
 
@@ -165,7 +165,7 @@ Still open:
    its canvas hidden; the canvas animation itself is not screenshot-diffed.
 6. **Repository weight.** The current tree is 29.6 MB, under the 40 MB target, but the Git clone history still retains historical media.
 7. **No independent release audit.** The workflow executed and the digest was
-   verified, but provenance and the 4.0.8 changes have not been independently
+   verified, but provenance and the 4.0.9 changes have not been independently
    checked.
 
 ## Strict score by dimension
@@ -174,10 +174,10 @@ Still open:
 | --- | ---: | --- |
 | Idea | 8.0 | Clear, differentiated, worth testing |
 | Implementation | 7.0 | Broad and coherent; uneven depth |
-| Test confidence | 7.5 | Coverage above 80% lines; site/app E2E and axe gated; eleven visual baselines |
-| Security | 7.5 | Strong recent hardening; not independently audited |
+| Test confidence | 7.6 | Coverage above 80% lines; site/app E2E and axe gated; eleven visual baselines |
+| Security | 8.0 | Host/token/key/consent hardening; not independently audited |
 | Documentation | 8.0 | Current docs are good; archive bloat hurts repo hygiene |
-| Release discipline | 8.0 | Automated workflow, digest and Sigstore signature verified |
+| Release discipline | 8.5 | 4.0.9 workflow, digest and identity-bound Sigstore verified |
 | Distribution | 1.5 | Effectively zero reach |
 | **Overall** | **6.7** | **Promising prototype, not yet a mature product** |
 
@@ -200,7 +200,7 @@ Still open:
 ### Week 3 — release proof
 
 - Verify the downloaded zip hash and provenance attestation.
-- Record an independent 4.0.8 audit covering the server/MCP changes.
+- Record an independent 4.0.9 audit covering the server/MCP changes.
 
 ### Week 4 — distribution proof
 
@@ -216,7 +216,7 @@ The project reaches “good” only when all of these are true:
 coverage >= 85% lines / 72% branches
 visual regression covers key public and app states
 tracked tree < 40 MB
-independent 4.0.8 audit completed
+independent 4.0.9 audit completed
 at least 3 external citations
 at least 10 real users or 3 interviews
 ```
@@ -226,6 +226,6 @@ at least 10 real users or 3 interviews
 - Scores are based on repository evidence, not interviews or telemetry.
 - There is no production analytics, so retention and conversion are unknown.
 - The manual FPS check is a single headless run, not a field performance study.
-- No independent security review of 4.0.8 was available.
+- No independent security review of 4.0.9 was available.
 - A high engineering score cannot compensate for zero distribution; the weights
   intentionally keep adoption material.
