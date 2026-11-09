@@ -1,0 +1,29 @@
+import { describe, expect, it, vi } from 'vitest';
+
+const notices: string[] = [];
+vi.mock('obsidian', () => ({
+  Notice: class {
+    constructor(public message: string) {
+      notices.push(message);
+    }
+  },
+}));
+
+import { enqueueActiveNote } from '../../src/plugin/inboxActions';
+
+describe('inboxActions', () => {
+  it('enqueues the active note body', async () => {
+    const enqueueShare = vi.fn(() => ({ item: { id: 'x' }, duplicate: false }));
+    const openInbox = vi.fn();
+    const app = {
+      workspace: {
+        getActiveFile: () => ({ extension: 'md', basename: '笔记', path: '笔记.md' }),
+      },
+      vault: { cachedRead: vi.fn(async () => '# 标题\n\n正文内容。') },
+    } as never;
+    await enqueueActiveNote({ app, enqueueShare, openInbox });
+    expect(enqueueShare).toHaveBeenCalledTimes(1);
+    expect(openInbox).toHaveBeenCalledTimes(1);
+    expect(notices.at(-1)).toBe('已把当前笔记放进收件箱。');
+  });
+});
