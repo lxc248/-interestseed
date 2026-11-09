@@ -14,6 +14,7 @@ const hasAppBaseline = existsSync(join(baselineDir, 'app-home-chromium-linux.png
 const hasSettingsBaseline = existsSync(join(baselineDir, 'settings-modal-chromium-linux.png'));
 const hasCaptureBaseline = existsSync(join(baselineDir, 'capture-modal-chromium-linux.png'));
 const hasExperimentBaseline = existsSync(join(baselineDir, 'experiment-modal-chromium-linux.png'));
+const hasSprintBaseline = existsSync(join(baselineDir, 'sprint-modal-chromium-linux.png'));
 let appServer: Server;
 let vaultPath: string;
 let appBase: string;
@@ -109,6 +110,18 @@ test('experiment modal visual', async ({ page }) => {
   await page.getByRole('button', { name: '开始 3 天实验' }).click();
   await expect(page.locator('#experiment-modal')).toBeVisible();
   await expect(page.locator('#experiment-modal')).toHaveScreenshot('experiment-modal.png', {
+    animations: 'disabled',
+    maxDiffPixelRatio: 0.01,
+  });
+});
+test('sprint modal visual', async ({ page }) => {
+  test.skip(process.platform !== 'linux', 'Visual baselines are generated on Linux CI.');
+  test.skip(!updating && !hasSprintBaseline, 'Sprint visual baseline is not installed yet.');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto(appBase);
+  await page.locator('#sprint-button').click();
+  await expect(page.locator('#sprint-modal')).toBeVisible();
+  await expect(page.locator('#sprint-modal')).toHaveScreenshot('sprint-modal.png', {
     animations: 'disabled',
     maxDiffPixelRatio: 0.01,
   });
