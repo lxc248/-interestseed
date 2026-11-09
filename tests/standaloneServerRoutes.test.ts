@@ -134,6 +134,28 @@ describe('standalone server routes', () => {
     expect(items[0].text).toContain('待处理');
   });
 
+  it('validates and persists experiment decisions', async () => {
+    const base = await start();
+    const invalid = await fetch(`${base}/api/experiments/decision`, {
+      method: 'POST',
+      headers: jsonHeaders(),
+      body: JSON.stringify({ decision: 'maybe' }),
+    });
+    expect(invalid.status).toBe(400);
+    const missing = await fetch(`${base}/api/experiments/decision`, {
+      method: 'POST',
+      headers: jsonHeaders(),
+      body: JSON.stringify({ decision: 'keep' }),
+    });
+    expect(missing.status).toBe(400);
+    const accepted = await fetch(`${base}/api/experiments/decision`, {
+      method: 'POST',
+      headers: jsonHeaders(),
+      body: JSON.stringify({ id: 'visual-experiment', decision: 'keep', note: 'done' }),
+    });
+    expect(accepted.status).toBe(200);
+    expect(await accepted.json()).toMatchObject({ ok: true, decision: 'keep' });
+  });
   it('handles empty undo and missing connect suggestions', async () => {
     const base = await start();
     const undo = await fetch(`${base}/api/undo`, {

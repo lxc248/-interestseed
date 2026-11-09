@@ -242,6 +242,7 @@ async function route(
     }
     const id = typeof body.id === 'string' ? body.id : '';
     if (!id) return sendJson(response, 400, { error: 'id required' });
+    await ensureStateDir(options.vaultPath);
     const path = join(stateDir(options.vaultPath), 'decisions.json');
     let decisions: unknown[] = [];
     if (existsSync(path)) {
