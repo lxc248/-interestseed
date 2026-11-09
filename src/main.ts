@@ -98,11 +98,10 @@ import {
 } from './ui/DiscoveryAuditModal';
 import { DiscoveryOverviewModal } from './ui/DiscoveryOverviewModal';
 import { DiscoveryExplorerModal } from './ui/DiscoveryExplorerModal';
-import { AiSetupModal } from './ui/AiSetupModal';
+import { openAiSetupModal } from './plugin/aiSetup';
 import { buildDiscoveryOverview } from './discovery/overview';
 import { buildExploration } from './discovery/exploration';
 import {
-  DEEPSEEK_V4_PRO_CONFIG,
   createModelProvider,
   type ExplorationInsight,
   type ExplorationRequest,
@@ -1337,24 +1336,14 @@ export default class InterestSeedPlugin extends Plugin {
   }
 
   openAiSetup(): void {
-    void this.getAiApiKey().then((key) => {
-      new AiSetupModal(this.app, {
-        endpoint: DEEPSEEK_V4_PRO_CONFIG.baseUrl,
-        providerLabel: `本地模型 · ${this.settings.aiModel}`,
-        enabled: this.settings.enableAI,
-        consentGranted: this.settings.aiConsentGranted,
-        hasKey: Boolean(key),
-        onSaveKey: (value) => this.saveAiApiKey(value),
-        onOpenSettings: () => {
-          const setting = (
-            this.app as unknown as {
-              setting?: { open(): void; openTabById(id: string): void };
-            }
-          ).setting;
-          setting?.open();
-          setting?.openTabById(this.manifest.id);
-        },
-      }).open();
+    openAiSetupModal({
+      app: this.app,
+      manifestId: this.manifest.id,
+      aiModel: this.settings.aiModel,
+      enableAI: this.settings.enableAI,
+      aiConsentGranted: this.settings.aiConsentGranted,
+      getKey: () => this.getAiApiKey(),
+      saveKey: (value) => this.saveAiApiKey(value),
     });
   }
 
