@@ -1,12 +1,15 @@
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('obsidian', () => ({
-  Notice: class {},
+  Notice: class {
+    constructor(public message: string) {}
+  },
 }));
 
 import {
   extendExperimentToSeven,
   getActiveExperiment,
+  recordExperimentCheckIn,
   recordQuickExperiment,
   startStarterExperiment,
 } from '../../src/plugin/experimentActions';
@@ -102,5 +105,19 @@ describe('experimentActions', () => {
     );
     expect(result).toBe(true);
     expect(updateNode).toHaveBeenCalledTimes(1);
+  });
+
+  it('returns false when checking in without an active experiment', () => {
+    const result = recordExperimentCheckIn(
+      {
+        updateNode: vi.fn(),
+        invalidateInsights: vi.fn(),
+        notifyStatus: vi.fn(),
+        persist: vi.fn(),
+      },
+      null,
+      { interest: 4, energy: 4, evidence: '做了' },
+    );
+    expect(result).toBe(false);
   });
 });
