@@ -80,6 +80,7 @@ import { buildRoutePlan, exportInterestRoute as writeInterestRoute, exportJsonCa
 import { openRelationCreateModal, openRelationEditModal } from './plugin/relationPrompts';
 import { openScanConfirmModal } from './plugin/scanPrompts';
 import { activateAgentView as activateAgentLeaf, activateAiView as activateAiLeaf, activateGraphView } from './plugin/leafViews';
+import { unloadPlugin } from './plugin/pluginLifecycle';
 import { suggestForActiveNote as suggestActiveNote, suggestForFile as suggestFile, suggestForSelectedNode as suggestSelectedNode } from './plugin/aiSuggestions';
 import { extendExperimentToSeven as extendExperiment, recordExperimentCheckIn as recordCheckIn, recordQuickExperiment as recordQuick, startStarterExperiment as startStarter } from './plugin/experimentActions';
 import { captureGapSeed as captureGapSeedFromModule } from './plugin/gapCapture';
@@ -373,21 +374,22 @@ export default class InterestSeedPlugin extends Plugin {
   }
 
   override onunload(): void {
-    // best-effort：Obsidian 的 onunload 不能可靠等待异步完成，应用退出窗口仍可能存在。
     this.unloading = true;
     this.auditTasks.invalidate();
     this.auditRuntimeSession?.invalidate();
     this.auditRuntimeSession = null;
-    this.auditVaultBinding?.invalidate();
     this.auditVaultBinding = null;
-    // 先 detach，让 view.onClose 的 saveViewport 在 flush 前提交。
-    this.app.workspace.detachLeavesOfType(INTERESTSEED_VIEW_TYPE);
-    this.app.workspace.detachLeavesOfType(INTERESTSEED_AGENT_VIEW_TYPE);
-    this.app.workspace.detachLeavesOfType(INTERESTSEED_AI_VIEW_TYPE);
-    this.discoveryQueue?.close();
-    void this.discoveryQueue?.flush();
-    void this.persistence?.flush();
-    this.persistence?.dispose();
+    unloadPlugin({
+      app: this.app,
+      graphViewType: INTERESTSEED_VIEW_TYPE,
+      agentViewType: INTERESTSEED_AGENT_VIEW_TYPE,
+      aiViewType: INTERESTSEED_AI_VIEW_TYPE,
+      invalidateAuditBinding: () => this.auditVaultBinding?.invalidate(),
+      closeDiscoveryQueue: () => this.discoveryQueue?.close(),
+      flushDiscoveryQueue: () => void this.discoveryQueue?.flush(),
+      flushPersistence: () => void this.persistence?.flush(),
+      disposePersistence: () => this.persistence?.dispose(),
+    });
   }
 
   // ------------------------------------------------------------ 视图
