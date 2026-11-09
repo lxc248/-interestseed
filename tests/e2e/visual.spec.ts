@@ -24,37 +24,6 @@ let appBase: string;
 
 test.beforeAll(async () => {
   vaultPath = await mkdtemp(join(tmpdir(), 'interestseed-visual-'));
-  const now = new Date().toISOString();
-  await mkdir(join(vaultPath, '.interestseed'), { recursive: true });
-  await writeFile(
-    join(vaultPath, '.interestseed', 'discoveries.json'),
-    JSON.stringify({
-      discoverySchemaVersion: 3,
-      updatedAt: now,
-      discoveries: [
-        {
-          id: 'visual-discovery',
-          kind: 'cross-project-topic',
-          title: '视觉测试发现',
-          description: '两个项目共享同一个可验证主题。',
-          nodeIds: ['visual-a', 'visual-b'],
-          projectKeys: ['项目 A', '项目 B'],
-          subjectKeys: ['visual'],
-          evidence: [{ kind: 'shared-tag', nodeId: 'visual-a', text: '共享标签 #visual' }],
-          ruleVersion: 'visual',
-          strength: 'moderate',
-          dedupeKey: 'visual',
-          status: 'active',
-          feedbackStatus: 'none',
-          application: { state: 'none' },
-          feedbackEvents: [],
-          createdAt: now,
-          updatedAt: now,
-        },
-      ],
-    }),
-  );
-
   appServer = createInterestSeedServer({ vaultPath, port: 0 });
   await new Promise<void>((resolve, reject) => {
     appServer.once('error', reject);
@@ -192,6 +161,36 @@ test('correction modal visual', async ({ page }) => {
   test.skip(process.platform !== 'linux', 'Visual baselines are generated on Linux CI.');
   test.skip(!updating && !hasCorrectionBaseline, 'Correction visual baseline is not installed yet.');
   await page.emulateMedia({ reducedMotion: 'reduce' });
+  const now = new Date().toISOString();
+  await mkdir(join(vaultPath, '.interestseed'), { recursive: true });
+  await writeFile(
+    join(vaultPath, '.interestseed', 'discoveries.json'),
+    JSON.stringify({
+      discoverySchemaVersion: 3,
+      updatedAt: now,
+      discoveries: [
+        {
+          id: 'visual-discovery',
+          kind: 'cross-project-topic',
+          title: '视觉测试发现',
+          description: '两个项目共享同一个可验证主题。',
+          nodeIds: ['visual-a', 'visual-b'],
+          projectKeys: ['项目 A', '项目 B'],
+          subjectKeys: ['visual'],
+          evidence: [{ kind: 'shared-tag', nodeId: 'visual-a', text: '共享标签 #visual' }],
+          ruleVersion: 'visual',
+          strength: 'moderate',
+          dedupeKey: 'visual',
+          status: 'active',
+          feedbackStatus: 'none',
+          application: { state: 'none' },
+          feedbackEvents: [],
+          createdAt: now,
+          updatedAt: now,
+        },
+      ],
+    }),
+  );
   await page.goto(appBase);
   await page.getByRole('button', { name: '改一下' }).first().click();
   await expect(page.locator('#correction-modal')).toBeVisible();
