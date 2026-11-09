@@ -143,4 +143,27 @@ describe('experimentActions', () => {
     expect(result).toBe(true);
     expect(updateNode).toHaveBeenCalledTimes(1);
   });
+
+  it('refuses to extend before the starter is complete', () => {
+    const state = createExperiment({
+      title: '兴趣',
+      hypothesis: '验证',
+      metric: '记录',
+      startedAt: new Date().toISOString(),
+      targetDays: 3,
+    }) as ExperimentState;
+    const incomplete = { ...state, targetDays: 3, logs: [{ day: 1 }] } as never;
+    const updateNode = vi.fn();
+    const result = extendExperimentToSeven(
+      {
+        updateNode,
+        invalidateInsights: vi.fn(),
+        notifyStatus: vi.fn(),
+        persist: vi.fn(),
+      },
+      { node: { id: 'a', metadata: {} } as never, state: incomplete, day: 2, gate: {} as never, summary: {} as never },
+    );
+    expect(result).toBe(false);
+    expect(updateNode).not.toHaveBeenCalled();
+  });
 });
