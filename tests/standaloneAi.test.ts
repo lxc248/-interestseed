@@ -47,11 +47,18 @@ afterEach(async () => {
 });
 
 describe('standalone AI key resolution', () => {
-  it('reads the configured environment variable first', async () => {
+  it('reads the dedicated environment variable first', async () => {
     const root = await vault();
-    process.env.INTERESTSEED_TEST_KEY = 'env-key';
-    const key = await resolveApiKey(root, { ...DEFAULT_CONFIG, keyEnv: 'INTERESTSEED_TEST_KEY' });
+    process.env.INTERESTSEED_AI_API_KEY = 'env-key';
+    const key = await resolveApiKey(root, { ...DEFAULT_CONFIG, keyEnv: 'INTERESTSEED_AI_API_KEY' });
     expect(key).toBe('env-key');
+  });
+
+  it('ignores unrelated environment variables', async () => {
+    const root = await vault();
+    process.env.INTERESTSEED_TEST_KEY = 'wrong-key';
+    const key = await resolveApiKey(root, { ...DEFAULT_CONFIG, keyEnv: 'INTERESTSEED_TEST_KEY' });
+    expect(key).toBeUndefined();
   });
 
   it('falls back to .interestseed/key', async () => {

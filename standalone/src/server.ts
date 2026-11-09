@@ -1,6 +1,7 @@
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
+import { randomBytes } from 'node:crypto';
 import { existsSync } from 'node:fs';
-import { readFile, rm, writeFile } from 'node:fs/promises';
+import { chmod, readFile, rm, writeFile } from 'node:fs/promises';
 import { extname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { InsightEngine } from '../../src/core/InsightEngine';
@@ -53,9 +54,10 @@ const webRoot = [
 ].find((path) => existsSync(join(path, 'index.html'))) ?? resolve(fileURLToPath(new URL('../web', import.meta.url)));
 
 export function createInterestSeedServer(options: ServerOptions): Server {
+  const sessionToken = randomBytes(32).toString('hex');
   return createServer(async (request, response) => {
     try {
-      await route(request, response, options);
+      await route(request, response, options, sessionToken);
     } catch (error) {
       if (error instanceof HttpError) {
         if (!response.headersSent) {
@@ -102,16 +104,33 @@ async function route(
   request: IncomingMessage,
   response: ServerResponse,
   options: ServerOptions,
+  sessionToken: string,
 ): Promise<void> {
+  const isApi = (request.url ?? '/').startsWith('/api/');
+  if (isApi) {
+    if (!isAllowedHost(request)) {
+      return sendJson(response, 403, { error: 'Host rejected.' });
+    }
+    if (!isAllowedOrigin(request)) {
+      return sendJson(response, 403, { error: 'Cross-origin request rejected.' });
+    }
+    if (
+      !(request.url ?? '').startsWith('/api/session') &&
+      requiresSessionToken(request) &&
+      request.headers['x-interestseed-token'] !== sessionToken
+    ) {
+      return sendJson(response, 403, { error: 'Session token required.' });
+    }
+  }
   const url = new URL(request.url ?? '/', `http://${request.headers.host ?? 'localhost'}`);
   if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method ?? '')) {
     const contentType = String(request.headers['content-type'] ?? '').toLowerCase();
     if (!contentType.startsWith('application/json')) {
       return sendJson(response, 415, { error: 'Content-Type must be application/json.' });
     }
-    if (!isAllowedOrigin(request)) {
-      return sendJson(response, 403, { error: 'Cross-origin request rejected.' });
-    }
+  }
+  if (url.pathname === '/api/session' && request.method === 'GET') {
+    return sendJson(response, 200, { token: sessionToken });
   }
   if (url.pathname === '/api/health' && request.method === 'GET') {
     return sendJson(response, 200, {
@@ -277,8 +296,10 @@ async function route(
       await ensureStateDir(options.vaultPath);
       const keyPath = join(stateDir(options.vaultPath), 'key');
       const value = body.key.trim();
-      if (value) await writeFile(keyPath, value, 'utf8');
-      else if (existsSync(keyPath)) await rm(keyPath);
+      if (value) {
+        await writeFile(keyPath, value, { encoding: 'utf8', mode: 0o600 });
+        await chmod(keyPath, 0o600).catch(() => undefined);
+      } else if (existsSync(keyPath)) await rm(keyPath);
     }
     await saveConfig(options.vaultPath, config);
     const key = await resolveApiKey(options.vaultPath, config);
@@ -490,20 +511,46 @@ function sendText(
   response.end(value);
 }
 
+function localPort(request: IncomingMessage): number | undefined {
+  return request.socket.localPort;
+}
+
+function isLocalHostname(hostname: string): boolean {
+  return hostname === '127.0.0.1' || hostname === 'localhost' || hostname === '::1' || hostname === '[::1]';
+}
+
+function isAllowedHost(request: IncomingMessage): boolean {
+  const host = request.headers.host;
+  if (!host) return false;
+  try {
+    const parsed = new URL(`http://${host}`);
+    const port = parsed.port ? Number(parsed.port) : 80;
+    return isLocalHostname(parsed.hostname) && port === localPort(request);
+  } catch {
+    return false;
+  }
+}
+
 function isAllowedOrigin(request: IncomingMessage): boolean {
   const origin = request.headers.origin;
+  const site = String(request.headers['sec-fetch-site'] ?? '');
+  if (site === 'cross-site') return false;
   if (origin) {
     if (origin === 'null') return false;
     try {
       const parsed = new URL(origin);
-      const localHosts = new Set(['127.0.0.1', 'localhost', '::1', '[::1]']);
-      return localHosts.has(parsed.hostname);
+      const port = parsed.port ? Number(parsed.port) : parsed.protocol === 'https:' ? 443 : 80;
+      return isLocalHostname(parsed.hostname) && port === localPort(request);
     } catch {
       return false;
     }
   }
+  return !site || site === 'same-origin' || site === 'none' || site === 'same-site';
+}
+
+function requiresSessionToken(request: IncomingMessage): boolean {
   const site = String(request.headers['sec-fetch-site'] ?? '');
-  return !site || site === 'same-origin' || site === 'none';
+  return Boolean(request.headers.origin) || site === 'same-origin';
 }
 
 function normalizeHttpBaseUrl(value: string): string {
@@ -527,7 +574,11 @@ async function readJson(request: IncomingMessage): Promise<Record<string, unknow
   }
   const raw = Buffer.concat(chunks).toString('utf8').trim();
   if (!raw) return {};
-  return JSON.parse(raw) as Record<string, unknown>;
+  try {
+    return JSON.parse(raw) as Record<string, unknown>;
+  } catch {
+    throw new HttpError(400, 'Invalid JSON body.');
+  }
 }
 
 function mime(path: string): string {

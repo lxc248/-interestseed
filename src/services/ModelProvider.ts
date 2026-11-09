@@ -212,11 +212,15 @@ export class OpenAICompatibleModelProvider implements ModelProvider {
     if (this.apiKey) headers.Authorization = `Bearer ${this.apiKey}`;
 
     const maxSuggestions = safeRequest.maxSuggestions ?? 5;
+    const controller = new AbortController();
+    this.abortControllers.add(controller);
+    const timeout = globalThis.setTimeout(() => controller.abort(), 30_000);
     let response: Response;
     try {
       response = await this.fetchImpl(url, {
         method: 'POST',
         headers,
+        signal: controller.signal,
         body: JSON.stringify({
           model: this.config.model,
           messages: [
@@ -248,6 +252,9 @@ export class OpenAICompatibleModelProvider implements ModelProvider {
       });
     } catch {
       throw new ModelProviderError('network', 'AI 本地服务不可用');
+    } finally {
+      globalThis.clearTimeout(timeout);
+      this.abortControllers.delete(controller);
     }
 
     if (!response.ok) {
