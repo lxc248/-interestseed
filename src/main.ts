@@ -96,20 +96,13 @@ import {
   type ExplorationInsight,
   type ExplorationRequest,
 } from './services/ModelProvider';
-import { isRecord } from './utils/validation';
 
-import { DATA_SCHEMA_VERSION, persistPluginData, pluginDataPayload, reportLoadResult } from './plugin/persistence';
+import { DATA_SCHEMA_VERSION, persistPluginData, pluginDataPayload, reportLoadResult, unpackStoredState } from './plugin/persistence';
 
 /** 主界面底部状态栏使用的快照。 */
 import { buildStatus, statusBarText, type InterestSeedStatus } from './plugin/status';
 export type { InterestSeedStatus };
 
-interface StoredPluginData {
-  schemaVersion?: unknown;
-  settings?: unknown;
-  lastRebuiltAt?: unknown;
-  inbox?: unknown;
-}
 
 /**
  * 插件入口只负责生命周期与装配：
@@ -1051,25 +1044,16 @@ export default class InterestSeedPlugin extends Plugin {
   }
 
   private async loadState(): Promise<void> {
-    const stored = (await this.loadData()) as StoredPluginData | null;
-    const record = isRecord(stored) ? stored : {};
-
-    const dataVersion = typeof record.schemaVersion === 'number' ? record.schemaVersion : 0;
-    if (dataVersion > DATA_SCHEMA_VERSION) {
+    const stored = await this.loadData();
+    const unpacked = unpackStoredState(stored);
+    if (unpacked.dataVersion > DATA_SCHEMA_VERSION) {
       console.warn(
-        `[InterestSeed] data.json 版本 ${dataVersion} 高于插件支持的 ${DATA_SCHEMA_VERSION}，已按默认值加载。`,
+        `[InterestSeed] data.json 版本 ${unpacked.dataVersion} 高于插件支持的 ${DATA_SCHEMA_VERSION}，已按默认值加载。`,
       );
     }
-
-    this.settings = normalizeSettings(record.settings);
-    this.inbox.load(record.inbox);
-
-    const lastRebuilt = record.lastRebuiltAt;
-    if (typeof lastRebuilt === 'string' && !Number.isNaN(Date.parse(lastRebuilt))) {
-      this.settingsLastRebuiltAt = new Date(lastRebuilt).toISOString();
-    } else if (typeof lastRebuilt === 'number') {
-      this.settingsLastRebuiltAt = new Date(lastRebuilt).toISOString();
-    }
+    this.settings = normalizeSettings(unpacked.settings);
+    this.inbox.load(unpacked.inbox);
+    if (unpacked.lastRebuiltAt) this.settingsLastRebuiltAt = unpacked.lastRebuiltAt;
   }
 
   getStatus(): InterestSeedStatus {

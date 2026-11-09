@@ -3,6 +3,29 @@ import type { LoadResult } from '../storage/GraphRepository';
 
 export const DATA_SCHEMA_VERSION = 1;
 
+export function unpackStoredState(stored: unknown): {
+  settings: unknown;
+  inbox: unknown;
+  lastRebuiltAt: string | null;
+  dataVersion: number;
+} {
+  const record = (typeof stored === 'object' && stored !== null ? stored : {}) as Record<string, unknown>;
+  const dataVersion = typeof record.schemaVersion === 'number' ? record.schemaVersion : 0;
+  const last = record.lastRebuiltAt;
+  let lastRebuiltAt: string | null = null;
+  if (typeof last === 'string' && !Number.isNaN(Date.parse(last))) {
+    lastRebuiltAt = new Date(last).toISOString();
+  } else if (typeof last === 'number') {
+    lastRebuiltAt = new Date(last).toISOString();
+  }
+  return {
+    settings: record.settings,
+    inbox: record.inbox,
+    lastRebuiltAt,
+    dataVersion,
+  };
+}
+
 export function pluginDataPayload(input: {
   settings: unknown;
   lastRebuiltAt: string | null;
