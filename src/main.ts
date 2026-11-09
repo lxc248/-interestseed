@@ -91,6 +91,7 @@ import { readAiApiKey, saveAiApiKey } from './plugin/aiKeyStore';
 import { buildRoutePlan, exportInterestRoute as writeInterestRoute, exportJsonCanvas as writeJsonCanvas } from './plugin/artifactExporter';
 import { openRelationCreateModal, openRelationEditModal } from './plugin/relationPrompts';
 import { openScanConfirmModal } from './plugin/scanPrompts';
+import { applySeedSprint as applySeedSprintFromModule } from './plugin/seedSprintApply';
 import {
   DiscoveryAuditPreviewModal,
   DiscoveryAuditSaveModal,
@@ -766,97 +767,22 @@ export default class InterestSeedPlugin extends Plugin {
     acceptedNodeIds: ReadonlySet<string>,
     acceptedEdgeIds: ReadonlySet<string>,
   ): number {
-    const now = new Date().toISOString();
-    const current = this.store.getGraph();
-    const nodes = [...current.nodes];
-    const edges = [...current.edges];
-    const knownNodes = new Set(nodes.map((node) => node.id));
-    const knownEdges = new Set(edges.map((edge) => edge.id));
-    const idMap = new Map<string, string>();
-
-    for (const proposal of draft.nodes) {
-      if (!acceptedNodeIds.has(proposal.id)) continue;
-      const id = nodeIdForUri(`interestseed://seed-sprint/${proposal.id}`);
-      idMap.set(proposal.id, id);
-      if (knownNodes.has(id)) continue;
-      nodes.push({
-        id,
-        type: proposal.type,
-        title: proposal.title,
-        tags: [...proposal.tags],
-        createdAt: now,
-        updatedAt: now,
-        metadata: {
-          seedSprint: true,
-          evidence: proposal.evidence,
-          confidence: proposal.confidence,
-          nextStep: proposal.nextStep === true,
-          taskState: proposal.nextStep ? 'experimenting' : 'judged',
-          taskStateUpdatedAt: now,
-          observations: appendObservation(undefined, {
-            source: 'seed-sprint',
-            evidence: proposal.evidence,
-            belief: 'changed',
-          }),
-          ...(proposal.nextStep
-            ? {
-                experimentDay: 0,
-                experimentStartedAt: now,
-                experimentStatus: 'active',
-                experimentState: createExperiment({
-                  title: proposal.title,
-                  hypothesis: draft.experiment.hypothesis,
-                  metric: draft.experiment.metric,
-                  startedAt: now,
-                  targetDays: STARTER_DAYS,
-                }),
-              }
-            : {}),
-        },
-      });
-      knownNodes.add(id);
-    }
-
-    for (const proposal of draft.edges) {
-      if (!acceptedEdgeIds.has(proposal.id)) continue;
-      const source = idMap.get(proposal.source);
-      const target = idMap.get(proposal.target);
-      if (!source || !target) continue;
-      const id = edgeIdFor(source, target, proposal.relation);
-      if (knownEdges.has(id)) continue;
-      edges.push({
-        id,
-        source,
-        target,
-        relation: proposal.relation,
-        origin: 'ai',
-        status: 'confirmed',
-        confidence: proposal.confidence,
-        evidence: [proposal.evidence],
-        createdAt: now,
-        updatedAt: now,
-      });
-      knownEdges.add(id);
-    }
-
-    const added = nodes.length - current.nodes.length;
-    if (added === 0) return 0;
-    this.session.replace(
-      {
-        ...current,
-        schemaVersion: current.schemaVersion,
-        updatedAt: now,
-        nodes,
-        edges,
+    return applySeedSprintFromModule({
+      draft,
+      acceptedNodeIds,
+      acceptedEdgeIds,
+      getGraph: () => this.store.getGraph(),
+      replaceGraph: (graph, message) => this.session.replace(graph, message),
+      markSeedSprintCompleted: (now) => {
+        this.settings.seedSprintCompletedAt = now;
       },
-      '冷启动问卷：种下第一张星图',
-    );
-    this.settings.seedSprintCompletedAt = now;
-    void this.saveSettings();
-    this.insightsCache = null;
-    this.notifyStatus();
-    void this.persist();
-    return added;
+      invalidateInsights: () => {
+        this.insightsCache = null;
+      },
+      notifyStatus: () => this.notifyStatus(),
+      saveSettings: () => void this.saveSettings(),
+      persist: () => void this.persist(),
+    });
   }
 
   async activateAgentView(): Promise<void> {
