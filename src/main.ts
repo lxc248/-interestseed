@@ -90,6 +90,7 @@ import { readAiApiKey, saveAiApiKey } from './plugin/aiKeyStore';
 import { buildRoutePlan, exportInterestRoute as writeInterestRoute, exportJsonCanvas as writeJsonCanvas } from './plugin/artifactExporter';
 import { openRelationCreateModal, openRelationEditModal } from './plugin/relationPrompts';
 import { openScanConfirmModal } from './plugin/scanPrompts';
+import { activateAgentView as activateAgentLeaf, activateAiView as activateAiLeaf } from './plugin/leafViews';
 import { captureInterestSpark as captureInterestSparkFromModule } from './plugin/sparkCapture';
 import { applySeedSprint as applySeedSprintFromModule } from './plugin/seedSprintApply';
 import {
@@ -735,28 +736,11 @@ export default class InterestSeedPlugin extends Plugin {
   }
 
   async activateAgentView(): Promise<void> {
-    const { workspace } = this.app;
-    const existing = workspace.getLeavesOfType(INTERESTSEED_AGENT_VIEW_TYPE);
-    let leaf: WorkspaceLeaf | null = existing[0] ?? null;
-    if (!leaf) {
-      // Reuse the current plugin leaf so opening the agent never splits the
-      // workspace into stacked panes; the graph view becomes the agent view.
-      const active = (workspace as unknown as { activeLeaf?: WorkspaceLeaf }).activeLeaf;
-      leaf = active ?? workspace.getLeaf('tab');
-    }
-    await leaf.setViewState({ type: INTERESTSEED_AGENT_VIEW_TYPE, active: true });
-    await workspace.revealLeaf(leaf);
+    await activateAgentLeaf(this.app);
   }
 
   async activateAiView(): Promise<AiSuggestionView | null> {
-    const { workspace } = this.app;
-    const existing = workspace.getLeavesOfType(INTERESTSEED_AI_VIEW_TYPE);
-    let leaf: WorkspaceLeaf | null = existing[0] ?? null;
-    if (!leaf) leaf = workspace.getRightLeaf(false);
-    if (!leaf) leaf = workspace.getLeaf('tab');
-    await leaf.setViewState({ type: INTERESTSEED_AI_VIEW_TYPE, active: true });
-    await workspace.revealLeaf(leaf);
-    return leaf.view instanceof AiSuggestionView ? leaf.view : null;
+    return activateAiLeaf(this.app);
   }
 
   async openAiPanel(): Promise<void> {
