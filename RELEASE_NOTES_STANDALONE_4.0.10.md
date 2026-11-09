@@ -13,12 +13,18 @@ Modular web app and tightened AI endpoint policy.
 ## Verification
 
 ```text
-Vitest        580 passed
+Vitest        591 passed
 MCP smoke      11 passed
 Playwright     31 passed
-Total         622 passed
+Total         633 passed
 npm audit     0 vulnerabilities
 CodeQL        open alerts: 0
+```
+
+SHA-256:
+
+```text
+c511fee47d2efe5d895540c06a62c576255a87fdb5819282f3d016a7b804a4bb
 ```
 
 ## Install
