@@ -62,8 +62,8 @@ import { AgentView, INTERESTSEED_AGENT_VIEW_TYPE } from './ui/AgentView';
 import { AiSuggestionView, INTERESTSEED_AI_VIEW_TYPE } from './ui/AiSuggestionView';
 import { NodeCreateModal } from './ui/NodeCreateModal';
 import { openGapCoachModal, openInboxModal, openSeedSprintModal, openShareCardModal, openSparkCaptureModal } from './plugin/modalOpeners';
+import { openExperimentModal } from './plugin/modalOpeners';
 import { ShareInbox, type InboxSource } from './inbox/ShareInbox';
-import { ExperimentModal } from './ui/ExperimentModal';
 import type { Insight } from './core/InsightEngine';
 import {
   canRecordToday,
@@ -432,7 +432,7 @@ export default class InterestSeedPlugin extends Plugin {
   }
 
   openExperiment(): void {
-    new ExperimentModal(this.app, this).open();
+    openExperimentModal(this.app, this);
   }
 
   recordExperimentCheckIn(input: ExperimentInput): boolean {
