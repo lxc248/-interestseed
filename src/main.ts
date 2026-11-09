@@ -51,7 +51,7 @@ import { PersistenceService, type PersistenceState } from './plugin/PersistenceS
 import { registerCommands } from './plugin/commands';
 import type { AiRelationSuggestion } from './services/ModelProvider';
 import { InterestSeedSettingsTab, normalizeSettings } from './settings/SettingsTab';
-import { VaultGraphRepository, type LoadResult } from './storage/GraphRepository';
+import { VaultGraphRepository } from './storage/GraphRepository';
 import {
   GRAPH_FILE,
   PluginDataStorage,
@@ -108,7 +108,7 @@ import {
 } from './services/ModelProvider';
 import { isRecord } from './utils/validation';
 
-const DATA_SCHEMA_VERSION = 1;
+import { DATA_SCHEMA_VERSION, persistPluginData, pluginDataPayload, reportLoadResult } from './plugin/persistence';
 
 /** 主界面底部状态栏使用的快照。 */
 import { buildStatus, statusBarText, type InterestSeedStatus } from './plugin/status';
@@ -354,7 +354,7 @@ export default class InterestSeedPlugin extends Plugin {
       }),
     );
 
-    this.reportLoadResult(loaded);
+    reportLoadResult(loaded);
     this.updateStatusBar();
     if (!this.discoveryLoadBlocked) {
       try {
@@ -1354,56 +1354,14 @@ export default class InterestSeedPlugin extends Plugin {
   // ------------------------------------------------------------ 内部实现
 
   private async persist(): Promise<void> {
-    try {
-      await this.saveData({
-        schemaVersion: DATA_SCHEMA_VERSION,
+    await persistPluginData(
+      (data) => this.saveData(data),
+      pluginDataPayload({
         settings: this.settings,
         lastRebuiltAt: this.settingsLastRebuiltAt,
-        inbox: this.inbox.serialize(),
-      });
-    } catch (error) {
-      console.error('[InterestSeed] 保存设置失败', error);
-      new Notice(
-        `InterestSeed：设置保存失败。${error instanceof Error ? error.message : String(error)}`,
-        10_000,
-      );
-    }
-  }
-
-  private reportLoadResult(result: LoadResult): void {
-    if (result.issues.length > 0) {
-      console.warn(`[InterestSeed] 图谱数据问题：\n${result.issues.join('\n')}`);
-    }
-    if (result.appliedMigrations.length > 0) {
-      console.warn(`[InterestSeed] 已迁移图谱数据：\n${result.appliedMigrations.join('\n')}`);
-    }
-    if (result.preMigrationBackupKey) {
-      console.warn(`[InterestSeed] 迁移前旧数据已备份：${result.preMigrationBackupKey}`);
-    }
-    if (result.corruptedBackupKey) {
-      console.warn(`[InterestSeed] 原始数据已备份：${result.corruptedBackupKey}`);
-    }
-    if (result.issuesBackupKey) {
-      console.warn(`[InterestSeed] 清洗前图谱已备份：${result.issuesBackupKey}`);
-    }
-    if (result.issues.length > 0 && !result.blocked) {
-      new Notice(
-        `InterestSeed：图谱加载时清洗了 ${result.issues.length} 条问题记录；原始文件已备份到插件目录。`,
-        10_000,
-      );
-    }
-
-    if (result.blocked) {
-      new Notice(
-        `InterestSeed：${result.blockedReason ?? '图谱存储已暂停'}。请在命令面板运行“备份旧数据并重置图谱存储”。`,
-        15_000,
-      );
-    } else if (result.source === 'recovered') {
-      new Notice(
-        'InterestSeed：图谱主文件损坏，已从备份恢复；原主文件已备份在插件目录。',
-        10_000,
-      );
-    }
+        inboxSerialized: this.inbox.serialize(),
+      }),
+    );
   }
 
   private async loadState(): Promise<void> {
