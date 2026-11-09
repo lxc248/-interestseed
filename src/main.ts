@@ -49,13 +49,13 @@ import { PersistenceService, type PersistenceState } from './plugin/PersistenceS
 import { registerCommands } from './plugin/commands';
 import type { AiRelationSuggestion } from './services/ModelProvider';
 import { InterestSeedSettingsTab, normalizeSettings } from './settings/SettingsTab';
+import type { GraphViewport, InterestSeedSettings } from './types/graph';
 import { VaultGraphRepository } from './storage/GraphRepository';
 import {
   GRAPH_FILE,
   PluginDataStorage,
   migrateLegacyGraphFile,
 } from './storage/PluginDataStorage';
-import type { GraphViewport, InterestSeedNode, InterestSeedSettings } from './types/graph';
 import { INTERESTSEED_VIEW_TYPE, InterestSeedView } from './ui/InterestSeedView';
 import { AgentView, INTERESTSEED_AGENT_VIEW_TYPE } from './ui/AgentView';
 import { AiSuggestionView, INTERESTSEED_AI_VIEW_TYPE } from './ui/AiSuggestionView';
@@ -65,12 +65,7 @@ import { openExperimentModal } from './plugin/modalOpeners';
 import { ShareInbox, type InboxSource } from './inbox/ShareInbox';
 import type { Insight } from './core/InsightEngine';
 import {
-  canRecordToday,
-  createExperiment,
-  experimentSummary,
-  parseExperiment,
   type ExperimentInput,
-  type ExperimentState,
   type QuickCheckInKind,
 } from './experiment/experiment';
 import type { SeedSprintDraft } from './onboarding/seedSprint';
@@ -82,7 +77,7 @@ import { openScanConfirmModal } from './plugin/scanPrompts';
 import { activateAgentView as activateAgentLeaf, activateAiView as activateAiLeaf, activateGraphView } from './plugin/leafViews';
 import { unloadPlugin } from './plugin/pluginLifecycle';
 import { suggestForActiveNote as suggestActiveNote, suggestForFile as suggestFile, suggestForSelectedNode as suggestSelectedNode } from './plugin/aiSuggestions';
-import { extendExperimentToSeven as extendExperiment, recordExperimentCheckIn as recordCheckIn, recordQuickExperiment as recordQuick, startStarterExperiment as startStarter } from './plugin/experimentActions';
+import { extendExperimentToSeven as extendExperiment, getActiveExperiment as getActiveExperimentSnapshot, recordExperimentCheckIn as recordCheckIn, recordQuickExperiment as recordQuick, startStarterExperiment as startStarter, type ActiveExperimentSnapshot } from './plugin/experimentActions';
 import { captureGapSeed as captureGapSeedFromModule } from './plugin/gapCapture';
 import { captureInterestSpark as captureInterestSparkFromModule } from './plugin/sparkCapture';
 import { applySeedSprint as applySeedSprintFromModule } from './plugin/seedSprintApply';
@@ -398,27 +393,10 @@ export default class InterestSeedPlugin extends Plugin {
     await activateGraphView(this.app, INTERESTSEED_VIEW_TYPE);
   }
 
-  getActiveExperiment(): {
-    node: InterestSeedNode;
-    state: ExperimentState;
-    day: number;
-    gate: ReturnType<typeof canRecordToday>;
-    summary: ReturnType<typeof experimentSummary>;
-  } | null {
-    const node = this.store
-      .listNodes()
-      .find((candidate) => candidate.metadata?.nextStep === true);
-    if (!node) return null;
-    const state =
-      parseExperiment(node.metadata, node.title) ??
-      createExperiment({ title: node.title, hypothesis: '这个兴趣值得我投入一周的真实注意力。' });
-    return {
-      node,
-      state,
-      day: Math.min(state.targetDays, state.logs.length + 1),
-      gate: canRecordToday(state),
-      summary: experimentSummary(state),
-    };
+  getActiveExperiment(): ActiveExperimentSnapshot | null {
+    return getActiveExperimentSnapshot({
+      listNodes: () => this.store.listNodes(),
+    });
   }
 
   openExperiment(): void {
