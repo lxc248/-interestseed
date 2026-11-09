@@ -9,7 +9,12 @@ vi.mock('obsidian', () => ({
   },
 }));
 
-import { persistPluginData, pluginDataPayload, reportLoadResult } from '../../src/plugin/persistence';
+import {
+  persistPluginData,
+  pluginDataPayload,
+  reportLoadResult,
+  unpackStoredState,
+} from '../../src/plugin/persistence';
 
 describe('persistence', () => {
   it('builds a payload with schema version and inbox', () => {
@@ -32,6 +37,19 @@ describe('persistence', () => {
     });
     await persistPluginData(saveData, { schemaVersion: 1 });
     expect(notices.some((entry) => entry.message.includes('设置保存失败'))).toBe(true);
+  });
+
+  it('unpacks stored state and normalizes lastRebuiltAt', () => {
+    const unpacked = unpackStoredState({
+      schemaVersion: 1,
+      settings: { enableAI: false },
+      inbox: '[]',
+      lastRebuiltAt: 1700000000000,
+    });
+    expect(unpacked.dataVersion).toBe(1);
+    expect(unpacked.settings).toEqual({ enableAI: false });
+    expect(unpacked.inbox).toBe('[]');
+    expect(unpacked.lastRebuiltAt).toMatch(/^\d{4}-\d{2}-\d{2}/);
   });
 
   it('reports a blocked load result', () => {
