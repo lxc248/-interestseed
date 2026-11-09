@@ -11,6 +11,7 @@ export interface InterestRouteInput {
     day: number;
     targetDays: number;
     status: string;
+    next?: string;
   } | null;
   generatedAt?: string;
 }
@@ -81,6 +82,12 @@ export function renderInterestRoute(input: InterestRouteInput): string {
     }
     lines.push('');
   }
-  lines.push('## 下一步', '', '- 回到图谱，选择一条线索，只做一件真实的小事。', '');
+  lines.push('## 下一步', '');
+  if (input.experiment?.next?.trim()) {
+    lines.push(`- ${input.experiment.next.trim()}`);
+  } else {
+    lines.push('- 回到图谱，选择一条线索，只做一件真实的小事。');
+  }
+  lines.push('');
   return lines.join('\n');
 }

@@ -106,6 +106,17 @@ describe('standalone server routes', () => {
     expect(body.graph.nodes.length).toBeGreaterThan(0);
   });
 
+  it('does not overwrite an existing capture with the same title', async () => {
+    const base = await start();
+    const body = JSON.stringify({ text: '同名捕获测试。' });
+    const first = await fetch(`${base}/api/capture`, { method: 'POST', headers: jsonHeaders(), body });
+    const second = await fetch(`${base}/api/capture`, { method: 'POST', headers: jsonHeaders(), body });
+    expect(first.status).toBe(200);
+    expect(second.status).toBe(200);
+    const firstBody = await first.json();
+    const secondBody = await second.json();
+    expect(secondBody.captured.path).not.toBe(firstBody.captured.path);
+  });
   it('enqueues and lists inbox items', async () => {
     const base = await start();
     const created = await fetch(`${base}/api/inbox`, {

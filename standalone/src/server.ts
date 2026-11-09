@@ -27,7 +27,7 @@ import {
 } from './discoveries';
 import { enqueueInbox, listInbox, resolveInbox } from './inbox';
 import { scanAndBuild } from './graph';
-import { ensureStateDir, loadConfig, loadState, saveConfig, stateDir, undoGraph } from './state';
+import { ensureStateDir, loadConfig, loadState, saveConfig, saveGraph, stateDir, undoGraph } from './state';
 
 declare const __INTERESTSEED_VERSION__: string | undefined;
 const SERVICE_VERSION = typeof __INTERESTSEED_VERSION__ === 'string' ? __INTERESTSEED_VERSION__ : 'dev';
@@ -174,6 +174,23 @@ async function route(
     if (!suggestion) return sendJson(response, 400, { error: 'suggestion required' });
     const result = await connectSuggestion(options.vaultPath, suggestion);
     return sendJson(response, 200, result);
+  }
+  if (url.pathname === '/api/edges/reject' && request.method === 'POST') {
+    const body = await readJson(request);
+    const edgeId = typeof body.edgeId === 'string' ? body.edgeId : '';
+    if (!edgeId) return sendJson(response, 400, { error: 'edgeId required' });
+    const state = await loadState(options.vaultPath);
+    const edge = state.graph.edges.find((item) => item.id === edgeId);
+    if (!edge) return sendJson(response, 404, { error: 'Edge not found.' });
+    const now = new Date().toISOString();
+    await saveGraph(options.vaultPath, {
+      ...state.graph,
+      edges: state.graph.edges.map((item) =>
+        item.id === edgeId ? { ...item, status: 'rejected' as const, updatedAt: now } : item,
+      ),
+      updatedAt: now,
+    });
+    return sendJson(response, 200, { ok: true, ...(await statePayload(options.vaultPath)) });
   }
   if (url.pathname === '/api/undo' && request.method === 'POST') {
     const previous = await undoGraph(options.vaultPath);
