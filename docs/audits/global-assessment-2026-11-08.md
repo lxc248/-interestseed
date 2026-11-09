@@ -1,6 +1,6 @@
 # Global assessment — 2026-11-08
 
-Strict engineering and product review of `interestseed` at `b1c9111`.
+Strict engineering and product review of `interestseed` at `9e9d99a`.
 
 This is not a marketing score. It measures whether the project is ready to be
 treated as a mature open-source product. Evidence was collected from the
@@ -28,9 +28,9 @@ limits remain external adoption and repository weight; app-state visual coverage
 | Category | Weight | Score | Weighted | Why this score |
 | --- | ---: | ---: | ---: | --- |
 | Product value / differentiation | 15% | 7.0 | 1.05 | Clear “capture → one connection → 3-day experiment → evidence” loop; unproven demand |
-| Product completeness / UX | 15% | 7.4 | 1.11 | CLI, web, skill, MCP and site exist; site + app E2E and axe gated; public pages plus app home/settings/capture/experiment/sprint/share/audit/correction visuals; landing animation missing |
+| Product completeness / UX | 15% | 7.4 | 1.11 | CLI, web, skill, MCP and site exist; site + app E2E and axe gated; public pages plus app home/settings/capture/experiment/sprint/share/audit/correction visuals; landing layout with canvas hidden; animation itself not diffed |
 | Code quality / maintainability | 15% | 7.0 | 1.05 | Strict TypeScript, modular layout, lint/typecheck; some large low-coverage modules |
-| Tests / QA | 15% | 7.5 | 1.125 | 616 tests, 85.71% line / 72.15% branch coverage; public pages plus app home/settings/capture/experiment/sprint/share/audit/correction visuals; landing animation missing |
+| Tests / QA | 15% | 7.5 | 1.125 | 617 tests, 85.71% line / 72.15% branch coverage; public pages plus app home/settings/capture/experiment/sprint/share/audit/correction visuals; landing layout with canvas hidden; animation itself not diffed |
 | Security / privacy | 15% | 7.5 | 1.125 | Critical leak fixed, guards and body limit tested; no independent 4.0.8 audit |
 | Docs / repo hygiene | 5% | 6.5 | 0.325 | Excellent current docs and checks; 29.6 MB tree, 2.5 MB archive; history still large |
 | Release / supply chain | 10% | 8.0 | 0.80 | 4.0.8 built by workflow; digest and Sigstore attestation verified; no independent audit |
@@ -42,15 +42,15 @@ limits remain external adoption and repository weight; app-state visual coverage
 ### Engineering
 
 ```text
-main:                 b1c9111
+main:                 9e9d99a
 Vitest:              574 passed
 MCP smoke:            11 passed
-Total tests:         616 passed
+Total tests:         617 passed
 Coverage statements:  82.96%
 Coverage branches:    72.15%
 Coverage functions:   85.16%
 Coverage lines:       85.71%
-Playwright E2E:       31 passed
+Playwright E2E:       32 passed
 Typecheck:            passed
 Lint:                 passed
 Build:                passed
@@ -161,8 +161,8 @@ Still open:
    `standalone/src/server.ts` is 60.69% lines and `GraphCanvas` is 63.97%.
 5. **Visual regression is partial.** Linux screenshot baselines cover
    `/how-it-works/`, `/download/`, app home, settings, capture, experiment,
-   sprint, share card, discovery audit and correction; the landing animation
-   still lacks a baseline.
+   sprint, share card, discovery audit, correction and the landing layout with
+   its canvas hidden; the canvas animation itself is not screenshot-diffed.
 6. **Repository weight.** The current tree is 29.6 MB, under the 40 MB target, but the Git clone history still retains historical media.
 7. **No independent release audit.** The workflow executed and the digest was
    verified, but provenance and the 4.0.8 changes have not been independently
@@ -174,7 +174,7 @@ Still open:
 | --- | ---: | --- |
 | Idea | 8.0 | Clear, differentiated, worth testing |
 | Implementation | 7.0 | Broad and coherent; uneven depth |
-| Test confidence | 7.5 | Coverage above 80% lines; site/app E2E and axe gated; ten visual baselines |
+| Test confidence | 7.5 | Coverage above 80% lines; site/app E2E and axe gated; eleven visual baselines |
 | Security | 7.5 | Strong recent hardening; not independently audited |
 | Documentation | 8.0 | Current docs are good; archive bloat hurts repo hygiene |
 | Release discipline | 8.0 | Automated workflow, digest and Sigstore signature verified |
