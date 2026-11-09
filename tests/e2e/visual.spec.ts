@@ -18,6 +18,7 @@ const hasSprintBaseline = existsSync(join(baselineDir, 'sprint-modal-chromium-li
 const hasShareCardBaseline = existsSync(join(baselineDir, 'share-card-modal-chromium-linux.png'));
 const hasDiscoveryAuditBaseline = existsSync(join(baselineDir, 'discovery-audit-modal-chromium-linux.png'));
 const hasCorrectionBaseline = existsSync(join(baselineDir, 'correction-modal-chromium-linux.png'));
+const hasLandingBaseline = existsSync(join(baselineDir, 'landing-chromium-linux.png'));
 let appServer: Server;
 let vaultPath: string;
 let appBase: string;
@@ -195,6 +196,19 @@ test('correction modal visual', async ({ page }) => {
   await page.getByRole('button', { name: '改一下' }).first().click();
   await expect(page.locator('#correction-modal')).toBeVisible();
   await expect(page.locator('#correction-modal')).toHaveScreenshot('correction-modal.png', {
+    animations: 'disabled',
+    maxDiffPixelRatio: 0.01,
+  });
+});
+test('landing page visual', async ({ page }) => {
+  test.skip(process.platform !== 'linux', 'Visual baselines are generated on Linux CI.');
+  test.skip(!updating && !hasLandingBaseline, 'Landing visual baseline is not installed yet.');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+  await page.addStyleTag({ content: 'canvas { visibility: hidden !important; }' });
+  await expect(page.locator('h1')).toBeVisible();
+  await expect(page).toHaveScreenshot('landing.png', {
+    fullPage: true,
     animations: 'disabled',
     maxDiffPixelRatio: 0.01,
   });
