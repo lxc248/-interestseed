@@ -86,6 +86,7 @@ import {
 import type { SeedSprintDraft } from './onboarding/seedSprint';
 import { edgeIdFor, hashString, nodeIdForUri } from './utils/ids';
 import { pathFromUri, vaultUri } from './utils/paths';
+import { enqueueActiveNote as enqueueActiveNoteFromApp, openSparkFromClipboard as openSparkFromClipboardFromApp } from './plugin/inboxActions';
 import { readAiApiKey, saveAiApiKey } from './plugin/aiKeyStore';
 import { buildRoutePlan, exportInterestRoute as writeInterestRoute, exportJsonCanvas as writeJsonCanvas } from './plugin/artifactExporter';
 import { openRelationCreateModal, openRelationEditModal } from './plugin/relationPrompts';
@@ -637,29 +638,11 @@ export default class InterestSeedPlugin extends Plugin {
   }
 
   async enqueueActiveNote(): Promise<void> {
-    const file = this.app.workspace.getActiveFile();
-    if (!file || file.extension !== 'md') {
-      new Notice('先打开一篇 Markdown 笔记，再加入收件箱。');
-      return;
-    }
-    const raw = await this.app.vault.cachedRead(file);
-    const body = raw
-      .replace(/^\uFEFF?---\r?\n[\s\S]*?\r?\n---\s*/u, '')
-      .replace(/^#{1,6}\s+/gm, '')
-      .replace(/\s+/g, ' ')
-      .trim()
-      .slice(0, 1600);
-    if (!body) {
-      new Notice('这篇笔记是空的，没有可加入的内容。');
-      return;
-    }
-    const result = this.enqueueShare(`${file.basename}\n${body}`, 'note', file.path);
-    if (!result) {
-      new Notice('当前笔记没有可加入的内容。');
-      return;
-    }
-    new Notice(result.duplicate ? '这篇笔记已经在收件箱里了。' : '已把当前笔记放进收件箱。');
-    this.openInbox();
+    await enqueueActiveNoteFromApp({
+      app: this.app,
+      enqueueShare: (text, source, sourceRef) => this.enqueueShare(text, source, sourceRef),
+      openInbox: () => this.openInbox(),
+    });
   }
 
   getPendingInboxItems(): ReturnType<ShareInbox['pending']> {
@@ -671,17 +654,10 @@ export default class InterestSeedPlugin extends Plugin {
   }
 
   async openSparkFromClipboard(): Promise<void> {
-    try {
-      const text = await navigator.clipboard.readText();
-      if (!text.trim()) {
-        new Notice('剪贴板里没有可识别的分享内容。');
-        return;
-      }
-      const result = this.enqueueShare(text, 'clipboard');
-      this.openSparkCapture(text, result?.item.id, 'clipboard');
-    } catch {
-      new Notice('无法读取剪贴板。请在手机快捷指令中使用 interestseed-share 链接，或手动粘贴。');
-    }
+    await openSparkFromClipboardFromApp({
+      enqueueShare: (text, source) => this.enqueueShare(text, source),
+      openSparkCapture: (text, itemId, source) => this.openSparkCapture(text, itemId, source),
+    });
   }
 
   openShareCard(): void {
