@@ -39,4 +39,13 @@ describe('status helpers', () => {
   it('renders an error suffix', () => {
     expect(statusBarText(stats, null, 'boom')).toBe('InterestSeed · 3 节点 / 1 已确认 / 2 建议 · ⚠ 错误');
   });
+
+  it('renders blocked and saveFailed suffixes', () => {
+    expect(statusBarText(stats, { blocked: true }, null)).toBe(
+      'InterestSeed · 3 节点 / 1 已确认 / 2 建议 · ⚠ 存储已暂停',
+    );
+    expect(statusBarText(stats, { saveFailed: true }, null)).toBe(
+      'InterestSeed · 3 节点 / 1 已确认 / 2 建议 · ⚠ 未保存',
+    );
+  });
 });
