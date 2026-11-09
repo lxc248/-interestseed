@@ -18,9 +18,9 @@ test('home page loads with primary navigation', async ({ page }) => {
 test('download page exposes the current standalone asset', async ({ page }) => {
   await page.goto('/download/');
   await expect(page).toHaveTitle(/Download/);
-  await expect(page.getByText('4.0.8').first()).toBeVisible();
-  const asset = page.locator('a[href*="interestseed-standalone-v4.0.8.zip"]').first();
-  await expect(asset).toHaveAttribute('href', /interestseed-standalone-v4\.0\.8\.zip/);
+  await expect(page.getByText('4.0.9').first()).toBeVisible();
+  const asset = page.locator('a[href*="interestseed-standalone-v4.0.9.zip"]').first();
+  await expect(asset).toHaveAttribute('href', /interestseed-standalone-v4\.0\.9\.zip/);
 });
 
 test('content pages render a heading', async ({ page }) => {
@@ -43,5 +43,5 @@ test('mobile layout has no horizontal overflow', async ({ page }) => {
 test('llms-full is served with the current release', async ({ request }) => {
   const response = await request.get('/llms-full.txt');
   expect(response.status()).toBe(200);
-  expect(await response.text()).toContain('Latest release: 4.0.8');
+  expect(await response.text()).toContain('Latest release: 4.0.9');
 });
