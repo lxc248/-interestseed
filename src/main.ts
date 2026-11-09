@@ -62,12 +62,8 @@ import { INTERESTSEED_VIEW_TYPE, InterestSeedView } from './ui/InterestSeedView'
 import { AgentView, INTERESTSEED_AGENT_VIEW_TYPE } from './ui/AgentView';
 import { AiSuggestionView, INTERESTSEED_AI_VIEW_TYPE } from './ui/AiSuggestionView';
 import { NodeCreateModal } from './ui/NodeCreateModal';
-import { SeedSprintModal } from './ui/SeedSprintModal';
-import { SparkCaptureModal } from './ui/SparkCaptureModal';
-import { ShareCardModal } from './ui/ShareCardModal';
-import { ShareInboxModal } from './ui/ShareInboxModal';
+import { openGapCoachModal, openInboxModal, openSeedSprintModal, openShareCardModal, openSparkCaptureModal } from './plugin/modalOpeners';
 import { ShareInbox, type InboxSource } from './inbox/ShareInbox';
-import { GapCoachModal } from './ui/GapCoachModal';
 import { ExperimentModal } from './ui/ExperimentModal';
 import type { Insight } from './core/InsightEngine';
 import {
@@ -570,7 +566,7 @@ export default class InterestSeedPlugin extends Plugin {
   }
 
   openGapCoach(insight: Insight): void {
-    new GapCoachModal(this.app, this, insight).open();
+    openGapCoachModal(this.app, this, insight);
   }
 
   captureGapSeed(insight: Insight, text: string): string | null {
@@ -595,11 +591,11 @@ export default class InterestSeedPlugin extends Plugin {
     source: InboxSource = 'share',
     sourceRef = '',
   ): void {
-    new SparkCaptureModal(this.app, this, initialText, inboxId, source, sourceRef).open();
+    openSparkCaptureModal(this.app, this, initialText, inboxId, source, sourceRef);
   }
 
   openInbox(): void {
-    new ShareInboxModal(this.app, this).open();
+    openInboxModal(this.app, this);
   }
 
   enqueueShare(text: string, source: InboxSource = 'share', sourceRef = ''): ReturnType<ShareInbox['enqueue']> {
@@ -632,7 +628,7 @@ export default class InterestSeedPlugin extends Plugin {
   }
 
   openShareCard(): void {
-    new ShareCardModal(this.app, this).open();
+    openShareCardModal(this.app, this);
   }
 
   async exportJsonCanvas(): Promise<void> {
@@ -678,7 +674,7 @@ export default class InterestSeedPlugin extends Plugin {
   }
 
   openSeedSprint(): void {
-    new SeedSprintModal(this.app, this).open();
+    openSeedSprintModal(this.app, this);
   }
 
   applySeedSprint(
