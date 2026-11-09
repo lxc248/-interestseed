@@ -1,5 +1,5 @@
 import { existsSync } from 'node:fs';
-import { mkdtemp, rm } from 'node:fs/promises';
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { Server } from 'node:http';
@@ -17,6 +17,7 @@ const hasExperimentBaseline = existsSync(join(baselineDir, 'experiment-modal-chr
 const hasSprintBaseline = existsSync(join(baselineDir, 'sprint-modal-chromium-linux.png'));
 const hasShareCardBaseline = existsSync(join(baselineDir, 'share-card-modal-chromium-linux.png'));
 const hasDiscoveryAuditBaseline = existsSync(join(baselineDir, 'discovery-audit-modal-chromium-linux.png'));
+const hasCorrectionBaseline = existsSync(join(baselineDir, 'correction-modal-chromium-linux.png'));
 let appServer: Server;
 let vaultPath: string;
 let appBase: string;
@@ -152,6 +153,48 @@ test('discovery audit modal visual', async ({ page }) => {
   await page.locator('#discoveries-audit').click();
   await expect(page.locator('#discovery-audit-modal')).toBeVisible();
   await expect(page.locator('#discovery-audit-modal')).toHaveScreenshot('discovery-audit-modal.png', {
+    animations: 'disabled',
+    maxDiffPixelRatio: 0.01,
+  });
+});
+test('correction modal visual', async ({ page }) => {
+  test.skip(process.platform !== 'linux', 'Visual baselines are generated on Linux CI.');
+  test.skip(!updating && !hasCorrectionBaseline, 'Correction visual baseline is not installed yet.');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  const now = new Date().toISOString();
+  await mkdir(join(vaultPath, '.interestseed'), { recursive: true });
+  await writeFile(
+    join(vaultPath, '.interestseed', 'discoveries.json'),
+    JSON.stringify({
+      discoverySchemaVersion: 3,
+      updatedAt: now,
+      discoveries: [
+        {
+          id: 'visual-discovery',
+          kind: 'cross-project-topic',
+          title: '视觉测试发现',
+          description: '两个项目共享同一个可验证主题。',
+          nodeIds: ['visual-a', 'visual-b'],
+          projectKeys: ['项目 A', '项目 B'],
+          subjectKeys: ['visual'],
+          evidence: [{ kind: 'shared-tag', nodeId: 'visual-a', text: '共享标签 #visual' }],
+          ruleVersion: 'visual',
+          strength: 'moderate',
+          dedupeKey: 'visual',
+          status: 'active',
+          feedbackStatus: 'none',
+          application: { state: 'none' },
+          feedbackEvents: [],
+          createdAt: now,
+          updatedAt: now,
+        },
+      ],
+    }),
+  );
+  await page.goto(appBase);
+  await page.getByRole('button', { name: '改一下' }).first().click();
+  await expect(page.locator('#correction-modal')).toBeVisible();
+  await expect(page.locator('#correction-modal')).toHaveScreenshot('correction-modal.png', {
     animations: 'disabled',
     maxDiffPixelRatio: 0.01,
   });
