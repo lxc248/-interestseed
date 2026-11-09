@@ -1,8 +1,8 @@
-# InterestSeed Standalone 4.0.8
+# InterestSeed Standalone 4.0.9
 
 This zip is self-contained. It does not need the Obsidian plugin runtime.
 
-## 4.0.8 highlights
+## 4.0.9 highlights
 
 - 1 MiB request-body limit; oversized bodies return 413.
 - 606-test quality gate: 574 Vitest + 11 MCP smoke + 21 Playwright E2E.
