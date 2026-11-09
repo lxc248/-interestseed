@@ -15,6 +15,8 @@ const hasSettingsBaseline = existsSync(join(baselineDir, 'settings-modal-chromiu
 const hasCaptureBaseline = existsSync(join(baselineDir, 'capture-modal-chromium-linux.png'));
 const hasExperimentBaseline = existsSync(join(baselineDir, 'experiment-modal-chromium-linux.png'));
 const hasSprintBaseline = existsSync(join(baselineDir, 'sprint-modal-chromium-linux.png'));
+const hasShareCardBaseline = existsSync(join(baselineDir, 'share-card-modal-chromium-linux.png'));
+const hasDiscoveryAuditBaseline = existsSync(join(baselineDir, 'discovery-audit-modal-chromium-linux.png'));
 let appServer: Server;
 let vaultPath: string;
 let appBase: string;
@@ -122,6 +124,34 @@ test('sprint modal visual', async ({ page }) => {
   await page.locator('#sprint-button').click();
   await expect(page.locator('#sprint-modal')).toBeVisible();
   await expect(page.locator('#sprint-modal')).toHaveScreenshot('sprint-modal.png', {
+    animations: 'disabled',
+    maxDiffPixelRatio: 0.01,
+  });
+});
+test('share card modal visual', async ({ page }) => {
+  test.skip(process.platform !== 'linux', 'Visual baselines are generated on Linux CI.');
+  test.skip(!updating && !hasShareCardBaseline, 'Share-card visual baseline is not installed yet.');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.request.post(`${appBase}/api/inbox`, {
+    data: { text: '分享卡视觉测试：读到一个值得验证的兴趣。' },
+  });
+  await page.goto(appBase);
+  await page.getByRole('button', { name: '做成图' }).first().click();
+  await expect(page.locator('#share-card-modal')).toBeVisible();
+  await expect(page.locator('#share-card-modal')).toHaveScreenshot('share-card-modal.png', {
+    animations: 'disabled',
+    maxDiffPixelRatio: 0.01,
+  });
+});
+
+test('discovery audit modal visual', async ({ page }) => {
+  test.skip(process.platform !== 'linux', 'Visual baselines are generated on Linux CI.');
+  test.skip(!updating && !hasDiscoveryAuditBaseline, 'Discovery-audit visual baseline is not installed yet.');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto(appBase);
+  await page.locator('#discoveries-audit').click();
+  await expect(page.locator('#discovery-audit-modal')).toBeVisible();
+  await expect(page.locator('#discovery-audit-modal')).toHaveScreenshot('discovery-audit-modal.png', {
     animations: 'disabled',
     maxDiffPixelRatio: 0.01,
   });
