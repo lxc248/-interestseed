@@ -19,6 +19,7 @@
 - Added troubleshooting documentation for 429, ports, keys and local-server errors.
 - Removed the inbox URL normalization regex backtracking risk.
 - Documented CodeQL alert triage and accepted local trust boundary.
+- Redacted the local API key from upstream error details.
 
 
 ## 4.0.6 — Hardening and observability

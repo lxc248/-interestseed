@@ -337,7 +337,7 @@ async function route(
         signal: controller.signal,
       });
       if (!chat.ok) {
-        const detail = (await chat.text()).slice(0, 180);
+        const detail = (await chat.text()).replaceAll(key, '[redacted]').slice(0, 180);
         const retryAfter = chat.headers.get('retry-after')?.trim();
         if (chat.status === 429) {
           return sendJson(response, 429, {
