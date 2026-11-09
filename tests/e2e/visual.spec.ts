@@ -12,6 +12,8 @@ const updating = process.env.UPDATE_SNAPSHOTS === '1';
 const hasBaseline = existsSync(join(baselineDir, 'how-it-works-chromium-linux.png'));
 const hasAppBaseline = existsSync(join(baselineDir, 'app-home-chromium-linux.png'));
 const hasSettingsBaseline = existsSync(join(baselineDir, 'settings-modal-chromium-linux.png'));
+const hasCaptureBaseline = existsSync(join(baselineDir, 'capture-modal-chromium-linux.png'));
+const hasExperimentBaseline = existsSync(join(baselineDir, 'experiment-modal-chromium-linux.png'));
 let appServer: Server;
 let vaultPath: string;
 let appBase: string;
@@ -79,6 +81,34 @@ test('settings modal visual', async ({ page }) => {
   await page.locator('#settings-button').click();
   await expect(page.locator('#settings-modal')).toBeVisible();
   await expect(page.locator('#settings-modal')).toHaveScreenshot('settings-modal.png', {
+    animations: 'disabled',
+    maxDiffPixelRatio: 0.01,
+  });
+});
+test('capture modal visual', async ({ page }) => {
+  test.skip(process.platform !== 'linux', 'Visual baselines are generated on Linux CI.');
+  test.skip(!updating && !hasCaptureBaseline, 'Capture visual baseline is not installed yet.');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto(appBase);
+  await page.locator('#capture-button').click();
+  await expect(page.locator('#capture-modal')).toBeVisible();
+  await expect(page.locator('#capture-modal')).toHaveScreenshot('capture-modal.png', {
+    animations: 'disabled',
+    maxDiffPixelRatio: 0.01,
+  });
+});
+
+test('experiment modal visual', async ({ page }) => {
+  test.skip(process.platform !== 'linux', 'Visual baselines are generated on Linux CI.');
+  test.skip(!updating && !hasExperimentBaseline, 'Experiment visual baseline is not installed yet.');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.request.post(`${appBase}/api/capture`, {
+    data: { title: 'Visual experiment', text: '用于视觉测试的真实观察内容。' },
+  });
+  await page.goto(appBase);
+  await page.getByRole('button', { name: '开始 3 天实验' }).click();
+  await expect(page.locator('#experiment-modal')).toBeVisible();
+  await expect(page.locator('#experiment-modal')).toHaveScreenshot('experiment-modal.png', {
     animations: 'disabled',
     maxDiffPixelRatio: 0.01,
   });
