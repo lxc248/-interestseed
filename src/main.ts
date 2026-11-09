@@ -87,7 +87,7 @@ import type { SeedSprintDraft } from './onboarding/seedSprint';
 import { edgeIdFor, hashString, nodeIdForUri } from './utils/ids';
 import { pathFromUri, vaultUri } from './utils/paths';
 import { readAiApiKey, saveAiApiKey } from './plugin/aiKeyStore';
-import { exportInterestRoute as writeInterestRoute, exportJsonCanvas as writeJsonCanvas } from './plugin/artifactExporter';
+import { buildRoutePlan, exportInterestRoute as writeInterestRoute, exportJsonCanvas as writeJsonCanvas } from './plugin/artifactExporter';
 import { RelationCreateModal } from './ui/RelationCreateModal';
 import { RelationEditModal } from './ui/RelationEditModal';
 import { ScanConfirmModal } from './ui/ScanConfirmModal';
@@ -696,39 +696,17 @@ export default class InterestSeedPlugin extends Plugin {
 
   async createInterestRoute(): Promise<void> {
     const selectedId = this.getSelectedNodeId();
-    const selected = selectedId ? this.store.getNode(selectedId) : undefined;
-    const tag = selected?.tags.find(
-      (value) =>
-        value.trim().length > 0 && value !== '火花' && value !== '文本' && value !== '视频',
-    );
-    const theme = tag ?? '全部兴趣';
-    const allNodes = this.store.listNodes();
-    const filtered = tag ? allNodes.filter((node) => node.tags.includes(tag)) : allNodes;
-    const nodes = filtered.length > 0 ? filtered : allNodes;
-    if (nodes.length === 0) {
+    const plan = buildRoutePlan({
+      selected: selectedId ? this.store.getNode(selectedId) : null,
+      allNodes: this.store.listNodes(),
+      neighbors: (id) => this.store.neighbors(id, { statuses: ['confirmed'] }),
+      active: this.getActiveExperiment(),
+    });
+    if (!plan) {
       new Notice('图谱里还没有可以生成路线的节点。');
       return;
     }
-    const active = this.getActiveExperiment();
-    const connectedIds = new Set(
-      nodes
-        .filter((node) => this.store.neighbors(node.id, { statuses: ['confirmed'] }).length > 0)
-        .map((node) => node.id),
-    );
-    await writeInterestRoute(this.app, {
-      theme,
-      nodes,
-      connectedIds,
-      experiment: active
-        ? {
-            title: active.state.title,
-            day: active.state.logs.length,
-            targetDays: active.state.targetDays,
-            status: active.state.status,
-            next: active.state.logs.at(-1)?.next,
-          }
-        : null,
-    });
+    await writeInterestRoute(this.app, plan);
   }
 
   captureInterestSpark(
