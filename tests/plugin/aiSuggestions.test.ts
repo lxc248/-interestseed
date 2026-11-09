@@ -9,7 +9,7 @@ vi.mock('obsidian', () => ({
   },
 }));
 
-import { suggestForActiveNote, suggestForSelectedNode } from '../../src/plugin/aiSuggestions';
+import { suggestForActiveNote, suggestForFile, suggestForSelectedNode } from '../../src/plugin/aiSuggestions';
 
 describe('aiSuggestions', () => {
   it('expands the selected node', async () => {
@@ -29,5 +29,16 @@ describe('aiSuggestions', () => {
       suggestForFile: vi.fn(async () => undefined),
     });
     expect(notices.at(-1)).toBe('先打开一篇 Markdown 笔记。');
+  });
+
+  it('expands the node matched for a file', async () => {
+    const expandWithAI = vi.fn(async () => undefined);
+    await suggestForFile({
+      file: { path: 'note.md' } as never,
+      findNodeByUri: vi.fn(() => ({ id: 'node-a' })),
+      listNodes: vi.fn(() => []),
+      expandWithAI,
+    });
+    expect(expandWithAI).toHaveBeenCalledWith('node-a');
   });
 });
