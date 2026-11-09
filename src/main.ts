@@ -10,7 +10,6 @@ import { InterestSeedGraphBuilder } from './core/GraphBuilder';
 import { GraphSession } from './core/GraphSession';
 import { InterestSeedGraphStore } from './core/GraphStore';
 import { InsightEngine, type GraphInsights } from './core/InsightEngine';
-import { appendObservation } from './core/observations';
 import { InterestSeedRelationEngine } from './core/RelationEngine';
 import { UndoHistory } from './core/UndoManager';
 import { DiscoveryEngine } from './discovery/DiscoveryEngine';
@@ -67,13 +66,10 @@ import { ShareInbox, type InboxSource } from './inbox/ShareInbox';
 import { ExperimentModal } from './ui/ExperimentModal';
 import type { Insight } from './core/InsightEngine';
 import {
-  QUICK_CHECK_INS,
-  STARTER_DAYS,
   canRecordToday,
   createExperiment,
   experimentSummary,
   parseExperiment,
-  recordExperimentLog,
   type ExperimentInput,
   type ExperimentState,
   type QuickCheckInKind,
@@ -86,6 +82,7 @@ import { openRelationCreateModal, openRelationEditModal } from './plugin/relatio
 import { openScanConfirmModal } from './plugin/scanPrompts';
 import { activateAgentView as activateAgentLeaf, activateAiView as activateAiLeaf } from './plugin/leafViews';
 import { suggestForActiveNote as suggestActiveNote, suggestForFile as suggestFile, suggestForSelectedNode as suggestSelectedNode } from './plugin/aiSuggestions';
+import { extendExperimentToSeven as extendExperiment, recordExperimentCheckIn as recordCheckIn, recordQuickExperiment as recordQuick, startStarterExperiment as startStarter } from './plugin/experimentActions';
 import { captureGapSeed as captureGapSeedFromModule } from './plugin/gapCapture';
 import { captureInterestSpark as captureInterestSparkFromModule } from './plugin/sparkCapture';
 import { applySeedSprint as applySeedSprintFromModule } from './plugin/seedSprintApply';
@@ -439,130 +436,61 @@ export default class InterestSeedPlugin extends Plugin {
   }
 
   recordExperimentCheckIn(input: ExperimentInput): boolean {
-    const active = this.getActiveExperiment();
-    if (!active) {
-      new Notice('没有进行中的兴趣实验。');
-      return false;
-    }
-    try {
-      const state = recordExperimentLog(active.state, input);
-      this.session.updateNode(
-        active.node.id,
-        {
-          metadata: {
-            ...active.node.metadata,
-            experimentState: state,
-            experimentDay: state.logs.length,
-            experimentStatus: state.status,
-            experimentLastCheckInAt: new Date().toISOString(),
-            taskState: state.status === 'complete' ? 'reviewed' : 'experimenting',
-            taskStateUpdatedAt: new Date().toISOString(),
-            observations: appendObservation(active.node.metadata, {
-              source: 'experiment',
-              evidence: input.evidence,
-              belief: input.interest >= 4 ? 'stronger' : input.interest <= 2 ? 'weaker' : 'changed',
-            }),
-          },
+    return recordCheckIn(
+      {
+        updateNode: (nodeId, patch, message) => this.session.updateNode(nodeId, patch, message),
+        invalidateInsights: () => {
+          this.insightsCache = null;
         },
-        `兴趣实验：记录第 ${state.logs.length} 天`,
-      );
-      this.insightsCache = null;
-      this.notifyStatus();
-      void this.persist();
-      new Notice(
-        state.status === 'complete'
-          ? `${state.targetDays} 天实验完成。现在可以回看你的兴趣曲线。`
-          : `第 ${state.logs.length} 天已记录。明天再来。`,
-      );
-      return true;
-    } catch (error) {
-      new Notice(error instanceof Error ? error.message : '实验记录失败。');
-      return false;
-    }
+        notifyStatus: () => this.notifyStatus(),
+        persist: () => void this.persist(),
+      },
+      this.getActiveExperiment(),
+      input,
+    );
   }
 
   recordQuickExperiment(kind: QuickCheckInKind): boolean {
-    const preset = QUICK_CHECK_INS[kind];
-    return this.recordExperimentCheckIn({
-      interest: preset.interest,
-      energy: preset.energy,
-      evidence: preset.evidence,
-    });
+    return recordQuick(
+      {
+        updateNode: (nodeId, patch, message) => this.session.updateNode(nodeId, patch, message),
+        invalidateInsights: () => {
+          this.insightsCache = null;
+        },
+        notifyStatus: () => this.notifyStatus(),
+        persist: () => void this.persist(),
+      },
+      this.getActiveExperiment(),
+      kind,
+    );
   }
 
   startStarterExperiment(): boolean {
-    const active = this.getActiveExperiment();
-    if (!active) {
-      new Notice('还没有进行中的实验。');
-      return false;
-    }
-    if (active.state.logs.length > 0 || active.state.status === 'complete') {
-      new Notice('已经有记录，不能再切换成 3 天试跑。');
-      return false;
-    }
-    const state: ExperimentState = {
-      ...active.state,
-      title: '3 天兴趣试跑',
-      targetDays: STARTER_DAYS,
-      hypothesis: active.state.hypothesis
-        .replace('7 天', '3 天')
-        .replace('一周', '三天'),
-      metric: '先做 3 天：每天记录一次兴趣强度、精力值和一个具体证据；3 条有效记录即完成。',
-    };
-    this.session.updateNode(
-      active.node.id,
+    return startStarter(
       {
-        title: state.title,
-        metadata: {
-          ...active.node.metadata,
-          experimentState: state,
-          experimentStatus: state.status,
-          taskState: 'experimenting',
-          taskStateUpdatedAt: new Date().toISOString(),
+        updateNode: (nodeId, patch, message) => this.session.updateNode(nodeId, patch, message),
+        invalidateInsights: () => {
+          this.insightsCache = null;
         },
+        notifyStatus: () => this.notifyStatus(),
+        persist: () => void this.persist(),
       },
-      '开始 3 天兴趣试跑',
+      this.getActiveExperiment(),
     );
-    this.insightsCache = null;
-    this.notifyStatus();
-    void this.persist();
-    new Notice('已切换为 3 天试跑。先看它能不能自然发生。');
-    return true;
   }
 
   extendExperimentToSeven(): boolean {
-    const active = this.getActiveExperiment();
-    if (!active || active.state.targetDays !== STARTER_DAYS) return false;
-    if (active.state.logs.length < STARTER_DAYS) {
-      new Notice('先完成 3 天试跑，再决定是否延长。');
-      return false;
-    }
-    const state: ExperimentState = {
-      ...active.state,
-      title: '7 天兴趣实验',
-      targetDays: 7,
-      status: 'active',
-      metric: '继续 4 天：每天记录一次兴趣强度、精力值和一个具体证据；7 条有效记录才完成。',
-    };
-    this.session.updateNode(
-      active.node.id,
+    return extendExperiment(
       {
-        title: state.title,
-        metadata: {
-          ...active.node.metadata,
-          experimentState: state,
-          experimentStatus: state.status,
-          taskState: 'experimenting',
-          taskStateUpdatedAt: new Date().toISOString(),
+        updateNode: (nodeId, patch, message) => this.session.updateNode(nodeId, patch, message),
+        invalidateInsights: () => {
+          this.insightsCache = null;
         },
+        notifyStatus: () => this.notifyStatus(),
+        persist: () => void this.persist(),
       },
-      '把 3 天试跑延长为 7 天实验',
+      this.getActiveExperiment(),
     );
-    this.insightsCache = null;
-    this.notifyStatus();
-    void this.persist();
-    new Notice('已延长为 7 天实验。接下来 4 天继续记录。');
-    return true;
   }
 
   openGapCoach(insight: Insight): void {
