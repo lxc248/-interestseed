@@ -3,7 +3,6 @@
  * Copyright (C) 2026 aicoder
  */
 import { Notice, Plugin, TFile } from 'obsidian';
-import type { WorkspaceLeaf } from 'obsidian';
 
 import { ObsidianVaultAdapterImpl } from './adapters/ObsidianVaultAdapter';
 import { InterestSeedGraphBuilder } from './core/GraphBuilder';
@@ -80,7 +79,7 @@ import { readAiApiKey, saveAiApiKey } from './plugin/aiKeyStore';
 import { buildRoutePlan, exportInterestRoute as writeInterestRoute, exportJsonCanvas as writeJsonCanvas } from './plugin/artifactExporter';
 import { openRelationCreateModal, openRelationEditModal } from './plugin/relationPrompts';
 import { openScanConfirmModal } from './plugin/scanPrompts';
-import { activateAgentView as activateAgentLeaf, activateAiView as activateAiLeaf } from './plugin/leafViews';
+import { activateAgentView as activateAgentLeaf, activateAiView as activateAiLeaf, activateGraphView } from './plugin/leafViews';
 import { suggestForActiveNote as suggestActiveNote, suggestForFile as suggestFile, suggestForSelectedNode as suggestSelectedNode } from './plugin/aiSuggestions';
 import { extendExperimentToSeven as extendExperiment, recordExperimentCheckIn as recordCheckIn, recordQuickExperiment as recordQuick, startStarterExperiment as startStarter } from './plugin/experimentActions';
 import { captureGapSeed as captureGapSeedFromModule } from './plugin/gapCapture';
@@ -394,18 +393,7 @@ export default class InterestSeedPlugin extends Plugin {
   // ------------------------------------------------------------ 视图
 
   async activateView(): Promise<void> {
-    const { workspace } = this.app;
-    const existing = workspace.getLeavesOfType(INTERESTSEED_VIEW_TYPE);
-    let leaf: WorkspaceLeaf | null = existing[0] ?? null;
-
-    if (!leaf) {
-      // Keep the plugin inside one visible leaf; do not create a second pane.
-      const active = (workspace as unknown as { activeLeaf?: WorkspaceLeaf }).activeLeaf;
-      leaf = active ?? workspace.getLeaf('tab');
-    }
-    await leaf.setViewState({ type: INTERESTSEED_VIEW_TYPE, active: true });
-
-    await workspace.revealLeaf(leaf);
+    await activateGraphView(this.app, INTERESTSEED_VIEW_TYPE);
   }
 
   getActiveExperiment(): {
