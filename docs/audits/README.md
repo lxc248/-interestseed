@@ -9,3 +9,4 @@ Older audits are in [`../../archive/review/`](../../archive/review/).
 - [version-comparison-4.0.0.md](version-comparison-4.0.0.md) — plugin vs standalone parity
 - [global-assessment-2026-11-08.md](global-assessment-2026-11-08.md) — strict global assessment at 30db0f7
 - [security-review-4.0.5.md](security-review-4.0.5.md) — internal security self-review, not independent
+- [codeql-triage-2026-11-09.md](codeql-triage-2026-11-09.md) — CodeQL alert triage and accepted local trust boundary
