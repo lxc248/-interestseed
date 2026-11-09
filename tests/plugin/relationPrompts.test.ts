@@ -43,15 +43,15 @@ describe('relationPrompts', () => {
       onConfirm,
     });
     expect(createOpen).toHaveBeenCalledTimes(1);
-    const modal = createOpen.mock.calls[0][0] as { onConfirm: unknown };
-    expect(modal.onConfirm).toBe(onConfirm);
+    const modal = createOpen.mock.calls[0]?.[0] as { onConfirm: unknown } | undefined;
+    expect(modal?.onConfirm).toBe(onConfirm);
   });
 
   it('opens the edit modal with the current relation', () => {
     const onConfirm = vi.fn();
     openRelationEditModal({ app: {} as never, relation: '引出', onConfirm });
     expect(editOpen).toHaveBeenCalledTimes(1);
-    const modal = editOpen.mock.calls[0][0] as { relation: string };
-    expect(modal.relation).toBe('引出');
+    const modal = editOpen.mock.calls[0]?.[0] as { relation: string } | undefined;
+    expect(modal?.relation).toBe('引出');
   });
 });
