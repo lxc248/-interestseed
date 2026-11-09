@@ -14,7 +14,7 @@ vi.mock('obsidian', () => ({
   },
 }));
 
-import { exportInterestRoute } from '../../src/plugin/artifactExporter';
+import { exportInterestRoute, exportJsonCanvas } from '../../src/plugin/artifactExporter';
 
 function makeApp(existing: string[] = []) {
   createMock.mockResolvedValue({ path: existing[0] ?? 'InterestSeed/route.md' });
@@ -49,6 +49,17 @@ describe('artifactExporter', () => {
     expect(createFolderMock).toHaveBeenCalledWith('InterestSeed');
     expect(createMock).toHaveBeenCalledTimes(1);
     expect(openLinkTextMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('writes a JSON Canvas from a non-empty graph', async () => {
+    const { app } = makeApp([]);
+    await exportJsonCanvas(app, {
+      nodes: [{ id: 'a', title: 'A', tags: [], metadata: {} }],
+      edges: [],
+    } as never);
+    expect(createFolderMock).toHaveBeenCalledWith('InterestSeed');
+    expect(createMock).toHaveBeenCalledTimes(1);
+    expect(String(createMock.mock.calls[0]?.[0])).toContain('.canvas');
   });
 
   it('adds a numeric suffix when a route already exists', async () => {
