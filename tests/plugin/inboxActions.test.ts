@@ -9,7 +9,7 @@ vi.mock('obsidian', () => ({
   },
 }));
 
-import { enqueueActiveNote } from '../../src/plugin/inboxActions';
+import { enqueueActiveNote, openSparkFromClipboard } from '../../src/plugin/inboxActions';
 
 describe('inboxActions', () => {
   it('enqueues the active note body', async () => {
@@ -25,5 +25,14 @@ describe('inboxActions', () => {
     expect(enqueueShare).toHaveBeenCalledTimes(1);
     expect(openInbox).toHaveBeenCalledTimes(1);
     expect(notices.at(-1)).toBe('已把当前笔记放进收件箱。');
+  });
+
+  it('opens spark capture from clipboard text', async () => {
+    vi.stubGlobal('navigator', { clipboard: { readText: vi.fn(async () => '分享内容') } });
+    const openSparkCapture = vi.fn();
+    const enqueueShare = vi.fn(() => ({ item: { id: 'x' } }));
+    await openSparkFromClipboard({ enqueueShare, openSparkCapture });
+    expect(enqueueShare).toHaveBeenCalledWith('分享内容', 'clipboard');
+    expect(openSparkCapture).toHaveBeenCalledWith('分享内容', 'x', 'clipboard');
   });
 });
