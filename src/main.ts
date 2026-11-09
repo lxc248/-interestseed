@@ -68,8 +68,6 @@ import { ShareCardModal } from './ui/ShareCardModal';
 import { ShareInboxModal } from './ui/ShareInboxModal';
 import { ShareInbox, type InboxSource } from './inbox/ShareInbox';
 import { analyzeShareText, describeSpark, isVideoSpark } from './services/shareAnalysis';
-import { renderInterestRoute } from './services/interestRoute';
-import { buildJsonCanvas } from './services/jsonCanvas';
 import { GapCoachModal } from './ui/GapCoachModal';
 import { ExperimentModal } from './ui/ExperimentModal';
 import type { Insight } from './core/InsightEngine';
@@ -87,7 +85,8 @@ import {
 } from './experiment/experiment';
 import type { SeedSprintDraft } from './onboarding/seedSprint';
 import { edgeIdFor, hashString, nodeIdForUri } from './utils/ids';
-import { pathFromUri, slugifyFileName, vaultUri } from './utils/paths';
+import { pathFromUri, vaultUri } from './utils/paths';
+import { exportInterestRoute as writeInterestRoute, exportJsonCanvas as writeJsonCanvas } from './plugin/artifactExporter';
 import { RelationCreateModal } from './ui/RelationCreateModal';
 import { RelationEditModal } from './ui/RelationEditModal';
 import { ScanConfirmModal } from './ui/ScanConfirmModal';
@@ -700,26 +699,7 @@ export default class InterestSeedPlugin extends Plugin {
   }
 
   async exportJsonCanvas(): Promise<void> {
-    const graph = this.store.getGraph();
-    if (graph.nodes.length === 0) {
-      new Notice('图谱里还没有节点，先留下一个火花。');
-      return;
-    }
-    const canvas = buildJsonCanvas(graph);
-    const folder = 'InterestSeed';
-    if (!this.app.vault.getAbstractFileByPath(folder)) {
-      await this.app.vault.createFolder(folder);
-    }
-    const stamp = new Date().toISOString().slice(0, 10);
-    let path = `${folder}/兴趣图谱-${stamp}.canvas`;
-    let suffix = 2;
-    while (this.app.vault.getAbstractFileByPath(path)) {
-      path = `${folder}/兴趣图谱-${stamp}-${suffix}.canvas`;
-      suffix += 1;
-    }
-    await this.app.vault.create(path, JSON.stringify(canvas, null, 2));
-    await this.app.workspace.openLinkText(path, '', false);
-    new Notice(`已导出 JSON Canvas：${path}`);
+    await writeJsonCanvas(this.app, this.store.getGraph());
   }
 
   async createInterestRoute(): Promise<void> {
@@ -743,7 +723,7 @@ export default class InterestSeedPlugin extends Plugin {
         .filter((node) => this.store.neighbors(node.id, { statuses: ['confirmed'] }).length > 0)
         .map((node) => node.id),
     );
-    const markdown = renderInterestRoute({
+    await writeInterestRoute(this.app, {
       theme,
       nodes,
       connectedIds,
@@ -757,21 +737,6 @@ export default class InterestSeedPlugin extends Plugin {
           }
         : null,
     });
-    const folder = 'InterestSeed';
-    if (!this.app.vault.getAbstractFileByPath(folder)) {
-      await this.app.vault.createFolder(folder);
-    }
-    const date = new Date().toISOString().slice(0, 10);
-    const base = `${folder}/兴趣路线 - ${slugifyFileName(theme)} - ${date}`;
-    let path = `${base}.md`;
-    let suffix = 2;
-    while (this.app.vault.getAbstractFileByPath(path)) {
-      path = `${base} ${suffix}.md`;
-      suffix += 1;
-    }
-    const file = await this.app.vault.create(path, markdown);
-    new Notice(`已生成兴趣路线：${path}`);
-    await this.app.workspace.openLinkText(file.path, '', false);
   }
 
   captureInterestSpark(
