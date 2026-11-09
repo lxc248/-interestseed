@@ -67,7 +67,6 @@ import { SparkCaptureModal } from './ui/SparkCaptureModal';
 import { ShareCardModal } from './ui/ShareCardModal';
 import { ShareInboxModal } from './ui/ShareInboxModal';
 import { ShareInbox, type InboxSource } from './inbox/ShareInbox';
-import { analyzeShareText, describeSpark, isVideoSpark } from './services/shareAnalysis';
 import { GapCoachModal } from './ui/GapCoachModal';
 import { ExperimentModal } from './ui/ExperimentModal';
 import type { Insight } from './core/InsightEngine';
@@ -91,6 +90,7 @@ import { readAiApiKey, saveAiApiKey } from './plugin/aiKeyStore';
 import { buildRoutePlan, exportInterestRoute as writeInterestRoute, exportJsonCanvas as writeJsonCanvas } from './plugin/artifactExporter';
 import { openRelationCreateModal, openRelationEditModal } from './plugin/relationPrompts';
 import { openScanConfirmModal } from './plugin/scanPrompts';
+import { captureInterestSpark as captureInterestSparkFromModule } from './plugin/sparkCapture';
 import { applySeedSprint as applySeedSprintFromModule } from './plugin/seedSprintApply';
 import {
   DiscoveryAuditPreviewModal,
@@ -690,72 +690,21 @@ export default class InterestSeedPlugin extends Plugin {
     why?: string,
     context?: { source?: InboxSource; sourceRef?: string },
   ): string | null {
-    const value = text.trim();
-    const title = describeSpark(value);
-    if (!title) {
-      new Notice('先写下一句话，或粘贴一个链接。');
-      return null;
-    }
-    const url = value.match(/https?:\/\/[^\s]+/i)?.[0];
-    const id = nodeIdForUri(`interestseed://spark/${hashString(value.toLowerCase())}`);
-    if (this.store.getNode(id)) {
-      new Notice('这个火花已经在图谱里了。');
-      return id;
-    }
-    const now = new Date().toISOString();
-    const video = isVideoSpark(value);
-    const analysis = analyzeShareText(value);
-    this.session.addNode(
-      {
-        id,
-        type: video ? 'video' : 'topic',
-        title,
-        ...(url ? { sourceUri: url } : {}),
-        tags: ['火花', video ? '视频' : '文本', ...analysis.topics],
-        createdAt: now,
-        updatedAt: now,
-        metadata: {
-          spark: true,
-          raw: value,
-          capturedAt: now,
-          platform: analysis.platform,
-          topics: analysis.topics,
-          taskState: targetId ? 'connected' : 'captured',
-          taskStateUpdatedAt: now,
-          contextSource: context?.source ?? 'share',
-          ...(context?.sourceRef ? { contextSourceRef: context.sourceRef } : {}),
-          observations: appendObservation(undefined, {
-            source: context?.source ?? 'share',
-            ...(context?.sourceRef ? { sourceRef: context.sourceRef } : {}),
-            evidence: value.slice(0, 280),
-            belief: 'changed',
-          }),
-          ...(why?.trim() ? { why: why.trim() } : {}),
-        },
+    return captureInterestSparkFromModule({
+      text,
+      targetId,
+      why,
+      context,
+      getNode: (id) => this.store.getNode(id),
+      addNode: (node, message) => this.session.addNode(node, message),
+      addEdge: (edge, message) => this.session.addEdge(edge, message),
+      invalidateInsights: () => {
+        this.insightsCache = null;
       },
-      '种下一个兴趣火花',
-    );
-    if (targetId && this.store.getNode(targetId)) {
-      this.session.addEdge(
-        {
-          id: edgeIdFor(targetId, id, '引出'),
-          source: targetId,
-          target: id,
-          relation: '引出',
-          origin: 'user',
-          status: 'confirmed',
-          evidence: ['来自你的火花捕获'],
-          createdAt: now,
-          updatedAt: now,
-        },
-        '把火花连接到已有兴趣',
-      );
-    }
-    this.insightsCache = null;
-    this.notifyStatus();
-    void this.persist();
-    this.setSelectedNode(id);
-    return id;
+      notifyStatus: () => this.notifyStatus(),
+      persist: () => void this.persist(),
+      setSelectedNode: (id) => this.setSelectedNode(id),
+    });
   }
 
   openSeedSprint(): void {
