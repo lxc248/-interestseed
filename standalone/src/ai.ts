@@ -14,7 +14,8 @@ export async function resolveApiKey(
   vaultPath: string,
   config: StandaloneConfig,
 ): Promise<string | undefined> {
-  const envValue = process.env[config.keyEnv];
+  const allowedKeyEnv = 'INTERESTSEED_AI_API_KEY';
+  const envValue = config.keyEnv === allowedKeyEnv ? process.env[allowedKeyEnv] : undefined;
   if (envValue?.trim()) return envValue.trim();
   const local = join(vaultPath, '.interestseed', 'key');
   if (existsSync(local)) {

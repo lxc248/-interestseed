@@ -1,6 +1,7 @@
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { connect } from 'node:net';
 import type { Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -9,6 +10,29 @@ import { createInterestSeedServer } from '../standalone/src/server';
 const dirs: string[] = [];
 const servers: Server[] = [];
 
+async function session(base: string): Promise<string> {
+  const response = await fetch(`${base}/api/session`);
+  const body = await response.json() as { token?: string };
+  if (!body.token) throw new Error('missing session token');
+  return body.token;
+}
+
+async function rawGet(base: string, host: string): Promise<number> {
+  const url = new URL(base);
+  return new Promise<number>((resolve, reject) => {
+    const socket = connect(Number(url.port), url.hostname, () => {
+      socket.write(`GET /api/state HTTP/1.1\r\nHost: ${host}\r\nConnection: close\r\n\r\n`);
+    });
+    let raw = '';
+    socket.setEncoding('utf8');
+    socket.on('data', (chunk) => { raw += chunk; });
+    socket.on('end', () => {
+      const match = raw.match(/^HTTP\/1\.[01] (\d{3})/);
+      resolve(match ? Number(match[1]) : 0);
+    });
+    socket.on('error', reject);
+  });
+}
 async function start(): Promise<string> {
   const vaultPath = await mkdtemp(join(tmpdir(), 'interestseed-server-'));
   dirs.push(vaultPath);
@@ -73,26 +97,46 @@ describe('standalone server request guards', () => {
     expect(response.status).toBe(403);
   });
 
-  it('allows a localhost origin', async () => {
+  it('allows the actual localhost origin with a session token', async () => {
     const base = await start();
+    const token = await session(base);
     const response = await fetch(`${base}/api/scan`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Origin: 'http://localhost:4173' },
+      headers: {
+        'Content-Type': 'application/json',
+        Origin: new URL(base).origin,
+        'X-InterestSeed-Token': token,
+      },
       body: '{}',
     });
     expect(response.status).toBe(200);
   });
 
-  it('allows an IPv6 loopback origin', async () => {
+  it('rejects a loopback origin on another port', async () => {
+    const base = await start();
+    const token = await session(base);
+    const response = await fetch(`${base}/api/scan`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Origin: 'http://localhost:4173', 'X-InterestSeed-Token': token },
+      body: '{}',
+    });
+    expect(response.status).toBe(403);
+  });
+
+  it('rejects a foreign Host header', async () => {
+    const base = await start();
+    expect(await rawGet(base, 'evil.example')).toBe(403);
+  });
+
+  it('requires a session token for browser-origin writes', async () => {
     const base = await start();
     const response = await fetch(`${base}/api/scan`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Origin: 'http://[::1]:4173' },
+      headers: { 'Content-Type': 'application/json', Origin: new URL(base).origin },
       body: '{}',
     });
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(403);
   });
-
   it('allows a CLI-style request without an origin', async () => {
     const base = await start();
     const response = await fetch(`${base}/api/scan`, {
@@ -162,8 +206,8 @@ describe('standalone server request guards', () => {
         headers: { 'Content-Type': 'application/json' },
         body: '{',
       });
-      expect(response.status).toBe(500);
-      expect(await response.json()).toEqual({ error: 'Internal server error.' });
+      expect(response.status).toBe(400);
+      expect(await response.json()).toEqual({ error: 'Invalid JSON body.' });
     } finally {
       log.mockRestore();
     }

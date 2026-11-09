@@ -9,15 +9,15 @@ import {
 } from '../src/services/ModelProvider';
 
 describe('AI defaults', () => {
-  it('enables AI and consent by default for new installs', () => {
-    expect(DEFAULT_SETTINGS.enableAI).toBe(true);
-    expect(DEFAULT_SETTINGS.aiConsentGranted).toBe(true);
+  it('keeps AI and consent off by default for new installs', () => {
+    expect(DEFAULT_SETTINGS.enableAI).toBe(false);
+    expect(DEFAULT_SETTINGS.aiConsentGranted).toBe(false);
     expect(DEFAULT_SETTINGS.aiProvider).toBe('local');
     expect(DEFAULT_SETTINGS.aiModel).toBe(DEFAULT_AI_MODEL);
 
     const normalized = normalizeSettings(undefined);
-    expect(normalized.enableAI).toBe(true);
-    expect(normalized.aiConsentGranted).toBe(true);
+    expect(normalized.enableAI).toBe(false);
+    expect(normalized.aiConsentGranted).toBe(false);
     expect(normalized.aiModel).toBe(DEFAULT_AI_MODEL);
   });
 

@@ -26,8 +26,8 @@ export const DEFAULT_CONFIG: StandaloneConfig = {
   model: 'cn:deepseek-v4.1-flash',
   baseUrl: 'http://localhost:7863/v1',
   keyEnv: 'INTERESTSEED_AI_API_KEY',
-  enableAI: true,
-  aiConsentGranted: true,
+  enableAI: false,
+  aiConsentGranted: false,
 };
 
 export interface StateFile {
