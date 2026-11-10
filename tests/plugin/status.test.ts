@@ -19,6 +19,13 @@ describe('status helpers', () => {
     });
   });
 
+  it('treats an undefined state as healthy', () => {
+    const status = buildStatus({ scanning: false, lastError: null, state: undefined, stats });
+    expect(status.blocked).toBe(false);
+    expect(status.saveFailed).toBe(false);
+    expect(status.blockedReason).toBeNull();
+  });
+
   it('reflects blocked and saveFailed state', () => {
     const status = buildStatus({
       scanning: true,
