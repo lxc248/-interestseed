@@ -67,9 +67,9 @@ npm run check:release
 
 ```text
 Vitest        701 passed
-MCP smoke      11 passed
+MCP smoke      19 passed
 Playwright     35 passed
-Total         780 passed
+Total         788 passed
 CodeQL open alerts: 0
 npm audit: 0
 Release workflow: success

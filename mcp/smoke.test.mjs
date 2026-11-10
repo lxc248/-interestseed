@@ -168,3 +168,93 @@ test('directory graph path returns a stable tool error', () => {
   assert.equal(lines[0].result.isError, true);
   assert.doesNotMatch(text, /EISDIR|is a directory|graph\.json/i);
 });
+test('ping answers and initialized stays silent', () => {
+  const { lines } = runServer([
+    JSON.stringify({ jsonrpc: '2.0', id: 20, method: 'ping' }),
+    JSON.stringify({ jsonrpc: '2.0', method: 'notifications/initialized' }),
+  ]);
+  assert.equal(lines.length, 1);
+  assert.deepEqual(lines[0].result, {});
+});
+
+test('unknown method returns -32601', () => {
+  const { lines } = runServer([
+    JSON.stringify({ jsonrpc: '2.0', id: 21, method: 'totally/unknown' }),
+  ]);
+  assert.equal(lines[0].error.code, -32601);
+  assert.match(lines[0].error.message, /Method not found/);
+});
+
+test('tools/list exposes the read-only tool set', () => {
+  const { lines } = runServer([
+    JSON.stringify({ jsonrpc: '2.0', id: 22, method: 'tools/list' }),
+  ]);
+  const { tools } = lines[0].result;
+  assert.ok(Array.isArray(tools));
+  assert.equal(tools.length, 5);
+  for (const tool of tools) {
+    assert.equal(typeof tool.name, 'string');
+    assert.equal(typeof tool.description, 'string');
+    assert.equal(typeof tool.inputSchema, 'object');
+  }
+});
+
+test('resources/list and resources/read agree on the graph', () => {
+  const { lines } = runServer([
+    JSON.stringify({ jsonrpc: '2.0', id: 23, method: 'resources/list' }),
+    JSON.stringify({ jsonrpc: '2.0', id: 24, method: 'resources/read', params: { uri: 'interestseed://graph' } }),
+  ]);
+  const uris = lines[0].result.resources.map((resource) => resource.uri);
+  assert.deepEqual(uris, [
+    'interestseed://graph',
+    'interestseed://experiment',
+    'interestseed://next',
+    'interestseed://context',
+    'interestseed://experiments',
+    'interestseed://discoveries',
+  ]);
+  const payload = JSON.parse(lines[1].result.contents[0].text);
+  assert.equal(payload.summary.nodes, 2);
+});
+
+test('unknown resource returns a generic error without leaking detail', () => {
+  const { lines } = runServer([
+    JSON.stringify({ jsonrpc: '2.0', id: 25, method: 'resources/read', params: { uri: 'interestseed://nope' } }),
+  ]);
+  assert.equal(lines[0].error.code, -32602);
+  assert.equal(lines[0].error.message, '资源读取失败');
+  assert.doesNotMatch(JSON.stringify(lines[0]), /C:\\\\|\\\\Users\\\\/);
+});
+
+test('prompts/list and prompts/get work for a known prompt', () => {
+  const { lines } = runServer([
+    JSON.stringify({ jsonrpc: '2.0', id: 26, method: 'prompts/list' }),
+    JSON.stringify({ jsonrpc: '2.0', id: 27, method: 'prompts/get', params: { name: 'review-interest', arguments: {} } }),
+  ]);
+  const names = lines[0].result.prompts.map((prompt) => prompt.name);
+  assert.deepEqual(names, ['review-interest', 'plan-next-experiment']);
+  assert.ok(Array.isArray(lines[1].result.messages));
+  assert.ok(lines[1].result.messages.length > 0);
+});
+
+test('unknown prompt returns a generic error', () => {
+  const { lines } = runServer([
+    JSON.stringify({ jsonrpc: '2.0', id: 28, method: 'prompts/get', params: { name: 'nope', arguments: {} } }),
+  ]);
+  assert.equal(lines[0].error.code, -32602);
+  assert.equal(lines[0].error.message, 'Prompt 读取失败');
+});
+
+test('minimal mode narrows both resources and prompts', () => {
+  const { lines } = runServer(
+    [
+      JSON.stringify({ jsonrpc: '2.0', id: 29, method: 'resources/list' }),
+      JSON.stringify({ jsonrpc: '2.0', id: 30, method: 'resources/read', params: { uri: 'interestseed://graph' } }),
+    ],
+    { minimal: true },
+  );
+  const uris = lines[0].result.resources.map((resource) => resource.uri);
+  assert.deepEqual(uris, ['interestseed://next']);
+  assert.equal(lines[1].error.code, -32602);
+  assert.equal(lines[1].error.message, '资源读取失败');
+});
