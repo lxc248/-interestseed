@@ -17,6 +17,7 @@ import {
   setDiscoveryFeedback,
   undoDiscoveryFeedbackById,
 } from './plugin/discoveryOps';
+import { reportDiscoveryBlocked, reportDiscoveryMigration } from './plugin/discoveryNotices';
 import { sortDiscoveries } from './discovery/ranking';
 import { DiscoveryRepository } from './discovery/DiscoveryRepository';
 import type { DiscoveryBackupStatus } from './discovery/DiscoveryRepository';
@@ -195,20 +196,7 @@ export default class InterestSeedPlugin extends Plugin {
     this.discoveryFile = discoveryResult.file;
     this.discoveryLoadBlocked = discoveryResult.blockedReason;
     this.discoveryLoadBackupStatus = discoveryResult.backupStatus;
-    const discoveryMigration = discoveryResult.migration;
-    if (
-      discoveryMigration &&
-      (discoveryMigration.legacyRecords > 0 ||
-        discoveryMigration.emptyEvidenceRecords > 0 ||
-        discoveryMigration.supersededRecords > 0)
-    ) {
-      console.warn(
-        `[InterestSeed] 发现迁移诊断（本次加载）：总 ${discoveryMigration.totalRecords}，legacy ${discoveryMigration.legacyRecords}，空证据 ${discoveryMigration.emptyEvidenceRecords}，自动收敛 ${discoveryMigration.supersededRecords}，本次实例持久化 ${discoveryMigration.persistedInThisInstance}；历史持久化 ${discoveryMigration.persistedHistory}`,
-      );
-      new Notice(
-        `发现迁移诊断：本次加载 legacy ${discoveryMigration.legacyRecords}，空证据 ${discoveryMigration.emptyEvidenceRecords}，自动收敛 ${discoveryMigration.supersededRecords}；历史持久化未知`,
-      );
-    }
+    reportDiscoveryMigration(discoveryResult.migration);
     this.discoveryQueue = new DiscoveryWriteQueue(
       this.discoveryFile,
       (file) => this.discoveryRepository.save(file),
@@ -227,18 +215,7 @@ export default class InterestSeedPlugin extends Plugin {
       enqueue: (mutator) => this.discoveryQueue.enqueue(mutator),
     });
     if (this.discoveryLoadBlocked) {
-      const backupHint =
-        this.discoveryLoadBackupStatus === 'succeeded'
-          ? '原始内容已备份'
-          : this.discoveryLoadBackupStatus === 'failed'
-            ? '备份失败，原文件未被覆盖'
-            : this.discoveryLoadBackupStatus === 'unavailable'
-              ? '读取失败，原文件未被修改'
-              : '';
-      new Notice(
-        `InterestSeed：${this.discoveryLoadBlocked}${backupHint ? `（${backupHint}）` : ''}`,
-        10_000,
-      );
+      reportDiscoveryBlocked(this.discoveryLoadBlocked, this.discoveryLoadBackupStatus);
     }
 
     this.controller = new GraphController({
