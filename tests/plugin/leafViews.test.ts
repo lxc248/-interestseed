@@ -21,7 +21,7 @@ function makeWorkspace() {
     setViewState: vi.fn(async () => undefined),
   };
   const workspace = {
-    getLeavesOfType: vi.fn(() => []),
+    getLeavesOfType: vi.fn<() => unknown[]>(() => []),
     getLeaf: vi.fn(() => leaf),
     getRightLeaf: vi.fn(() => null),
     revealLeaf: vi.fn(async () => undefined),
@@ -36,6 +36,14 @@ describe('leafViews', () => {
     await activateGraphView(app, 'graph-view');
     expect(leaf.setViewState).toHaveBeenCalledWith({ type: 'graph-view', active: true });
     expect(workspace.revealLeaf).toHaveBeenCalled();
+  });
+
+  it('reuses an existing graph view leaf', async () => {
+    const { app, leaf, workspace } = makeWorkspace();
+    workspace.getLeavesOfType = vi.fn<() => unknown[]>(() => [leaf]);
+    await activateGraphView(app, 'graph-view');
+    expect(leaf.setViewState).toHaveBeenCalledWith({ type: 'graph-view', active: true });
+    expect(workspace.revealLeaf).toHaveBeenCalledWith(leaf);
   });
 
   it('activates the agent view leaf', async () => {
