@@ -77,7 +77,7 @@ describe('discoveryUI', () => {
   });
 
   it('shows a theme on the graph view', async () => {
-    const view = new InterestSeedView();
+    const view = new InterestSeedView({} as never, {} as never);
     await showDiscoveriesForTheme({
       app: {
         workspace: { getLeavesOfType: () => [{ view }] },
