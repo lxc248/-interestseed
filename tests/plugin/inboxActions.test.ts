@@ -49,4 +49,12 @@ describe('inboxActions', () => {
       '无法读取剪贴板。请在手机快捷指令中使用 interestseed-share 链接，或手动粘贴。',
     );
   });
+
+  it('notices when the clipboard text is empty', async () => {
+    vi.stubGlobal('navigator', { clipboard: { readText: vi.fn(async () => '   ') } });
+    const enqueueShare = vi.fn();
+    await openSparkFromClipboard({ enqueueShare, openSparkCapture: vi.fn() });
+    expect(enqueueShare).not.toHaveBeenCalled();
+    expect(notices.at(-1)).toBe('剪贴板里没有可识别的分享内容。');
+  });
 });
