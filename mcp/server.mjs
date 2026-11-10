@@ -30,8 +30,8 @@
  * and printed to stderr once, so a cloud agent platform can never reach an
  * unauthenticated local server.
  */
-import { randomBytes, timingSafeEqual } from 'node:crypto';
-import { existsSync, readFileSync } from 'node:fs';
+import { createHash, randomBytes, randomUUID, timingSafeEqual } from 'node:crypto';
+import { copyFileSync, existsSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { dirname, join, resolve } from 'node:path';
 
@@ -50,6 +50,9 @@ const httpFlag = readFlag('--http') || process.env.INTERESTSEED_MCP_HTTP || '';
 const httpPort = httpFlag === '' ? null : Number(httpFlag);
 const httpHost = readFlag('--host') || process.env.INTERESTSEED_MCP_HOST || '127.0.0.1';
 let authToken = readFlag('--token') || process.env.INTERESTSEED_MCP_TOKEN || '';
+// Write access is opt-in: the server stays read-only unless you ask for more.
+const writeRequested = args.includes('--write') || process.env.INTERESTSEED_MCP_WRITE === '1';
+const writeEnabled = writeRequested && !minimal;
 const graphArgIndex = args.indexOf('--graph');
 const standaloneDefault = resolve(process.cwd(), '.interestseed/state.json');
 const pluginDefault = resolve(process.cwd(), '.obsidian/plugins/interestseed/graphs/default.json');
@@ -74,6 +77,213 @@ function readGraph() {
   return graph;
 }
 
+/* ------------------------------------------------------------------ */
+/* Write support (only mounted when --write is passed)                 */
+/* ------------------------------------------------------------------ */
+
+const VIDEO_HOST_PATTERN = /(youtube\.com|youtu\.be|bilibili\.com|b23\.tv|douyin\.com|tiktok\.com|kuaishou\.com|vimeo\.com)/i;
+const IMAGE_HOST_PATTERN = /(instagram\.com|pinterest\.com|pin\.it)/i;
+const EXPERIMENTS_FILE = 'experiments.json';
+
+function nowIso() {
+  return new Date().toISOString();
+}
+
+function nodeIdFor(title, url) {
+  const digest = createHash('sha1').update(`${title}|${url ?? ''}`.toLowerCase()).digest('hex');
+  return `node_${digest.slice(0, 10)}`;
+}
+
+function nodeTypeForUrl(url) {
+  if (!url) return 'topic';
+  if (VIDEO_HOST_PATTERN.test(url)) return 'video';
+  if (IMAGE_HOST_PATTERN.test(url)) return 'image';
+  return 'topic';
+}
+
+/** Read the raw document so a write can preserve its original envelope. */
+function loadDocument() {
+  let raw;
+  try {
+    raw = readFileSync(graphPath, 'utf8').replace(/^\uFEFF/, '');
+  } catch {
+    throw new Error('图谱文件不存在');
+  }
+  const doc = JSON.parse(raw);
+  const isEnvelope = Boolean(doc?.graph && Array.isArray(doc.graph.nodes));
+  const graph = isEnvelope ? doc.graph : doc;
+  if (!graph || !Array.isArray(graph.nodes) || !Array.isArray(graph.edges)) {
+    throw new Error('图谱文件缺少 nodes / edges');
+  }
+  return { doc, graph, isEnvelope };
+}
+
+function saveDocument({ doc, graph, isEnvelope }) {
+  const payload = isEnvelope ? { ...doc, graph } : graph;
+  const body = `${JSON.stringify(payload, null, 2)}\n`;
+  const temp = `${graphPath}.tmp`;
+  // Keep one rollback copy: a bad write must never cost the user their graph.
+  try {
+    copyFileSync(graphPath, `${graphPath}.bak`);
+  } catch {
+    // First write on a fresh file: nothing to back up.
+  }
+  writeFileSync(temp, body, 'utf8');
+  renameSync(temp, graphPath);
+}
+
+function normalizeTitle(value) {
+  if (typeof value !== 'string') return '';
+  return value.replace(/\s+/g, ' ').trim().slice(0, 120);
+}
+
+function findExistingNode(graph, title, url) {
+  const lowered = title.toLowerCase();
+  return (
+    graph.nodes.find((node) => (node.title ?? '').trim().toLowerCase() === lowered) ??
+    (url
+      ? graph.nodes.find((node) => node.metadata?.sourceUrl === url || node.metadata?.canonicalUrl === url)
+      : undefined)
+  );
+}
+
+function captureInterest(input) {
+  const title = normalizeTitle(input?.title);
+  if (!title) throw new ToolInputError('title 不能为空');
+  const url = typeof input?.url === 'string' && input.url.trim() ? input.url.trim() : null;
+  const note = typeof input?.note === 'string' ? input.note.trim().slice(0, 500) : '';
+  const tags = Array.isArray(input?.tags)
+    ? input.tags
+        .filter((tag) => typeof tag === 'string')
+        .map((tag) => tag.trim())
+        .filter(Boolean)
+        .slice(0, 8)
+    : [];
+
+  const document = loadDocument();
+  const existing = findExistingNode(document.graph, title, url);
+  if (existing) {
+    return { created: false, node: publicNode(existing, degreeMap(document.graph).get(existing.id) ?? 0) };
+  }
+
+  const timestamp = nowIso();
+  const node = {
+    id: nodeIdFor(title, url),
+    type: nodeTypeForUrl(url),
+    title,
+    tags,
+    createdAt: timestamp,
+    updatedAt: timestamp,
+    metadata: {
+      ...(url ? { sourceUrl: url } : {}),
+      ...(note ? { summary: note } : {}),
+      capturedVia: 'mcp',
+    },
+  };
+  document.graph.nodes.push(node);
+  document.graph.updatedAt = timestamp;
+  saveDocument(document);
+  return { created: true, node: publicNode(node, 0) };
+}
+
+function experimentsFilePath() {
+  return join(dirname(graphPath), EXPERIMENTS_FILE);
+}
+
+function loadExperimentFile() {
+  const path = experimentsFilePath();
+  if (!existsSync(path)) return { schemaVersion: 1, experiments: [] };
+  const parsed = JSON.parse(readFileSync(path, 'utf8').replace(/^\uFEFF/, ''));
+  return {
+    schemaVersion: 1,
+    experiments: Array.isArray(parsed.experiments) ? parsed.experiments : [],
+  };
+}
+
+function saveExperimentFile(file) {
+  const path = experimentsFilePath();
+  const temp = `${path}.tmp`;
+  writeFileSync(temp, `${JSON.stringify(file, null, 2)}\n`, 'utf8');
+  renameSync(temp, path);
+}
+
+function startExperiment(input) {
+  const requested = normalizeTitle(input?.interest);
+  if (!requested) throw new ToolInputError('interest 不能为空');
+
+  const document = loadDocument();
+  if (!document.isEnvelope) {
+    throw new ToolInputError(
+      '当前连接的是 Obsidian 插件图谱，实验由插件自身管理（MCP 不写入插件数据）；请连接独立版的 state.json。',
+    );
+  }
+
+  const node = document.graph.nodes.find(
+    (entry) => entry.id === requested || (entry.title ?? '').trim().toLowerCase() === requested.toLowerCase(),
+  );
+  if (!node) throw new ToolInputError(`找不到兴趣：${requested}`);
+
+  const file = loadExperimentFile();
+  const active = file.experiments.find((item) => item.state?.status === 'active');
+  if (active) {
+    throw new ToolInputError(`已有进行中的实验（${active.id}：${active.state?.title ?? ''}），一次只推进一个。`);
+  }
+
+  const days = Math.min(30, Math.max(3, Math.round(Number(input?.days) || 3)));
+  const hypothesis =
+    typeof input?.hypothesis === 'string' && input.hypothesis.trim()
+      ? input.hypothesis.trim().slice(0, 300)
+      : `我愿意连续 ${days} 天为「${node.title}」做一次真实行动。`;
+
+  const experiment = {
+    id: `exp_${randomUUID().slice(0, 8)}`,
+    nodeId: node.id,
+    state: {
+      title: node.title,
+      hypothesis,
+      metric: '每天记录一次兴趣强度（1–5）与一个具体证据。',
+      startedAt: nowIso(),
+      targetDays: days,
+      status: 'active',
+      logs: [],
+    },
+  };
+  file.experiments.unshift(experiment);
+  saveExperimentFile(file);
+  return experiment;
+}
+
+const writeTools = [
+  {
+    name: 'interestseed_capture_interest',
+    description:
+      '把一条兴趣写进 InterestSeed 图谱。已存在同名或同链接的节点时不会重复创建。需要服务以 --write 启动。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        title: { type: 'string', description: '兴趣标题，必填' },
+        url: { type: 'string', description: '来源链接，可选' },
+        note: { type: 'string', description: '一句备注，可选' },
+        tags: { type: 'array', items: { type: 'string' }, description: '标签，可选' },
+      },
+      required: ['title'],
+    },
+  },
+  {
+    name: 'interestseed_start_experiment',
+    description:
+      '为一个已存在的兴趣启动 3/7 天实验。只写独立版 state.json；插件内的实验请用插件操作。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        interest: { type: 'string', description: '兴趣标题或节点 id，必填' },
+        hypothesis: { type: 'string', description: '假设，可选' },
+        days: { type: 'number', description: '天数，默认 3' },
+      },
+      required: ['interest'],
+    },
+  },
+];
 function readStandaloneJson(fileName) {
   const path = join(dirname(graphPath), fileName);
   let raw;
@@ -293,7 +503,9 @@ const minimalToolNames = new Set([
   'interestseed_next_step',
   'interestseed_get_experiment',
 ]);
-const exposedTools = minimal ? tools.filter((tool) => minimalToolNames.has(tool.name)) : tools;
+const exposedTools = (
+  minimal ? tools.filter((tool) => minimalToolNames.has(tool.name)) : tools
+).concat(writeEnabled ? writeTools : []);
 
 function toolResult(value) {
   return {
@@ -304,6 +516,14 @@ function toolResult(value) {
 function callTool(name, input) {
   if (minimal && !minimalToolNames.has(name)) {
     throw new Error(`未知工具：${name}`);
+  }
+  if (name === 'interestseed_capture_interest') {
+    if (!writeEnabled) throw new ToolInputError('写入未开启：请用 --write 启动服务。');
+    return toolResult(captureInterest(input));
+  }
+  if (name === 'interestseed_start_experiment') {
+    if (!writeEnabled) throw new ToolInputError('写入未开启：请用 --write 启动服务。');
+    return toolResult(startExperiment(input));
   }
   const graph = readGraph();
   if (name === 'interestseed_get_graph') {
@@ -477,14 +697,28 @@ function fail(id, code, userMessage, kind, cause) {
   return error(id, code, userMessage);
 }
 
+/**
+ * A validation error written by us for the caller. Its message is safe to
+ * return verbatim, so an agent can correct its own request. Unexpected errors
+ * stay behind the generic message and go to stderr instead.
+ */
+class ToolInputError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'ToolInputError';
+  }
+}
+
 function toolFail(id, cause) {
   const detail = cause instanceof Error ? cause.message : String(cause ?? '');
   process.stderr.write(`InterestSeed MCP tool error: ${detail}\n`);
+  const safe = cause instanceof ToolInputError ? detail : null;
   return response(id, {
     content: [
       {
         type: 'text',
-        text: 'InterestSeed MCP 错误：请求无法完成。详细信息已写入服务端日志。',
+        text:
+          safe ?? 'InterestSeed MCP 错误：请求无法完成。详细信息已写入服务端日志。',
       },
     ],
     isError: true,
