@@ -64,6 +64,9 @@ import { NodeCreateModal } from './ui/NodeCreateModal';
 import { openGapCoachModal, openInboxModal, openSeedSprintModal, openShareCardModal, openSparkCaptureModal } from './plugin/modalOpeners';
 import { openExperimentModal } from './plugin/modalOpeners';
 import { ShareInbox, type InboxSource } from './inbox/ShareInbox';
+import { importEntriesToInbox, type ImportOutcome } from './inbox/importToInbox';
+import { parseImport } from './services/importers';
+import { openImportFavoritesModal } from './plugin/favoritesImport';
 import type { Insight } from './core/InsightEngine';
 import {
   type ExperimentInput,
@@ -462,6 +465,17 @@ export default class InterestSeedPlugin extends Plugin {
     openInboxModal(this.app, this);
   }
 
+  /** Import an exported favourites file into the inbox (one persist per batch). */
+  importFavorites(text: string): ImportOutcome {
+    const parsed = parseImport(text);
+    const outcome = importEntriesToInbox(this.inbox, parsed.items);
+    if (outcome.added > 0) void this.persist();
+    return outcome;
+  }
+
+  openImportFavorites(): void {
+    openImportFavoritesModal(this.app, (text) => this.importFavorites(text));
+  }
   enqueueShare(text: string, source: InboxSource = 'share', sourceRef = ''): ReturnType<ShareInbox['enqueue']> {
     const result = this.inbox.enqueue(text, source, sourceRef);
     if (result) void this.persist();

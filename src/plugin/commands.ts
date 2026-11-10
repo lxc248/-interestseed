@@ -10,6 +10,7 @@ export interface CommandHost {
   openSparkCapture(initialText?: string): void;
   openSparkFromClipboard(): Promise<void>;
   openShareCard(): void;
+  openImportFavorites(): void;
   exportJsonCanvas(): Promise<void> | void;
   createInterestRoute(): Promise<void> | void;
   openInbox(): void;
@@ -89,6 +90,11 @@ export function registerCommands(plugin: Plugin, host: CommandHost): void {
     callback: () => host.openShareCard(),
   });
 
+  plugin.addCommand({
+    id: 'interestseed-import-favorites',
+    name: '批量导入收藏（书签 HTML / JSON / CSV）',
+    callback: () => host.openImportFavorites(),
+  });
   plugin.addCommand({
     id: 'interestseed-inbox',
     name: '打开分享收件箱（列表 / 专注）',

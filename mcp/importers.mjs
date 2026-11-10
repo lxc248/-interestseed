@@ -42,19 +42,29 @@ function stripTags(value) {
 /** Netscape bookmark export: the format every browser and many tools emit. */
 function parseBookmarksHtml(text) {
   const items = [];
-  const pattern = /<a\s[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi;
-  let match;
-  while ((match = pattern.exec(text)) !== null) {
-    const url = normaliseUrl(decodeEntities(match[1]));
+  const lower = text.toLowerCase();
+  let cursor = 0;
+  while (cursor < lower.length) {
+    const start = lower.indexOf('<a ', cursor);
+    if (start < 0) break;
+    const tagEnd = lower.indexOf('>', start);
+    if (tagEnd < 0) break;
+    const close = lower.indexOf('</a>', tagEnd);
+    if (close < 0) break;
+    const tag = text.slice(start, tagEnd + 1);
+    const href = /href="([^"]*)"/i.exec(tag);
+    cursor = close + 4;
+    if (!href) continue;
+    const url = normaliseUrl(decodeEntities(href[1]));
     if (!url) continue;
-    const title = cleanTitle(decodeEntities(stripTags(match[2])));
-    items.push({ title, url });
+    items.push({ title: cleanTitle(decodeEntities(stripTags(text.slice(tagEnd + 1, close)))), url });
   }
   return items;
 }
 
 function looksLikeBookmarksHtml(text) {
-  return /<a\s[^>]*href=/i.test(text) && /<\/a>/i.test(text);
+  const lower = text.toLowerCase();
+  return lower.includes('<a ') && lower.includes('href=') && lower.includes('</a>');
 }
 
 /** Only the fields we understand are read; unknown shapes are ignored. */
