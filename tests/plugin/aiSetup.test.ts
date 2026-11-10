@@ -61,4 +61,19 @@ describe('aiSetup', () => {
     expect(open).toHaveBeenCalledTimes(1);
     expect(openTabById).toHaveBeenCalledWith('interestseed');
   });
+
+  it('passes consent false into the modal', async () => {
+    openAiSetupModal({
+      app: {} as never,
+      manifestId: 'interestseed',
+      aiModel: 'local',
+      enableAI: false,
+      aiConsentGranted: false,
+      getKey: vi.fn(async () => undefined),
+      saveKey: vi.fn(async () => undefined),
+    });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const options = (constructed.at(-1) as { options: { consentGranted: boolean } }).options;
+    expect(options.consentGranted).toBe(false);
+  });
 });
