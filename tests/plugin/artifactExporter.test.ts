@@ -161,6 +161,17 @@ describe('artifactExporter', () => {
     expect(plan?.nodes.map((node) => node.id)).toEqual(['a']);
   });
 
+  it('falls back to all nodes when the tag matches none', () => {
+    const plan = buildRoutePlan({
+      selected: { id: 'a', title: 'A', tags: ['孤岛标签'], metadata: {} } as never,
+      allNodes: [{ id: 'a', title: 'A', tags: ['其他'], metadata: {} }] as never,
+      neighbors: () => [],
+      active: null,
+    });
+    expect(plan?.theme).toBe('孤岛标签');
+    expect(plan?.nodes).toHaveLength(1);
+  });
+
   it('adds a numeric suffix when a route already exists', async () => {
     const date = new Date().toISOString().slice(0, 10);
     const { app } = makeApp(['InterestSeed', `InterestSeed/兴趣路线 - 测试兴趣 - ${date}.md`]);
