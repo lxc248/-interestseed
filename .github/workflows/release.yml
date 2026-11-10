@@ -82,7 +82,7 @@ jobs:
           else
             gh release create "$RELEASE_TAG" --title "InterestSeed ${RELEASE_TAG#v}" "${NOTES_ARGS[@]}"
           fi
-          # Obsidian 社区目录要求 release 里直接有 main.js / manifest.json / styles.css 三个资产。
+          # Obsidian community listing requires main.js / manifest.json / styles.css
           gh release upload "$RELEASE_TAG" --clobber \
             release/interestseed-*.zip \
             release/SHA256SUMS.txt \
@@ -93,3 +93,13 @@ jobs:
             assets/interestseed-launch-cover.png \
             assets/cosmic-viewer.png \
             assets/plugin-cosmic.png
+
+      # Plugin tags (not standalone-*) must expose the Obsidian assets.
+      - name: Verify Obsidian release assets
+        if: ${{ !startsWith(github.event.inputs.tag || github.ref_name, 'standalone-') }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          OBSIDIAN_CHECK_RELEASE: '1'
+        run: node scripts/check-obsidian.mjs
