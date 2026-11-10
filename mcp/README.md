@@ -173,6 +173,7 @@ INTERESTSEED_MCP_WRITE=1 node mcp/server.mjs --graph "..."
 ```text
 interestseed_capture_interest     title（必填）/ url / note / tags
 interestseed_start_experiment     interest（必填，标题或节点 id）/ hypothesis / days
+interestseed_log_experiment       evidence（必填，至少 4 字）/ interest / energy / next / experiment
 ```
 
 ### 安全与边界
@@ -183,6 +184,7 @@ interestseed_start_experiment     interest（必填，标题或节点 id）/ hyp
 temp + rename 原子写                不会留下写了一半的 JSON
 保留原有信封结构                    {schemaVersion, graph:{...}} 不会被打平
 一次只允许一个进行中的实验          已有 active 实验时直接拒绝并告知其 id
+每天只能记一条实验日志              重复记录直接拒绝；写满目标天数后自动置为 complete
 只写独立版 state.json              插件图谱会明确拒绝：实验由插件自己管理
 minimal 模式永不暴露写工具          --minimal + --write 只给只读工具
 ```
