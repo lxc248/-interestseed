@@ -66,10 +66,10 @@ npm run check:release
 ## Evidence
 
 ```text
-Vitest        634 passed
+Vitest        635 passed
 MCP smoke      11 passed
 Playwright     31 passed
-Total         676 passed
+Total         677 passed
 CodeQL open alerts: 0
 npm audit: 0
 Release workflow: success
