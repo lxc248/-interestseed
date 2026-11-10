@@ -65,10 +65,11 @@ test('write tools appear with --write', () => {
       graphPath: vault.graphPath,
     });
     const names = lines[0].result.tools.map((tool) => tool.name);
-    assert.equal(names.length, 8);
+    assert.equal(names.length, 9);
     assert.ok(names.includes('interestseed_capture_interest'));
     assert.ok(names.includes('interestseed_start_experiment'));
     assert.ok(names.includes('interestseed_log_experiment'));
+    assert.ok(names.includes('interestseed_undo_last_capture'));
   } finally {
     vault.cleanup();
   }
@@ -470,6 +471,129 @@ test('log_experiment refuses to extend a finished experiment', () => {
     );
     assert.equal(lines[0].result.isError, true);
     assert.match(lines[0].result.content[0].text, /3 天试跑已经完成/);
+  } finally {
+    vault.cleanup();
+  }
+});
+test('undo removes the last MCP capture', () => {
+  const vault = makeVault();
+  try {
+    const lines = runServer(
+      [
+        call(1, 'interestseed_capture_interest', { title: '陶艺' }),
+        call(2, 'interestseed_capture_interest', { title: '木工' }),
+        call(3, 'interestseed_undo_last_capture', {}),
+      ],
+      { graphPath: vault.graphPath },
+    );
+    const removed = JSON.parse(lines[2].result.content[0].text);
+    assert.equal(removed.removed.title, '木工');
+    const onDisk = JSON.parse(readFileSync(vault.graphPath, 'utf8'));
+    const titles = onDisk.graph.nodes.map((node) => node.title);
+    assert.ok(titles.includes('陶艺'));
+    assert.ok(!titles.includes('木工'));
+  } finally {
+    vault.cleanup();
+  }
+});
+
+test('undo accepts an explicit node id', () => {
+  const vault = makeVault();
+  try {
+    const lines = runServer(
+      [
+        call(1, 'interestseed_capture_interest', { title: '陶艺' }),
+        call(2, 'interestseed_capture_interest', { title: '木工' }),
+      ],
+      { graphPath: vault.graphPath },
+    );
+    const first = JSON.parse(lines[0].result.content[0].text);
+    const lines2 = runServer([call(3, 'interestseed_undo_last_capture', { id: first.node.id })], {
+      graphPath: vault.graphPath,
+    });
+    assert.equal(JSON.parse(lines2[0].result.content[0].text).removed.title, '陶艺');
+    const onDisk = JSON.parse(readFileSync(vault.graphPath, 'utf8'));
+    const titles = onDisk.graph.nodes.map((node) => node.title);
+    assert.ok(titles.includes('木工'));
+    assert.ok(!titles.includes('陶艺'));
+  } finally {
+    vault.cleanup();
+  }
+});
+
+test('undo refuses a node that still has edges', () => {
+  const vault = makeVault();
+  try {
+    const captured = JSON.parse(
+      runServer([call(1, 'interestseed_capture_interest', { title: '陶艺' })], {
+        graphPath: vault.graphPath,
+      })[0].result.content[0].text,
+    );
+    const onDisk = JSON.parse(readFileSync(vault.graphPath, 'utf8'));
+    onDisk.graph.edges.push({
+      id: 'e9',
+      source: captured.node.id,
+      target: 'a',
+      relation: '相关',
+      origin: 'user',
+      status: 'confirmed',
+      createdAt: '',
+      updatedAt: '',
+    });
+    writeFileSync(vault.graphPath, JSON.stringify(onDisk, null, 2));
+
+    const lines = runServer([call(2, 'interestseed_undo_last_capture', { id: captured.node.id })], {
+      graphPath: vault.graphPath,
+    });
+    assert.equal(lines[0].result.isError, true);
+    assert.match(lines[0].result.content[0].text, /还有 1 条连接/);
+  } finally {
+    vault.cleanup();
+  }
+});
+
+test('undo refuses a node that carries an experiment', () => {
+  const vault = makeVault();
+  try {
+    const captured = JSON.parse(
+      runServer([call(1, 'interestseed_capture_interest', { title: '陶艺' })], {
+        graphPath: vault.graphPath,
+      })[0].result.content[0].text,
+    );
+    runServer([call(2, 'interestseed_start_experiment', { interest: '陶艺' })], {
+      graphPath: vault.graphPath,
+    });
+    const lines = runServer([call(3, 'interestseed_undo_last_capture', { id: captured.node.id })], {
+      graphPath: vault.graphPath,
+    });
+    assert.equal(lines[0].result.isError, true);
+    assert.match(lines[0].result.content[0].text, /实验/);
+  } finally {
+    vault.cleanup();
+  }
+});
+
+test('undo refuses nodes that MCP did not create', () => {
+  const vault = makeVault();
+  try {
+    const lines = runServer([call(1, 'interestseed_undo_last_capture', { id: 'a' })], {
+      graphPath: vault.graphPath,
+    });
+    assert.equal(lines[0].result.isError, true);
+    assert.match(lines[0].result.content[0].text, /只能撤销通过 MCP 创建的节点/);
+  } finally {
+    vault.cleanup();
+  }
+});
+
+test('undo explains when there is nothing to undo', () => {
+  const vault = makeVault();
+  try {
+    const lines = runServer([call(1, 'interestseed_undo_last_capture', {})], {
+      graphPath: vault.graphPath,
+    });
+    assert.equal(lines[0].result.isError, true);
+    assert.match(lines[0].result.content[0].text, /没有可撤销的 MCP 节点/);
   } finally {
     vault.cleanup();
   }

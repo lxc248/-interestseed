@@ -334,6 +334,45 @@ function logExperiment(input) {
     logs,
   };
 }
+function undoLastCapture(input) {
+  const document = loadDocument();
+  const graph = document.graph;
+  const requestedId = typeof input?.id === 'string' ? input.id.trim() : '';
+
+  let target = null;
+  if (requestedId) {
+    target = graph.nodes.find((node) => node.id === requestedId) ?? null;
+    if (!target) throw new ToolInputError(`找不到节点：${requestedId}`);
+    if (target.metadata?.capturedVia !== 'mcp') {
+      throw new ToolInputError('只能撤销通过 MCP 创建的节点，这条是别处创建的。');
+    }
+  } else {
+    for (let index = graph.nodes.length - 1; index >= 0; index -= 1) {
+      if (graph.nodes[index].metadata?.capturedVia === 'mcp') {
+        target = graph.nodes[index];
+        break;
+      }
+    }
+    if (!target) throw new ToolInputError('没有可撤销的 MCP 节点。');
+  }
+
+  const edges = graph.edges.filter((edge) => edge.source === target.id || edge.target === target.id);
+  if (edges.length > 0) {
+    throw new ToolInputError(`这个节点还有 ${edges.length} 条连接，先处理连接再撤销。`);
+  }
+
+  const experimentFile = loadExperimentFile();
+  const linked = experimentFile.experiments.find((entry) => entry.nodeId === target.id);
+  if (linked) {
+    throw new ToolInputError(`这个节点上有实验（${linked.id}），撤销会丢证据，已拒绝。`);
+  }
+
+  graph.nodes = graph.nodes.filter((node) => node.id !== target.id);
+  graph.updatedAt = nowIso();
+  saveDocument(document);
+  return { removed: { id: target.id, title: target.title, type: target.type } };
+}
+
 const writeTools = [
   {
     name: 'interestseed_capture_interest',
@@ -378,6 +417,17 @@ const writeTools = [
         next: { type: 'string', description: '下一步，可选' },
       },
       required: ['evidence'],
+    },
+  },
+  {
+    name: 'interestseed_undo_last_capture',
+    description:
+      '撤销最近一次通过 MCP 创建的节点。节点上已有连接或实验时拒绝，避免丢证据。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', description: '节点 id，留空则撤销最近一次 MCP 创建' },
+      },
     },
   },
 ];
@@ -625,6 +675,10 @@ function callTool(name, input) {
   if (name === 'interestseed_log_experiment') {
     if (!writeEnabled) throw new ToolInputError('写入未开启：请用 --write 启动服务。');
     return toolResult(logExperiment(input));
+  }
+  if (name === 'interestseed_undo_last_capture') {
+    if (!writeEnabled) throw new ToolInputError('写入未开启：请用 --write 启动服务。');
+    return toolResult(undoLastCapture(input));
   }
   const graph = readGraph();
   if (name === 'interestseed_get_graph') {
