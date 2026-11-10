@@ -38,6 +38,14 @@ describe('leafViews', () => {
     expect(workspace.revealLeaf).toHaveBeenCalled();
   });
 
+  it('reuses an existing graph view leaf', async () => {
+    const { app, leaf, workspace } = makeWorkspace();
+    workspace.getLeavesOfType = vi.fn(() => [leaf]);
+    await activateGraphView(app, 'graph-view');
+    expect(leaf.setViewState).toHaveBeenCalledWith({ type: 'graph-view', active: true });
+    expect(workspace.revealLeaf).toHaveBeenCalledWith(leaf);
+  });
+
   it('activates the agent view leaf', async () => {
     const { app, leaf } = makeWorkspace();
     await activateAgentView(app);
