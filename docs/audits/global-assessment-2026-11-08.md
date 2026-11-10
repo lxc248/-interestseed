@@ -213,7 +213,7 @@ Still open:
 The project reaches “good” only when all of these are true:
 
 ```text
-coverage >= 85% lines / 72% branches
+coverage >= 85.5% lines / 72.5% branches
 visual regression covers key public and app states
 tracked tree < 40 MB
 independent 4.0.9 audit completed
