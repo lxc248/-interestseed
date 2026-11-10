@@ -186,6 +186,29 @@ async function addInbox() {
   }
 }
 
+async function importInbox() {
+  const area = $('#inbox-import-text');
+  const text = area.value.trim();
+  if (!text) {
+    toast('先粘贴导出文件的内容', true);
+    return;
+  }
+  try {
+    setBusy(true);
+    const report = await api('/api/inbox/import', { method: 'POST', body: JSON.stringify({ text }) });
+    area.value = '';
+    await load();
+    const extras = [];
+    if (report.duplicates > 0) extras.push(`重复 ${report.duplicates} 条`);
+    if (report.duplicatesInFile > 0) extras.push(`文件内重复 ${report.duplicatesInFile} 条`);
+    if (report.truncated) extras.push('超出上限已截断');
+    toast(`导入 ${report.added} 条${extras.length > 0 ? `（${extras.join('，')}）` : ''}`);
+  } catch (error) {
+    toast(error.message, true);
+  } finally {
+    setBusy(false);
+  }
+}
 async function resolveInboxItem(id, status) {
   try {
     setBusy(true);
@@ -595,6 +618,7 @@ $('#discoveries-refresh').addEventListener('click', async () => {
   }
 });
 $('#inbox-add').addEventListener('click', addInbox);
+$('#inbox-import-run').addEventListener('click', importInbox);
 $('#inbox-input').addEventListener('keydown', (event) => {
   if (event.key === 'Enter') addInbox();
 });
