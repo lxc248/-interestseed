@@ -41,4 +41,14 @@ describe('aiSuggestions', () => {
     });
     expect(expandWithAI).toHaveBeenCalledWith('node-a');
   });
+
+  it('notices when a file has no matched node', async () => {
+    await suggestForFile({
+      file: { path: 'note.md' } as never,
+      findNodeByUri: vi.fn(() => null),
+      listNodes: vi.fn(() => []),
+      expandWithAI: vi.fn(async () => undefined),
+    });
+    expect(notices.at(-1)).toBe('这篇笔记还没进入图谱；先运行一次“重新扫描”。');
+  });
 });
