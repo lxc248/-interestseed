@@ -82,7 +82,7 @@ if (!(await exists(notesPath))) {
 }
 
 // README 的安装说明必须指向真实存在的包名，否则用户下不到东西。
-for (const readme of ['README.md', 'README.en.md']) {
+for (const readme of ['README.md', 'README.en.md', 'docs/tutorial.md']) {
   const text = await readFile(resolve(root, readme), 'utf8');
   const needle = `interestseed-${manifest.version}.zip`;
   if (!text.includes(needle)) {

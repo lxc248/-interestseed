@@ -8,7 +8,7 @@ independence.
 ```text
 Repository: https://github.com/lxc248/-interestseed
 Standalone: 4.0.9
-Archive:    interestseed-standalone-v4.0.9.zip
+Archive:    interestseed-standalone-v4.0.10.zip
 SHA-256:    5d00805958efaec9079e949ee2d83407c4bcc81f191e4e9bf451a5ac6dde1c8a
 ```
 
