@@ -203,6 +203,12 @@ function loadExperimentFile() {
 function saveExperimentFile(file) {
   const path = experimentsFilePath();
   const temp = `${path}.tmp`;
+  // Same rollback guarantee as the graph: never let a bad write lose evidence.
+  try {
+    copyFileSync(path, `${path}.bak`);
+  } catch {
+    // First write on a fresh file: nothing to back up.
+  }
   writeFileSync(temp, `${JSON.stringify(file, null, 2)}\n`, 'utf8');
   renameSync(temp, path);
 }
@@ -334,6 +340,48 @@ function logExperiment(input) {
     logs,
   };
 }
+/** Undo the newest log entry. Returns the removed entry so nothing is lost silently. */
+function undoLastLog(input) {
+  const file = loadExperimentFile();
+  const requestedId = typeof input?.experiment === 'string' ? input.experiment.trim() : '';
+  const index = requestedId
+    ? file.experiments.findIndex((entry) => entry.id === requestedId)
+    : file.experiments.findIndex((entry) => entry.state?.status === 'active');
+
+  if (index < 0) {
+    throw new ToolInputError(
+      requestedId
+        ? `找不到实验：${requestedId}`
+        : '当前没有进行中的实验，请用 experiment 指定一个已完成实验的 id。',
+    );
+  }
+
+  const current = file.experiments[index];
+  const state = current.state;
+  const logs = Array.isArray(state.logs) ? state.logs : [];
+  if (logs.length === 0) throw new ToolInputError('这个实验还没有日志可以撤销。');
+
+  const removed = logs[logs.length - 1];
+  const nextLogs = logs.slice(0, -1);
+  const nextState = {
+    ...state,
+    logs: nextLogs,
+    status: nextLogs.length >= state.targetDays ? 'complete' : 'active',
+  };
+  file.experiments[index] = { ...current, state: nextState };
+  saveExperimentFile(file);
+
+  return {
+    id: current.id,
+    removed,
+    status: nextState.status,
+    day: experimentDayOf(nextState),
+    targetDays: nextState.targetDays,
+    remaining: Math.max(0, nextState.targetDays - nextLogs.length),
+    logs: nextLogs,
+  };
+}
+
 function undoLastCapture(input) {
   const document = loadDocument();
   const graph = document.graph;
@@ -427,6 +475,17 @@ const writeTools = [
       type: 'object',
       properties: {
         id: { type: 'string', description: '节点 id，留空则撤销最近一次 MCP 创建' },
+      },
+    },
+  },
+  {
+    name: 'interestseed_undo_last_log',
+    description:
+      '撤销最近一条实验日志，并把实验状态回退（写满后自动完成的可回到进行中）。被删的日志会原样返回。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        experiment: { type: 'string', description: '实验 id，留空则取当前进行中的实验' },
       },
     },
   },
@@ -679,6 +738,10 @@ function callTool(name, input) {
   if (name === 'interestseed_undo_last_capture') {
     if (!writeEnabled) throw new ToolInputError('写入未开启：请用 --write 启动服务。');
     return toolResult(undoLastCapture(input));
+  }
+  if (name === 'interestseed_undo_last_log') {
+    if (!writeEnabled) throw new ToolInputError('写入未开启：请用 --write 启动服务。');
+    return toolResult(undoLastLog(input));
   }
   const graph = readGraph();
   if (name === 'interestseed_get_graph') {

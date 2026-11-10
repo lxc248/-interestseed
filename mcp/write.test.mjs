@@ -65,11 +65,12 @@ test('write tools appear with --write', () => {
       graphPath: vault.graphPath,
     });
     const names = lines[0].result.tools.map((tool) => tool.name);
-    assert.equal(names.length, 9);
+    assert.equal(names.length, 10);
     assert.ok(names.includes('interestseed_capture_interest'));
     assert.ok(names.includes('interestseed_start_experiment'));
     assert.ok(names.includes('interestseed_log_experiment'));
     assert.ok(names.includes('interestseed_undo_last_capture'));
+    assert.ok(names.includes('interestseed_undo_last_log'));
   } finally {
     vault.cleanup();
   }
@@ -594,6 +595,138 @@ test('undo explains when there is nothing to undo', () => {
     });
     assert.equal(lines[0].result.isError, true);
     assert.match(lines[0].result.content[0].text, /没有可撤销的 MCP 节点/);
+  } finally {
+    vault.cleanup();
+  }
+});
+test('undo_last_log removes the newest entry', () => {
+  const vault = withActiveExperiment();
+  try {
+    const lines = runServer(
+      [
+        call(1, 'interestseed_log_experiment', { evidence: '今天拍了楼下的树' }),
+        call(2, 'interestseed_undo_last_log', {}),
+      ],
+      { graphPath: vault.graphPath },
+    );
+    const payload = JSON.parse(lines[1].result.content[0].text);
+    assert.equal(payload.removed.evidence, '今天拍了楼下的树');
+    assert.equal(payload.logs.length, 0);
+    assert.equal(payload.status, 'active');
+    assert.equal(payload.remaining, 3);
+
+    const file = JSON.parse(readFileSync(join(vault.dir, 'experiments.json'), 'utf8'));
+    assert.equal(file.experiments[0].state.logs.length, 0);
+  } finally {
+    vault.cleanup();
+  }
+});
+
+test('undo_last_log keeps the earlier entries', () => {
+  const vault = makeVault({
+    experiments: {
+      schemaVersion: 1,
+      experiments: [
+        {
+          id: 'exp_two',
+          nodeId: 'a',
+          state: {
+            title: '摄影',
+            hypothesis: '每天拍一张',
+            metric: '每天记录一次',
+            startedAt: '2026-01-01T00:00:00.000Z',
+            targetDays: 3,
+            status: 'active',
+            logs: [
+              { day: 1, date: '2026-01-01', recordedAt: '2026-01-01T00:00:00.000Z', interest: 3, energy: 3, evidence: '第一天' },
+              { day: 2, date: '2026-01-02', recordedAt: '2026-01-02T00:00:00.000Z', interest: 4, energy: 5, evidence: '第二天' },
+            ],
+          },
+        },
+      ],
+    },
+  });
+  try {
+    const lines = runServer([call(1, 'interestseed_undo_last_log', { experiment: 'exp_two' })], {
+      graphPath: vault.graphPath,
+    });
+    const payload = JSON.parse(lines[0].result.content[0].text);
+    assert.equal(payload.removed.evidence, '第二天');
+    assert.equal(payload.logs.length, 1);
+    assert.equal(payload.logs[0].evidence, '第一天');
+  } finally {
+    vault.cleanup();
+  }
+});
+
+test('undo_last_log reopens a completed experiment', () => {
+  const vault = makeVault({
+    experiments: {
+      schemaVersion: 1,
+      experiments: [
+        {
+          id: 'exp_done2',
+          nodeId: 'a',
+          state: {
+            title: '摄影',
+            hypothesis: '每天拍一张',
+            metric: '每天记录一次',
+            startedAt: '2026-01-01T00:00:00.000Z',
+            targetDays: 3,
+            status: 'complete',
+            logs: [
+              { day: 1, date: '2026-01-01', recordedAt: '2026-01-01T00:00:00.000Z', interest: 3, energy: 3, evidence: '第一天' },
+              { day: 2, date: '2026-01-02', recordedAt: '2026-01-02T00:00:00.000Z', interest: 3, energy: 3, evidence: '第二天' },
+              { day: 3, date: '2026-01-03', recordedAt: '2026-01-03T00:00:00.000Z', interest: 3, energy: 3, evidence: '第三天' },
+            ],
+          },
+        },
+      ],
+    },
+  });
+  try {
+    const lines = runServer([call(1, 'interestseed_undo_last_log', { experiment: 'exp_done2' })], {
+      graphPath: vault.graphPath,
+    });
+    const payload = JSON.parse(lines[0].result.content[0].text);
+    assert.equal(payload.status, 'active');
+    assert.equal(payload.remaining, 1);
+    assert.equal(payload.logs.length, 2);
+  } finally {
+    vault.cleanup();
+  }
+});
+
+test('undo_last_log refuses an experiment without logs', () => {
+  const vault = withActiveExperiment();
+  try {
+    const lines = runServer([call(1, 'interestseed_undo_last_log', {})], { graphPath: vault.graphPath });
+    assert.equal(lines[0].result.isError, true);
+    assert.match(lines[0].result.content[0].text, /还没有日志/);
+  } finally {
+    vault.cleanup();
+  }
+});
+
+test('undo_last_log refuses an unknown experiment id', () => {
+  const vault = withActiveExperiment();
+  try {
+    const lines = runServer([call(1, 'interestseed_undo_last_log', { experiment: 'exp_nope' })], {
+      graphPath: vault.graphPath,
+    });
+    assert.equal(lines[0].result.isError, true);
+    assert.match(lines[0].result.content[0].text, /找不到实验/);
+  } finally {
+    vault.cleanup();
+  }
+});
+
+test('undo_last_log explains when nothing is running', () => {
+  const vault = makeVault();
+  try {
+    const lines = runServer([call(1, 'interestseed_undo_last_log', {})], { graphPath: vault.graphPath });
+    assert.equal(lines[0].result.isError, true);
+    assert.match(lines[0].result.content[0].text, /没有进行中的实验/);
   } finally {
     vault.cleanup();
   }
