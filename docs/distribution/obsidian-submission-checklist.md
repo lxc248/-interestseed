@@ -67,3 +67,4 @@
 该检查已加入 `npm run verify`，因此每次 CI 都会跑。
 
 设置 `OBSIDIAN_CHECK_RELEASE=1` 时会额外用 GitHub API 核对 release 里的 `main.js` / `manifest.json` / `styles.css`；发布工作流在发布后自动跑这一步，缺资产会直接失败。
+`npm run check:mobile-bundle` 会用一个**没有 Node 内置模块**的沙箱加载 `dist/main.js`：只放行 `require('obsidian')`，其余任何 `require` 都判失败。这样如果有人在模块顶层 `import fs from 'node:fs'`，CI 会立刻拦住——那种改动会让插件在手机上白屏，而普通单测发现不了。
