@@ -252,9 +252,6 @@ export default class InterestSeedPlugin extends Plugin {
     this.addRibbonIcon('bot', '打开 InterestSeed Agent', () => {
       void this.activateAgentView();
     });
-    this.addRibbonIcon('sparkles', '打开 InterestSeed Agent', () => {
-      void this.activateAgentView();
-    });
     registerCommands(this, this);
     this.registerEvent(
       this.app.workspace.on('file-menu', (menu, file) => {
