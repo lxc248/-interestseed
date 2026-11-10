@@ -127,4 +127,17 @@ describe('artifactExporter', () => {
     expect(createMock).toHaveBeenCalledTimes(1);
     expect(String(createMock.mock.calls[0]?.[0])).toContain(' 2.md');
   });
+
+  it('slugifies the route theme in the filename', async () => {
+    const { app } = makeApp([]);
+    await exportInterestRoute(app, {
+      theme: '测试 / 兴趣',
+      nodes: [{ id: 'a', title: 'A', tags: ['测试 / 兴趣'], metadata: undefined }] as never,
+      connectedIds: new Set(['a']),
+      experiment: null,
+    });
+    expect(String(createMock.mock.calls[0]?.[0])).toMatch(
+      /兴趣路线 - 测试 兴趣 - \d{4}-\d{2}-\d{2}\.md$/,
+    );
+  });
 });
