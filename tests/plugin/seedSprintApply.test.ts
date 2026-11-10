@@ -95,4 +95,29 @@ describe('seedSprintApply', () => {
     const graph = replaceGraph.mock.calls[0]?.[0] as { edges: unknown[] };
     expect(graph.edges).toHaveLength(1);
   });
+
+  it('skips an accepted edge whose endpoint node is missing', () => {
+    const replaceGraph = vi.fn();
+    applySeedSprint({
+      draft: {
+        nodes: [{ id: 'a', title: 'A', type: 'topic', tags: [], evidence: 'e', confidence: 1 }],
+        edges: [
+          { id: 'e1', source: 'a', target: 'missing', relation: '引出', evidence: 'e', confidence: 0.9 },
+        ],
+        mystery: { title: 'm', reason: 'r' },
+        experiment: { title: 'e', hypothesis: 'h', metric: 'm', prompt: 'p', days: 3, steps: [] },
+      },
+      acceptedNodeIds: new Set(['a']),
+      acceptedEdgeIds: new Set(['e1']),
+      getGraph: () => ({ nodes: [], edges: [], schemaVersion: 1, updatedAt: 'old' } as never),
+      replaceGraph,
+      markSeedSprintCompleted: vi.fn(),
+      invalidateInsights: vi.fn(),
+      notifyStatus: vi.fn(),
+      saveSettings: vi.fn(),
+      persist: vi.fn(),
+    });
+    const graph = replaceGraph.mock.calls[0]?.[0] as { edges: unknown[] };
+    expect(graph.edges).toHaveLength(0);
+  });
 });
