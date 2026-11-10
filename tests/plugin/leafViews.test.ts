@@ -52,6 +52,14 @@ describe('leafViews', () => {
     expect(leaf.setViewState).toHaveBeenCalledWith({ type: 'agent-view', active: true });
   });
 
+  it('reuses an existing agent view leaf', async () => {
+    const { app, leaf, workspace } = makeWorkspace();
+    workspace.getLeavesOfType = vi.fn<() => unknown[]>(() => [leaf]);
+    await activateAgentView(app);
+    expect(leaf.setViewState).toHaveBeenCalledWith({ type: 'agent-view', active: true });
+    expect(workspace.revealLeaf).toHaveBeenCalledWith(leaf);
+  });
+
   it('returns the AI view instance', async () => {
     const { app, leaf } = makeWorkspace();
     await expect(activateAiView(app)).resolves.toBe(leaf.view);
