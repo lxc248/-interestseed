@@ -72,6 +72,10 @@ describe('persistence', () => {
     });
   });
 
+  it('handles primitive stored state as empty', () => {
+    expect(unpackStoredState('legacy').dataVersion).toBe(0);
+  });
+
   it('reports a blocked load result', () => {
     reportLoadResult({
       source: 'clean',
