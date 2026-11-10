@@ -85,7 +85,6 @@ jobs:
           # Obsidian 社区目录要求 release 里直接有 main.js / manifest.json / styles.css 三个资产。
           gh release upload "$RELEASE_TAG" --clobber \
             release/interestseed-*.zip \
-            release/interestseed-skill-*.zip \
             release/SHA256SUMS.txt \
             dist/main.js \
             dist/manifest.json \
