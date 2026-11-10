@@ -25,17 +25,12 @@ import {
 import { DiscoveryWriteQueue } from './discovery/DiscoveryWriteQueue';
 import { hasDiscoveryContentChanged } from './discovery/refresh';
 import { AuditVaultBinding } from './discovery/auditBinding';
-import {
-  buildDiscoveryAuditFromProjection,
-  formatDiscoveryAudit,
-  type DiscoveryAuditScope,
-} from './discovery/audit';
+import { type DiscoveryAuditScope } from './discovery/audit';
 import {
   AuditRuntimeSession,
-  loadDiscoveryAuditSource,
   type AuditRuntimeState,
 } from './discovery/auditSource';
-import { AuditTaskCoordinator, type AuditTaskToken } from './discovery/auditTask';
+import { AuditTaskCoordinator } from './discovery/auditTask';
 import { ObsidianDiscoveryAuditAdapter } from './adapters/ObsidianDiscoveryAuditAdapter';
 import { notifyDiscoveryListenersSafely } from './discovery/notify';
 import type {
@@ -81,15 +76,15 @@ import { extendExperimentToSeven as extendExperiment, getActiveExperiment as get
 import { captureGapSeed as captureGapSeedFromModule } from './plugin/gapCapture';
 import { captureInterestSpark as captureInterestSparkFromModule } from './plugin/sparkCapture';
 import { applySeedSprint as applySeedSprintFromModule } from './plugin/seedSprintApply';
-import {
-  DiscoveryAuditPreviewModal,
-  DiscoveryAuditSaveModal,
-  DiscoveryAuditScopeModal,
-} from './ui/DiscoveryAuditModal';
 import { openAiSetupModal } from './plugin/aiSetup';
 import { openDiscoveryExplorer, openDiscoveryOverview, showDiscoveriesForTheme } from './plugin/discoveryUI';
 import { type ExplorationInsight, type ExplorationRequest } from './services/ModelProvider';
 import { generateExplorationInsightService } from './plugin/explorationInsight';
+import {
+  collectAuditProjectKeys,
+  promptAuditScopeModal,
+  runDiscoveryAudit,
+} from './plugin/auditUI';
 
 import { DATA_SCHEMA_VERSION, persistPluginData, pluginDataPayload, reportLoadResult, unpackStoredState } from './plugin/persistence';
 
@@ -743,83 +738,25 @@ export default class InterestSeedPlugin extends Plugin {
       new Notice('InterestSeed：当前 Vault 绑定不可用，无法审计。');
       return;
     }
-    const projectKeys = [
-      ...new Set(
-        this.listDiscoveries()
-          .flatMap((item) => item.projectKeys)
-          .map((key) => key.trim())
-          .filter(Boolean),
-      ),
-    ].sort();
+    const projectKeys = collectAuditProjectKeys(this.listDiscoveries());
     if (projectKeys.length === 0) {
       new Notice('InterestSeed：当前没有可审计的顶层项目范围。');
       return;
     }
-    new DiscoveryAuditScopeModal(this.app, {
-      binding,
-      projectKeys,
-      onConfirm: (scope) => {
-        void this.runDiscoveryAudit(scope);
-      },
-    }).open();
+    promptAuditScopeModal(this.app, binding, projectKeys, (scope) => {
+      void this.runDiscoveryAudit(scope);
+    });
   }
 
-  private async runDiscoveryAudit(scope: DiscoveryAuditScope): Promise<void> {
-    const token = this.auditTasks.begin();
-    if (!token) {
-      new Notice('InterestSeed：插件上下文已失效，无法审计。');
-      return;
-    }
-    const binding = this.getAuditVaultBinding();
-    const session = this.getAuditRuntimeSession();
-    const adapter = this.getDiscoveryAuditAdapter();
-    if (!binding || scope.binding !== binding || !session || !adapter) {
-      this.auditTasks.cancel();
-      new Notice('InterestSeed：Vault 绑定或数据完整性状态不可用，已取消审计。');
-      return;
-    }
-
-    try {
-      const source = await loadDiscoveryAuditSource(adapter, binding, session, {
-        signal: token.signal,
-      });
-      if (!this.auditTasks.isCurrent(token)) return;
-      if (!source.ok) {
-        new Notice(`InterestSeed：${source.message}（${source.code}）`, 10_000);
-        return;
-      }
-      const summary = buildDiscoveryAuditFromProjection(source.projection, scope);
-      if (!this.auditTasks.isCurrent(token)) return;
-      const text = formatDiscoveryAudit(summary);
-      new DiscoveryAuditPreviewModal(this.app, {
-        text,
-        onSave: () => {
-          if (!this.auditTasks.isCurrent(token)) {
-            new Notice('InterestSeed：审计任务已失效，未保存报告。', 8000);
-            return;
-          }
-          this.openAuditSaveDialog(text, token);
-        },
-        onClose: () => this.auditTasks.cancel(),
-      }).open();
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      new Notice(`InterestSeed：审计失败——${message}`, 10_000);
-    } finally {
-      this.auditTasks.finish(token);
-    }
-  }
-
-  private openAuditSaveDialog(text: string, token: AuditTaskToken): void {
-    const stamp = new Date().toISOString().replace(/[:.]/g, '-');
-    new DiscoveryAuditSaveModal(this.app, {
-      text,
-      defaultName: `InterestSeed-audit-${stamp}.md`,
-      canSave: () => this.auditTasks.isCurrent(token),
-      onSaved: () => {
-        new Notice('InterestSeed：聚合审计报告已保存。', 6000);
-      },
-    }).open();
+  private runDiscoveryAudit(scope: DiscoveryAuditScope): Promise<void> {
+    return runDiscoveryAudit({
+      app: this.app,
+      auditTasks: this.auditTasks,
+      getAuditVaultBinding: () => this.getAuditVaultBinding(),
+      getAuditRuntimeSession: () => this.getAuditRuntimeSession(),
+      getDiscoveryAuditAdapter: () => this.getDiscoveryAuditAdapter(),
+      scope,
+    });
   }
 
   async reconcileDiscoveries(): Promise<void> {
