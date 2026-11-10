@@ -85,13 +85,6 @@ async function submitExperimentStart() {
   return experimentView.submit();
 }
 
-async function logExperiment(input) {
-  return experimentView.log(input);
-}
-
-async function extendExperiment(id) {
-  return experimentView.extend(id);
-}
 function friendlyFeedback(status) {
   return {
     none: '新发现',
@@ -274,26 +267,6 @@ async function suggestFor(nodeId) {
     const message = friendlyAiError(error.message);
     state.aiError = message;
     toast(message, true);
-  } finally {
-    setBusy(false);
-  }
-}
-
-async function connectSuggestion(suggestion) {
-  try {
-    setBusy(true);
-    const result = await api('/api/connect', {
-      method: 'POST',
-      body: JSON.stringify({ suggestion }),
-    });
-    if (!result.ok) throw new Error(result.message || '写入失败');
-    state.lastConnected = result.edge;
-    state.suggestions.splice(state.index, 1);
-    if (state.index >= state.suggestions.length) state.index = 0;
-    await load();
-    toast('已连上这条关系');
-  } catch (error) {
-    toast(error.message, true);
   } finally {
     setBusy(false);
   }
