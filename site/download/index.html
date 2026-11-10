@@ -60,19 +60,19 @@
       One zip. Node.js 22+. Any Markdown vault. No account, no cloud sync and no
       automatic graph writes.
     </p>
-    <p class="article-meta">Released 2026-11-08 · macOS / Windows / Linux</p>
+    <p class="article-meta">Released 2026-11-11 · macOS / Windows / Linux</p>
 
     <div class="download-card">
       <div>
         <strong>interestseed-standalone-v4.0.11.zip</strong>
-        <p>79 KB · CLI + local web + agent skill + read-only MCP</p>
+        <p>99 KB · CLI + local web + agent skill + MCP</p>
       </div>
       <a class="btn btn-primary" href="https://github.com/lxc248/-interestseed/releases/download/standalone-v4.0.11/interestseed-standalone-v4.0.11.zip">Download</a>
     </div>
 
     <div class="checksum">
       <strong>SHA-256</strong>
-      <code>c511fee47d2efe5d895540c06a62c576255a87fdb5819282f3d016a7b804a4bb</code>
+      <code>ef61aa4c53b4b8000ee40e66e77916e40be34d290ca73bbd212b5e7d01a34bcf</code>
     </div>
 
     <h2>Install</h2>
@@ -83,16 +83,16 @@ node interestseed-standalone-v4.0.11/cli.js serve --vault "&lt;vault&gt;" --port
 
     <h2>What is in 4.0.11</h2>
     <ul>
-      <li>Route failures return a stable generic 500; internal exception text stays on stderr.</li>
-      <li>MCP <code>--minimal</code> exposes only the next step and current experiment.</li>
-      <li>MCP graph path errors are stable tool errors, not filesystem details.</li>
-      <li>Static file headers and encoded path boundaries are covered by regression tests.</li>
-      <li>540 Vitest + 11 MCP smoke tests passing.</li>
+      <li><code>inbox import --file/--text</code> brings an exported favourites file into the inbox (bookmark HTML, JSON, CSV, or a URL list).</li>
+      <li><code>POST /api/inbox/import</code> exposes the same import over HTTP and answers 400 for unusable input.</li>
+      <li>The web inbox has a collapsible import panel; results report added and duplicate counts.</li>
+      <li>Fixed: the inbox forgot <code>sourcePlatform</code> and <code>canonicalUrl</code> after a restart, so imported items lost their origin.</li>
+      <li>944 tests passing (820 Vitest + 85 MCP + 39 Playwright).</li>
     </ul>
 
     <h2>Verify the download</h2>
     <pre>sha256sum interestseed-standalone-v4.0.11.zip
-# c511fee47d2efe5d895540c06a62c576255a87fdb5819282f3d016a7b804a4bb</pre>
+# ef61aa4c53b4b8000ee40e66e77916e40be34d290ca73bbd212b5e7d01a34bcf</pre>
     <p>
       Release page:
       <a href="https://github.com/lxc248/-interestseed/releases/tag/standalone-v4.0.11">standalone-v4.0.11</a>
