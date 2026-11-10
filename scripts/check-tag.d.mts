@@ -1,7 +1,5 @@
 /** Type declarations for the release tag checker used by the release workflows. */
 
-export declare const PATTERNS: { plugin: RegExp; standalone: RegExp };
-
 export interface ReleaseVersions {
   plugin?: string;
   standalone?: string;

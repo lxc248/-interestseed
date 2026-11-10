@@ -16,8 +16,6 @@ const SEMVER = /^\d+\.\d+\.\d+$/;
 const PLUGIN_TAG = /^\d+\.\d+\.\d+$/;
 const STANDALONE_TAG = /^standalone-v(\d+\.\d+\.\d+)$/;
 
-export const PATTERNS = { plugin: PLUGIN_TAG, standalone: STANDALONE_TAG };
-
 /**
  * @returns {string[]} human readable problems; empty means the tag is usable.
  */
