@@ -3,6 +3,7 @@ import type { WorkspaceLeaf } from 'obsidian';
 import type { existsSync } from 'node:fs';
 
 import type InterestSeedPlugin from '../main';
+import { AGENT_MOBILE_MESSAGE, isDesktopApp } from '../plugin/platform';
 import {
   DshAcpClient,
   type DshAgentEvent,
@@ -53,6 +54,11 @@ export class AgentView extends ItemView {
     this.contentEl.empty();
     this.contentEl.addClass('interestseed-agent-root');
     this.renderHeader();
+    if (!isDesktopApp()) {
+      this.renderMobileNotice();
+      this.setStatus('closed', '仅桌面端可用');
+      return;
+    }
     this.renderTranscript();
     this.renderComposer();
     if (!this.plugin.settings.enableDshAgent) {
@@ -113,6 +119,17 @@ export class AgentView extends ItemView {
     this.transcript = scroll.createDiv({ cls: 'interestseed-agent-transcript' });
     this.permissionHost = scroll.createDiv({ cls: 'interestseed-agent-permission-host' });
     this.renderEmptyState();
+  }
+
+  private renderMobileNotice(): void {
+    const wrap = this.contentEl.createDiv({ cls: 'interestseed-agent-empty' });
+    const mark = wrap.createDiv({ cls: 'interestseed-agent-empty-mark' });
+    setIcon(mark, 'monitor');
+    wrap.createEl('h4', { text: 'Agent 仅桌面端可用' });
+    wrap.createEl('p', { text: AGENT_MOBILE_MESSAGE });
+    wrap.createEl('p', {
+      text: '其余功能（图谱、收件箱、实验、分享卡）在移动端可以正常使用。',
+    });
   }
 
   private renderEmptyState(): void {
