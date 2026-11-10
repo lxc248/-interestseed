@@ -100,3 +100,28 @@
 
 同一套解析逻辑在 MCP 侧也有（`interestseed_import_favorites`），由
 `tests/importersParity.test.ts` 保证两份实现结果完全一致。
+## 七、独立版（CLI / HTTP）
+
+同一条解析逻辑也在独立版里，命令行：
+
+```bash
+interestseed inbox import --file ~/Downloads/bookmarks.html --vault "/path/to/vault"
+# 或直接给内容
+interestseed inbox import --text "title,url`n陶艺,https://..." --vault "/path/to/vault"
+```
+
+HTTP：
+
+```http
+POST /api/inbox/import
+{ "text": "<导出文件全文>" }
+```
+
+返回：
+
+```json
+{ "ok": true, "format": "csv", "parsed": 2, "added": 2, "duplicates": 0,
+  "duplicatesInFile": 0, "truncated": false }
+```
+
+与插件一致：只进收件箱、单次上限 500 条、重复链接跳过、输入无法识别返回 400。
