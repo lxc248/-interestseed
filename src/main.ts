@@ -19,6 +19,7 @@ import {
 } from './plugin/discoveryOps';
 import { reportDiscoveryBlocked, reportDiscoveryMigration } from './plugin/discoveryNotices';
 import { registerSurfaces } from './plugin/surfaces';
+import { agentUnavailableReason } from './plugin/platform';
 import { sortDiscoveries } from './discovery/ranking';
 import { DiscoveryRepository } from './discovery/DiscoveryRepository';
 import type { DiscoveryBackupStatus } from './discovery/DiscoveryRepository';
@@ -563,6 +564,11 @@ export default class InterestSeedPlugin extends Plugin {
   }
 
   async activateAgentView(): Promise<void> {
+    const reason = agentUnavailableReason();
+    if (reason) {
+      new Notice(`InterestSeed：${reason}`);
+      return;
+    }
     await activateAgentLeaf(this.app);
   }
 

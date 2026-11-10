@@ -3,6 +3,8 @@ import type {
   SpawnOptions,
 } from 'node:child_process';
 
+import { AGENT_MOBILE_MESSAGE, isDesktopApp } from '../plugin/platform';
+
 export type DshAgentStatus = 'starting' | 'ready' | 'working' | 'idle' | 'closed';
 
 export interface DshPermissionOption {
@@ -80,6 +82,10 @@ export class DshAcpClient {
 
   async start(): Promise<void> {
     if (this.isRunning) return;
+    if (!isDesktopApp()) {
+      this.options.onEvent({ type: 'status', status: 'closed', detail: AGENT_MOBILE_MESSAGE });
+      throw new Error(AGENT_MOBILE_MESSAGE);
+    }
     this.options.onEvent({ type: 'status', status: 'starting', detail: '启动 DSH ACP…' });
     // Obsidian desktop plugins are CJS; Vite cannot dynamically import Electron Node built-ins.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
