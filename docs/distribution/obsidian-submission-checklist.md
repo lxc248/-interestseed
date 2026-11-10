@@ -21,8 +21,8 @@
 | 无 `eval` | 全仓库 `src` 未命中 | 通过 |
 | 网络请求默认关闭 | `enableAI=false`、`aiConsentGranted=false` | 通过（需在 README 说明） |
 | `isDesktopOnly` | `false`（Agent 功能已加桌面守卫） | 通过：主体不依赖 Node；`DshAcpClient.start()` 在移动端直接拒绝并给出提示 |
-| 插件 release 资产 | `3.7.0` release 已含 `main.js`(663,734) / `manifest.json`(286) / `styles.css`(216,552) | 通过 |
-| release tag 与 manifest 版本一致 | tag `3.7.0` → `3f567e2` | 通过 |
+| 插件 release 资产 | `3.7.1` release 已含 `main.js`(666,946) / `manifest.json`(287) / `styles.css`(216,552) | 通过 |
+| release tag 与 manifest 版本一致 | tag `3.7.1` → `64f40bd` | 通过 |
 | 发布工作流上传插件三件套 | `release.yml` 已上传三件套 | 通过 |
 
 ## 二、本轮修复（已完成，2026-11-10）
