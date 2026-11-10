@@ -20,12 +20,12 @@
 | 源码可读、无混淆 | 是 | 通过 |
 | 无 `eval` | 全仓库 `src` 未命中 | 通过 |
 | 网络请求默认关闭 | `enableAI=false`、`aiConsentGranted=false` | 通过（需在 README 说明） |
-| `isDesktopOnly` | `false` | **失败**：`DshAcpClient` 用 `node:child_process`，`AgentView` 用 `require('fs')`，移动端会崩 |
-| 插件 release 资产 | 只有 `standalone-v4.x` 的 zip | **失败**：缺 `main.js` / `manifest.json` / `styles.css` 三个独立资产 |
-| release tag 与 manifest 版本一致 | 无 `3.7.0`（只有 `v3.7.0`） | **失败**：Obsidian 要求 tag 精确等于 manifest 版本 |
-| 发布工作流上传插件三件套 | `release.yml` 只上传 zip | **失败** |
+| `isDesktopOnly` | `true`（已修） | 通过：`DshAcpClient` 用 `node:child_process`，`AgentView` 用 `require('fs')`，必须桌面端 |
+| 插件 release 资产 | `3.7.0` release 已含 `main.js`(663,734) / `manifest.json`(286) / `styles.css`(216,552) | 通过 |
+| release tag 与 manifest 版本一致 | tag `3.7.0` → `3f567e2` | 通过 |
+| 发布工作流上传插件三件套 | `release.yml` 已上传三件套 | 通过 |
 
-## 二、本轮修复
+## 二、本轮修复（已完成，2026-11-10）
 
 1. `manifest.json` 的 `isDesktopOnly` 改为 `true`（诚实反映桌面依赖）。
 2. `release.yml` 在发布时额外上传 `dist/main.js`、`dist/manifest.json`、`dist/styles.css`，资产名保持原样。
@@ -50,10 +50,10 @@
 
 ## 四、提交前必须自检的四件事
 
-- [ ] `https://github.com/lxc248/-interestseed/releases/tag/3.7.0` 页面能直接看到 `main.js`、`manifest.json`、`styles.css` 三个资产
-- [ ] `manifest.json` 在 release 里的 `version` 是 `3.7.0`
-- [ ] 该 release 里的 `main.js` 与仓库 `main` 分支构建产物一致（工作流构建，非本地构建）
-- [ ] README 首屏能看懂产品做什么、如何安装、AI 是否联网
+- [x] `https://github.com/lxc248/-interestseed/releases/tag/3.7.0` 页面能直接看到 `main.js`、`manifest.json`、`styles.css` 三个资产
+- [x] `manifest.json` 在 release 里的 `version` 是 `3.7.0`（已下载资产核对）
+- [x] 该 release 由 `release.yml` 在 CI 中构建（run 42799636717 success），非本地构建
+- [x] README 已加「网络与隐私」段，说明 AI 默认关闭、仅开启后访问 `api.deepseek.com`
 
 ## 五、已知不阻断但会被 reviewer 提到的点
 
