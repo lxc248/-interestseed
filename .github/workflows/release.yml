@@ -71,14 +71,16 @@ jobs:
         run: |
           set -euo pipefail
           NOTES="RELEASE_NOTES_${RELEASE_TAG#v}.md"
-          if [ ! -f "$NOTES" ]; then
-            echo "Missing release notes: $NOTES"
-            exit 1
+          NOTES_ARGS=(--generate-notes)
+          if [ -f "$NOTES" ]; then
+            NOTES_ARGS=(--notes-file "$NOTES")
+          else
+            echo "No $NOTES on this commit; falling back to generated notes."
           fi
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            gh release edit "$RELEASE_TAG" --notes-file "$NOTES"
+            gh release edit "$RELEASE_TAG" "${NOTES_ARGS[@]}"
           else
-            gh release create "$RELEASE_TAG" --title "InterestSeed ${RELEASE_TAG#v}" --notes-file "$NOTES"
+            gh release create "$RELEASE_TAG" --title "InterestSeed ${RELEASE_TAG#v}" "${NOTES_ARGS[@]}"
           fi
           # Obsidian 社区目录要求 release 里直接有 main.js / manifest.json / styles.css 三个资产。
           gh release upload "$RELEASE_TAG" --clobber \
