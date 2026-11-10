@@ -1015,7 +1015,7 @@ function handle(message) {
         resources: { subscribe: false, listChanged: false },
         prompts: { listChanged: false },
       },
-      serverInfo: { name: 'interestseed', version: '4.0.10' },
+      serverInfo: { name: 'interestseed', version: '4.0.11' },
     });
   }
   if (method === 'notifications/initialized') return null;
