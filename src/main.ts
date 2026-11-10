@@ -91,11 +91,8 @@ import { DiscoveryExplorerModal } from './ui/DiscoveryExplorerModal';
 import { openAiSetupModal } from './plugin/aiSetup';
 import { buildDiscoveryOverview } from './discovery/overview';
 import { buildExploration } from './discovery/exploration';
-import {
-  createModelProvider,
-  type ExplorationInsight,
-  type ExplorationRequest,
-} from './services/ModelProvider';
+import { type ExplorationInsight, type ExplorationRequest } from './services/ModelProvider';
+import { generateExplorationInsightService } from './plugin/explorationInsight';
 
 import { DATA_SCHEMA_VERSION, persistPluginData, pluginDataPayload, reportLoadResult, unpackStoredState } from './plugin/persistence';
 
@@ -733,28 +730,16 @@ export default class InterestSeedPlugin extends Plugin {
     if (view instanceof InterestSeedView) view.showDiscoveriesForTheme(theme);
   }
 
-  private async generateExplorationInsight(
+  private generateExplorationInsight(
     request: ExplorationRequest,
   ): Promise<ExplorationInsight> {
-    const apiKey = await this.getAiApiKey();
-    const provider = createModelProvider(
-      {
-        enableAI: this.settings.enableAI,
-        aiConsentGranted: this.settings.aiConsentGranted,
-        model: this.settings.aiModel,
-      },
-      undefined,
-      apiKey,
-    );
-    try {
-      if (!provider.explore) {
-        throw new Error('AI 尚未启用或未授权；请在设置中启用 AI 并确认隐私授权。');
-      }
-      const result = await provider.explore(request);
-      return result as ExplorationInsight;
-    } finally {
-      provider.dispose();
-    }
+    return generateExplorationInsightService({
+      request,
+      enableAI: this.settings.enableAI,
+      aiConsentGranted: this.settings.aiConsentGranted,
+      aiModel: this.settings.aiModel,
+      getApiKey: () => this.getAiApiKey(),
+    });
   }
 
   promptAudit(): void {
