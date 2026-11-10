@@ -51,7 +51,8 @@ describe('relationPrompts', () => {
     const onConfirm = vi.fn();
     openRelationEditModal({ app: {} as never, relation: '引出', onConfirm });
     expect(editOpen).toHaveBeenCalledTimes(1);
-    const modal = editOpen.mock.calls[0]?.[0] as { relation: string } | undefined;
+    const modal = editOpen.mock.calls[0]?.[0] as { relation: string; onConfirm: unknown } | undefined;
     expect(modal?.relation).toBe('引出');
+    expect(modal?.onConfirm).toBe(onConfirm);
   });
 });
