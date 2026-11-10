@@ -70,7 +70,8 @@ describe('artifactExporter', () => {
   });
 
   it('adds a numeric suffix when a route already exists', async () => {
-    const { app } = makeApp(['InterestSeed', 'InterestSeed/兴趣路线 - 测试兴趣 - 2026-11-09.md']);
+    const date = new Date().toISOString().slice(0, 10);
+    const { app } = makeApp(['InterestSeed', `InterestSeed/兴趣路线 - 测试兴趣 - ${date}.md`]);
     await exportInterestRoute(app, {
       theme: '测试兴趣',
       nodes: [],
