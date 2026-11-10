@@ -69,7 +69,7 @@ npm run check:release
 Vitest        701 passed
 MCP smoke      11 passed
 Playwright     35 passed
-Total         773 passed
+Total         780 passed
 CodeQL open alerts: 0
 npm audit: 0
 Release workflow: success
