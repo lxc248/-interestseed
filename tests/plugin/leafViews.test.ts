@@ -72,4 +72,12 @@ describe('leafViews', () => {
     await expect(activateAiView(app)).resolves.toBe(leaf.view);
     expect(workspace.revealLeaf).toHaveBeenCalledWith(leaf);
   });
+
+  it('returns null when the AI leaf holds another view type', async () => {
+    const { app, workspace } = makeWorkspace();
+    workspace.getLeavesOfType = vi.fn<() => unknown[]>(() => [
+      { view: {}, setViewState: vi.fn(async () => undefined) },
+    ]);
+    await expect(activateAiView(app)).resolves.toBeNull();
+  });
 });
