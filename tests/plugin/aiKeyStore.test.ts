@@ -41,4 +41,13 @@ describe('aiKeyStore', () => {
     });
     expect(await readAiApiKey(app)).toBeUndefined();
   });
+
+  it('returns false when saving a key fails', async () => {
+    const { app } = appWithStorage({
+      setSecret: vi.fn(async () => {
+        throw new Error('denied');
+      }),
+    });
+    expect(await saveAiApiKey(app, 'key')).toBe(false);
+  });
 });
