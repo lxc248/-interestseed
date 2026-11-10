@@ -182,7 +182,7 @@ Web：`http://127.0.0.1:4173`
 
 ### Obsidian 插件（在 Obsidian 内使用）
 
-1. 从 [Releases](https://github.com/lxc248/-interestseed/releases) 下载 `interestseed-3.7.2.zip`。
+1. 从 [Releases](https://github.com/lxc248/-interestseed/releases) 下载 `interestseed-3.7.3.zip`。
 2. 解压到：
 
 ```text
