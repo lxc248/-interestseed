@@ -29,7 +29,11 @@ export async function saveAiApiKey(app: App, value: string): Promise<boolean> {
   const storage = secretStorage(app);
   if (!storage) return false;
   const trimmed = value.trim();
-  if (trimmed) await storage.setSecret('interestseed-ai-key', trimmed);
-  else await storage.deleteSecret('interestseed-ai-key');
-  return true;
+  try {
+    if (trimmed) await storage.setSecret('interestseed-ai-key', trimmed);
+    else await storage.deleteSecret('interestseed-ai-key');
+    return true;
+  } catch {
+    return false;
+  }
 }
