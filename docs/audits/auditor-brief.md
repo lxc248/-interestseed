@@ -2,12 +2,15 @@
 
 For a human security reviewer. This is a handoff document, not an audit claim.
 
+How to approach an auditor, engagement options and email templates: [audit-invitation.md](audit-invitation.md).
+
 ## What to review
 
 ```text
 Repo:      https://github.com/lxc248/-interestseed
-Commit:    a5f2bea
+Commit:    8d92b29
 Release:   standalone-v4.0.10
+Plugin:    3.7.0 (Obsidian, tag 3.7.0)
 ZIP SHA-256:
 c511fee47d2efe5d895540c06a62c576255a87fdb5819282f3d016a7b804a4bb
 ```
