@@ -31,6 +31,16 @@ describe('aiSuggestions', () => {
     expect(notices.at(-1)).toBe('先打开一篇 Markdown 笔记。');
   });
 
+  it('suggests for the active note file', async () => {
+    const file = { path: 'note.md' };
+    const suggestForFile = vi.fn(async () => undefined);
+    await suggestForActiveNote({
+      app: { workspace: { getActiveFile: () => file } } as never,
+      suggestForFile,
+    });
+    expect(suggestForFile).toHaveBeenCalledWith(file);
+  });
+
   it('expands the node matched for a file', async () => {
     const expandWithAI = vi.fn(async () => undefined);
     await suggestForFile({
