@@ -38,4 +38,23 @@ describe('gapCapture', () => {
     expect(addEdge).toHaveBeenCalledTimes(1);
     expect(setSelectedNode).toHaveBeenCalledWith(result);
   });
+
+  it('captures a gap seed without an edge when the linked node is missing', () => {
+    const addNode = vi.fn();
+    const addEdge = vi.fn();
+    const result = captureGapSeed({
+      insight: { id: 'gap', title: '缺一个', detail: '细节', nodeIds: ['missing'] } as never,
+      text: '一个新的观察',
+      getNode: vi.fn(() => null),
+      addNode,
+      addEdge,
+      invalidateInsights: vi.fn(),
+      notifyStatus: vi.fn(),
+      persist: vi.fn(),
+      setSelectedNode: vi.fn(),
+    });
+    expect(result).toMatch(/^node_/);
+    expect(addNode).toHaveBeenCalledTimes(1);
+    expect(addEdge).not.toHaveBeenCalled();
+  });
 });
