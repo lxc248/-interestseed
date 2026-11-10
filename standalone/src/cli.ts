@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  * Copyright (C) 2026 aicoder
  */
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { connectSuggestion, suggestRelations } from './ai';
 import { captureToVault } from './capture';
@@ -15,6 +15,7 @@ import {
   refreshDiscoveries,
 } from './discoveries';
 import { enqueueInbox, listInbox, resolveInbox } from './inbox';
+import { importFavorites } from './import';
 import {
   activeExperiment,
   experimentView,
@@ -207,7 +208,13 @@ async function main(): Promise<void> {
       }
       return print({ ok: true, ...result });
     }
-    throw new Error(`Unknown inbox command: ${sub}`);
+    if (sub === 'import') {
+      const file = typeof flags.file === 'string' ? flags.file : '';
+      const inline = typeof flags.text === 'string' ? flags.text : '';
+      const text = file ? readFileSync(resolve(file), 'utf8') : inline;
+      if (!text.trim()) throw new Error('inbox import requires --file <path> or --text <content>');
+      return print({ ok: true, ...(await importFavorites(vaultPath, text)) });
+    }    throw new Error(`Unknown inbox command: ${sub}`);
   }
 
   if (command === 'serve') {
@@ -255,7 +262,7 @@ Usage:
   interestseed capture --text <text> [--title <title>] [--url <url>]
   interestseed status [--vault <path>]
   interestseed discoveries list | refresh | apply --id <id> | dismiss --id <id>
-  interestseed inbox list | add --text <text> | keep --id <id> | pass --id <id>
+  interestseed inbox list | add --text <text> | import --file <export-path> | keep --id <id> | pass --id <id>
   interestseed suggest [--vault <path>] [--node <id>]
   interestseed connect --source <id> --target <id> --relation <name> [--reason <text>]
   interestseed undo

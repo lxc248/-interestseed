@@ -55,3 +55,25 @@ describe('importEntriesToInbox', () => {
     );
   });
 });
+describe('inbox serialisation', () => {
+  it('keeps platform metadata across a save and reload', () => {
+    const inbox = new ShareInbox();
+    inbox.enqueue('https://www.douyin.com/video/123?utm_source=share', 'clipboard', 'export-import');
+    const saved = inbox.serialize();
+
+    const reloaded = new ShareInbox();
+    reloaded.load(JSON.parse(JSON.stringify(saved)));
+
+    const item = reloaded.pending()[0];
+    expect(item?.sourcePlatform).toBe('douyin');
+    expect(item?.canonicalUrl).toBe('https://douyin.com/video/123');
+  });
+
+  it('drops junk fields instead of trusting the file', () => {
+    const inbox = new ShareInbox();
+    inbox.load([{ id: 'a', text: 'x', addedAt: 'now', sourcePlatform: 42, canonicalUrl: null }]);
+    const item = inbox.pending()[0];
+    expect(item?.sourcePlatform).toBeUndefined();
+    expect(item?.canonicalUrl).toBeUndefined();
+  });
+});

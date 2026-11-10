@@ -27,6 +27,7 @@ import {
   refreshDiscoveries,
 } from './discoveries';
 import { enqueueInbox, listInbox, resolveInbox } from './inbox';
+import { ImportInputError, importFavorites } from './import';
 import { scanAndBuild } from './graph';
 import { ensureStateDir, loadConfig, loadState, saveConfig, saveGraph, stateDir, undoGraph } from './state';
 
@@ -339,6 +340,17 @@ async function route(
       typeof body.sourceRef === 'string' ? body.sourceRef : '',
     );
     return sendJson(response, 200, { ok: true, ...result });
+  }
+  if (url.pathname === '/api/inbox/import' && request.method === 'POST') {
+    const body = await readJson(request);
+    try {
+      const report = await importFavorites(options.vaultPath, typeof body.text === 'string' ? body.text : '');
+      return sendJson(response, 200, { ok: true, ...report });
+    } catch (error) {
+      if (error instanceof HttpError) throw error;
+      if (error instanceof ImportInputError) throw new HttpError(400, error.message);
+      mapDomainError(error);
+    }
   }
   if (url.pathname === '/api/inbox/resolve' && request.method === 'POST') {
     const body = await readJson(request);

@@ -110,6 +110,10 @@ export class ShareInbox {
           ? item.source
           : 'share') as InboxSource,
         ...(item.sourceRef ? { sourceRef: String(item.sourceRef) } : {}),
+        // Platform metadata must survive a reload, otherwise the inbox forgets
+        // where an item came from after a restart.
+        ...(typeof item.sourcePlatform === 'string' ? { sourcePlatform: item.sourcePlatform } : {}),
+        ...(typeof item.canonicalUrl === 'string' ? { canonicalUrl: item.canonicalUrl } : {}),
       }))
       .filter((item) => {
         if (!item.id || !item.text || seenIds.has(item.id)) return false;
