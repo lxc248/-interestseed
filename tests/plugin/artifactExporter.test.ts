@@ -62,6 +62,16 @@ describe('artifactExporter', () => {
     expect(String(createMock.mock.calls[0]?.[0])).toContain('.canvas');
   });
 
+  it('adds a numeric suffix when a canvas already exists', async () => {
+    const date = new Date().toISOString().slice(0, 10);
+    const { app } = makeApp([`InterestSeed/兴趣图谱-${date}.canvas`]);
+    await exportJsonCanvas(app, {
+      nodes: [{ id: 'a', title: 'A', tags: [], metadata: {} }],
+      edges: [],
+    } as never);
+    expect(String(createMock.mock.calls[0]?.[0])).toContain(`兴趣图谱-${date}-2.canvas`);
+  });
+
   it('does not write a canvas for an empty graph', async () => {
     const { app } = makeApp([]);
     await exportJsonCanvas(app, { nodes: [], edges: [] } as never);
