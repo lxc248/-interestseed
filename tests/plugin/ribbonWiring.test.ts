@@ -18,7 +18,8 @@ function ribbonLabels(source: string): string[] {
   const pattern = /addRibbonIcon\(\s*'[^']*'\s*,\s*'([^']+)'/g;
   let match = pattern.exec(source);
   while (match) {
-    labels.push(match[1]);
+    const label = match[1];
+    if (label) labels.push(label);
     match = pattern.exec(source);
   }
   return labels;
