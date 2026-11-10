@@ -144,4 +144,23 @@ describe('persistence', () => {
     } as never);
     expect(notices.some((entry) => entry.message.includes('图谱存储已暂停'))).toBe(true);
   });
+
+  it('warns when migrations and backups were applied', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    reportLoadResult({
+      source: 'clean',
+      blocked: false,
+      blockedReason: null,
+      issues: [],
+      appliedMigrations: ['m1'],
+      preMigrationBackupKey: 'backup-before.json',
+      corruptedBackupKey: 'backup-corrupted.json',
+      issuesBackupKey: 'backup-issues.json',
+    } as never);
+    expect(warn.mock.calls.join(' ')).toContain('已迁移图谱数据');
+    expect(warn.mock.calls.join(' ')).toContain('迁移前旧数据已备份');
+    expect(warn.mock.calls.join(' ')).toContain('原始数据已备份');
+    expect(warn.mock.calls.join(' ')).toContain('清洗前图谱已备份');
+    warn.mockRestore();
+  });
 });
