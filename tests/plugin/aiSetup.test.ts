@@ -73,7 +73,9 @@ describe('aiSetup', () => {
       saveKey: vi.fn(async () => undefined),
     });
     await new Promise((resolve) => setTimeout(resolve, 0));
-    const options = (constructed.at(-1) as { options: { consentGranted: boolean } }).options;
+    const options = (constructed.at(-1) as { options: { consentGranted: boolean; enabled: boolean; hasKey: boolean } }).options;
     expect(options.consentGranted).toBe(false);
+    expect(options.enabled).toBe(false);
+    expect(options.hasKey).toBe(false);
   });
 });
