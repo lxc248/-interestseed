@@ -163,7 +163,9 @@ These aren't a feature checklist. They're the moves I actually make every day.
 | **Interest Route** | An explicit Markdown MOC generated on command. It never writes notes automatically. |
 | **Five share cards** | Xiaohongshu, Instagram, X, WeChat, and Story, rendered locally on Canvas. |
 | **AI suggestion** | On by default; your local model only; one at a time; editable relation; undo after connecting; default `cn:deepseek-v4.1-flash` |
-| **MCP interface** | Zero-dependency read-only MCP server, protocol `2026-07-28`. |
+| **Import** | Browser bookmark HTML, Bilibili favourite JSON, CSV, or a plain URL list; up to 500 per batch, queued in the inbox for one-by-one judgement |
+| **Source detection** | 23 domestic and international platforms (Douyin, Kuaishou, Xiaohongshu, Bilibili, Weibo, Zhihu, YouTube, X, Reddit…), tracking parameters stripped, short links flagged, one row per distinct item |
+| **MCP server** | Zero-dependency MCP server over stdio or HTTP with a bearer token; read-only by default, writes opt-in, protocol `2026-07-28` |
 | **Adaptive layout** | Desktop, narrow, and very narrow panes with icon-first actions and no horizontal overflow. |
 
 ## Install it
@@ -284,7 +286,7 @@ The user keeps the decision rights.
 src/            Obsidian plugin source
 standalone/     CLI + local web + agent skill
 site/           Landing page (GitHub Pages)
-mcp/            Read-only MCP server
+mcp/            MCP server (stdio + HTTP, read-only by default)
 tests/          Tests
 docs/           Current documentation
 docs/audits/    Current audit reports
