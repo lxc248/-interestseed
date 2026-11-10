@@ -65,12 +65,13 @@ test('write tools appear with --write', () => {
       graphPath: vault.graphPath,
     });
     const names = lines[0].result.tools.map((tool) => tool.name);
-    assert.equal(names.length, 10);
+    assert.equal(names.length, 11);
     assert.ok(names.includes('interestseed_capture_interest'));
     assert.ok(names.includes('interestseed_start_experiment'));
     assert.ok(names.includes('interestseed_log_experiment'));
     assert.ok(names.includes('interestseed_undo_last_capture'));
     assert.ok(names.includes('interestseed_undo_last_log'));
+    assert.ok(names.includes('interestseed_import_favorites'));
   } finally {
     vault.cleanup();
   }
@@ -727,6 +728,87 @@ test('undo_last_log explains when nothing is running', () => {
     const lines = runServer([call(1, 'interestseed_undo_last_log', {})], { graphPath: vault.graphPath });
     assert.equal(lines[0].result.isError, true);
     assert.match(lines[0].result.content[0].text, /没有进行中的实验/);
+  } finally {
+    vault.cleanup();
+  }
+});
+const IMPORT_CSV = `title,url
+陶艺入门,https://www.xiaohongshu.com/explore/65abc
+剪辑节奏,https://www.douyin.com/video/123
+摄影,https://www.bilibili.com/video/BV1xx411c7mD`;
+
+test('import creates nodes in one write', () => {
+  const vault = makeVault();
+  try {
+    const lines = runServer([call(1, 'interestseed_import_favorites', { text: IMPORT_CSV })], {
+      graphPath: vault.graphPath,
+    });
+    const payload = JSON.parse(lines[0].result.content[0].text);
+    assert.equal(payload.format, 'csv');
+    assert.equal(payload.created, 2, '摄影 already exists in the vault');
+    assert.equal(payload.skipped, 1);
+    const onDisk = JSON.parse(readFileSync(vault.graphPath, 'utf8'));
+    assert.equal(onDisk.graph.nodes.length, 3);
+    assert.equal(onDisk.schemaVersion, 2, 'the envelope survives a bulk write');
+  } finally {
+    vault.cleanup();
+  }
+});
+
+test('import dryRun reports without writing', () => {
+  const vault = makeVault();
+  try {
+    const lines = runServer(
+      [call(1, 'interestseed_import_favorites', { text: IMPORT_CSV, dryRun: true })],
+      { graphPath: vault.graphPath },
+    );
+    const payload = JSON.parse(lines[0].result.content[0].text);
+    assert.equal(payload.dryRun, true);
+    assert.equal(payload.created, 2);
+    const onDisk = JSON.parse(readFileSync(vault.graphPath, 'utf8'));
+    assert.equal(onDisk.graph.nodes.length, 1, 'nothing was written');
+  } finally {
+    vault.cleanup();
+  }
+});
+
+test('import accepts browser bookmark exports', () => {
+  const vault = makeVault();
+  try {
+    const html = '<DL><DT><A HREF="https://b23.tv/abc">三秒抓人的开场</A></DL>';
+    const lines = runServer([call(1, 'interestseed_import_favorites', { text: html })], {
+      graphPath: vault.graphPath,
+    });
+    const payload = JSON.parse(lines[0].result.content[0].text);
+    assert.equal(payload.format, 'bookmarks-html');
+    assert.equal(payload.created, 1);
+    assert.equal(payload.items[0].url, 'https://b23.tv/abc');
+  } finally {
+    vault.cleanup();
+  }
+});
+
+test('import rejects empty text', () => {
+  const vault = makeVault();
+  try {
+    const lines = runServer([call(1, 'interestseed_import_favorites', { text: '  ' })], {
+      graphPath: vault.graphPath,
+    });
+    assert.equal(lines[0].result.isError, true);
+    assert.match(lines[0].result.content[0].text, /text 不能为空/);
+  } finally {
+    vault.cleanup();
+  }
+});
+
+test('import explains when nothing could be recognised', () => {
+  const vault = makeVault();
+  try {
+    const lines = runServer([call(1, 'interestseed_import_favorites', { text: '完全无关的一段话' })], {
+      graphPath: vault.graphPath,
+    });
+    assert.equal(lines[0].result.isError, true);
+    assert.match(lines[0].result.content[0].text, /没有识别到可导入的条目/);
   } finally {
     vault.cleanup();
   }
