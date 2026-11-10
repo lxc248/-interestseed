@@ -180,9 +180,9 @@ node standalone/dist/cli.js serve --vault "<vault>" --port 4173
 
 Web: `http://127.0.0.1:4173`
 
-### Obsidian plugin (compatibility)
+### Obsidian plugin (inside Obsidian)
 
-1. Download `interestseed-v3.7.0.zip` from [Releases](https://github.com/lxc248/-interestseed/releases).
+1. Download `interestseed-3.7.2.zip` from [Releases](https://github.com/lxc248/-interestseed/releases).
 2. Extract it into:
 
 ```text

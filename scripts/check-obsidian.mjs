@@ -81,6 +81,15 @@ if (!(await exists(notesPath))) {
   errors.push(`缺少发布说明 RELEASE_NOTES_${manifest.version}.md（发布工作流会用到）`);
 }
 
+// README 的安装说明必须指向真实存在的包名，否则用户下不到东西。
+for (const readme of ['README.md', 'README.en.md']) {
+  const text = await readFile(resolve(root, readme), 'utf8');
+  const needle = `interestseed-${manifest.version}.zip`;
+  if (!text.includes(needle)) {
+    errors.push(`${readme} 未引用实际的插件包名 ${needle}（安装步骤会指向不存在的文件）`);
+  }
+}
+
 const mainTs = await readFile(resolve(root, 'src/main.ts'), 'utf8');
 if (/\beval\s*\(/.test(mainTs)) errors.push('src/main.ts 使用了 eval，Obsidian 审核不允许');
 
@@ -117,6 +126,10 @@ if (process.env.OBSIDIAN_CHECK_RELEASE === '1') {
       const names = new Set((release.assets ?? []).map((asset) => asset.name));
       for (const asset of ['main.js', 'manifest.json', 'styles.css']) {
         if (!names.has(asset)) errors.push(`release ${safeVersion} 缺少资产 ${asset}`);
+      }
+      const zipName = `interestseed-${safeVersion}.zip`;
+      if (!names.has(zipName)) {
+        errors.push(`release 缺少插件包 ${zipName}（README 安装说明会 404）`);
       }
     }
   }
