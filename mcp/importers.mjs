@@ -21,13 +21,22 @@ function normaliseUrl(value) {
   return trimmed;
 }
 
+const ENTITIES = { amp: '&', lt: '<', gt: '>', quot: '"', '#39': "'" };
+
+/** One pass only: sequential replaces would decode `&amp;lt;` twice. */
 function decodeEntities(value) {
-  return value
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'");
+  return value.replace(/&(amp|lt|gt|quot|#39);/g, (match, name) => ENTITIES[name] ?? match);
+}
+
+/** Strip markup until it stops changing, then drop leftover angle brackets. */
+function stripTags(value) {
+  let text = value;
+  for (let round = 0; round < 3; round += 1) {
+    const next = text.replace(/<[^>]*>/g, ' ');
+    if (next === text) break;
+    text = next;
+  }
+  return text.replace(/[<>]/g, ' ');
 }
 
 /** Netscape bookmark export: the format every browser and many tools emit. */
@@ -38,7 +47,7 @@ function parseBookmarksHtml(text) {
   while ((match = pattern.exec(text)) !== null) {
     const url = normaliseUrl(decodeEntities(match[1]));
     if (!url) continue;
-    const title = cleanTitle(decodeEntities(match[2].replace(/<[^>]+>/g, '')));
+    const title = cleanTitle(decodeEntities(stripTags(match[2])));
     items.push({ title, url });
   }
   return items;

@@ -105,3 +105,17 @@ test('json entries without title or url are skipped', () => {
   assert.equal(result.items[0].title, '只有标题');
   assert.equal(result.items[1].url, 'https://a.example');
 });
+test('entities are decoded once, not twice', () => {
+  const html = '<DL><DT><A HREF="https://example.com/a?x=1&amp;y=2">实体 &amp;lt; 保持原样</A></DL>';
+  const result = parseImport(html);
+  assert.equal(result.items.length, 1);
+  assert.equal(result.items[0].url, 'https://example.com/a?x=1&y=2');
+  // `&amp;lt;` must decode to `&lt;`, never to `<`.
+  assert.equal(result.items[0].title, '实体 &lt; 保持原样');
+});
+
+test('nested markup is stripped from titles', () => {
+  const html = '<DL><DT><A HREF="https://example.com/b"><b>粗体</b> <i>斜体</i></A></DL>';
+  const result = parseImport(html);
+  assert.equal(result.items[0].title, '粗体 斜体');
+});
