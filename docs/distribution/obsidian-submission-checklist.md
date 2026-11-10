@@ -74,3 +74,34 @@
 - 打开 `OBSIDIAN_CHECK_RELEASE=1` 时，release 里必须真的存在这个 zip
 
 加这条的原因：README 曾经写着 `interestseed-v3.7.0.zip`，而实际资产叫 `interestseed-3.7.2.zip`。安装说明指向不存在的文件，用户第一步就会卡住，而所有测试和 CI 都不会报错。
+## 七、提交状态（2026-11-10）
+
+已在 fork 里把改动做好，**但 PR 无法从 API 创建**：
+
+```text
+上游      obsidianmd/obsidian-releases @ 1022687
+Fork      已 merge-upstream 同步到同一 commit
+分支      lxc248/obsidian-releases:add-interestseed-plugin
+提交      4f089ed  "Add InterestSeed plugin"
+改动      仅 community-plugins.json，追加 1 条（10,206 条，JSON 解析通过）
+compare   ahead=1 behind=0 files=1
+```
+
+两条创建 PR 的路径都失败：
+
+```text
+REST     POST /repos/obsidianmd/obsidian-releases/pulls  → 404 Not Found
+GraphQL  createPullRequest                               → FORBIDDEN
+         "lxc248 does not have the correct permissions to execute `CreatePullRequest`"
+```
+
+排除本地因素：同一天用同一个 token 在本仓库成功创建过数十个 PR，因此不是 token 或额度问题，而是**目标仓库对该账号的权限限制**（可能是账号被 GitHub 标记，或该组织对低信任账号的限制）。
+
+### 手动提交（约 2 次点击）
+
+1. 打开 https://github.com/lxc248/obsidian-releases/tree/add-interestseed-plugin
+2. 页面顶部会出现 `Contribute` → `Open pull request`
+3. 标题填 `Add InterestSeed plugin`，正文可用下面这段
+4. Base 选 `obsidianmd/obsidian-releases` 的 `master`
+
+如果连网页也提示无权创建，说明是账号层面的限制，需要先向 GitHub Support 申诉。
