@@ -11,8 +11,12 @@ import { InterestSeedGraphStore } from './core/GraphStore';
 import { InsightEngine, type GraphInsights } from './core/InsightEngine';
 import { InterestSeedRelationEngine } from './core/RelationEngine';
 import { UndoHistory } from './core/UndoManager';
-import { DiscoveryEngine } from './discovery/DiscoveryEngine';
-import { applyDiscoveryFeedback, undoDiscoveryFeedback } from './discovery/feedback';
+import {
+  reconcileDiscoveries,
+  refreshDiscoveries,
+  setDiscoveryFeedback,
+  undoDiscoveryFeedbackById,
+} from './plugin/discoveryOps';
 import { sortDiscoveries } from './discovery/ranking';
 import { DiscoveryRepository } from './discovery/DiscoveryRepository';
 import type { DiscoveryBackupStatus } from './discovery/DiscoveryRepository';
@@ -23,7 +27,6 @@ import {
   type DiscoveryApplicationResult,
 } from './discovery/application';
 import { DiscoveryWriteQueue } from './discovery/DiscoveryWriteQueue';
-import { hasDiscoveryContentChanged } from './discovery/refresh';
 import { AuditVaultBinding } from './discovery/auditBinding';
 import { type DiscoveryAuditScope } from './discovery/audit';
 import {
@@ -760,9 +763,10 @@ export default class InterestSeedPlugin extends Plugin {
   }
 
   async reconcileDiscoveries(): Promise<void> {
-    await this.discoveryApplication.reconcile();
-    await this.refreshDiscoveries();
-    new Notice('InterestSeed：发现应用状态已按当前图谱核对。');
+    await reconcileDiscoveries({
+      reconcile: () => this.discoveryApplication.reconcile(),
+      refresh: () => this.refreshDiscoveries(),
+    });
   }
 
   listDiscoveries(): Discovery[] {
@@ -770,20 +774,11 @@ export default class InterestSeedPlugin extends Plugin {
   }
 
   async refreshDiscoveries(): Promise<void> {
-    if (this.discoveryLoadBlocked) {
-      new Notice(`InterestSeed：${this.discoveryLoadBlocked}`, 8000);
-      return;
-    }
-    try {
-      await this.discoveryQueue.enqueue((state) => {
-        // 在队列任务内部基于最新状态重算，避免反馈/其他保存刚写入后被旧快照覆盖。
-        const next = new DiscoveryEngine().generate(this.store.getGraph(), state);
-        return hasDiscoveryContentChanged(state, next) ? next : state;
-      });
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      new Notice(`InterestSeed：发现数据保存失败——${message}`, 10_000);
-    }
+    await refreshDiscoveries({
+      blockedReason: this.discoveryLoadBlocked,
+      getGraph: () => this.store.getGraph(),
+      enqueue: (mutator) => this.discoveryQueue.enqueue(mutator),
+    });
   }
 
   async setDiscoveryFeedback(
@@ -791,40 +786,22 @@ export default class InterestSeedPlugin extends Plugin {
     action: DiscoveryFeedbackAction,
     correction?: DiscoveryCorrection,
   ): Promise<void> {
-    if (this.discoveryLoadBlocked) {
-      new Notice(`InterestSeed：${this.discoveryLoadBlocked}`, 8000);
-      return;
-    }
-    const current = this.discoveryQueue.getState();
-    const discovery = current.discoveries.find((item) => item.id === id);
-    if (!discovery) {
-      new Notice('这条发现已不存在，无法操作。');
-      return;
-    }
-
-    try {
-      await this.discoveryQueue.enqueue((state) =>
-        applyDiscoveryFeedback(state, id, action, undefined, correction),
-      );
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      new Notice(`InterestSeed：反馈保存失败——${message}`, 10_000);
-    }
+    await setDiscoveryFeedback({
+      blockedReason: this.discoveryLoadBlocked,
+      getState: () => this.discoveryQueue.getState(),
+      enqueue: (mutator) => this.discoveryQueue.enqueue(mutator),
+      id,
+      action,
+      correction,
+    });
   }
 
   async undoDiscoveryFeedback(id: string): Promise<void> {
-    if (this.discoveryLoadBlocked) {
-      new Notice(`InterestSeed：${this.discoveryLoadBlocked}`, 8000);
-      return;
-    }
-    try {
-      await this.discoveryQueue.enqueue((state) =>
-        undoDiscoveryFeedback(state, id),
-      );
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      new Notice(`InterestSeed：撤销反馈失败——${message}`, 10_000);
-    }
+    await undoDiscoveryFeedbackById({
+      blockedReason: this.discoveryLoadBlocked,
+      enqueue: (mutator) => this.discoveryQueue.enqueue(mutator),
+      id,
+    });
   }
 
   subscribeDiscoveries(listener: () => void): () => void {
