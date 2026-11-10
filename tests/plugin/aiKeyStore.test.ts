@@ -59,4 +59,9 @@ describe('aiKeyStore', () => {
     });
     expect(await saveAiApiKey(app, '   ')).toBe(false);
   });
+
+  it('treats an empty stored key as missing', async () => {
+    const { app } = appWithStorage({ getSecret: vi.fn(async () => '   ') });
+    expect(await readAiApiKey(app)).toBeUndefined();
+  });
 });
