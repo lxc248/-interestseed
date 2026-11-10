@@ -59,6 +59,10 @@ describe('persistence', () => {
     expect(invalid.lastRebuiltAt).toBeNull();
   });
 
+  it('defaults non-numeric schema versions to 0', () => {
+    expect(unpackStoredState({ schemaVersion: 'x' }).dataVersion).toBe(0);
+  });
+
   it('reports a blocked load result', () => {
     reportLoadResult({
       source: 'clean',
