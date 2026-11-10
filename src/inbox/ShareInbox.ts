@@ -1,4 +1,5 @@
 import { hashString } from '../utils/ids';
+import { detectIngest } from '../services/ingest';
 
 export type InboxStatus = 'pending' | 'kept' | 'passed';
 export type InboxSource = 'share' | 'clipboard' | 'note';
@@ -10,6 +11,10 @@ export interface ShareInboxItem {
   status: InboxStatus;
   source: InboxSource;
   sourceRef?: string;
+  /** Detected platform id (douyin, youtube, …); absent for plain text items. */
+  sourcePlatform?: string;
+  /** Same URL with tracking parameters stripped. */
+  canonicalUrl?: string;
 }
 
 export interface EnqueueResult {
@@ -51,6 +56,7 @@ export class ShareInbox {
       (item) => normalizeKey(item.text) === key && item.status === 'pending',
     );
     if (duplicate) return { item: duplicate, duplicate: true };
+    const ingest = detectIngest(value);
     const item: ShareInboxItem = {
       id: `inbox_${hashString(key)}`,
       text: value,
@@ -58,6 +64,8 @@ export class ShareInbox {
       status: 'pending',
       source,
       ...(sourceRef ? { sourceRef } : {}),
+      ...(ingest.platform !== 'text' ? { sourcePlatform: ingest.platform } : {}),
+      ...(ingest.canonicalUrl ? { canonicalUrl: ingest.canonicalUrl } : {}),
     };
     this.items = [item, ...this.items].slice(0, this.maxItems);
     return { item, duplicate: false };

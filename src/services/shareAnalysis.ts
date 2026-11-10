@@ -6,35 +6,27 @@
  * the user a small, explicit next decision.
  */
 
-export type SharePlatform =
-  | 'douyin'
-  | 'xiaohongshu'
-  | 'bilibili'
-  | 'youtube'
-  | 'web'
-  | 'text';
+import { detectIngest, type IngestCardPreset, type IngestKind, type PLATFORMS } from './ingest';
+
+export type SharePlatform = (typeof PLATFORMS)[number]['id'] | 'web' | 'text';
 
 export interface ShareAnalysis {
   platform: SharePlatform;
   platformLabel: string;
   url: string | null;
+  /** URL with tracking parameters removed; may equal `url` when nothing was stripped. */
+  canonicalUrl: string | null;
+  kind: IngestKind;
+  /** True when the source is a short-link host we cannot expand offline. */
+  shortLink: boolean;
+  cardPreset: IngestCardPreset | null;
   title: string;
   topics: string[];
   why: string;
   nextQuestion: string;
 }
 
-const PLATFORM_RULES: Array<{
-  platform: SharePlatform;
-  label: string;
-  test: RegExp;
-}> = [
-  { platform: 'douyin', label: '抖音', test: /(?:^|\s)(?:https?:\/\/)?(?:[^/\s]+\.)?douyin\.com(?:\/|\s|$)/i },
-  { platform: 'xiaohongshu', label: '小红书', test: /(?:^|\s)(?:https?:\/\/)?(?:[^/\s]+\.)?(?:xiaohongshu\.com|xhslink\.com|rednote\.com)(?:\/|\s|$)/i },
-  { platform: 'bilibili', label: 'B 站', test: /(?:^|\s)(?:https?:\/\/)?(?:[^/\s]+\.)?(?:bilibili\.com|b23\.tv)(?:\/|\s|$)/i },
-  { platform: 'youtube', label: 'YouTube', test: /(?:^|\s)(?:https?:\/\/)?(?:[^/\s]+\.)?(?:youtube\.com|youtu\.be)(?:\/|\s|$)/i },
-  { platform: 'web', label: '网页', test: /https?:\/\//i },
-];
+
 
 const TOPIC_RULES: Array<{ topic: string; test: RegExp }> = [
   { topic: 'AI 与工具', test: /ai|agent|大模型|deepseek|kimi|vibe|工具|效率|自动化/i },
@@ -66,10 +58,10 @@ function cleanTitle(raw: string): string {
 
 export function analyzeShareText(raw: string): ShareAnalysis {
   const text = raw.trim();
-  const url = text.match(/https?:\/\/[^\s]+/i)?.[0] ?? null;
-  const platformRule = PLATFORM_RULES.find((rule) => rule.test.test(text));
-  const platform = platformRule?.platform ?? 'text';
-  const platformLabel = platformRule?.label ?? '一段文字';
+  const ingest = detectIngest(text);
+  const url = ingest.url;
+  const platform = ingest.platform as SharePlatform;
+  const platformLabel = ingest.label;
   const title = cleanTitle(text) || `${platformLabel}内容`;
   const topics = TOPIC_RULES.filter((rule) => rule.test.test(text))
     .map((rule) => rule.topic)
@@ -79,6 +71,10 @@ export function analyzeShareText(raw: string): ShareAnalysis {
     platform,
     platformLabel,
     url,
+    canonicalUrl: ingest.canonicalUrl,
+    kind: ingest.kind,
+    shortLink: ingest.shortLink,
+    cardPreset: ingest.cardPreset,
     title,
     topics,
     why:
@@ -94,7 +90,10 @@ export function analyzeShareText(raw: string): ShareAnalysis {
 
 /** True when the pasted text points at a video platform. */
 export function isVideoSpark(text: string): boolean {
-  return /(youtube\.com|youtu\.be|bilibili\.com|douyin\.com|tiktok\.com|vimeo\.com)/i.test(text);
+  return (
+    /(youtube\.com|youtu\.be|bilibili\.com|douyin\.com|tiktok\.com|vimeo\.com)/i.test(text) ||
+    detectIngest(text).kind === 'video'
+  );
 }
 
 /** A short human label for a spark, without fetching the source page. */
