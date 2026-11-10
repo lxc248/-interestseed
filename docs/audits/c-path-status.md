@@ -8,8 +8,8 @@ Internal milestones complete. Honest score: **7.1 / 10**.
 main.ts           1548 → 1073 lines
 plugin modules    17 → 19
 standalone app.js 1397 → 589 lines
-tests             648 → 756 passed (710 vitest + 11 mcp + 35 e2e)
-coverage          lines 86.46% / branches 73.36% / functions 86.14% (gates 83 / 72.5 / 85.5 / 85.5)
+tests             648 → 765 passed (719 vitest + 11 mcp + 35 e2e)
+coverage          lines 86.60% / branches 73.33% / functions 86.52% (gates 83 / 72.5 / 85.5 / 85.5)
 CodeQL            open alerts 0
 npm audit         0 vulnerabilities
 release           4.0.10 published, digest published
@@ -30,7 +30,7 @@ launch materials  launch kit + honest adoption tracker ready
 
 ```text
 Code quality   7.5 / 10   (23 modules, main.ts 1073)
-Tests / QA     8.1 / 10   (756 tests, green thresholds)
+Tests / QA     8.1 / 10   (765 tests, green thresholds)
 Overall        7.1 / 10
 ```
 
