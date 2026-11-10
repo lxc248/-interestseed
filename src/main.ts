@@ -86,11 +86,8 @@ import {
   DiscoveryAuditSaveModal,
   DiscoveryAuditScopeModal,
 } from './ui/DiscoveryAuditModal';
-import { DiscoveryOverviewModal } from './ui/DiscoveryOverviewModal';
-import { DiscoveryExplorerModal } from './ui/DiscoveryExplorerModal';
 import { openAiSetupModal } from './plugin/aiSetup';
-import { buildDiscoveryOverview } from './discovery/overview';
-import { buildExploration } from './discovery/exploration';
+import { openDiscoveryExplorer, openDiscoveryOverview, showDiscoveriesForTheme } from './plugin/discoveryUI';
 import { type ExplorationInsight, type ExplorationRequest } from './services/ModelProvider';
 import { generateExplorationInsightService } from './plugin/explorationInsight';
 
@@ -696,38 +693,36 @@ export default class InterestSeedPlugin extends Plugin {
   }
 
   openDiscoveryOverview(): void {
-    const overview = buildDiscoveryOverview(
-      this.discoveryQueue.getState(),
-      this.store.getGraph(),
-    );
-    new DiscoveryOverviewModal(this.app, overview).open();
+    openDiscoveryOverview(this.app, this.discoveryQueue.getState(), this.store.getGraph());
   }
 
   openDiscoveryExplorer(): void {
     const file = this.discoveryQueue.getState();
-    const overview = buildDiscoveryOverview(file, this.store.getGraph());
-    const data = buildExploration(file);
     const aiAvailable = this.settings.enableAI && this.settings.aiConsentGranted;
     const aiUnavailableReason = !this.settings.enableAI
       ? 'AI 未启用'
       : !this.settings.aiConsentGranted
         ? 'AI 未授权'
         : undefined;
-    new DiscoveryExplorerModal(this.app, data, overview, {
+    openDiscoveryExplorer({
+      app: this.app,
+      file,
+      graph: this.store.getGraph(),
+      aiAvailable,
+      aiUnavailableReason,
       onThemeSelect: (theme) => {
         void this.showDiscoveriesForTheme(theme);
       },
-      aiAvailable,
-      aiUnavailableReason,
       onGenerateAi: (request) => this.generateExplorationInsight(request),
-    }).open();
+    });
   }
 
   async showDiscoveriesForTheme(theme: string): Promise<void> {
-    await this.activateView();
-    const leaf = this.app.workspace.getLeavesOfType(INTERESTSEED_VIEW_TYPE)[0];
-    const view = leaf?.view;
-    if (view instanceof InterestSeedView) view.showDiscoveriesForTheme(theme);
+    await showDiscoveriesForTheme({
+      app: this.app,
+      theme,
+      activateView: () => this.activateView(),
+    });
   }
 
   private generateExplorationInsight(
