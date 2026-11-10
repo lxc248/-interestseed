@@ -45,7 +45,7 @@ describe('aiSuggestions', () => {
   it('notices when a file has no matched node', async () => {
     await suggestForFile({
       file: { path: 'note.md' } as never,
-      findNodeByUri: vi.fn(() => null),
+      findNodeByUri: vi.fn(() => undefined),
       listNodes: vi.fn(() => []),
       expandWithAI: vi.fn(async () => undefined),
     });
