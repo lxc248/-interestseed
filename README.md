@@ -163,7 +163,9 @@ Capture → Decide → Connect → Verify → Review → Next action
 | **兴趣路线** | 显式命令生成 Markdown MOC，从不自动写笔记 |
 | **五种分享卡** | 小红书、Instagram、X、微信、Story，全部本地 Canvas 渲染 |
 | **AI 建议** | 默认关闭；你在设置里开启并填写自己的 API Key 后才会访问 `https://api.deepseek.com`；一次只给一条；可改关系名；连上后可撤销 |
-| **MCP 接口** | 零依赖只读 MCP server，协议 `2026-07-28` |
+| **批量导入** | 浏览器书签 HTML / B 站收藏 JSON / CSV / 链接列表，一次最多 500 条，先进收件箱再逐条判断 |
+| **来源识别** | 23 个国内外平台（抖音、快手、小红书、B 站、微博、知乎、YouTube、X、Reddit…），剥离追踪参数、标记短链、同一内容只留一条 |
+| **MCP 接口** | 零依赖 MCP server，stdio 或 HTTP + Bearer token，默认只读、可显式开启写入，协议 `2026-07-28` |
 | **自适应布局** | 桌面、窄栏、极窄栏三档，图标优先，不横向溢出 |
 
 ## 装起来
