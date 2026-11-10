@@ -332,3 +332,17 @@ button, input { font: inherit; }
 .suggested-card { border: 1px solid var(--line); background: var(--panel); border-radius: 12px; padding: 10px 12px; }
 .suggested-card h3 { margin: 0; font-size: 13px; }
 .suggested-card p { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+.inbox-import { margin: 10px 18px 0; border-top: 1px solid var(--line, #e5e0d8); padding-top: 8px; }
+.inbox-import summary { cursor: pointer; font-size: 0.85rem; color: var(--muted, #6b6459); }
+.inbox-import textarea {
+  width: 100%;
+  margin-top: 8px;
+  font-family: var(--font-monospace, ui-monospace, monospace);
+  font-size: 0.8rem;
+  border: 1px solid var(--line, #e5e0d8);
+  border-radius: 6px;
+  padding: 8px;
+  resize: vertical;
+}
+.inbox-import-actions { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+.inbox-import-actions .hint { font-size: 0.75rem; color: var(--muted, #6b6459); }

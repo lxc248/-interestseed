@@ -124,4 +124,6 @@ POST /api/inbox/import
   "duplicatesInFile": 0, "truncated": false }
 ```
 
+web 界面：分享收件箱面板里展开「批量导入收藏」，粘贴后点「导入到收件箱」，结果以 toast 反馈（导入 N 条 / 重复 N 条 / 文件内重复 N 条）。
+
 与插件一致：只进收件箱、单次上限 500 条、重复链接跳过、输入无法识别返回 400。

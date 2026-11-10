@@ -85,6 +85,13 @@ async function submitExperimentStart() {
   return experimentView.submit();
 }
 
+async function logExperiment(input) {
+  return experimentView.log(input);
+}
+
+async function extendExperiment(id) {
+  return experimentView.extend(id);
+}
 function friendlyFeedback(status) {
   return {
     none: '新发现',
@@ -186,6 +193,29 @@ async function addInbox() {
   }
 }
 
+async function importInbox() {
+  const area = $('#inbox-import-text');
+  const text = area.value.trim();
+  if (!text) {
+    toast('先粘贴导出文件的内容', true);
+    return;
+  }
+  try {
+    setBusy(true);
+    const report = await api('/api/inbox/import', { method: 'POST', body: JSON.stringify({ text }) });
+    area.value = '';
+    await load();
+    const extras = [];
+    if (report.duplicates > 0) extras.push(`重复 ${report.duplicates} 条`);
+    if (report.duplicatesInFile > 0) extras.push(`文件内重复 ${report.duplicatesInFile} 条`);
+    if (report.truncated) extras.push('超出上限已截断');
+    toast(`导入 ${report.added} 条${extras.length > 0 ? `（${extras.join('，')}）` : ''}`);
+  } catch (error) {
+    toast(error.message, true);
+  } finally {
+    setBusy(false);
+  }
+}
 async function resolveInboxItem(id, status) {
   try {
     setBusy(true);
@@ -267,6 +297,26 @@ async function suggestFor(nodeId) {
     const message = friendlyAiError(error.message);
     state.aiError = message;
     toast(message, true);
+  } finally {
+    setBusy(false);
+  }
+}
+
+async function connectSuggestion(suggestion) {
+  try {
+    setBusy(true);
+    const result = await api('/api/connect', {
+      method: 'POST',
+      body: JSON.stringify({ suggestion }),
+    });
+    if (!result.ok) throw new Error(result.message || '写入失败');
+    state.lastConnected = result.edge;
+    state.suggestions.splice(state.index, 1);
+    if (state.index >= state.suggestions.length) state.index = 0;
+    await load();
+    toast('已连上这条关系');
+  } catch (error) {
+    toast(error.message, true);
   } finally {
     setBusy(false);
   }
@@ -595,6 +645,7 @@ $('#discoveries-refresh').addEventListener('click', async () => {
   }
 });
 $('#inbox-add').addEventListener('click', addInbox);
+$('#inbox-import-run').addEventListener('click', importInbox);
 $('#inbox-input').addEventListener('keydown', (event) => {
   if (event.key === 'Enter') addInbox();
 });

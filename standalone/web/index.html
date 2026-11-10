@@ -99,7 +99,14 @@
           <input id="inbox-input" aria-label="收件箱条目" placeholder="粘贴一条收藏或想法…" />
           <button id="inbox-add" class="button primary">加入</button>
         </div>
-        <div id="inbox-list" class="panel-body"></div>
+        <details id="inbox-import" class="inbox-import">
+          <summary>批量导入收藏（书签 HTML / JSON / CSV）</summary>
+          <textarea id="inbox-import-text" rows="5" placeholder="粘贴导出文件的内容…"></textarea>
+          <div class="inbox-import-actions">
+            <button id="inbox-import-run" class="button ghost">导入到收件箱</button>
+            <span id="inbox-import-hint" class="hint">导入只进收件箱，不直接改星图。</span>
+          </div>
+        </details>        <div id="inbox-list" class="panel-body"></div>
       </section>
 
       <section class="panel history-panel">
