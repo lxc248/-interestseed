@@ -22,7 +22,7 @@
     "check:version": "node scripts/check-version.mjs",
     "check:obsidian": "node scripts/check-obsidian.mjs",
     "check:mobile-bundle": "node scripts/check-bundle-mobile.mjs",
-    "test:mcp": "node --test mcp/smoke.test.mjs mcp/http.test.mjs",
+    "test:mcp": "node --test mcp/smoke.test.mjs mcp/http.test.mjs mcp/write.test.mjs",
     "check:release": "node scripts/check-release.mjs",
     "check:size": "node scripts/check-size.mjs",
     "check:cli": "node scripts/check-cli-version.mjs",

@@ -158,3 +158,38 @@ Transport  Streamable HTTP（请求 - 响应，无 SSE）
 ```
 
 如果云平台只支持 SSE 或要求 OAuth，需要在前面加一层网关做转换——本 server 只实现 JSON-RPC over HTTP。
+## 写入模式（默认关闭）
+
+默认只读。要允许 AI 把兴趣写进图谱，必须显式开启：
+
+```bash
+node mcp/server.mjs --write --graph "<vault>/.interestseed/state.json"
+# 或
+INTERESTSEED_MCP_WRITE=1 node mcp/server.mjs --graph "..."
+```
+
+开启后多出两个工具：
+
+```text
+interestseed_capture_interest     title（必填）/ url / note / tags
+interestseed_start_experiment     interest（必填，标题或节点 id）/ hypothesis / days
+```
+
+### 安全与边界
+
+```text
+同名或同链接的节点不会重复创建      幂等，返回 created:false 和已有节点
+写入前先备份                       生成 <graph>.bak，写坏了能回滚
+temp + rename 原子写                不会留下写了一半的 JSON
+保留原有信封结构                    {schemaVersion, graph:{...}} 不会被打平
+一次只允许一个进行中的实验          已有 active 实验时直接拒绝并告知其 id
+只写独立版 state.json              插件图谱会明确拒绝：实验由插件自己管理
+minimal 模式永不暴露写工具          --minimal + --write 只给只读工具
+```
+
+### 错误分两类
+
+```text
+校验错误（你自己写错）   原样返回，例如「找不到兴趣：陶艺」「已有进行中的实验（exp_x…）」
+意外错误                 统一返回通用文案，细节只进 stderr，不泄露本机路径
+```

@@ -8,7 +8,7 @@ Internal milestones complete. Honest score: **7.1 / 10**.
 main.ts           1548 → 1073 lines
 plugin modules    17 → 19
 standalone app.js 1397 → 589 lines
-tests             648 → 860 passed (793 vitest + 32 mcp + 35 e2e)
+tests             648 → 874 passed (793 vitest + 46 mcp + 35 e2e)
 coverage          lines 87.76% / branches 74.98% / functions 86.79% (gates 83 / 72.5 / 85.5 / 85.5)
 CodeQL            open alerts 0
 npm audit         0 vulnerabilities
