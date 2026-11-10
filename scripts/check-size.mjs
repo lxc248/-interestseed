@@ -28,4 +28,8 @@ if (total > MAX_TRACKED_BYTES) {
   for (const entry of largest.slice(0, 10)) console.error(`  ${mb(entry.size)}  ${entry.path}`);
   process.exit(1);
 }
-console.log(`Tracked tree check passed: ${mb(total)} / ${mb(MAX_TRACKED_BYTES)}.`);
+console.log(
+  `Tracked tree check passed: ${mb(total)} / ${mb(MAX_TRACKED_BYTES)}（余量 ${mb(MAX_TRACKED_BYTES - total)}）`,
+);
+// 通过时也报最大文件：体积是慢性问题，只在超限时才说话就太晚了。
+for (const entry of largest.slice(0, 5)) console.log(`  largest: ${mb(entry.size)}  ${entry.path}`);
