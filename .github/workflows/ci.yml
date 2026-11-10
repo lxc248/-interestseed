@@ -43,4 +43,4 @@ jobs:
         with:
           node-version: '22'
 
-      - run: node --test mcp/smoke.test.mjs
+      - run: npm run test:mcp
