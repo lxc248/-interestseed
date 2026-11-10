@@ -95,3 +95,31 @@ describe('surfaces', () => {
     expect(new Set(titles).size).toBe(titles.length);
   });
 });
+describe('surfaces on mobile', () => {
+  it('hides only the desktop-only ribbon', () => {
+    const { registry, ribbons } = makeRegistry();
+    registerSurfaces({
+      registry,
+      viewTypes: VIEW_TYPES,
+      createView: () => ({}),
+      actions: { graph: vi.fn(), ai: vi.fn(), agent: vi.fn() },
+      isDesktop: false,
+    });
+    expect(ribbons.map((ribbon) => ribbon.title)).toEqual([
+      '打开兴趣图谱',
+      '打开 InterestSeed AI 建议',
+    ]);
+  });
+
+  it('still registers every view so commands keep working', () => {
+    const { registry, views } = makeRegistry();
+    registerSurfaces({
+      registry,
+      viewTypes: VIEW_TYPES,
+      createView: () => ({}),
+      actions: { graph: vi.fn(), ai: vi.fn(), agent: vi.fn() },
+      isDesktop: false,
+    });
+    expect(views.map((view) => view.type)).toHaveLength(3);
+  });
+});

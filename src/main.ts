@@ -19,7 +19,7 @@ import {
 } from './plugin/discoveryOps';
 import { reportDiscoveryBlocked, reportDiscoveryMigration } from './plugin/discoveryNotices';
 import { registerSurfaces } from './plugin/surfaces';
-import { agentUnavailableReason } from './plugin/platform';
+import { agentUnavailableReason, isDesktopApp } from './plugin/platform';
 import { sortDiscoveries } from './discovery/ranking';
 import { DiscoveryRepository } from './discovery/DiscoveryRepository';
 import type { DiscoveryBackupStatus } from './discovery/DiscoveryRepository';
@@ -259,6 +259,7 @@ export default class InterestSeedPlugin extends Plugin {
         ai: () => void this.activateAiView(),
         agent: () => void this.activateAgentView(),
       },
+      isDesktop: isDesktopApp(),
     });
     registerCommands(this, this);
     this.registerEvent(
