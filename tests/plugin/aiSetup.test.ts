@@ -42,4 +42,23 @@ describe('aiSetup', () => {
     expect(options.enabled).toBe(true);
     expect(options.hasKey).toBe(true);
   });
+
+  it('opens the settings tab when requested', async () => {
+    const open = vi.fn();
+    const openTabById = vi.fn();
+    openAiSetupModal({
+      app: { setting: { open, openTabById } } as never,
+      manifestId: 'interestseed',
+      aiModel: 'local',
+      enableAI: true,
+      aiConsentGranted: true,
+      getKey: vi.fn(async () => 'key'),
+      saveKey: vi.fn(async () => undefined),
+    });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const options = (constructed.at(-1) as { options: { onOpenSettings: () => void } }).options;
+    options.onOpenSettings();
+    expect(open).toHaveBeenCalledTimes(1);
+    expect(openTabById).toHaveBeenCalledWith('interestseed');
+  });
 });
