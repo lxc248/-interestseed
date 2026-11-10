@@ -49,6 +49,16 @@ async function saveFile(vaultPath: string, file: ExperimentFile): Promise<void> 
   await rename(temp, path);
 }
 
+/**
+ * 实验相关的可映射错误：服务端据此返回 400 / 404 / 409，而不是一律 500。
+ */
+export class ExperimentError extends Error {
+  constructor(readonly status: number, message: string) {
+    super(message);
+    this.name = 'ExperimentError';
+  }
+}
+
 export async function listExperiments(vaultPath: string): Promise<StoredExperiment[]> {
   return (await loadFile(vaultPath)).experiments;
 }
@@ -64,7 +74,7 @@ export async function startExperiment(
 ): Promise<StoredExperiment> {
   const file = await loadFile(vaultPath);
   const title = input.title.trim();
-  if (!title) throw new Error('Experiment title is required.');
+  if (!title) throw new ExperimentError(400, 'Experiment title is required.');
   const state = createExperiment({
     title,
     hypothesis:
@@ -90,7 +100,7 @@ export async function logExperiment(
 ): Promise<StoredExperiment> {
   const file = await loadFile(vaultPath);
   const index = file.experiments.findIndex((item) => item.id === id);
-  if (index < 0) throw new Error('Experiment not found.');
+  if (index < 0) throw new ExperimentError(404, 'Experiment not found.');
   const current = file.experiments[index]!;
   const next = recordExperimentLog(current.state, input, now);
   const experiment: StoredExperiment = { ...current, state: next };
@@ -106,9 +116,9 @@ export async function extendExperiment(
 ): Promise<StoredExperiment> {
   const file = await loadFile(vaultPath);
   const index = file.experiments.findIndex((item) => item.id === id);
-  if (index < 0) throw new Error('Experiment not found.');
+  if (index < 0) throw new ExperimentError(404, 'Experiment not found.');
   const current = file.experiments[index]!;
-  if (current.state.status === 'complete') throw new Error('这个实验已经完成。');
+  if (current.state.status === 'complete') throw new ExperimentError(409, '这个实验已经完成。');
   const days = Math.min(30, Math.max(3, Math.round(targetDays)));
   const state: ExperimentState = {
     ...current.state,

@@ -25,6 +25,17 @@ export async function resolveApiKey(
   return undefined;
 }
 
+/**
+ * AI 未就绪（缺 key / 未启用 / 未同意）属于客户端可修复的状态，
+ * 不是服务端故障。服务端据此返回 409 而不是 500，让界面能显示可操作提示。
+ */
+export class AiPreconditionError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'AiPreconditionError';
+  }
+}
+
 export async function suggestRelations(
   vaultPath: string,
   focusNodeId?: string,
@@ -33,15 +44,15 @@ export async function suggestRelations(
   const state = await loadState(vaultPath);
   const key = await resolveApiKey(vaultPath, config);
   if (!key) {
-    throw new Error(
+    throw new AiPreconditionError(
       `Missing API key. Set ${config.keyEnv} or write .interestseed/key.`,
     );
   }
   if (!config.enableAI) {
-    throw new Error('AI 已关闭，请先在设置里启用。');
+    throw new AiPreconditionError('AI 已关闭，请先在设置里启用。');
   }
   if (!config.aiConsentGranted) {
-    throw new Error('还没有确认 AI 请求边界，请先在设置里同意。');
+    throw new AiPreconditionError('还没有确认 AI 请求边界，请先在设置里同意。');
   }
 
   const request = buildRelationRequest(state.graph.nodes, {
