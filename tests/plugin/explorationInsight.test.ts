@@ -42,4 +42,19 @@ describe('explorationInsight', () => {
     ).rejects.toThrow('AI 尚未启用或未授权');
     expect(dispose).toHaveBeenCalled();
   });
+
+  it('disposes the provider when exploration throws', async () => {
+    dispose.mockClear();
+    explore.mockRejectedValueOnce(new Error('boom'));
+    await expect(
+      generateExplorationInsightService({
+        request: { theme: '测试' } as never,
+        enableAI: true,
+        aiConsentGranted: true,
+        aiModel: 'local',
+        getApiKey: vi.fn(async () => 'key'),
+      }),
+    ).rejects.toThrow('boom');
+    expect(dispose).toHaveBeenCalledTimes(1);
+  });
 });
