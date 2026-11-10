@@ -7,39 +7,34 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 /**
- * ribbon 图标只在 Obsidian 运行时才注册，单元测试拿不到实例。
- * 这里退一步，直接对装配源码做静态断言：数量和标题唯一性。
- * 之前真的出现过两个同名「打开 InterestSeed Agent」按钮。
+ * 装配层的行为断言在 surfaces.test.ts。
+ * 这里只守一条结构约束：main.ts 必须通过 registerSurfaces 统一注册，
+ * 不允许再出现零散的 addRibbonIcon / registerView 调用。
+ * 之前真的出现过两个同名 Agent ribbon 按钮。
  */
 const sourcePath = join(process.cwd(), 'src', 'main.ts');
 
-function ribbonLabels(source: string): string[] {
-  const labels: string[] = [];
-  const pattern = /addRibbonIcon\(\s*'[^']*'\s*,\s*'([^']+)'/g;
-  let match = pattern.exec(source);
-  while (match) {
-    const label = match[1];
-    if (label) labels.push(label);
-    match = pattern.exec(source);
-  }
-  return labels;
+async function readMainSource(): Promise<string> {
+  return readFile(sourcePath, 'utf8');
 }
 
-describe('ribbon wiring', () => {
-  it('registers exactly three ribbon buttons with unique labels', async () => {
-    const source = await readFile(sourcePath, 'utf8');
-    const labels = ribbonLabels(source);
-    expect(labels).toHaveLength(3);
-    expect(new Set(labels).size).toBe(labels.length);
+function countOccurrences(source: string, needle: string): number {
+  return source.split(needle).length - 1;
+}
+
+describe('plugin surface wiring', () => {
+  it('registers surfaces through the shared helper exactly once', async () => {
+    const source = await readMainSource();
+    expect(countOccurrences(source, 'registerSurfaces(')).toBe(1);
   });
 
-  it('keeps one dedicated entry per surface', async () => {
-    const source = await readFile(sourcePath, 'utf8');
-    const labels = ribbonLabels(source);
-    expect(labels).toEqual([
-      '打开兴趣图谱',
-      '打开 InterestSeed AI 建议',
-      '打开 InterestSeed Agent',
-    ]);
+  it('does not register ribbon icons inline', async () => {
+    const source = await readMainSource();
+    expect(countOccurrences(source, 'addRibbonIcon(')).toBe(0);
+  });
+
+  it('does not register views inline', async () => {
+    const source = await readMainSource();
+    expect(countOccurrences(source, 'registerView(')).toBe(0);
   });
 });

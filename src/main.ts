@@ -18,6 +18,7 @@ import {
   undoDiscoveryFeedbackById,
 } from './plugin/discoveryOps';
 import { reportDiscoveryBlocked, reportDiscoveryMigration } from './plugin/discoveryNotices';
+import { registerSurfaces } from './plugin/surfaces';
 import { sortDiscoveries } from './discovery/ranking';
 import { DiscoveryRepository } from './discovery/DiscoveryRepository';
 import type { DiscoveryBackupStatus } from './discovery/DiscoveryRepository';
@@ -240,17 +241,23 @@ export default class InterestSeedPlugin extends Plugin {
       openAiSuggestions: (suggestions) => this.openAiSuggestions(suggestions),
     });
 
-    this.registerView(INTERESTSEED_VIEW_TYPE, (leaf) => new InterestSeedView(leaf, this));
-    this.registerView(INTERESTSEED_AGENT_VIEW_TYPE, (leaf) => new AgentView(leaf, this));
-    this.registerView(INTERESTSEED_AI_VIEW_TYPE, (leaf) => new AiSuggestionView(leaf, this));
-    this.addRibbonIcon('sprout', '打开兴趣图谱', () => {
-      void this.activateView();
-    });
-    this.addRibbonIcon('sparkles', '打开 InterestSeed AI 建议', () => {
-      void this.activateAiView();
-    });
-    this.addRibbonIcon('bot', '打开 InterestSeed Agent', () => {
-      void this.activateAgentView();
+    registerSurfaces({
+      registry: this,
+      viewTypes: {
+        graph: INTERESTSEED_VIEW_TYPE,
+        ai: INTERESTSEED_AI_VIEW_TYPE,
+        agent: INTERESTSEED_AGENT_VIEW_TYPE,
+      },
+      createView: (viewType, leaf) => {
+        if (viewType === INTERESTSEED_VIEW_TYPE) return new InterestSeedView(leaf, this);
+        if (viewType === INTERESTSEED_AGENT_VIEW_TYPE) return new AgentView(leaf, this);
+        return new AiSuggestionView(leaf, this);
+      },
+      actions: {
+        graph: () => void this.activateView(),
+        ai: () => void this.activateAiView(),
+        agent: () => void this.activateAgentView(),
+      },
     });
     registerCommands(this, this);
     this.registerEvent(
