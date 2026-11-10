@@ -46,31 +46,58 @@ function decodeEntities(value: string): string {
   return value.replace(/&(amp|lt|gt|quot|#39);/g, (match, name: string) => ENTITIES[name] ?? match);
 }
 
-/** Strip markup until it stops changing, then drop leftover angle brackets. */
+/**
+ * Strip markup by scanning instead of with a regex: `<[^>]*>` backtracks
+ * badly on hostile input, and CodeQL flags it as polynomial ReDoS.
+ */
 function stripTags(value: string): string {
-  let text = value;
-  for (let round = 0; round < 3; round += 1) {
-    const next = text.replace(/<[^>]*>/g, ' ');
-    if (next === text) break;
-    text = next;
+  let out = '';
+  let index = 0;
+  let stripped = false;
+  while (index < value.length) {
+    const open = value.indexOf('<', index);
+    if (open < 0) break;
+    const close = value.indexOf('>', open);
+    if (close < 0) break;
+    out += `${value.slice(index, open)} `;
+    index = close + 1;
+    stripped = true;
   }
-  return text.replace(/[<>]/g, ' ');
+  out += value.slice(index);
+  const text = stripped ? out : value;
+  return text.split('<').join(' ').split('>').join(' ');
 }
 
+/**
+ * Scan bookmark anchors linearly. A single regex over the whole document is the
+ * classic polynomial-backtracking shape, so the tag and its text are located
+ * with indexOf and only the small attribute string goes through a regex.
+ */
 function parseBookmarksHtml(text: string): ImportEntry[] {
   const entries: ImportEntry[] = [];
-  const pattern = /<a\s[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi;
-  let match: RegExpExecArray | null;
-  while ((match = pattern.exec(text)) !== null) {
-    const url = normaliseUrl(decodeEntities(match[1] ?? ''));
+  const lower = text.toLowerCase();
+  let cursor = 0;
+  while (cursor < lower.length) {
+    const start = lower.indexOf('<a ', cursor);
+    if (start < 0) break;
+    const tagEnd = lower.indexOf('>', start);
+    if (tagEnd < 0) break;
+    const close = lower.indexOf('</a>', tagEnd);
+    if (close < 0) break;
+    const tag = text.slice(start, tagEnd + 1);
+    const href = /href="([^"]*)"/i.exec(tag);
+    cursor = close + 4;
+    if (!href) continue;
+    const url = normaliseUrl(decodeEntities(href[1] ?? ''));
     if (!url) continue;
-    entries.push({ title: cleanTitle(decodeEntities(stripTags(match[2] ?? ''))), url });
+    entries.push({ title: cleanTitle(decodeEntities(stripTags(text.slice(tagEnd + 1, close)))), url });
   }
   return entries;
 }
 
 function looksLikeBookmarksHtml(text: string): boolean {
-  return /<a\s[^>]*href=/i.test(text) && /<\/a>/i.test(text);
+  const lower = text.toLowerCase();
+  return lower.includes('<a ') && lower.includes('href=') && lower.includes('</a>');
 }
 
 function pickEntry(source: unknown): ImportEntry | null {
