@@ -41,10 +41,10 @@ Do not claim 8.5, users, downloads, stars, or an independent audit that do not e
 ## Obsidian 社区目录（2026-11-10）
 
 ```text
-release tag 3.7.0  -> 3f567e2
-assets         main.js 663,734 / manifest.json 286 / styles.css 216,552
-manifest       version 3.7.0, isDesktopOnly true
-workflow       run 42799636717 success（CI 构建）
+release tag 3.7.1  -> 64f40bd
+assets         main.js 666,946 / manifest.json 287 / styles.css 216,552
+manifest       version 3.7.1, isDesktopOnly false（移动端可安装）
+workflow       run 42815398424 success（CI 构建）
 ```
 
 尚未提交 community-plugins.json PR；提交入口与条目见 docs/distribution/obsidian-submission-checklist.md。
