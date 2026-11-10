@@ -31,6 +31,15 @@ describe('persistence', () => {
     });
   });
 
+  it('builds a payload with optional fields missing', () => {
+    expect(pluginDataPayload({ settings: undefined, lastRebuiltAt: null, inboxSerialized: undefined })).toEqual({
+      schemaVersion: 1,
+      settings: undefined,
+      lastRebuiltAt: null,
+      inbox: undefined,
+    });
+  });
+
   it('notices when persistence fails', async () => {
     const saveData = vi.fn(async () => {
       throw new Error('disk full');
