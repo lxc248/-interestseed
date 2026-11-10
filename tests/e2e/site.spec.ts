@@ -30,10 +30,9 @@ test('download page exposes the current standalone asset', async ({ page }) => {
   const asset = page
     .locator(`a[href*="interestseed-standalone-v${STANDALONE_VERSION}.zip"]`)
     .first();
-  await expect(asset).toHaveAttribute(
-    'href',
-    new RegExp(`interestseed-standalone-v${STANDALONE_VERSION.replace(/\./g, '\\.')}\\.zip`),
-  );
+  await expect(asset).toHaveCount(1);
+  const href = (await asset.getAttribute('href')) ?? '';
+  expect(href).toContain(`interestseed-standalone-v${STANDALONE_VERSION}.zip`);
 });
 
 test('content pages render a heading', async ({ page }) => {
