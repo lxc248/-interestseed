@@ -162,7 +162,7 @@ Capture → Decide → Connect → Verify → Review → Next action
 | **上下文搜索** | 标题、标签、摘要、为什么、原文、来源路径、观察证据，多字段确定性搜索，无需 embedding |
 | **兴趣路线** | 显式命令生成 Markdown MOC，从不自动写笔记 |
 | **五种分享卡** | 小红书、Instagram、X、微信、Story，全部本地 Canvas 渲染 |
-| **AI 建议** | 默认开启；只使用你自己的本地模型；一次只给一条；可改关系名；连上后可撤销；默认 `cn:deepseek-v4.1-flash` |
+| **AI 建议** | 默认关闭；你在设置里开启并填写自己的 API Key 后才会访问 `https://api.deepseek.com`；一次只给一条；可改关系名；连上后可撤销 |
 | **MCP 接口** | 零依赖只读 MCP server，协议 `2026-07-28` |
 | **自适应布局** | 桌面、窄栏、极窄栏三档，图标优先，不横向溢出 |
 
@@ -247,6 +247,12 @@ node --test mcp/smoke.test.mjs
 
 要求 Node.js 22+。
 
+## 网络与隐私
+
+- 插件不发送任何遥测；图谱、发现、设置都存在你的 vault 里。
+- AI 默认关闭（`enableAI=false`、`aiConsentGranted=false`）。只有你主动开启并填写自己的 API Key 后，才会访问 `https://api.deepseek.com`。
+- API Key 存在 Obsidian secret storage，不写入导出的图谱或分享卡。
+- 桌面端专用：Agent 功能依赖本地进程（`node:child_process`），因此 `isDesktopOnly = true`，移动端暂不支持。
 ## 几条不肯让步的原则
 
 ```text
