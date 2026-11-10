@@ -45,4 +45,23 @@ describe('sparkCapture', () => {
     expect(addNode).toHaveBeenCalledTimes(1);
     expect(addEdge).toHaveBeenCalledTimes(1);
   });
+
+  it('captures a spark without creating an edge when the target is missing', () => {
+    const addNode = vi.fn();
+    const addEdge = vi.fn();
+    const result = captureInterestSpark({
+      text: '想学一门乐器',
+      targetId: 'missing',
+      getNode: vi.fn(() => null),
+      addNode,
+      addEdge,
+      invalidateInsights: vi.fn(),
+      notifyStatus: vi.fn(),
+      persist: vi.fn(),
+      setSelectedNode: vi.fn(),
+    });
+    expect(result).toMatch(/^node_/);
+    expect(addNode).toHaveBeenCalledTimes(1);
+    expect(addEdge).not.toHaveBeenCalled();
+  });
 });
