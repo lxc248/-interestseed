@@ -8,9 +8,10 @@ import { InsightEngine } from '../../src/core/InsightEngine';
 import type { AiRelationSuggestion } from '../../src/services/ModelProvider';
 import { connectSuggestion, resolveApiKey } from './ai';
 import { captureToVault } from './capture';
-import { suggestRelations } from './ai';
+import { suggestRelations, AiPreconditionError } from './ai';
 import {
   activeExperiment,
+  ExperimentError,
   experimentView,
   extendExperiment,
   listExperiments,
@@ -46,6 +47,20 @@ class HttpError extends Error {
   ) {
     super(message);
   }
+}
+
+/**
+ * 把领域层的“可预期失败”翻译成正确的 HTTP 状态码。
+ * 未识别的错误继续向上抛，由统一错误处理返回 500 且不泄露内部信息。
+ */
+function mapDomainError(error: unknown): never {
+  if (error instanceof AiPreconditionError) {
+    throw new HttpError(409, error.message);
+  }
+  if (error instanceof ExperimentError) {
+    throw new HttpError(error.status, error.message);
+  }
+  throw error;
 }
 
 const webRoot = [
@@ -165,8 +180,13 @@ async function route(
     const nodeId =
       url.searchParams.get('nodeId') ??
       (typeof body.nodeId === 'string' ? body.nodeId : undefined);
-    const suggestions = await suggestRelations(options.vaultPath, nodeId ?? undefined);
-    return sendJson(response, 200, { suggestions });
+    try {
+      const suggestions = await suggestRelations(options.vaultPath, nodeId ?? undefined);
+      return sendJson(response, 200, { suggestions });
+    } catch (error) {
+      // AI 未配置是客户端可修复状态，用 409 把可操作提示透出去，而不是 500 掩盖掉。
+      mapDomainError(error);
+    }
   }
   if (url.pathname === '/api/connect' && request.method === 'POST') {
     const body = await readJson(request);
@@ -203,36 +223,48 @@ async function route(
   }
   if (url.pathname === '/api/experiments' && request.method === 'POST') {
     const body = await readJson(request);
-    const experiment = await startExperiment(options.vaultPath, {
-      title: typeof body.title === 'string' ? body.title : '',
-      ...(typeof body.hypothesis === 'string' ? { hypothesis: body.hypothesis } : {}),
-      ...(typeof body.nodeId === 'string' ? { nodeId: body.nodeId } : {}),
-      ...(typeof body.targetDays === 'number' ? { targetDays: body.targetDays } : {}),
-    });
-    return sendJson(response, 200, { ok: true, experiment: experimentView(experiment) });
+    try {
+      const experiment = await startExperiment(options.vaultPath, {
+        title: typeof body.title === 'string' ? body.title : '',
+        ...(typeof body.hypothesis === 'string' ? { hypothesis: body.hypothesis } : {}),
+        ...(typeof body.nodeId === 'string' ? { nodeId: body.nodeId } : {}),
+        ...(typeof body.targetDays === 'number' ? { targetDays: body.targetDays } : {}),
+      });
+      return sendJson(response, 200, { ok: true, experiment: experimentView(experiment) });
+    } catch (error) {
+      mapDomainError(error);
+    }
   }
   if (url.pathname === '/api/experiments/log' && request.method === 'POST') {
     const body = await readJson(request);
-    const experiment = await logExperiment(
-      options.vaultPath,
-      typeof body.id === 'string' ? body.id : '',
-      {
-        interest: Number(body.interest ?? 3),
-        energy: Number(body.energy ?? 3),
-        evidence: typeof body.evidence === 'string' ? body.evidence : '',
-        ...(typeof body.next === 'string' ? { next: body.next } : {}),
-      },
-    );
-    return sendJson(response, 200, { ok: true, experiment: experimentView(experiment) });
+    try {
+      const experiment = await logExperiment(
+        options.vaultPath,
+        typeof body.id === 'string' ? body.id : '',
+        {
+          interest: Number(body.interest ?? 3),
+          energy: Number(body.energy ?? 3),
+          evidence: typeof body.evidence === 'string' ? body.evidence : '',
+          ...(typeof body.next === 'string' ? { next: body.next } : {}),
+        },
+      );
+      return sendJson(response, 200, { ok: true, experiment: experimentView(experiment) });
+    } catch (error) {
+      mapDomainError(error);
+    }
   }
   if (url.pathname === '/api/experiments/extend' && request.method === 'POST') {
     const body = await readJson(request);
-    const experiment = await extendExperiment(
-      options.vaultPath,
-      typeof body.id === 'string' ? body.id : '',
-      Number(body.targetDays ?? 7),
-    );
-    return sendJson(response, 200, { ok: true, experiment: experimentView(experiment) });
+    try {
+      const experiment = await extendExperiment(
+        options.vaultPath,
+        typeof body.id === 'string' ? body.id : '',
+        Number(body.targetDays ?? 7),
+      );
+      return sendJson(response, 200, { ok: true, experiment: experimentView(experiment) });
+    } catch (error) {
+      mapDomainError(error);
+    }
   }
   if (url.pathname === '/api/experiments/decision' && request.method === 'POST') {
     const body = await readJson(request);
