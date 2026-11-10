@@ -9,7 +9,7 @@ main.ts           1548 → 1051 lines
 plugin modules    17 → 19
 standalone app.js 1397 → 589 lines
 tests             648 → 709 passed (643 vitest + 11 mcp + 31 e2e)
-coverage          lines 86.04% / branches 72.78% / functions 85.65% (gates 83 / 72.5 / 85.5 / 85.5)
+coverage          lines 86.22% / branches 73.10% / functions 85.65% (gates 83 / 72.5 / 85.5 / 85.5)
 CodeQL            open alerts 0
 npm audit         0 vulnerabilities
 release           4.0.10 published, digest published
