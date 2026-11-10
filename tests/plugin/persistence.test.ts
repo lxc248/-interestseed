@@ -52,6 +52,13 @@ describe('persistence', () => {
     expect(unpacked.lastRebuiltAt).toMatch(/^\d{4}-\d{2}-\d{2}/);
   });
 
+  it('parses a string lastRebuiltAt and ignores an invalid one', () => {
+    const valid = unpackStoredState({ lastRebuiltAt: '2026-11-09T00:00:00.000Z' });
+    expect(valid.lastRebuiltAt).toBe('2026-11-09T00:00:00.000Z');
+    const invalid = unpackStoredState({ lastRebuiltAt: 'not-a-date' });
+    expect(invalid.lastRebuiltAt).toBeNull();
+  });
+
   it('reports a blocked load result', () => {
     reportLoadResult({
       source: 'clean',
