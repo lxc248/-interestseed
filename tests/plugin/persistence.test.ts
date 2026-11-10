@@ -72,6 +72,10 @@ describe('persistence', () => {
     expect(unpackStoredState({ schemaVersion: 'x' }).dataVersion).toBe(0);
   });
 
+  it('keeps a numeric schema version', () => {
+    expect(unpackStoredState({ schemaVersion: 2 }).dataVersion).toBe(2);
+  });
+
   it('handles null stored state as empty', () => {
     expect(unpackStoredState(null)).toEqual({
       settings: undefined,
