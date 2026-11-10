@@ -50,4 +50,13 @@ describe('aiKeyStore', () => {
     });
     expect(await saveAiApiKey(app, 'key')).toBe(false);
   });
+
+  it('returns false when deleting a blank key fails', async () => {
+    const { app } = appWithStorage({
+      deleteSecret: vi.fn(async () => {
+        throw new Error('denied');
+      }),
+    });
+    expect(await saveAiApiKey(app, '   ')).toBe(false);
+  });
 });
