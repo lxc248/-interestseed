@@ -126,4 +126,18 @@ describe('persistence', () => {
     } as never);
     expect(notices.some((entry) => entry.message.includes('已从备份恢复'))).toBe(true);
   });
+
+  it('uses a default reason when blocked without a reason', () => {
+    reportLoadResult({
+      source: 'clean',
+      blocked: true,
+      blockedReason: null,
+      issues: [],
+      appliedMigrations: [],
+      preMigrationBackupKey: null,
+      corruptedBackupKey: null,
+      issuesBackupKey: null,
+    } as never);
+    expect(notices.some((entry) => entry.message.includes('图谱存储已暂停'))).toBe(true);
+  });
 });
