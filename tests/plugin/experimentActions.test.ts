@@ -180,4 +180,15 @@ describe('experimentActions', () => {
     expect(result).toBe(false);
     expect(updateNode).not.toHaveBeenCalled();
   });
+
+  it('refuses to start or extend without an active experiment', () => {
+    const actions = {
+      updateNode: vi.fn(),
+      invalidateInsights: vi.fn(),
+      notifyStatus: vi.fn(),
+      persist: vi.fn(),
+    };
+    expect(startStarterExperiment(actions, null)).toBe(false);
+    expect(extendExperimentToSeven(actions, null)).toBe(false);
+  });
 });
