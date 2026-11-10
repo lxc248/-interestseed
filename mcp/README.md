@@ -111,3 +111,50 @@ MCP 2026-07-28
 ## 版本
 
 随插件版本发布；当前 `4.0.3`。
+## HTTP 模式（接入云端智能体平台）
+
+stdio 只能被本机程序启动；扣子、Dify、百炼这类**云端**平台连不到你本地的 stdio 进程。HTTP 模式就是为此而加。
+
+```bash
+node mcp/server.mjs --http 4174 --graph "/path/to/graphs/default.json" --token "<你的密钥>"
+# 或
+INTERESTSEED_MCP_TOKEN="<你的密钥>" node mcp/server.mjs --http 4174 --graph "..."
+```
+
+启动后输出一行：
+
+```json
+{"event":"listening","url":"http://127.0.0.1:4174","auth":"bearer"}
+```
+
+端点：
+
+```text
+GET  /health   存活检查，不需要 token，不含任何图谱数据
+POST /mcp      JSON-RPC，必须带 Authorization: Bearer <token>
+OPTIONS /mcp   CORS 预检
+```
+
+### 安全约束
+
+```text
+默认只绑定 127.0.0.1，不对外网开放
+必须提供 token；不给就随机生成一个并打印到 stderr
+token 用 timingSafeEqual 比较，避免计时侧信道
+单请求体上限 1 MiB
+/health 刻意不鉴权，但也刻意不返回任何图谱内容
+```
+
+要对外暴露必须显式 `--host 0.0.0.0`，此时请自行加反向代理与 TLS。
+
+### 云端平台怎么填
+
+以通用「自定义 MCP / HTTP 工具」配置为例：
+
+```text
+URL        http://<你的公网地址>:4174/mcp
+Auth       Bearer <token>
+Transport  Streamable HTTP（请求 - 响应，无 SSE）
+```
+
+如果云平台只支持 SSE 或要求 OAuth，需要在前面加一层网关做转换——本 server 只实现 JSON-RPC over HTTP。

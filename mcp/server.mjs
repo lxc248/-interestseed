@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  * Copyright (C) 2026 aicoder
  */
-/* global process */
+/* global process, Buffer, URL, setTimeout */
 /**
  * InterestSeed read-only MCP server.
  *
@@ -20,13 +20,36 @@
  * Minimal mode exposes only `interestseed_next_step` and
  * `interestseed_get_experiment`, with the single `interestseed://next` resource.
  * Use it when the MCP client only needs the next action, not the full graph.
+ *
+ * Transport:
+ *   default      stdio (one JSON-RPC message per line)
+ *   --http PORT  Streamable HTTP on 127.0.0.1:PORT (0 picks a free port)
+ *
+ * The HTTP transport always requires a bearer token. Supply one with
+ * `--token` or `INTERESTSEED_MCP_TOKEN`; otherwise a random token is generated
+ * and printed to stderr once, so a cloud agent platform can never reach an
+ * unauthenticated local server.
  */
+import { randomBytes, timingSafeEqual } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
+import { createServer } from 'node:http';
 import { dirname, join, resolve } from 'node:path';
 
 const PROTOCOL_VERSION = '2026-07-28';
 const args = process.argv.slice(2);
 const minimal = args.includes('--minimal') || process.env.INTERESTSEED_MCP_MINIMAL === '1';
+
+function readFlag(name) {
+  const withEquals = args.find((arg) => arg.startsWith(`${name}=`));
+  if (withEquals) return withEquals.slice(name.length + 1);
+  const index = args.indexOf(name);
+  return index >= 0 ? (args[index + 1] ?? '') : '';
+}
+
+const httpFlag = readFlag('--http') || process.env.INTERESTSEED_MCP_HTTP || '';
+const httpPort = httpFlag === '' ? null : Number(httpFlag);
+const httpHost = readFlag('--host') || process.env.INTERESTSEED_MCP_HOST || '127.0.0.1';
+let authToken = readFlag('--token') || process.env.INTERESTSEED_MCP_TOKEN || '';
 const graphArgIndex = args.indexOf('--graph');
 const standaloneDefault = resolve(process.cwd(), '.interestseed/state.json');
 const pluginDefault = resolve(process.cwd(), '.obsidian/plugins/interestseed/graphs/default.json');
@@ -512,56 +535,193 @@ function handle(message) {
 }
 
 const MAX_LINE_BYTES = 1024 * 1024;
-let buffer = '';
-process.stdin.setEncoding('utf8');
-process.stdin.on('data', (chunk) => {
-  buffer += chunk;
-  if (buffer.length > MAX_LINE_BYTES) {
-    process.stderr.write('InterestSeed MCP: input line exceeds 1 MiB limit\n');
-    process.exit(2);
-  }
-  const lines = buffer.split('\n');
-  buffer = lines.pop() ?? '';
-  for (const line of lines) {
-    if (!line.trim()) continue;
-    try {
-      const result = handle(JSON.parse(line.replace(/^\uFEFF/, '')));
-      if (result) process.stdout.write(`${JSON.stringify(result)}\n`);
-    } catch (cause) {
-      process.stdout.write(
-        `${JSON.stringify(error(null, -32700, cause instanceof Error ? cause.message : 'parse error'))}\n`,
-      );
-    }
-  }
-});
-process.stdin.on('end', () => {
-  // Process the final line even when the client did not send a trailing newline.
-  const tail = buffer.trim();
-  if (tail) {
-    try {
-      const result = handle(JSON.parse(tail.replace(/^\uFEFF/, '')));
-      if (result) process.stdout.write(`${JSON.stringify(result)}\n`);
-    } catch (cause) {
-      process.stdout.write(
-        `${JSON.stringify(error(null, -32700, cause instanceof Error ? cause.message : 'parse error'))}\n`,
-      );
-    }
-  }
-  process.exit(0);
-});
-process.stdin.on('error', (cause) => {
-  process.stderr.write(`InterestSeed MCP stdin error: ${cause instanceof Error ? cause.message : String(cause)}\n`);
-  process.exit(1);
-});
 
-for (const signal of ['SIGINT', 'SIGTERM']) {
-  process.on(signal, () => {
-    // Flush stdout before leaving so the client never reads a truncated line.
-    process.exitCode = 0;
-    process.stdout.write('\n');
+/** Parse one JSON-RPC line into a response object, or null for notifications. */
+function dispatchLine(line) {
+  const trimmed = line.replace(/^\uFEFF/, '');
+  if (!trimmed.trim()) return null;
+  try {
+    return handle(JSON.parse(trimmed));
+  } catch (cause) {
+    return error(null, -32700, cause instanceof Error ? cause.message : 'parse error');
+  }
+}
+
+function tokenMatches(provided) {
+  if (!authToken) return false;
+  const expected = Buffer.from(authToken, 'utf8');
+  const received = Buffer.from(provided, 'utf8');
+  if (expected.length !== received.length) return false;
+  return timingSafeEqual(expected, received);
+}
+
+const CORS_HEADERS = {
+  'access-control-allow-origin': '*',
+  'access-control-allow-headers': 'authorization, content-type, mcp-session-id',
+  'access-control-allow-methods': 'POST, GET, OPTIONS',
+  'access-control-expose-headers': 'mcp-session-id',
+};
+
+function sendJson(res, status, payload, extraHeaders = {}) {
+  const body = JSON.stringify(payload);
+  res.writeHead(status, {
+    'content-type': 'application/json; charset=utf-8',
+    'content-length': Buffer.byteLength(body),
+    'cache-control': 'no-store',
+    ...CORS_HEADERS,
+    ...extraHeaders,
+  });
+  res.end(body);
+}
+
+function startHttpServer() {
+  if (!authToken) {
+    authToken = randomBytes(24).toString('hex');
+    process.stderr.write(`InterestSeed MCP: no token supplied, generated one\nINTERESTSEED_MCP_TOKEN=${authToken}\n`);
+  }
+
+  const server = createServer((req, res) => {
+    const url = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`);
+
+    if (req.method === 'OPTIONS') {
+      res.writeHead(204, CORS_HEADERS);
+      res.end();
+      return;
+    }
+
+    // Unauthenticated liveness probe: no graph data, no tool output.
+    if (req.method === 'GET' && url.pathname === '/health') {
+      sendJson(res, 200, { ok: true, server: 'interestseed', protocolVersion: PROTOCOL_VERSION });
+      return;
+    }
+
+    if (url.pathname !== '/mcp') {
+      sendJson(res, 404, { error: 'not found' });
+      return;
+    }
+    if (req.method !== 'POST') {
+      sendJson(res, 405, { error: 'method not allowed' }, { allow: 'POST, OPTIONS' });
+      return;
+    }
+
+    const header = req.headers.authorization ?? '';
+    const match = /^Bearer (.+)$/i.exec(header);
+    if (!match || !tokenMatches(match[1].trim())) {
+      sendJson(res, 401, { error: 'unauthorized' }, { 'www-authenticate': 'Bearer' });
+      return;
+    }
+
+    const chunks = [];
+    let size = 0;
+    req.on('data', (chunk) => {
+      size += chunk.length;
+      if (size > MAX_LINE_BYTES) {
+        sendJson(res, 413, { error: 'payload too large' });
+        req.destroy();
+        return;
+      }
+      chunks.push(chunk);
+    });
+    req.on('end', () => {
+      const raw = Buffer.concat(chunks).toString('utf8');
+      if (!raw.trim()) {
+        sendJson(res, 400, error(null, -32700, 'empty body'));
+        return;
+      }
+
+      let parsed;
+      try {
+        parsed = JSON.parse(raw.replace(/^\uFEFF/, ''));
+      } catch (cause) {
+        sendJson(res, 400, error(null, -32700, cause instanceof Error ? cause.message : 'parse error'));
+        return;
+      }
+
+      const batch = Array.isArray(parsed) ? parsed : null;
+      const messages = batch ?? [parsed];
+      const responses = [];
+      for (const message of messages) {
+        let result;
+        try {
+          result = handle(message);
+        } catch (cause) {
+          result = error(message?.id ?? null, -32603, cause instanceof Error ? cause.message : 'internal error');
+        }
+        if (result) responses.push(result);
+      }
+
+      if (responses.length === 0) {
+        res.writeHead(202, { ...CORS_HEADERS, 'cache-control': 'no-store' });
+        res.end();
+        return;
+      }
+
+      const extraHeaders = {};
+      // Streamable HTTP clients expect a session id once initialize succeeds.
+      if (messages.some((message) => message?.method === 'initialize')) {
+        extraHeaders['mcp-session-id'] = randomBytes(16).toString('hex');
+      }
+      sendJson(res, 200, batch ? responses : responses[0], extraHeaders);
+    });
+    req.on('error', () => {
+      sendJson(res, 400, { error: 'request error' });
+    });
+  });
+
+  server.listen(httpPort ?? 0, httpHost, () => {
+    const address = server.address();
+    const port = typeof address === 'object' && address ? address.port : httpPort;
+    process.stdout.write(`${JSON.stringify({ event: 'listening', url: `http://${httpHost}:${port}`, auth: 'bearer' })}\n`);
+    process.stderr.write(`InterestSeed MCP HTTP listening on http://${httpHost}:${port}/mcp\n`);
+  });
+
+  const shutdown = () => {
+    server.close(() => process.exit(0));
+    setTimeout(() => process.exit(0), 1000).unref();
+  };
+  for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, shutdown);
+  return server;
+}
+
+function startStdioServer() {
+  let buffer = '';
+  process.stdin.setEncoding('utf8');
+  process.stdin.on('data', (chunk) => {
+    buffer += chunk;
+    if (buffer.length > MAX_LINE_BYTES) {
+      process.stderr.write('InterestSeed MCP: input line exceeds 1 MiB limit\n');
+      process.exit(2);
+    }
+    const lines = buffer.split('\n');
+    buffer = lines.pop() ?? '';
+    for (const line of lines) {
+      const result = dispatchLine(line);
+      if (result) process.stdout.write(`${JSON.stringify(result)}\n`);
+    }
+  });
+  process.stdin.on('end', () => {
+    // Process the final line even when the client did not send a trailing newline.
+    const result = dispatchLine(buffer);
+    if (result) process.stdout.write(`${JSON.stringify(result)}\n`);
     process.exit(0);
   });
+  process.stdin.on('error', (cause) => {
+    process.stderr.write(`InterestSeed MCP stdin error: ${cause instanceof Error ? cause.message : String(cause)}\n`);
+    process.exit(1);
+  });
+
+  for (const signal of ['SIGINT', 'SIGTERM']) {
+    process.on(signal, () => {
+      // Flush stdout before leaving so the client never reads a truncated line.
+      process.exitCode = 0;
+      process.stdout.write('\n');
+      process.exit(0);
+    });
+  }
 }
+
+if (httpPort === null) startStdioServer();
+else startHttpServer();
 
 process.on('uncaughtException', (cause) => {
   process.stderr.write(`InterestSeed MCP uncaught exception: ${cause instanceof Error ? cause.message : String(cause)}\n`);
