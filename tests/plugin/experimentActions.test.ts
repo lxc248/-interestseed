@@ -144,6 +144,20 @@ describe('experimentActions', () => {
     expect(updateNode).toHaveBeenCalledTimes(1);
   });
 
+  it('returns false when quick check-in has no active experiment', () => {
+    const result = recordQuickExperiment(
+      {
+        updateNode: vi.fn(),
+        invalidateInsights: vi.fn(),
+        notifyStatus: vi.fn(),
+        persist: vi.fn(),
+      },
+      null,
+      'did',
+    );
+    expect(result).toBe(false);
+  });
+
   it('refuses to extend before the starter is complete', () => {
     const state = createExperiment({
       title: '兴趣',
