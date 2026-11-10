@@ -21,7 +21,7 @@
   <img alt="Release" src="https://img.shields.io/github/v/release/lxc248/-interestseed?style=for-the-badge" />
   <img alt="Tests" src="https://img.shields.io/badge/tests-944%20passing-22c55e?style=for-the-badge" />
   <img alt="Coverage" src="https://img.shields.io/badge/coverage-86%25-14b8a6?style=for-the-badge" />
-  <img alt="Latest" src="https://img.shields.io/badge/latest-4.0.10-d97757?style=for-the-badge" />
+  <img alt="Latest" src="https://img.shields.io/badge/latest-4.0.11-d97757?style=for-the-badge" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b?style=for-the-badge" />
 </p>
 
@@ -172,7 +172,7 @@ Capture → Decide → Connect → Verify → Review → Next action
 
 ### 独立版（推荐）
 
-也可以直接从 [Releases](https://github.com/lxc248/-interestseed/releases) 下载 `interestseed-standalone-v4.0.10.zip`。
+也可以直接从 [Releases](https://github.com/lxc248/-interestseed/releases) 下载 `interestseed-standalone-v4.0.11.zip`。
 
 ```bash
 npm run build:standalone

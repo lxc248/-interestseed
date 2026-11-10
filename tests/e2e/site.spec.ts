@@ -1,4 +1,12 @@
+/* global process */
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { expect, test } from '@playwright/test';
+
+/** Read the version instead of hardcoding it: a bump must not need a test edit. */
+const STANDALONE_VERSION: string = JSON.parse(
+  readFileSync(join(process.cwd(), 'standalone', 'package.json'), 'utf8'),
+).version as string;
 
 const contentPages = [
   '/how-it-works/',
@@ -18,9 +26,13 @@ test('home page loads with primary navigation', async ({ page }) => {
 test('download page exposes the current standalone asset', async ({ page }) => {
   await page.goto('/download/');
   await expect(page).toHaveTitle(/Download/);
-  await expect(page.getByText('4.0.10').first()).toBeVisible();
-  const asset = page.locator('a[href*="interestseed-standalone-v4.0.10.zip"]').first();
-  await expect(asset).toHaveAttribute('href', /interestseed-standalone-v4\.0\.10\.zip/);
+  await expect(page.getByText(STANDALONE_VERSION).first()).toBeVisible();
+  const asset = page
+    .locator(`a[href*="interestseed-standalone-v${STANDALONE_VERSION}.zip"]`)
+    .first();
+  await expect(asset).toHaveCount(1);
+  const href = (await asset.getAttribute('href')) ?? '';
+  expect(href).toContain(`interestseed-standalone-v${STANDALONE_VERSION}.zip`);
 });
 
 test('content pages render a heading', async ({ page }) => {
@@ -43,5 +55,5 @@ test('mobile layout has no horizontal overflow', async ({ page }) => {
 test('llms-full is served with the current release', async ({ request }) => {
   const response = await request.get('/llms-full.txt');
   expect(response.status()).toBe(200);
-  expect(await response.text()).toContain('Latest release: 4.0.10');
+  expect(await response.text()).toContain('Latest release: ' + STANDALONE_VERSION);
 });
