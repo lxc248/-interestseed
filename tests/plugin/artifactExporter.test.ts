@@ -79,6 +79,31 @@ describe('artifactExporter', () => {
     ).toBeNull();
   });
 
+  it('falls back to all nodes when no theme tag exists', () => {
+    const plan = buildRoutePlan({
+      selected: { id: 'a', title: 'A', tags: ['火花'], metadata: {} } as never,
+      allNodes: [{ id: 'a', title: 'A', tags: ['火花'], metadata: {} }] as never,
+      neighbors: () => [],
+      active: null,
+    });
+    expect(plan?.theme).toBe('全部兴趣');
+    expect(plan?.nodes).toHaveLength(1);
+  });
+
+  it('filters nodes by the first meaningful theme tag', () => {
+    const plan = buildRoutePlan({
+      selected: { id: 'a', title: 'A', tags: ['火花', '文本', '测试兴趣'], metadata: {} } as never,
+      allNodes: [
+        { id: 'a', title: 'A', tags: ['测试兴趣'], metadata: {} },
+        { id: 'b', title: 'B', tags: ['其他'], metadata: {} },
+      ] as never,
+      neighbors: () => [],
+      active: null,
+    });
+    expect(plan?.theme).toBe('测试兴趣');
+    expect(plan?.nodes.map((node) => node.id)).toEqual(['a']);
+  });
+
   it('adds a numeric suffix when a route already exists', async () => {
     const date = new Date().toISOString().slice(0, 10);
     const { app } = makeApp(['InterestSeed', `InterestSeed/兴趣路线 - 测试兴趣 - ${date}.md`]);
