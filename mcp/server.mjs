@@ -253,6 +253,87 @@ function startExperiment(input) {
   return experiment;
 }
 
+const STARTER_DAYS = 3;
+
+function localDate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function clampScore(value) {
+  const number = typeof value === 'number' ? value : Number(value);
+  if (!Number.isFinite(number)) return 1;
+  return Math.min(5, Math.max(1, Math.round(number)));
+}
+
+function experimentDayOf(state) {
+  return Math.min(state.targetDays, state.logs.length + 1);
+}
+
+/** Mirrors src/experiment/experiment.ts so MCP-written logs stay compatible. */
+function logExperiment(input) {
+  const file = loadExperimentFile();
+  const requestedId = typeof input?.experiment === 'string' ? input.experiment.trim() : '';
+  const index = requestedId
+    ? file.experiments.findIndex((entry) => entry.id === requestedId)
+    : file.experiments.findIndex((entry) => entry.state?.status === 'active');
+
+  if (index < 0) {
+    throw new ToolInputError(
+      requestedId ? `找不到实验：${requestedId}` : '当前没有进行中的实验，请先用 interestseed_start_experiment 启动一个。',
+    );
+  }
+
+  const current = file.experiments[index];
+  const state = current.state;
+  if (state.status === 'complete' || state.logs.length >= state.targetDays) {
+    throw new ToolInputError(state.targetDays === STARTER_DAYS ? '3 天试跑已经完成。' : '7 天实验已经完成。');
+  }
+
+  const now = new Date();
+  const today = localDate(now);
+  if (state.logs.some((log) => log.date === today)) {
+    throw new ToolInputError('今天已经记录过了，明天再来。');
+  }
+
+  const evidence = typeof input?.evidence === 'string' ? input.evidence.trim() : '';
+  if (evidence.length < 4) {
+    throw new ToolInputError('写下至少 4 个字的真实观察，才算一条实验记录。');
+  }
+
+  const nextValue = typeof input?.next === 'string' ? input.next.trim().slice(0, 200) : '';
+  const log = {
+    day: experimentDayOf(state),
+    date: today,
+    recordedAt: now.toISOString(),
+    interest: clampScore(input?.interest ?? 3),
+    energy: clampScore(input?.energy ?? 3),
+    evidence: evidence.slice(0, 500),
+    ...(nextValue ? { next: nextValue } : {}),
+  };
+  const logs = [...state.logs, log];
+  const nextState = {
+    ...state,
+    logs,
+    status: logs.length >= state.targetDays ? 'complete' : 'active',
+  };
+  file.experiments[index] = { ...current, state: nextState };
+  saveExperimentFile(file);
+
+  return {
+    id: current.id,
+    ...(current.nodeId ? { nodeId: current.nodeId } : {}),
+    title: nextState.title,
+    hypothesis: nextState.hypothesis,
+    status: nextState.status,
+    day: experimentDayOf(nextState),
+    targetDays: nextState.targetDays,
+    remaining: Math.max(0, nextState.targetDays - logs.length),
+    logs,
+  };
+}
 const writeTools = [
   {
     name: 'interestseed_capture_interest',
@@ -281,6 +362,22 @@ const writeTools = [
         days: { type: 'number', description: '天数，默认 3' },
       },
       required: ['interest'],
+    },
+  },
+  {
+    name: 'interestseed_log_experiment',
+    description:
+      '给进行中的实验记一条当天观察。每天只能记一次；写完目标天数后实验自动完成。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        experiment: { type: 'string', description: '实验 id，留空则取当前进行中的实验' },
+        evidence: { type: 'string', description: '你今天实际观察到的事实，至少 4 个字，必填' },
+        interest: { type: 'number', description: '今天对它的兴趣强度 1–5，默认 3' },
+        energy: { type: 'number', description: '今天的精力 1–5，默认 3' },
+        next: { type: 'string', description: '下一步，可选' },
+      },
+      required: ['evidence'],
     },
   },
 ];
@@ -524,6 +621,10 @@ function callTool(name, input) {
   if (name === 'interestseed_start_experiment') {
     if (!writeEnabled) throw new ToolInputError('写入未开启：请用 --write 启动服务。');
     return toolResult(startExperiment(input));
+  }
+  if (name === 'interestseed_log_experiment') {
+    if (!writeEnabled) throw new ToolInputError('写入未开启：请用 --write 启动服务。');
+    return toolResult(logExperiment(input));
   }
   const graph = readGraph();
   if (name === 'interestseed_get_graph') {

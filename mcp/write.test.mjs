@@ -65,9 +65,10 @@ test('write tools appear with --write', () => {
       graphPath: vault.graphPath,
     });
     const names = lines[0].result.tools.map((tool) => tool.name);
-    assert.equal(names.length, 7);
+    assert.equal(names.length, 8);
     assert.ok(names.includes('interestseed_capture_interest'));
     assert.ok(names.includes('interestseed_start_experiment'));
+    assert.ok(names.includes('interestseed_log_experiment'));
   } finally {
     vault.cleanup();
   }
@@ -268,6 +269,207 @@ test('start_experiment explains why the plugin layout is not writable', () => {
     });
     assert.equal(lines[0].result.isError, true);
     assert.match(lines[0].result.content[0].text, /插件图谱/);
+  } finally {
+    vault.cleanup();
+  }
+});
+function withActiveExperiment() {
+  const vault = makeVault({
+    experiments: {
+      schemaVersion: 1,
+      experiments: [
+        {
+          id: 'exp_active',
+          nodeId: 'a',
+          state: {
+            title: '摄影',
+            hypothesis: '每天拍一张',
+            metric: '每天记录一次',
+            startedAt: '2026-01-01T00:00:00.000Z',
+            targetDays: 3,
+            status: 'active',
+            logs: [],
+          },
+        },
+      ],
+    },
+  });
+  return vault;
+}
+
+test('log_experiment appends the first day', () => {
+  const vault = withActiveExperiment();
+  try {
+    const lines = runServer(
+      [call(1, 'interestseed_log_experiment', { evidence: '今天拍了楼下的树' })],
+      { graphPath: vault.graphPath },
+    );
+    const payload = JSON.parse(lines[0].result.content[0].text);
+    assert.equal(payload.id, 'exp_active');
+    assert.equal(payload.status, 'active');
+    assert.equal(payload.day, 2);
+    assert.equal(payload.remaining, 2);
+    assert.equal(payload.logs.length, 1);
+    assert.equal(payload.logs[0].day, 1);
+    assert.equal(payload.logs[0].evidence, '今天拍了楼下的树');
+    assert.equal(payload.logs[0].interest, 3);
+    assert.equal(payload.logs[0].energy, 3);
+    assert.match(payload.logs[0].date, /^\d{4}-\d{2}-\d{2}$/);
+  } finally {
+    vault.cleanup();
+  }
+});
+
+test('log_experiment clamps scores and keeps the next step', () => {
+  const vault = withActiveExperiment();
+  try {
+    const lines = runServer(
+      [
+        call(1, 'interestseed_log_experiment', {
+          evidence: '今天拍了三张',
+          interest: 9,
+          energy: 0,
+          next: '明天换一个主题',
+        }),
+      ],
+      { graphPath: vault.graphPath },
+    );
+    const log = JSON.parse(lines[0].result.content[0].text).logs[0];
+    assert.equal(log.interest, 5);
+    assert.equal(log.energy, 1);
+    assert.equal(log.next, '明天换一个主题');
+  } finally {
+    vault.cleanup();
+  }
+});
+
+test('log_experiment rejects evidence that is too short', () => {
+  const vault = withActiveExperiment();
+  try {
+    const lines = runServer([call(1, 'interestseed_log_experiment', { evidence: '嗯' })], {
+      graphPath: vault.graphPath,
+    });
+    assert.equal(lines[0].result.isError, true);
+    assert.match(lines[0].result.content[0].text, /至少 4 个字/);
+  } finally {
+    vault.cleanup();
+  }
+});
+
+test('log_experiment refuses a second entry on the same day', () => {
+  const vault = withActiveExperiment();
+  try {
+    const lines = runServer(
+      [
+        call(1, 'interestseed_log_experiment', { evidence: '今天拍了楼下的树' }),
+        call(2, 'interestseed_log_experiment', { evidence: '再记一次看看' }),
+      ],
+      { graphPath: vault.graphPath },
+    );
+    assert.equal(lines[1].result.isError, true);
+    assert.match(lines[1].result.content[0].text, /今天已经记录过了/);
+  } finally {
+    vault.cleanup();
+  }
+});
+
+test('log_experiment refuses an unknown experiment id', () => {
+  const vault = withActiveExperiment();
+  try {
+    const lines = runServer(
+      [call(1, 'interestseed_log_experiment', { experiment: 'exp_nope', evidence: '随便写点什么' })],
+      { graphPath: vault.graphPath },
+    );
+    assert.equal(lines[0].result.isError, true);
+    assert.match(lines[0].result.content[0].text, /找不到实验/);
+  } finally {
+    vault.cleanup();
+  }
+});
+
+test('log_experiment explains when nothing is running', () => {
+  const vault = makeVault();
+  try {
+    const lines = runServer([call(1, 'interestseed_log_experiment', { evidence: '随便写点什么' })], {
+      graphPath: vault.graphPath,
+    });
+    assert.equal(lines[0].result.isError, true);
+    assert.match(lines[0].result.content[0].text, /没有进行中的实验/);
+  } finally {
+    vault.cleanup();
+  }
+});
+
+test('log_experiment completes the experiment on the last day', () => {
+  const vault = makeVault({
+    experiments: {
+      schemaVersion: 1,
+      experiments: [
+        {
+          id: 'exp_last',
+          nodeId: 'a',
+          state: {
+            title: '摄影',
+            hypothesis: '每天拍一张',
+            metric: '每天记录一次',
+            startedAt: '2026-01-01T00:00:00.000Z',
+            targetDays: 3,
+            status: 'active',
+            logs: [
+              { day: 1, date: '2026-01-01', recordedAt: '2026-01-01T00:00:00.000Z', interest: 3, energy: 3, evidence: '第一天' },
+              { day: 2, date: '2026-01-02', recordedAt: '2026-01-02T00:00:00.000Z', interest: 3, energy: 3, evidence: '第二天' },
+            ],
+          },
+        },
+      ],
+    },
+  });
+  try {
+    const lines = runServer(
+      [call(1, 'interestseed_log_experiment', { evidence: '第三天拍完了' })],
+      { graphPath: vault.graphPath },
+    );
+    const payload = JSON.parse(lines[0].result.content[0].text);
+    assert.equal(payload.status, 'complete');
+    assert.equal(payload.remaining, 0);
+    assert.equal(payload.logs.length, 3);
+  } finally {
+    vault.cleanup();
+  }
+});
+
+test('log_experiment refuses to extend a finished experiment', () => {
+  const vault = makeVault({
+    experiments: {
+      schemaVersion: 1,
+      experiments: [
+        {
+          id: 'exp_done',
+          nodeId: 'a',
+          state: {
+            title: '摄影',
+            hypothesis: '每天拍一张',
+            metric: '每天记录一次',
+            startedAt: '2026-01-01T00:00:00.000Z',
+            targetDays: 3,
+            status: 'complete',
+            logs: [
+              { day: 1, date: '2026-01-01', recordedAt: '2026-01-01T00:00:00.000Z', interest: 3, energy: 3, evidence: '第一天' },
+              { day: 2, date: '2026-01-02', recordedAt: '2026-01-02T00:00:00.000Z', interest: 3, energy: 3, evidence: '第二天' },
+              { day: 3, date: '2026-01-03', recordedAt: '2026-01-03T00:00:00.000Z', interest: 3, energy: 3, evidence: '第三天' },
+            ],
+          },
+        },
+      ],
+    },
+  });
+  try {
+    const lines = runServer(
+      [call(1, 'interestseed_log_experiment', { experiment: 'exp_done', evidence: '再记一天' })],
+      { graphPath: vault.graphPath },
+    );
+    assert.equal(lines[0].result.isError, true);
+    assert.match(lines[0].result.content[0].text, /3 天试跑已经完成/);
   } finally {
     vault.cleanup();
   }
