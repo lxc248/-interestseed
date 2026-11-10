@@ -63,6 +63,15 @@ describe('persistence', () => {
     expect(unpackStoredState({ schemaVersion: 'x' }).dataVersion).toBe(0);
   });
 
+  it('handles null stored state as empty', () => {
+    expect(unpackStoredState(null)).toEqual({
+      settings: undefined,
+      inbox: undefined,
+      lastRebuiltAt: null,
+      dataVersion: 0,
+    });
+  });
+
   it('reports a blocked load result', () => {
     reportLoadResult({
       source: 'clean',
