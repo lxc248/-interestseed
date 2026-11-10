@@ -11,3 +11,4 @@ Older audits are in [`../../archive/review/`](../../archive/review/).
 - [security-review-4.0.5.md](security-review-4.0.5.md) — internal security self-review, not independent
 - [codeql-triage-2026-11-09.md](codeql-triage-2026-11-09.md) — CodeQL alert triage and accepted local trust boundary
 - [external-audit-packet-2026-11-09.md](external-audit-packet-2026-11-09.md) — scope and evidence for a future human reviewer
+- [auditor-brief.md](auditor-brief.md) — one-page handoff for a human reviewer
