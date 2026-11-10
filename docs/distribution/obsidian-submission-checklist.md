@@ -68,3 +68,9 @@
 
 设置 `OBSIDIAN_CHECK_RELEASE=1` 时会额外用 GitHub API 核对 release 里的 `main.js` / `manifest.json` / `styles.css`；发布工作流在发布后自动跑这一步，缺资产会直接失败。
 `npm run check:mobile-bundle` 会用一个**没有 Node 内置模块**的沙箱加载 `dist/main.js`：只放行 `require('obsidian')`，其余任何 `require` 都判失败。这样如果有人在模块顶层 `import fs from 'node:fs'`，CI 会立刻拦住——那种改动会让插件在手机上白屏，而普通单测发现不了。
+`check:obsidian` 还会核对两件与「用户能不能装上」直接相关的事：
+
+- `README.md` / `README.en.md` 必须引用真实的插件包名 `interestseed-<version>.zip`
+- 打开 `OBSIDIAN_CHECK_RELEASE=1` 时，release 里必须真的存在这个 zip
+
+加这条的原因：README 曾经写着 `interestseed-v3.7.0.zip`，而实际资产叫 `interestseed-3.7.2.zip`。安装说明指向不存在的文件，用户第一步就会卡住，而所有测试和 CI 都不会报错。
