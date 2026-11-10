@@ -85,25 +85,39 @@ const mainTs = await readFile(resolve(root, 'src/main.ts'), 'utf8');
 if (/\beval\s*\(/.test(mainTs)) errors.push('src/main.ts 使用了 eval，Obsidian 审核不允许');
 
 if (process.env.OBSIDIAN_CHECK_RELEASE === '1') {
-  const repo = process.env.GITHUB_REPOSITORY || 'lxc248/-interestseed';
-  const token = process.env.GITHUB_TOKEN;
-  const response = await fetch(
-    `https://api.github.com/repos/${repo}/releases/tags/${manifest.version}`,
-    {
-      headers: {
-        Accept: 'application/vnd.github+json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        'User-Agent': 'interestseed-check',
-      },
-    },
-  );
-  if (!response.ok) {
-    errors.push(`未找到 tag=${manifest.version} 的 release（HTTP ${response.status}）`);
+  // URL 里只允许用重新拼出来的数字版本号和仓库名白名单，避免把文件内容直接带进网络请求。
+  const [major, minor, patch] = String(manifest.version)
+    .split('.')
+    .map((part) => Number.parseInt(part, 10));
+  const safeVersion = [major, minor, patch]
+    .map((part) => (Number.isInteger(part) && part >= 0 ? part : 0))
+    .join('.');
+
+  const rawRepo = process.env.GITHUB_REPOSITORY || 'lxc248/-interestseed';
+  const repoMatch = /^([A-Za-z0-9._-]+)\/([A-Za-z0-9._-]+)$/.exec(rawRepo);
+  if (!repoMatch) {
+    errors.push(`GITHUB_REPOSITORY 格式不合法：${rawRepo}`);
   } else {
-    const release = await response.json();
-    const names = new Set((release.assets ?? []).map((asset) => asset.name));
-    for (const asset of ['main.js', 'manifest.json', 'styles.css']) {
-      if (!names.has(asset)) errors.push(`release ${manifest.version} 缺少资产 ${asset}`);
+    const repo = `${repoMatch[1]}/${repoMatch[2]}`;
+    const token = process.env.GITHUB_TOKEN;
+    const response = await fetch(
+      `https://api.github.com/repos/${repo}/releases/tags/${safeVersion}`,
+      {
+        headers: {
+          Accept: 'application/vnd.github+json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          'User-Agent': 'interestseed-check',
+        },
+      },
+    );
+    if (!response.ok) {
+      errors.push(`未找到 tag=${safeVersion} 的 release（HTTP ${response.status}）`);
+    } else {
+      const release = await response.json();
+      const names = new Set((release.assets ?? []).map((asset) => asset.name));
+      for (const asset of ['main.js', 'manifest.json', 'styles.css']) {
+        if (!names.has(asset)) errors.push(`release ${safeVersion} 缺少资产 ${asset}`);
+      }
     }
   }
 } else {
