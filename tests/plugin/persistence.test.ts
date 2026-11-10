@@ -98,4 +98,32 @@ describe('persistence', () => {
     } as never);
     expect(notices.some((entry) => entry.message.includes('read-only'))).toBe(true);
   });
+
+  it('notices cleaned issues on load', () => {
+    reportLoadResult({
+      source: 'clean',
+      blocked: false,
+      blockedReason: null,
+      issues: ['bad-node'],
+      appliedMigrations: [],
+      preMigrationBackupKey: null,
+      corruptedBackupKey: null,
+      issuesBackupKey: null,
+    } as never);
+    expect(notices.some((entry) => entry.message.includes('清洗了 1 条问题记录'))).toBe(true);
+  });
+
+  it('notices a recovered load source', () => {
+    reportLoadResult({
+      source: 'recovered',
+      blocked: false,
+      blockedReason: null,
+      issues: [],
+      appliedMigrations: [],
+      preMigrationBackupKey: null,
+      corruptedBackupKey: null,
+      issuesBackupKey: null,
+    } as never);
+    expect(notices.some((entry) => entry.message.includes('已从备份恢复'))).toBe(true);
+  });
 });
