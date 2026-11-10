@@ -35,4 +35,18 @@ describe('inboxActions', () => {
     expect(enqueueShare).toHaveBeenCalledWith('分享内容', 'clipboard');
     expect(openSparkCapture).toHaveBeenCalledWith('分享内容', 'x', 'clipboard');
   });
+
+  it('notices when the clipboard cannot be read', async () => {
+    vi.stubGlobal('navigator', {
+      clipboard: {
+        readText: vi.fn(async () => {
+          throw new Error('denied');
+        }),
+      },
+    });
+    await openSparkFromClipboard({ enqueueShare: vi.fn(), openSparkCapture: vi.fn() });
+    expect(notices.at(-1)).toBe(
+      '无法读取剪贴板。请在手机快捷指令中使用 interestseed-share 链接，或手动粘贴。',
+    );
+  });
 });
