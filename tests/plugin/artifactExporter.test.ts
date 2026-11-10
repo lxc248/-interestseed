@@ -134,6 +134,19 @@ describe('artifactExporter', () => {
     });
   });
 
+  it('marks nodes with neighbors as connected', () => {
+    const plan = buildRoutePlan({
+      selected: null,
+      allNodes: [
+        { id: 'a', title: 'A', tags: [], metadata: {} },
+        { id: 'b', title: 'B', tags: [], metadata: {} },
+      ] as never,
+      neighbors: (id) => (id === 'a' ? [{ id: 'e' }] : []),
+      active: null,
+    });
+    expect([...plan!.connectedIds]).toEqual(['a']);
+  });
+
   it('filters nodes by the first meaningful theme tag', () => {
     const plan = buildRoutePlan({
       selected: { id: 'a', title: 'A', tags: ['火花', '文本', '测试兴趣'], metadata: {} } as never,
