@@ -14,7 +14,7 @@ vi.mock('obsidian', () => ({
   },
 }));
 
-import { exportInterestRoute, exportJsonCanvas } from '../../src/plugin/artifactExporter';
+import { buildRoutePlan, exportInterestRoute, exportJsonCanvas } from '../../src/plugin/artifactExporter';
 
 function makeApp(existing: string[] = []) {
   createMock.mockResolvedValue({ path: existing[0] ?? 'InterestSeed/route.md' });
@@ -67,6 +67,16 @@ describe('artifactExporter', () => {
     await exportJsonCanvas(app, { nodes: [], edges: [] } as never);
     expect(createFolderMock).not.toHaveBeenCalled();
     expect(notices.at(-1)).toBe('图谱里还没有节点，先留下一个火花。');
+  });
+
+  it('returns null from buildRoutePlan for an empty graph', () => {
+    expect(
+      buildRoutePlan({
+        allNodes: [],
+        neighbors: () => [],
+        active: null,
+      }),
+    ).toBeNull();
   });
 
   it('adds a numeric suffix when a route already exists', async () => {
