@@ -20,14 +20,14 @@
 | 源码可读、无混淆 | 是 | 通过 |
 | 无 `eval` | 全仓库 `src` 未命中 | 通过 |
 | 网络请求默认关闭 | `enableAI=false`、`aiConsentGranted=false` | 通过（需在 README 说明） |
-| `isDesktopOnly` | `true`（已修） | 通过：`DshAcpClient` 用 `node:child_process`，`AgentView` 用 `require('fs')`，必须桌面端 |
+| `isDesktopOnly` | `false`（Agent 功能已加桌面守卫） | 通过：主体不依赖 Node；`DshAcpClient.start()` 在移动端直接拒绝并给出提示 |
 | 插件 release 资产 | `3.7.0` release 已含 `main.js`(663,734) / `manifest.json`(286) / `styles.css`(216,552) | 通过 |
 | release tag 与 manifest 版本一致 | tag `3.7.0` → `3f567e2` | 通过 |
 | 发布工作流上传插件三件套 | `release.yml` 已上传三件套 | 通过 |
 
 ## 二、本轮修复（已完成，2026-11-10）
 
-1. `manifest.json` 的 `isDesktopOnly` 改为 `true`（诚实反映桌面依赖）。
+1. `manifest.json` 的 `isDesktopOnly` 改为 `false`：插件主体不依赖 Node，Agent 功能用 `Platform.isDesktopApp` 在移动端显式拒绝。
 2. `release.yml` 在发布时额外上传 `dist/main.js`、`dist/manifest.json`、`dist/styles.css`，资产名保持原样。
 3. 打 `3.7.0` tag（不带 `v`），由工作流构建并发布三件套。
 4. README 增加“网络与隐私”段落，说明 AI 默认关闭、仅在你开启并填 key 后才访问 `https://api.deepseek.com`。

@@ -19,7 +19,7 @@
   <img alt="Local model" src="https://img.shields.io/badge/LOCAL-MODEL-22c55e?style=for-the-badge" />
   <img alt="CI" src="https://github.com/lxc248/-interestseed/actions/workflows/ci.yml/badge.svg?branch=main" />
   <img alt="Release" src="https://img.shields.io/github/v/release/lxc248/-interestseed?style=for-the-badge" />
-  <img alt="Tests" src="https://img.shields.io/badge/tests-788%20passing-22c55e?style=for-the-badge" />
+  <img alt="Tests" src="https://img.shields.io/badge/tests-794%20passing-22c55e?style=for-the-badge" />
   <img alt="Coverage" src="https://img.shields.io/badge/coverage-86%25-14b8a6?style=for-the-badge" />
   <img alt="Latest" src="https://img.shields.io/badge/latest-4.0.10-d97757?style=for-the-badge" />
   <img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-f59e0b?style=for-the-badge" />
@@ -230,7 +230,7 @@ AI 关系建议默认开启，只在你点击 AI 时请求所选模型；接入�
 这些数字不是装饰。每次改完，我都会重新跑一遍。
 
 ```text
-788 tests passing
+794 tests passing
 86.45% line coverage（统计范围见 vitest 配置）
 92.25% core coverage
 46.53% UI coverage
@@ -252,7 +252,7 @@ node --test mcp/smoke.test.mjs
 - 插件不发送任何遥测；图谱、发现、设置都存在你的 vault 里。
 - AI 默认关闭（`enableAI=false`、`aiConsentGranted=false`）。只有你主动开启并填写自己的 API Key 后，才会访问 `https://api.deepseek.com`。
 - API Key 存在 Obsidian secret storage，不写入导出的图谱或分享卡。
-- 桌面端专用：Agent 功能依赖本地进程（`node:child_process`），因此 `isDesktopOnly = true`，移动端暂不支持。
+- 移动端可安装：图谱、收件箱、实验、分享卡都只依赖 vault 文件。Agent 功能需要本地进程，在移动端会显示“Agent 需要本地进程，目前只在桌面端可用。”而不是崩溃。
 ## 几条不肯让步的原则
 
 ```text
