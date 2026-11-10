@@ -18,6 +18,8 @@ export interface SurfaceSpec {
   key: SurfaceKey;
   icon: string;
   title: string;
+  /** 需要本地进程的入口：移动端不注册 ribbon，避免用户点了才看到报错。 */
+  desktopOnly?: boolean;
 }
 
 /**
@@ -28,24 +30,30 @@ export interface SurfaceSpec {
 export const SURFACES: readonly SurfaceSpec[] = [
   { key: 'graph', icon: 'sprout', title: '打开兴趣图谱' },
   { key: 'ai', icon: 'sparkles', title: '打开 InterestSeed AI 建议' },
-  { key: 'agent', icon: 'bot', title: '打开 InterestSeed Agent' },
+  { key: 'agent', icon: 'bot', title: '打开 InterestSeed Agent', desktopOnly: true },
 ];
 
 /**
- * 注册三个视图与三个 ribbon 入口。
- * 每个 ribbon 必须点到自己那个界面；这条约束由单元测试逐条断言。
+ * 注册视图与 ribbon 入口。
+ * - 所有视图都注册：命令面板里的入口仍然存在，由宿主给出友好提示。
+ * - 仅 ribbon 会按平台裁剪：移动端不暴露 Agent 按钮。
  */
 export function registerSurfaces(input: {
   registry: SurfaceRegistry;
   viewTypes: Record<SurfaceKey, string>;
   createView: (viewType: string, leaf: WorkspaceLeaf) => unknown;
   actions: SurfaceActions;
+  isDesktop?: boolean;
 }): void {
+  const isDesktop = input.isDesktop ?? true;
+
   for (const surface of SURFACES) {
     const viewType = input.viewTypes[surface.key];
     input.registry.registerView(viewType, (leaf) => input.createView(viewType, leaf));
   }
+
   for (const surface of SURFACES) {
+    if (surface.desktopOnly && !isDesktop) continue;
     const action = input.actions[surface.key];
     input.registry.addRibbonIcon(surface.icon, surface.title, () => action());
   }
