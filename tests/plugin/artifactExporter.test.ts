@@ -111,6 +111,29 @@ describe('artifactExporter', () => {
     expect(plan?.nodes).toHaveLength(1);
   });
 
+  it('carries the active experiment into the route plan', () => {
+    const plan = buildRoutePlan({
+      selected: null,
+      allNodes: [{ id: 'a', title: 'A', tags: ['火花'], metadata: {} }] as never,
+      neighbors: () => [],
+      active: {
+        state: {
+          title: '实验',
+          logs: [{ next: '明天继续' }],
+          targetDays: 7,
+          status: 'active',
+        },
+      } as never,
+    });
+    expect(plan?.experiment).toEqual({
+      title: '实验',
+      day: 1,
+      targetDays: 7,
+      status: 'active',
+      next: '明天继续',
+    });
+  });
+
   it('filters nodes by the first meaningful theme tag', () => {
     const plan = buildRoutePlan({
       selected: { id: 'a', title: 'A', tags: ['火花', '文本', '测试兴趣'], metadata: {} } as never,
