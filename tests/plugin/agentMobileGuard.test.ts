@@ -34,3 +34,25 @@ describe('DshAcpClient desktop guard', () => {
     expect(source).toContain("from '../plugin/platform'");
   });
 });
+/**
+ * AgentView 会渲染整套会话 UI，直接单测会把 400+ 行 UI 代码拉进覆盖率范围。
+ * 这里只守住「移动端不进会话 UI」这条结构约束。
+ */
+describe('AgentView on mobile', () => {
+  it('returns before rendering the transcript or composer', async () => {
+    const source = await readFile(join(process.cwd(), 'src', 'ui', 'AgentView.ts'), 'utf8');
+    const guard = source.indexOf('if (!isDesktopApp())');
+    const transcript = source.indexOf('this.renderTranscript();');
+    const composer = source.indexOf('this.renderComposer();');
+    expect(guard).toBeGreaterThan(-1);
+    expect(guard).toBeLessThan(transcript);
+    expect(guard).toBeLessThan(composer);
+  });
+
+  it('shows the shared mobile message instead of an empty panel', async () => {
+    const source = await readFile(join(process.cwd(), 'src', 'ui', 'AgentView.ts'), 'utf8');
+    expect(source).toContain('renderMobileNotice');
+    expect(source).toContain('AGENT_MOBILE_MESSAGE');
+    expect(source).toContain('Agent 仅桌面端可用');
+  });
+});
