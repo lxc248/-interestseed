@@ -29,7 +29,7 @@ limits remain external adoption and repository weight; app-state visual coverage
 | --- | ---: | ---: | ---: | --- |
 | Product value / differentiation | 15% | 7.2 | 1.08 | Clear “capture → one connection → 3-day experiment → evidence” loop; unproven demand |
 | Product completeness / UX | 15% | 7.6 | 1.14 | CLI, web, skill, MCP and site exist; site + app E2E and axe gated; public pages plus app home/settings/capture/experiment/sprint/share/audit/correction visuals; landing layout with canvas hidden; animation itself not diffed |
-| Code quality / maintainability | 15% | 7.5 | 1.13 | Strict TypeScript, 22 extracted plugin modules, app.js 589 lines, main.ts 1069 lines; remaining onload/onunload glue |
+| Code quality / maintainability | 15% | 7.5 | 1.13 | Strict TypeScript, 22 extracted plugin modules, app.js 601 lines, main.ts 1069 lines; remaining onload/onunload glue |
 | Tests / QA | 15% | 8.1 | 1.22 | 743 tests, 86.45% line / 73.36% branch coverage; public pages plus app home/settings/capture/experiment/sprint/share/audit/correction visuals; landing layout with canvas hidden; animation itself not diffed |
 | Security / privacy | 15% | 8.0 | 1.20 | Critical leak fixed, guards and body limit tested; no independent 4.0.9 audit |
 | Docs / repo hygiene | 5% | 7.2 | 0.36 | Excellent current docs and checks; 29.6 MB tree, 2.5 MB archive; history still large |
