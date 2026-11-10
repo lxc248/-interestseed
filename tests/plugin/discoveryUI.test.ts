@@ -76,6 +76,20 @@ describe('discoveryUI', () => {
     expect(onThemeSelect).toHaveBeenCalledWith('x');
   });
 
+  it('passes the AI unavailable reason into the explorer', () => {
+    openDiscoveryExplorer({
+      app: {} as never,
+      file: { theme: 'x' } as never,
+      graph: { nodes: [] } as never,
+      aiAvailable: false,
+      aiUnavailableReason: 'AI 未启用',
+      onThemeSelect: vi.fn(),
+      onGenerateAi: vi.fn(async () => ({}) as never),
+    });
+    expect(explorerOptions?.aiAvailable).toBe(false);
+    expect(explorerOptions?.aiUnavailableReason).toBe('AI 未启用');
+  });
+
   it('shows a theme on the graph view', async () => {
     const view = new InterestSeedView({} as never, {} as never);
     await showDiscoveriesForTheme({
