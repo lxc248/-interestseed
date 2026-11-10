@@ -67,4 +67,32 @@ describe('seedSprintApply', () => {
     expect(added).toBe(0);
     expect(replaceGraph).not.toHaveBeenCalled();
   });
+
+  it('applies accepted edges between accepted nodes', () => {
+    const replaceGraph = vi.fn();
+    applySeedSprint({
+      draft: {
+        nodes: [
+          { id: 'a', title: 'A', type: 'topic', tags: [], evidence: 'e', confidence: 1 },
+          { id: 'b', title: 'B', type: 'topic', tags: [], evidence: 'e', confidence: 1 },
+        ],
+        edges: [
+          { id: 'e1', source: 'a', target: 'b', relation: '引出', evidence: 'e', confidence: 0.9 },
+        ],
+        mystery: { title: 'm', reason: 'r' },
+        experiment: { title: 'e', hypothesis: 'h', metric: 'm', prompt: 'p', days: 3, steps: [] },
+      },
+      acceptedNodeIds: new Set(['a', 'b']),
+      acceptedEdgeIds: new Set(['e1']),
+      getGraph: () => ({ nodes: [], edges: [], schemaVersion: 1, updatedAt: 'old' } as never),
+      replaceGraph,
+      markSeedSprintCompleted: vi.fn(),
+      invalidateInsights: vi.fn(),
+      notifyStatus: vi.fn(),
+      saveSettings: vi.fn(),
+      persist: vi.fn(),
+    });
+    const graph = replaceGraph.mock.calls[0]?.[0] as { edges: unknown[] };
+    expect(graph.edges).toHaveLength(1);
+  });
 });
