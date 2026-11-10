@@ -62,7 +62,7 @@ Obsidian is optional; the Markdown vault is the data layer.
 ## Facts
 
 ```text
-Latest release: 4.0.10
+Latest release: 4.0.8
 License: AGPL-3.0-only
 Platform: macOS / Windows / Linux
 Runtime: Node.js
@@ -151,8 +151,14 @@ Do say:
 
 ```text
 Website: live
-Latest release: 4.0.10
+Latest release: 4.0.8
 External citations: not yet established
 Next action: submit to one directory, then measure referral traffic
 ```
 
+
+
+## 4.0.10 发布材料
+
+- [launch-kit-4.0.10.md](distribution/launch-kit-4.0.10.md)
+- [adoption-tracker-2026-11-10.md](distribution/adoption-tracker-2026-11-10.md)
