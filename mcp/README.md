@@ -176,6 +176,7 @@ interestseed_start_experiment     interest（必填，标题或节点 id）/ hyp
 interestseed_log_experiment       evidence（必填，至少 4 字）/ interest / energy / next / experiment
 interestseed_undo_last_capture     id（可选，留空撤销最近一次 MCP 创建）
 interestseed_undo_last_log         experiment（可选，留空取当前进行中的实验）
+interestseed_import_favorites     text（导出文件原文）/ dryRun（只统计不落盘）
 ```
 
 ### 安全与边界
@@ -189,6 +190,7 @@ temp + rename 原子写                不会留下写了一半的 JSON
 每天只能记一条实验日志              重复记录直接拒绝；写满目标天数后自动置为 complete
 误建可以撤销                        只能撤销 MCP 创建的节点；已有连接或实验时拒绝
 写错的日志也能撤                      撤销最近一条并把状态回退，被删内容原样返回
+可从平台导出文件批量导入                书签 HTML / JSON / CSV / 纯链接，单次最多 500 条
 只写独立版 state.json              插件图谱会明确拒绝：实验由插件自己管理
 minimal 模式永不暴露写工具          --minimal + --write 只给只读工具
 ```
@@ -198,4 +200,37 @@ minimal 模式永不暴露写工具          --minimal + --write 只给只读工
 ```text
 校验错误（你自己写错）   原样返回，例如「找不到兴趣：陶艺」「已有进行中的实验（exp_x…）」
 意外错误                 统一返回通用文案，细节只进 stderr，不泄露本机路径
+```
+## 批量导入收藏（`interestseed_import_favorites`）
+
+抖音、小红书、B 站都没有面向个人开发者的「读取收藏」接口，所以现实路径是**用户自己导出的文件**。这个工具离线解析四种常见格式：
+
+```text
+浏览器书签 HTML      Chrome / Edge / Safari / Firefox 导出的书签
+JSON                含 B 站收藏接口的 {data:{medias:[{title, bvid}]}} 结构
+CSV                 带 title/url 列（浏览器扩展、Reddit saved、表格导出）
+纯链接列表          一行一个 URL，行内可带标题
+```
+
+调用示例：
+
+```json
+{ "name": "interestseed_import_favorites", "arguments": { "text": "<导出文件全文>" } }
+```
+
+返回：
+
+```json
+{ "format": "csv", "created": 2, "skipped": 1, "duplicatesInFile": 0, "truncated": false,
+  "items": [{ "id": "node_xxx", "title": "陶艺入门", "url": "https://..." }] }
+```
+
+约定：
+
+```text
+单次最多 500 条           超出会置 truncated=true
+文件内重复链接只取第一条   duplicatesInFile 报告数量
+图谱里已存在的标题/链接    跳过并计入 skipped
+批量写入只落盘一次        不是 500 次写文件
+dryRun=true               只解析统计，不动图谱——建议先跑一次看数量
 ```

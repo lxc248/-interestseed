@@ -31,9 +31,46 @@
  * unauthenticated local server.
  */
 import { createHash, randomBytes, randomUUID, timingSafeEqual } from 'node:crypto';
+import { parseImport } from './importers.mjs';
 import { copyFileSync, existsSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { dirname, join, resolve } from 'node:path';
+/** Create many nodes with a single write. Used by the export importer. */
+function captureMany(entries, { dryRun = false } = {}) {
+  const document = loadDocument();
+  const created = [];
+  const skipped = [];
+
+  for (const entry of entries) {
+    const title = normalizeTitle(entry.title) || normalizeTitle(entry.url ?? '');
+    const url = entry.url ?? null;
+    if (!title) continue;
+    const existing = findExistingNode(document.graph, title, url);
+    if (existing) {
+      skipped.push({ title: existing.title, reason: 'exists' });
+      continue;
+    }
+    const timestamp = nowIso();
+    const node = {
+      id: nodeIdFor(title, url),
+      type: nodeTypeForUrl(url),
+      title,
+      tags: [],
+      createdAt: timestamp,
+      updatedAt: timestamp,
+      metadata: { ...(url ? { sourceUrl: url } : {}), capturedVia: 'mcp' },
+    };
+    if (!dryRun) document.graph.nodes.push(node);
+    created.push({ id: node.id, title: node.title, url });
+  }
+
+  if (!dryRun && created.length > 0) {
+    document.graph.updatedAt = nowIso();
+    saveDocument(document);
+  }
+  return { dryRun, created: created.length, skipped: skipped.length, items: created, skippedItems: skipped };
+}
+
 
 const PROTOCOL_VERSION = '2026-07-28';
 const args = process.argv.slice(2);
@@ -489,6 +526,19 @@ const writeTools = [
       },
     },
   },
+  {
+    name: 'interestseed_import_favorites',
+    description:
+      '从平台导出文件批量导入收藏：浏览器书签 HTML、JSON（含 B 站收藏）、CSV（title/url 列）、纯链接列表。默认真的写入；dryRun 只统计不落盘。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        text: { type: 'string', description: '导出文件的原始内容，必填' },
+        dryRun: { type: 'boolean', description: '只解析并统计，不写入图谱' },
+      },
+      required: ['text'],
+    },
+  },
 ];
 function readStandaloneJson(fileName) {
   const path = join(dirname(graphPath), fileName);
@@ -742,6 +792,18 @@ function callTool(name, input) {
   if (name === 'interestseed_undo_last_log') {
     if (!writeEnabled) throw new ToolInputError('写入未开启：请用 --write 启动服务。');
     return toolResult(undoLastLog(input));
+  }
+  if (name === 'interestseed_import_favorites') {
+    if (!writeEnabled) throw new ToolInputError('写入未开启：请用 --write 启动服务。');
+    if (typeof input?.text !== 'string' || !input.text.trim()) {
+      throw new ToolInputError('text 不能为空：请粘贴导出文件的内容。');
+    }
+    const parsed = parseImport(input.text);
+    if (parsed.items.length === 0) {
+      throw new ToolInputError('没有识别到可导入的条目（格式判断为 ' + parsed.format + '）。');
+    }
+    const result = captureMany(parsed.items, { dryRun: input.dryRun === true });
+    return toolResult({ format: parsed.format, duplicatesInFile: parsed.duplicates, truncated: parsed.truncated, ...result });
   }
   const graph = readGraph();
   if (name === 'interestseed_get_graph') {
