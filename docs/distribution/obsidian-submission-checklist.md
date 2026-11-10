@@ -60,3 +60,10 @@
 - 仓库根目录有大量历史报告 `.md` 与截图，体积偏大（约 29.6 MB tree）。审核不要求清理，但会拖慢 clone。
 - 4.0.x 的 standalone 版本与 3.7.0 的插件版本号不一致，需在 README 里解释清楚（插件 3.7.0 / CLI 4.0.x）。
 - 尚无独立第三方安全审计，README 中不得暗示已审计。
+## 六、自动化门禁
+
+`npm run check:obsidian` 会检查：`id` 命名规则、`name` 不含 Obsidian/Plugin、描述 ≤250 字符、`version` 与 `package.json` 一致、`versions.json` 有对应条目、`RELEASE_NOTES_<version>.md` 存在、`src` 无 `eval`。
+
+该检查已加入 `npm run verify`，因此每次 CI 都会跑。
+
+设置 `OBSIDIAN_CHECK_RELEASE=1` 时会额外用 GitHub API 核对 release 里的 `main.js` / `manifest.json` / `styles.css`；发布工作流在发布后自动跑这一步，缺资产会直接失败。
