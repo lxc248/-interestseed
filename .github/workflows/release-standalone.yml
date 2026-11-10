@@ -31,11 +31,17 @@ jobs:
           node-version: '22'
           cache: npm
 
+      - name: Check tag format
+        env:
+          TAG: ${{ inputs.tag || github.ref_name }}
+        run: node scripts/check-tag.mjs standalone "$TAG"
+
       - run: npm ci
       - run: npm run verify
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
       - run: npm run build:standalone
+
 
       - name: Package standalone
         run: node scripts/package-standalone.mjs
@@ -44,8 +50,6 @@ jobs:
         run: npm run check:package-digest
 
       - name: Check version and notes
-        env:
-          TAG: ${{ inputs.tag || github.ref_name }}
         run: |
           set -euo pipefail
           VERSION="${TAG#standalone-v}"
@@ -64,9 +68,7 @@ jobs:
 
       - name: Publish release assets
         if: ${{ inputs.dry_run != true }}
-        env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ inputs.tag || github.ref_name }}
         run: |
           set -euo pipefail
           VERSION="${TAG#standalone-v}"
@@ -83,9 +85,7 @@ jobs:
 
       - name: Verify published asset
         if: ${{ inputs.dry_run != true }}
-        env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ inputs.tag || github.ref_name }}
         run: |
           set -euo pipefail
           VERSION="${TAG#standalone-v}"
@@ -98,6 +98,5 @@ jobs:
 
       - name: Verify release metadata and attestation
         if: ${{ inputs.dry_run != true }}
-        env:
           GITHUB_TOKEN: ${{ github.token }}
         run: npm run check:release
